@@ -1,0 +1,373 @@
+{
+  "results": {
+    "nortruthfulqa_mc_nob_p0": {
+      "alias": "nortruthfulqa_mc_nob_p0",
+      "acc,none": 0.28688524590163933,
+      "acc_stderr,none": 0.020496010609248962
+    },
+    "nortruthfulqa_mc_nob_p1": {
+      "alias": "nortruthfulqa_mc_nob_p1",
+      "acc,none": 0.5368852459016393,
+      "acc_stderr,none": 0.022595427506892887
+    },
+    "nortruthfulqa_mc_nob_p2": {
+      "alias": "nortruthfulqa_mc_nob_p2",
+      "acc,none": 0.4323770491803279,
+      "acc_stderr,none": 0.022448990159551842
+    },
+    "nortruthfulqa_mc_nob_p3": {
+      "alias": "nortruthfulqa_mc_nob_p3",
+      "acc,none": 0.4426229508196721,
+      "acc_stderr,none": 0.02250748788145392
+    },
+    "nortruthfulqa_mc_nob_p4": {
+      "alias": "nortruthfulqa_mc_nob_p4",
+      "acc,none": 0.5286885245901639,
+      "acc_stderr,none": 0.022619836861124804
+    }
+  },
+  "group_subtasks": {
+    "nortruthfulqa_mc_nob_p4": [],
+    "nortruthfulqa_mc_nob_p3": [],
+    "nortruthfulqa_mc_nob_p2": [],
+    "nortruthfulqa_mc_nob_p1": [],
+    "nortruthfulqa_mc_nob_p0": []
+  },
+  "configs": {
+    "nortruthfulqa_mc_nob_p0": {
+      "task": "nortruthfulqa_mc_nob_p0",
+      "tag": "nortruthfulqa_mc_nob",
+      "dataset_path": "ltg/nortruthfulqa_mc",
+      "dataset_name": "nb",
+      "validation_split": "validation",
+      "doc_to_text": "def p0_nb(doc):\n    prompt = \"Spørsmål: {question}\\n\\nSvar:\"\n    return prompt.format(question=doc[\"question\"])\n",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{mc1_targets.choices}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p0_nb at 0x4004e504f9c0>",
+        "doc_to_choice": "{{mc1_targets.choices}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/AI-Sweden-Models-Llama-3-8B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "nortruthfulqa_mc_nob_p1": {
+      "task": "nortruthfulqa_mc_nob_p1",
+      "tag": "nortruthfulqa_mc_nob",
+      "dataset_path": "ltg/nortruthfulqa_mc",
+      "dataset_name": "nb",
+      "validation_split": "validation",
+      "doc_to_text": "def p1_nb(doc):\n    prompt = \"Spørsmål: {question}\\n\\nSvaralternativer:{choices}\\n\\nSvar:\"\n    choices = \"\".join(\n        list(map(lambda choice: f\"\\n- {choice}\", doc[\"mc1_targets\"][\"choices\"]))\n    )\n    return prompt.format(question=doc[\"question\"], choices=choices)\n",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{mc1_targets.choices}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p1_nb at 0x4004e4f8aca0>",
+        "doc_to_choice": "{{mc1_targets.choices}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/AI-Sweden-Models-Llama-3-8B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "nortruthfulqa_mc_nob_p2": {
+      "task": "nortruthfulqa_mc_nob_p2",
+      "tag": "nortruthfulqa_mc_nob",
+      "dataset_path": "ltg/nortruthfulqa_mc",
+      "dataset_name": "nb",
+      "validation_split": "validation",
+      "doc_to_text": "def p2_nb(doc):\n    prompt = \"Spørsmål: {question}\\n\\nHvilke av følgende alternativer er riktig svar på spørsmålet?{choices}\"\n    choices = \"\".join(\n        list(map(lambda choice: f\"\\n- {choice}\", doc[\"mc1_targets\"][\"choices\"]))\n    )\n    return prompt.format(question=doc[\"question\"], choices=choices)\n",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{mc1_targets.choices}}",
+      "description": "",
+      "target_delimiter": "\n",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p2_nb at 0x4004e4ef5f80>",
+        "doc_to_choice": "{{mc1_targets.choices}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": "\n"
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/AI-Sweden-Models-Llama-3-8B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "nortruthfulqa_mc_nob_p3": {
+      "task": "nortruthfulqa_mc_nob_p3",
+      "tag": "nortruthfulqa_mc_nob",
+      "dataset_path": "ltg/nortruthfulqa_mc",
+      "dataset_name": "nb",
+      "validation_split": "validation",
+      "doc_to_text": "def p3_nb(doc):\n    prompt = \"Gitt følgende spørsmål, hvilket av de mulige svarene under er riktig?\\nSpørsmål: {question}\\n{choices}\"\n    choices = \"\".join(\n        list(map(lambda choice: f\"\\n- {choice}\", doc[\"mc1_targets\"][\"choices\"]))\n    )\n    return prompt.format(question=doc[\"question\"], choices=choices)\n",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{mc1_targets.choices}}",
+      "description": "",
+      "target_delimiter": "\n",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p3_nb at 0x4004e4e4d300>",
+        "doc_to_choice": "{{mc1_targets.choices}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": "\n"
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/AI-Sweden-Models-Llama-3-8B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "nortruthfulqa_mc_nob_p4": {
+      "task": "nortruthfulqa_mc_nob_p4",
+      "tag": "nortruthfulqa_mc_nob",
+      "dataset_path": "ltg/nortruthfulqa_mc",
+      "dataset_name": "nb",
+      "validation_split": "validation",
+      "doc_to_text": "def p4_nb(doc):\n    prompt = \"{question}\\nVelg et av følgende mulige svar:{choices}\\n\\nSvar:\"\n    choices = \"\".join(\n        list(map(lambda choice: f\"\\n- {choice}\", doc[\"mc1_targets\"][\"choices\"]))\n    )\n    return prompt.format(question=doc[\"question\"], choices=choices)\n",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{mc1_targets.choices}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p4_nb at 0x4004d7aa5580>",
+        "doc_to_choice": "{{mc1_targets.choices}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/AI-Sweden-Models-Llama-3-8B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    }
+  },
+  "versions": {
+    "nortruthfulqa_mc_nob_p0": 1.0,
+    "nortruthfulqa_mc_nob_p1": 1.0,
+    "nortruthfulqa_mc_nob_p2": 1.0,
+    "nortruthfulqa_mc_nob_p3": 1.0,
+    "nortruthfulqa_mc_nob_p4": 1.0
+  },
+  "n-shot": {
+    "nortruthfulqa_mc_nob_p0": 1,
+    "nortruthfulqa_mc_nob_p1": 1,
+    "nortruthfulqa_mc_nob_p2": 1,
+    "nortruthfulqa_mc_nob_p3": 1,
+    "nortruthfulqa_mc_nob_p4": 1
+  },
+  "higher_is_better": {
+    "nortruthfulqa_mc_nob_p0": {
+      "acc": true
+    },
+    "nortruthfulqa_mc_nob_p1": {
+      "acc": true
+    },
+    "nortruthfulqa_mc_nob_p2": {
+      "acc": true
+    },
+    "nortruthfulqa_mc_nob_p3": {
+      "acc": true
+    },
+    "nortruthfulqa_mc_nob_p4": {
+      "acc": true
+    }
+  },
+  "n-samples": {
+    "nortruthfulqa_mc_nob_p0": {
+      "original": 488,
+      "effective": 488
+    },
+    "nortruthfulqa_mc_nob_p1": {
+      "original": 488,
+      "effective": 488
+    },
+    "nortruthfulqa_mc_nob_p2": {
+      "original": 488,
+      "effective": 488
+    },
+    "nortruthfulqa_mc_nob_p3": {
+      "original": 488,
+      "effective": 488
+    },
+    "nortruthfulqa_mc_nob_p4": {
+      "original": 488,
+      "effective": 488
+    }
+  },
+  "config": {
+    "model": "vllm",
+    "model_args": {
+      "pretrained": "models/AI-Sweden-Models-Llama-3-8B",
+      "tensor_parallel_size": 1,
+      "dtype": "auto",
+      "gpu_memory_utilization": 0.9,
+      "trust_remote_code": true
+    },
+    "batch_size": "auto",
+    "batch_sizes": [],
+    "device": "cuda:0",
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {},
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": "728b2bc",
+  "date": 1771199907.5109677,
+  "pretty_env_info": "PyTorch version: 2.10.0a0+a36e1d39eb.nvinternal.main.41386253\nIs debug build: False\nCUDA used to build PyTorch: 13.1\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 24.04.3 LTS (aarch64)\nGCC version: (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0\nClang version: Could not collect\nCMake version: Could not collect\nLibc version: glibc-2.39\n\nPython version: 3.12.3 (main, Jan  8 2026, 11:30:50) [GCC 13.3.0] (64-bit runtime)\nPython platform: Linux-6.4.0-150600.23.25_15.0.9-cray_shasta_c_64k-aarch64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: 13.1.115\nCUDA_MODULE_LOADING set to: \nGPU models and configuration: GPU 0: NVIDIA GH200 120GB\nNvidia driver version: 565.57.01\ncuDNN version: Probably one of the following:\n/usr/lib/aarch64-linux-gnu/libcudnn.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_adv.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_cnn.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_runtime_compiled.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_graph.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_heuristic.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_ops.so.9.17.1\nIs XPU available: False\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\n\nCPU:\nArchitecture:                         aarch64\nCPU op-mode(s):                       64-bit\nByte Order:                           Little Endian\nCPU(s):                               288\nOn-line CPU(s) list:                  0-287\nVendor ID:                            ARM\nModel name:                           Neoverse-V2\nModel:                                0\nThread(s) per core:                   1\nCore(s) per socket:                   72\nSocket(s):                            4\nStepping:                             r0p0\nFrequency boost:                      disabled\nCPU(s) scaling MHz:                   105%\nCPU max MHz:                          3429.0000\nCPU min MHz:                          81.0000\nBogoMIPS:                             2000.00\nFlags:                                fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 sve asimdfhm dit uscat ilrcpc flagm sb paca pacg dcpodp sve2 sveaes svepmull svebitperm svesha3 svesm4 flagm2 frint svei8mm svebf16 i8mm bf16 dgh bti\nL1d cache:                            18 MiB (288 instances)\nL1i cache:                            18 MiB (288 instances)\nL2 cache:                             288 MiB (288 instances)\nL3 cache:                             456 MiB (4 instances)\nNUMA node(s):                         36\nNUMA node0 CPU(s):                    0-71\nNUMA node1 CPU(s):                    72-143\nNUMA node2 CPU(s):                    144-215\nNUMA node3 CPU(s):                    216-287\nNUMA node4 CPU(s):                    \nNUMA node5 CPU(s):                    \nNUMA node6 CPU(s):                    \nNUMA node7 CPU(s):                    \nNUMA node8 CPU(s):                    \nNUMA node9 CPU(s):                    \nNUMA node10 CPU(s):                   \nNUMA node11 CPU(s):                   \nNUMA node12 CPU(s):                   \nNUMA node13 CPU(s):                   \nNUMA node14 CPU(s):                   \nNUMA node15 CPU(s):                   \nNUMA node16 CPU(s):                   \nNUMA node17 CPU(s):                   \nNUMA node18 CPU(s):                   \nNUMA node19 CPU(s):                   \nNUMA node20 CPU(s):                   \nNUMA node21 CPU(s):                   \nNUMA node22 CPU(s):                   \nNUMA node23 CPU(s):                   \nNUMA node24 CPU(s):                   \nNUMA node25 CPU(s):                   \nNUMA node26 CPU(s):                   \nNUMA node27 CPU(s):                   \nNUMA node28 CPU(s):                   \nNUMA node29 CPU(s):                   \nNUMA node30 CPU(s):                   \nNUMA node31 CPU(s):                   \nNUMA node32 CPU(s):                   \nNUMA node33 CPU(s):                   \nNUMA node34 CPU(s):                   \nNUMA node35 CPU(s):                   \nVulnerability Gather data sampling:   Not affected\nVulnerability Itlb multihit:          Not affected\nVulnerability L1tf:                   Not affected\nVulnerability Mds:                    Not affected\nVulnerability Meltdown:               Not affected\nVulnerability Mmio stale data:        Not affected\nVulnerability Reg file data sampling: Not affected\nVulnerability Retbleed:               Not affected\nVulnerability Spec rstack overflow:   Not affected\nVulnerability Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:             Mitigation; __user pointer sanitization\nVulnerability Spectre v2:             Not affected\nVulnerability Srbds:                  Not affected\nVulnerability Tsx async abort:        Not affected\n\nVersions of relevant libraries:\n[pip3] numpy==2.1.0\n[pip3] nvidia-cudnn-frontend==1.17.0\n[pip3] torch==2.10.0a0+a36e1d39eb.nvinternal.main.41386253\n[pip3] torchvision==0.25.0a0+6b56de1c.nvinternal.main.41386253\n[pip3] triton==3.5.1+gitcced7793\n[conda] Could not collect",
+  "transformers_version": "4.57.1",
+  "lm_eval_version": "0.4.10",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<|end_of_text|>",
+    "128001"
+  ],
+  "tokenizer_eos_token": [
+    "<|end_of_text|>",
+    "128001"
+  ],
+  "tokenizer_bos_token": [
+    "<|begin_of_text|>",
+    "128000"
+  ],
+  "eot_token_id": 128001,
+  "max_length": 8192,
+  "task_hashes": {
+    "nortruthfulqa_mc_nob_p0": "b8fbafa24a8c2642cccb52b2e76ba68a3989d910db26d721bd1162900c4f786d",
+    "nortruthfulqa_mc_nob_p1": "0211dd1892f41435adb4f64f0b845b230e4c31566376f242766eb8c0a60db196",
+    "nortruthfulqa_mc_nob_p2": "6e91eb6f334d6cdcd96ec8e56468217f6061a771987767c804675ed750aebe9e",
+    "nortruthfulqa_mc_nob_p3": "92146611d7bc98f9092920c70ae3d72ce3b8cd99102c854fa5fae3d20e0f3404",
+    "nortruthfulqa_mc_nob_p4": "ebe4a36fe18f6b75a970644613dcb040386811c390aaaee19c66da80b4cc7358"
+  },
+  "model_source": "vllm",
+  "model_name": "models/AI-Sweden-Models-Llama-3-8B",
+  "model_name_sanitized": "models__AI-Sweden-Models-Llama-3-8B",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": null,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "total_evaluation_time_seconds": "164.49861705396324"
+}

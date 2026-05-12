@@ -1,0 +1,462 @@
+{
+  "results": {
+    "norquad_p0": {
+      "alias": "norquad_p0",
+      "f1,none": 0.5249109857547034,
+      "f1_stderr,none": 0.014382751384051581,
+      "exact_match,none": 0.18008474576271186,
+      "exact_match_stderr,none": 0.0177056752033991
+    },
+    "norquad_p1": {
+      "alias": "norquad_p1",
+      "f1,none": 0.523199075838816,
+      "f1_stderr,none": 0.014819882304401217,
+      "exact_match,none": 0.17372881355932204,
+      "exact_match_stderr,none": 0.017457690005745725
+    },
+    "norquad_p2": {
+      "alias": "norquad_p2",
+      "f1,none": 0.5098137809329821,
+      "f1_stderr,none": 0.013812639342934205,
+      "exact_match,none": 0.15677966101694915,
+      "exact_match_stderr,none": 0.016753476611557735
+    },
+    "norquad_p3": {
+      "alias": "norquad_p3",
+      "f1,none": 0.32937456693172273,
+      "f1_stderr,none": 0.010784429424638274,
+      "exact_match,none": 0.023305084745762712,
+      "exact_match_stderr,none": 0.0069517533218525955
+    },
+    "norquad_p4": {
+      "alias": "norquad_p4",
+      "f1,none": 0.492967247272322,
+      "f1_stderr,none": 0.014033847652504693,
+      "exact_match,none": 0.1419491525423729,
+      "exact_match_stderr,none": 0.01608097810999869
+    }
+  },
+  "group_subtasks": {
+    "norquad_p4": [],
+    "norquad_p3": [],
+    "norquad_p2": [],
+    "norquad_p1": [],
+    "norquad_p0": []
+  },
+  "configs": {
+    "norquad_p0": {
+      "task": "norquad_p0",
+      "tag": "norquad",
+      "dataset_path": "ltg/norquad",
+      "training_split": "train",
+      "validation_split": "validation",
+      "test_split": "test",
+      "process_docs": "def process_docs(dataset: datasets.Dataset):\n    def _helper(doc):\n        doc[\"title\"] = doc[\"context\"].strip().split(\"\\n\")[0].strip()\n        doc[\"passage\"] = \"\\n\".join(doc[\"context\"].strip().split(\"\\n\")[1:]).strip()\n        doc[\"question\"] = \" \".join(doc[\"question\"].strip().split())\n        return doc\n\n    return dataset.map(_helper)\n",
+      "doc_to_text": "def p0(doc):\n    title = doc[\"title\"]\n    passage = doc[\"passage\"]\n    question = doc[\"question\"]\n    prompt = f\"Tittel: {title}\\n\\nTekst: {passage}\\n\\nSpørsmål: {question}\\n\\nSvar:\"\n    return prompt\n",
+      "doc_to_target": "{{answers[\"text\"][0]}}",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    preds = results[0]\n    reference = doc[\"answers\"][\"text\"][0]\n    f1_sum = squad_metrics.compute_f1(reference, preds)\n    exact_match = squad_metrics.compute_exact(reference, preds)\n    return {\"f1\": f1_sum, \"exact_match\": exact_match}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x400376cc8680>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p0 at 0x400376b27d80>",
+        "doc_to_choice": null,
+        "doc_to_target": "{{answers[\"text\"][0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "exact_match",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": "<|eot_id|>",
+        "do_sample": false,
+        "max_new_tokens": 32
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.1-8B-Instruct-full",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.7,
+        "tokenizer_mode": "auto",
+        "max_model_len": 16384
+      }
+    },
+    "norquad_p1": {
+      "task": "norquad_p1",
+      "tag": "norquad",
+      "dataset_path": "ltg/norquad",
+      "training_split": "train",
+      "validation_split": "validation",
+      "test_split": "test",
+      "process_docs": "def process_docs(dataset: datasets.Dataset):\n    def _helper(doc):\n        doc[\"title\"] = doc[\"context\"].strip().split(\"\\n\")[0].strip()\n        doc[\"passage\"] = \"\\n\".join(doc[\"context\"].strip().split(\"\\n\")[1:]).strip()\n        doc[\"question\"] = \" \".join(doc[\"question\"].strip().split())\n        return doc\n\n    return dataset.map(_helper)\n",
+      "doc_to_text": "def p1(doc):\n    title = doc[\"title\"]\n    passage = doc[\"passage\"]\n    question = doc[\"question\"]\n    prompt = f'Tittel: {title}\\n\\nTekst: {passage}\\n\\nGitt teksten over, hva er svaret på følgende spørsmål? \"{question}\"\\n\\nSvar:'\n    return prompt\n",
+      "doc_to_target": "{{answers[\"text\"][0]}}",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    preds = results[0]\n    reference = doc[\"answers\"][\"text\"][0]\n    f1_sum = squad_metrics.compute_f1(reference, preds)\n    exact_match = squad_metrics.compute_exact(reference, preds)\n    return {\"f1\": f1_sum, \"exact_match\": exact_match}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x400375517420>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p1 at 0x400375516c00>",
+        "doc_to_choice": null,
+        "doc_to_target": "{{answers[\"text\"][0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "exact_match",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": "<|eot_id|>",
+        "do_sample": false,
+        "max_new_tokens": 32
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.1-8B-Instruct-full",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.7,
+        "tokenizer_mode": "auto",
+        "max_model_len": 16384
+      }
+    },
+    "norquad_p2": {
+      "task": "norquad_p2",
+      "tag": "norquad",
+      "dataset_path": "ltg/norquad",
+      "training_split": "train",
+      "validation_split": "validation",
+      "test_split": "test",
+      "process_docs": "def process_docs(dataset: datasets.Dataset):\n    def _helper(doc):\n        doc[\"title\"] = doc[\"context\"].strip().split(\"\\n\")[0].strip()\n        doc[\"passage\"] = \"\\n\".join(doc[\"context\"].strip().split(\"\\n\")[1:]).strip()\n        doc[\"question\"] = \" \".join(doc[\"question\"].strip().split())\n        return doc\n\n    return dataset.map(_helper)\n",
+      "doc_to_text": "def p2(doc):\n    title = doc[\"title\"]\n    passage = doc[\"passage\"]\n    question = doc[\"question\"]\n    prompt = (\n        f\"Tittel: {title}\\n\\nTekst: {passage}\\n\\nSvar på følgende: {question}\\n\\nSvar:\"\n    )\n    return prompt\n",
+      "doc_to_target": "{{answers[\"text\"][0]}}",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    preds = results[0]\n    reference = doc[\"answers\"][\"text\"][0]\n    f1_sum = squad_metrics.compute_f1(reference, preds)\n    exact_match = squad_metrics.compute_exact(reference, preds)\n    return {\"f1\": f1_sum, \"exact_match\": exact_match}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x400375c49d00>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p2 at 0x400375c499e0>",
+        "doc_to_choice": null,
+        "doc_to_target": "{{answers[\"text\"][0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "exact_match",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": "<|eot_id|>",
+        "do_sample": false,
+        "max_new_tokens": 32
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.1-8B-Instruct-full",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.7,
+        "tokenizer_mode": "auto",
+        "max_model_len": 16384
+      }
+    },
+    "norquad_p3": {
+      "task": "norquad_p3",
+      "tag": "norquad",
+      "dataset_path": "ltg/norquad",
+      "training_split": "train",
+      "validation_split": "validation",
+      "test_split": "test",
+      "process_docs": "def process_docs(dataset: datasets.Dataset):\n    def _helper(doc):\n        doc[\"title\"] = doc[\"context\"].strip().split(\"\\n\")[0].strip()\n        doc[\"passage\"] = \"\\n\".join(doc[\"context\"].strip().split(\"\\n\")[1:]).strip()\n        doc[\"question\"] = \" \".join(doc[\"question\"].strip().split())\n        return doc\n\n    return dataset.map(_helper)\n",
+      "doc_to_text": "def p3(doc):\n    title = doc[\"title\"]\n    passage = doc[\"passage\"]\n    question = doc[\"question\"]\n    prompt = f'Tittel: {title}\\n\\nTekst: {passage}\\n\\nHvordan kan man svare på spørsmålet \"{question}\", gitt teksten over?\\n\\nSvar:'\n    return prompt\n",
+      "doc_to_target": "{{answers[\"text\"][0]}}",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    preds = results[0]\n    reference = doc[\"answers\"][\"text\"][0]\n    f1_sum = squad_metrics.compute_f1(reference, preds)\n    exact_match = squad_metrics.compute_exact(reference, preds)\n    return {\"f1\": f1_sum, \"exact_match\": exact_match}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x40035fbb0e00>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p3 at 0x40035fbb0720>",
+        "doc_to_choice": null,
+        "doc_to_target": "{{answers[\"text\"][0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "exact_match",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": "<|eot_id|>",
+        "do_sample": false,
+        "max_new_tokens": 32
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.1-8B-Instruct-full",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.7,
+        "tokenizer_mode": "auto",
+        "max_model_len": 16384
+      }
+    },
+    "norquad_p4": {
+      "task": "norquad_p4",
+      "tag": "norquad",
+      "dataset_path": "ltg/norquad",
+      "training_split": "train",
+      "validation_split": "validation",
+      "test_split": "test",
+      "process_docs": "def process_docs(dataset: datasets.Dataset):\n    def _helper(doc):\n        doc[\"title\"] = doc[\"context\"].strip().split(\"\\n\")[0].strip()\n        doc[\"passage\"] = \"\\n\".join(doc[\"context\"].strip().split(\"\\n\")[1:]).strip()\n        doc[\"question\"] = \" \".join(doc[\"question\"].strip().split())\n        return doc\n\n    return dataset.map(_helper)\n",
+      "doc_to_text": "def p4(doc):\n    title = doc[\"title\"]\n    passage = doc[\"passage\"]\n    question = doc[\"question\"]\n    prompt = f'Tittel: {title}\\n\\nTekst:{passage}\\n\\nGitt teksten over, besvar følgende spørsmål: \"{question}\"\\n\\nSvar:'\n    return prompt\n",
+      "doc_to_target": "{{answers[\"text\"][0]}}",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    preds = results[0]\n    reference = doc[\"answers\"][\"text\"][0]\n    f1_sum = squad_metrics.compute_f1(reference, preds)\n    exact_match = squad_metrics.compute_exact(reference, preds)\n    return {\"f1\": f1_sum, \"exact_match\": exact_match}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x40035eb207c0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p4 at 0x40035eb20180>",
+        "doc_to_choice": null,
+        "doc_to_target": "{{answers[\"text\"][0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "exact_match",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": "<|eot_id|>",
+        "do_sample": false,
+        "max_new_tokens": 32
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.1-8B-Instruct-full",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.7,
+        "tokenizer_mode": "auto",
+        "max_model_len": 16384
+      }
+    }
+  },
+  "versions": {
+    "norquad_p0": 1.0,
+    "norquad_p1": 1.0,
+    "norquad_p2": 1.0,
+    "norquad_p3": 1.0,
+    "norquad_p4": 1.0
+  },
+  "n-shot": {
+    "norquad_p0": 0,
+    "norquad_p1": 0,
+    "norquad_p2": 0,
+    "norquad_p3": 0,
+    "norquad_p4": 0
+  },
+  "higher_is_better": {
+    "norquad_p0": {
+      "exact_match": true,
+      "f1": true
+    },
+    "norquad_p1": {
+      "exact_match": true,
+      "f1": true
+    },
+    "norquad_p2": {
+      "exact_match": true,
+      "f1": true
+    },
+    "norquad_p3": {
+      "exact_match": true,
+      "f1": true
+    },
+    "norquad_p4": {
+      "exact_match": true,
+      "f1": true
+    }
+  },
+  "n-samples": {
+    "norquad_p0": {
+      "original": 472,
+      "effective": 472
+    },
+    "norquad_p1": {
+      "original": 472,
+      "effective": 472
+    },
+    "norquad_p2": {
+      "original": 472,
+      "effective": 472
+    },
+    "norquad_p3": {
+      "original": 472,
+      "effective": 472
+    },
+    "norquad_p4": {
+      "original": 472,
+      "effective": 472
+    }
+  },
+  "config": {
+    "model": "vllm",
+    "model_args": {
+      "pretrained": "models/Llama-3.1-8B-Instruct-full",
+      "tensor_parallel_size": 1,
+      "dtype": "bfloat16",
+      "gpu_memory_utilization": 0.7,
+      "tokenizer_mode": "auto",
+      "max_model_len": 16384,
+      "trust_remote_code": true
+    },
+    "batch_size": "auto",
+    "batch_sizes": [],
+    "device": "cuda:0",
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {
+      "until": "<|eot_id|>"
+    },
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": "728b2bc",
+  "date": 1772925574.3237529,
+  "pretty_env_info": "PyTorch version: 2.10.0a0+a36e1d39eb.nvinternal.main.41386253\nIs debug build: False\nCUDA used to build PyTorch: 13.1\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 24.04.3 LTS (aarch64)\nGCC version: (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0\nClang version: Could not collect\nCMake version: Could not collect\nLibc version: glibc-2.39\n\nPython version: 3.12.3 (main, Jan  8 2026, 11:30:50) [GCC 13.3.0] (64-bit runtime)\nPython platform: Linux-6.4.0-150600.23.25_15.0.9-cray_shasta_c_64k-aarch64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: 13.1.115\nCUDA_MODULE_LOADING set to: \nGPU models and configuration: GPU 0: NVIDIA GH200 120GB\nNvidia driver version: 565.57.01\ncuDNN version: Probably one of the following:\n/usr/lib/aarch64-linux-gnu/libcudnn.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_adv.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_cnn.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_runtime_compiled.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_graph.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_heuristic.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_ops.so.9.17.1\nIs XPU available: False\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\n\nCPU:\nArchitecture:                         aarch64\nCPU op-mode(s):                       64-bit\nByte Order:                           Little Endian\nCPU(s):                               288\nOn-line CPU(s) list:                  0-287\nVendor ID:                            ARM\nModel name:                           Neoverse-V2\nModel:                                0\nThread(s) per core:                   1\nCore(s) per socket:                   72\nSocket(s):                            4\nStepping:                             r0p0\nFrequency boost:                      disabled\nCPU(s) scaling MHz:                   102%\nCPU max MHz:                          3456.0000\nCPU min MHz:                          81.0000\nBogoMIPS:                             2000.00\nFlags:                                fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 sve asimdfhm dit uscat ilrcpc flagm sb paca pacg dcpodp sve2 sveaes svepmull svebitperm svesha3 svesm4 flagm2 frint svei8mm svebf16 i8mm bf16 dgh bti\nL1d cache:                            18 MiB (288 instances)\nL1i cache:                            18 MiB (288 instances)\nL2 cache:                             288 MiB (288 instances)\nL3 cache:                             456 MiB (4 instances)\nNUMA node(s):                         36\nNUMA node0 CPU(s):                    0-71\nNUMA node1 CPU(s):                    72-143\nNUMA node2 CPU(s):                    144-215\nNUMA node3 CPU(s):                    216-287\nNUMA node4 CPU(s):                    \nNUMA node5 CPU(s):                    \nNUMA node6 CPU(s):                    \nNUMA node7 CPU(s):                    \nNUMA node8 CPU(s):                    \nNUMA node9 CPU(s):                    \nNUMA node10 CPU(s):                   \nNUMA node11 CPU(s):                   \nNUMA node12 CPU(s):                   \nNUMA node13 CPU(s):                   \nNUMA node14 CPU(s):                   \nNUMA node15 CPU(s):                   \nNUMA node16 CPU(s):                   \nNUMA node17 CPU(s):                   \nNUMA node18 CPU(s):                   \nNUMA node19 CPU(s):                   \nNUMA node20 CPU(s):                   \nNUMA node21 CPU(s):                   \nNUMA node22 CPU(s):                   \nNUMA node23 CPU(s):                   \nNUMA node24 CPU(s):                   \nNUMA node25 CPU(s):                   \nNUMA node26 CPU(s):                   \nNUMA node27 CPU(s):                   \nNUMA node28 CPU(s):                   \nNUMA node29 CPU(s):                   \nNUMA node30 CPU(s):                   \nNUMA node31 CPU(s):                   \nNUMA node32 CPU(s):                   \nNUMA node33 CPU(s):                   \nNUMA node34 CPU(s):                   \nNUMA node35 CPU(s):                   \nVulnerability Gather data sampling:   Not affected\nVulnerability Itlb multihit:          Not affected\nVulnerability L1tf:                   Not affected\nVulnerability Mds:                    Not affected\nVulnerability Meltdown:               Not affected\nVulnerability Mmio stale data:        Not affected\nVulnerability Reg file data sampling: Not affected\nVulnerability Retbleed:               Not affected\nVulnerability Spec rstack overflow:   Not affected\nVulnerability Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:             Mitigation; __user pointer sanitization\nVulnerability Spectre v2:             Not affected\nVulnerability Srbds:                  Not affected\nVulnerability Tsx async abort:        Not affected\n\nVersions of relevant libraries:\n[pip3] numpy==2.1.0\n[pip3] nvidia-cudnn-frontend==1.17.0\n[pip3] torch==2.10.0a0+a36e1d39eb.nvinternal.main.41386253\n[pip3] torchvision==0.25.0a0+6b56de1c.nvinternal.main.41386253\n[pip3] triton==3.5.1+gitcced7793\n[conda] Could not collect",
+  "transformers_version": "4.57.1",
+  "lm_eval_version": "0.4.10",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<|eot_id|>",
+    "128009"
+  ],
+  "tokenizer_eos_token": [
+    "<|eot_id|>",
+    "128009"
+  ],
+  "tokenizer_bos_token": [
+    "<|begin_of_text|>",
+    "128000"
+  ],
+  "eot_token_id": 128009,
+  "max_length": 16384,
+  "task_hashes": {
+    "norquad_p0": "b0ac62a94537575ff900bc3e2d1be61286b8a93b8a8c18556267cee45e37837b",
+    "norquad_p1": "eb121fa1ea0e24b201e33b24cc384386b674e1daac8607aedb12788ba224d7c5",
+    "norquad_p2": "4369a1df5ed4f036c2947552f7c5662d0d7066caed797727f1d75db8f1920ca8",
+    "norquad_p3": "4e34c722b180646452e0535e3c57292f665a57edc246a7de5582d01c2aabeef5",
+    "norquad_p4": "e765f1b2fb0700f34439410a780f8df6aeece118e061fc9bcc59d960195b0fc4"
+  },
+  "model_source": "vllm",
+  "model_name": "models/Llama-3.1-8B-Instruct-full",
+  "model_name_sanitized": "models__Llama-3.1-8B-Instruct-full",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": true,
+  "chat_template": "{{- bos_token }}\n{%- if custom_tools is defined %}\n    {%- set tools = custom_tools %}\n{%- endif %}\n{%- if not tools_in_user_message is defined %}\n    {%- set tools_in_user_message = true %}\n{%- endif %}\n{%- if not date_string is defined %}\n    {%- set date_string = \"26 Jul 2024\" %}\n{%- endif %}\n{%- if not tools is defined %}\n    {%- set tools = none %}\n{%- endif %}\n\n{#- This block extracts the system message, so we can slot it into the right place. #}\n{%- if messages[0]['role'] == 'system' %}\n    {%- set system_message = messages[0]['content']|trim %}\n    {%- set messages = messages[1:] %}\n{%- else %}\n    {%- set system_message = \"\" %}\n{%- endif %}\n\n{#- System message + builtin tools #}\n{{- \"<|start_header_id|>system<|end_header_id|>\\n\\n\" }}\n{%- if builtin_tools is defined or tools is not none %}\n    {{- \"Environment: ipython\\n\" }}\n{%- endif %}\n{%- if builtin_tools is defined %}\n    {{- \"Tools: \" + builtin_tools | reject('equalto', 'code_interpreter') | join(\", \") + \"\\n\\n\"}}\n{%- endif %}\n{{- \"Cutting Knowledge Date: December 2023\\n\" }}\n{{- \"Today Date: \" + date_string + \"\\n\\n\" }}\n{%- if tools is not none and not tools_in_user_message %}\n    {{- \"You have access to the following functions. To call a function, please respond with JSON for a function call.\" }}\n    {{- 'Respond in the format {\"name\": function name, \"parameters\": dictionary of argument name and its value}.' }}\n    {{- \"Do not use variables.\\n\\n\" }}\n    {%- for t in tools %}\n        {{- t | tojson(indent=4) }}\n        {{- \"\\n\\n\" }}\n    {%- endfor %}\n{%- endif %}\n{{- system_message }}\n{{- \"<|eot_id|>\" }}\n\n{#- Custom tools are passed in a user message with some extra guidance #}\n{%- if tools_in_user_message and not tools is none %}\n    {#- Extract the first user message so we can plug it in here #}\n    {%- if messages | length != 0 %}\n        {%- set first_user_message = messages[0]['content']|trim %}\n        {%- set messages = messages[1:] %}\n    {%- else %}\n        {{- raise_exception(\"Cannot put tools in the first user message when there's no first user message!\") }}\n{%- endif %}\n    {{- '<|start_header_id|>user<|end_header_id|>\\n\\n' -}}\n    {{- \"Given the following functions, please respond with a JSON for a function call \" }}\n    {{- \"with its proper arguments that best answers the given prompt.\\n\\n\" }}\n    {{- 'Respond in the format {\"name\": function name, \"parameters\": dictionary of argument name and its value}.' }}\n    {{- \"Do not use variables.\\n\\n\" }}\n    {%- for t in tools %}\n        {{- t | tojson(indent=4) }}\n        {{- \"\\n\\n\" }}\n    {%- endfor %}\n    {{- first_user_message + \"<|eot_id|>\"}}\n{%- endif %}\n\n{%- for message in messages %}\n    {%- if not (message.role == 'ipython' or message.role == 'tool' or 'tool_calls' in message) %}\n        {{- '<|start_header_id|>' + message['role'] + '<|end_header_id|>\\n\\n'+ message['content'] | trim + '<|eot_id|>' }}\n    {%- elif 'tool_calls' in message %}\n        {%- if not message.tool_calls|length == 1 %}\n            {{- raise_exception(\"This model only supports single tool-calls at once!\") }}\n        {%- endif %}\n        {%- set tool_call = message.tool_calls[0].function %}\n        {%- if builtin_tools is defined and tool_call.name in builtin_tools %}\n            {{- '<|start_header_id|>assistant<|end_header_id|>\\n\\n' -}}\n            {{- \"<|python_tag|>\" + tool_call.name + \".call(\" }}\n            {%- for arg_name, arg_val in tool_call.arguments | items %}\n                {{- arg_name + '=\"' + arg_val + '\"' }}\n                {%- if not loop.last %}\n                    {{- \", \" }}\n                {%- endif %}\n                {%- endfor %}\n            {{- \")\" }}\n        {%- else  %}\n            {{- '<|start_header_id|>assistant<|end_header_id|>\\n\\n' -}}\n            {{- '{\"name\": \"' + tool_call.name + '\", ' }}\n            {{- '\"parameters\": ' }}\n            {{- tool_call.arguments | tojson }}\n            {{- \"}\" }}\n        {%- endif %}\n        {%- if builtin_tools is defined %}\n            {#- This means we're in ipython mode #}\n            {{- \"<|eom_id|>\" }}\n        {%- else %}\n            {{- \"<|eot_id|>\" }}\n        {%- endif %}\n    {%- elif message.role == \"tool\" or message.role == \"ipython\" %}\n        {{- \"<|start_header_id|>ipython<|end_header_id|>\\n\\n\" }}\n        {%- if message.content is mapping or message.content is iterable %}\n            {{- message.content | tojson }}\n        {%- else %}\n            {{- message.content }}\n        {%- endif %}\n        {{- \"<|eot_id|>\" }}\n    {%- endif %}\n{%- endfor %}\n{%- if add_generation_prompt %}\n    {{- '<|start_header_id|>assistant<|end_header_id|>\\n\\n' }}\n{%- endif %}\n",
+  "chat_template_sha": "e10ca381b1ccc5cf9db52e371f3b6651576caee0a630b452e2816b2d404d4b65",
+  "total_evaluation_time_seconds": "112.10553015000187"
+}
