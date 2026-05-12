@@ -12,9 +12,10 @@ import {
 import { makePlotlyConfig } from "../shared/chart.js";
 import {
   attachTooltip, buildTaskCheckboxes, syncTaskCheckboxStates,
+  bindModuleActionStopPropagation,
 } from "../shared/ui.js";
 import {
-  renderProgressChart, updateProgressDescription,
+  renderProgressChart, updateProgressTitle,
 } from "../shared/progress.js";
 import {
   filter, initFilter, runFilter, showFilterUI, hideFilterUI,
@@ -436,7 +437,7 @@ function setLanguage(lang) {
 // ─────────────────────────────────────────────────────────────
 
 function render() {
-  updateProgressDescription(chartConfig);
+  updateProgressTitle(chartConfig);
   if (state.currentTaskSelection === "__filtered__") {
     if (filter.allBenchmarks.size === 0) {
       filter.allBenchmarks = new Set(Object.keys(state.metricsSetup));
@@ -535,6 +536,7 @@ async function init() {
       filterSourceFn: () => state.currentTaskSelection === "__filtered__" ? filter.allBenchmarks : state.checkedTasks,
       onChange: onTaskCheckboxChange,
     });
+    bindModuleActionStopPropagation();
 
     if (hasURL) {
       document.getElementById("task-select").value = state.currentTaskSelection;

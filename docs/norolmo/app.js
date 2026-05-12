@@ -8,8 +8,8 @@
 import { state } from "../shared/state.js";
 import { MODEL_COLORS, isAggregateSelection } from "../shared/core.js";
 import { makePlotlyConfig } from "../shared/chart.js";
-import { buildTaskCheckboxes, syncTaskCheckboxStates } from "../shared/ui.js";
-import { renderProgressChart, updateProgressDescription } from "../shared/progress.js";
+import { buildTaskCheckboxes, syncTaskCheckboxStates, bindModuleActionStopPropagation } from "../shared/ui.js";
+import { renderProgressChart, updateProgressTitle } from "../shared/progress.js";
 import { UrlState } from "../shared/url-state.js";
 
 const TOKENS_PER_STEP = 8192 * 1024;  // 8,388,608 tokens per training step
@@ -293,7 +293,7 @@ function onTaskCheckboxChange() {
 // ─────────────────────────────────────────────────────────────
 
 function render() {
-  updateProgressDescription(chartConfig);
+  updateProgressTitle(chartConfig);
   renderProgressChart(chartConfig);
   urlState.save();
 }
@@ -355,6 +355,7 @@ async function init() {
       filterSourceFn: () => state.checkedTasks,
       onChange: onTaskCheckboxChange,
     });
+    bindModuleActionStopPropagation();
 
     if (hasURL) {
       document.getElementById("task-select").value = state.currentTaskSelection;

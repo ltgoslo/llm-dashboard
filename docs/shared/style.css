@@ -1,61 +1,266 @@
 :root {
-  --bg: #fafafa;
-  --surface: #ffffff;
+  /* Palette */
+  --surface: #ffffff;          /* the white plot band */
+  --bg-tint: #eef0f4;           /* (currently unused outside the dark theme) */
+  --black: #0f1115;             /* the dark band */
   --fg: #1e293b;
   --fg-muted: #64748b;
   --accent: #6366f1;
   --accent-hover: #4f46e5;
   --accent-light: #eef2ff;
   --border: #e2e8f0;
-  --border-light: #f1f5f9;
+  --border-light: #eef0f3;
   --radius: 10px;
-  --font: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Type */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-serif: "Merriweather", "Source Serif Pro", Georgia, serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+html, body { width: 100%; }
+
 body {
-  font-family: var(--font);
-  background: var(--bg);
+  font-family: var(--font-sans);
+  /* Body background is the page tint so the white chart band can "float"
+     above it with a soft drop shadow on both top and bottom edges. */
+  background: var(--bg-tint);
   color: var(--fg);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-header { text-align: center; padding: 2.5rem 1rem 1.5rem; }
-header h1 { font-size: 1.6rem; font-weight: 600; color: var(--fg); letter-spacing: -0.02em; }
-.subtitle { color: var(--fg-muted); margin-top: 0.4rem; font-size: 0.9rem; }
-.subtitle a { color: var(--accent); text-decoration: none; }
-.subtitle a:hover { text-decoration: underline; }
+/* ────────────────────────────────────────────────────────────
+   Bands — full-width sections with a centered inner column.
+   .band-white = white background (only the plot section).
+   .band-black = inverted dark background. CSS variables are
+   re-scoped inside .band-black so all child text/borders flip
+   automatically without needing per-element overrides.
+   ──────────────────────────────────────────────────────────── */
 
-main { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 1.5rem; }
+.band { width: 100%; }
+.band-tint { background: var(--bg-tint); }
+.band-white {
+  background: var(--surface);
+  position: relative;
+  /* Soft drop shadow on the top and bottom edges of the white plot band.
+     Two layers: a tight near-shadow + a moderately diffuse one. */
+  box-shadow:
+    0 2px 4px -2px rgba(15, 23, 42, 0.05),
+    0 -2px 4px -2px rgba(15, 23, 42, 0.03),
+    0 12px 24px -12px rgba(15, 23, 42, 0.08),
+    0 -12px 24px -12px rgba(15, 23, 42, 0.05);
+}
+.band-black {
+  background: var(--black);
+  --surface: #1a1c22;            /* light-card → muted dark surface */
+  /* Body text is intentionally a slightly muted off-white; only headings get
+     pure-ish white (via --fg-strong) so the page doesn't feel glaring. */
+  --fg: #c8cdd6;
+  --fg-strong: #f1f5f9;
+  --fg-muted: #8a93a3;
+  --border: #2a2f3a;
+  --border-light: #1f2229;
+  --accent-light: rgba(99, 102, 241, 0.22);
+}
+/* Bright shade for headings inside the dark band */
+.band-black h1,
+.band-black h2,
+.band-black h3,
+.band-black h4 { color: var(--fg-strong); }
 
-/* ───── Tab navigation (multisynt languages) ───── */
-.tab-nav { display: flex; gap: 0; margin-bottom: 1rem; border-bottom: 1px solid var(--border); }
+.band-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Header
+   ──────────────────────────────────────────────────────────── */
+
+header.dashboard-header {
+  padding: 3rem 0 2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.header-titles { flex: 1; min-width: 0; }
+
+header.dashboard-header h1 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 2.4rem;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: #000;
+  margin: 0;
+}
+
+.header-icon {
+  flex-shrink: 0;
+  width: 56px;
+  height: auto;
+  /* Soften the flag's red so it doesn't fight the title */
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.about-inline { margin-top: 0.5rem; }
+.about-inline > summary {
+  list-style: none;
+  cursor: pointer;
+  color: var(--fg-muted);
+  font-size: 0.92rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.about-inline > summary::-webkit-details-marker { display: none; }
+.about-inline > summary::after {
+  content: "▾";
+  font-size: 1.4rem;
+  line-height: 0.7;
+  transition: transform 0.15s;
+}
+.about-inline[open] > summary::after { transform: rotate(180deg); }
+.about-inline > summary:hover { color: var(--accent); }
+
+.about-content {
+  max-width: 760px;
+  margin: 1.25rem 0 0.25rem;
+}
+.about-section + .about-section { margin-top: 1.25rem; }
+.about-section h2 {
+  font-family: var(--font-serif); font-weight: 700;
+  font-size: 1.2rem; color: #000; margin-bottom: 0.5rem;
+}
+.about-section h3 {
+  font-family: var(--font-serif); font-weight: 700;
+  font-size: 1.02rem; color: #000; margin-bottom: 0.4rem;
+}
+.about-section p {
+  font-size: 0.92rem; color: var(--fg); line-height: 1.65; margin-bottom: 0.5rem;
+}
+.about-section p:last-child { margin-bottom: 0; }
+.about-section ul { padding-left: 1.25rem; margin-bottom: 0.5rem; }
+.about-section ul:last-child { margin-bottom: 0; }
+.about-section li {
+  font-size: 0.92rem; color: var(--fg); line-height: 1.65; margin-bottom: 0.4rem;
+}
+.about-section a { color: var(--accent); text-decoration: none; }
+.about-section a:hover { text-decoration: underline; }
+.about-formula {
+  font-family: "JetBrains Mono", "Menlo", monospace;
+  background: var(--surface);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+.about-citation {
+  font-family: "JetBrains Mono", "Menlo", monospace;
+  font-size: 0.78rem; line-height: 1.55;
+  background: var(--surface); padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px; overflow-x: auto;
+  color: var(--fg); white-space: pre-wrap;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Multisynt language tabs
+   ──────────────────────────────────────────────────────────── */
+
+.tab-nav {
+  display: flex; gap: 0;
+  margin: 0 0 1rem;
+  border-bottom: 1px solid var(--border);
+}
 .tab-btn {
   padding: 0.6rem 1.25rem; border: none; background: none; cursor: pointer;
-  font-family: var(--font); font-size: 0.9rem; font-weight: 500;
+  font-family: var(--font-sans); font-size: 0.9rem; font-weight: 500;
   color: var(--fg-muted); border-bottom: 2px solid transparent;
   transition: color 0.15s, border-color 0.15s; margin-bottom: -1px;
 }
 .tab-btn:hover { color: var(--fg); }
 .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-/* ───── Controls bar ───── */
-.controls {
-  display: flex; column-gap: 1.5rem; row-gap: 0.5rem; align-items: center;
-  flex-wrap: wrap; margin-bottom: 0.75rem; padding: 0.6rem 0.9rem;
-  background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
+/* ────────────────────────────────────────────────────────────
+   Chart section — full-width white band
+   ──────────────────────────────────────────────────────────── */
+
+.chart-section { padding: 1.5rem 0 1.5rem; }
+
+.chart-zone {
+  position: relative;
 }
+
+/* The chart title is wrapped in a <details>/<summary>; clicking the title
+   expands an inline description below it (similar to the About panel). */
+.chart-title-details { margin: 0 0 0.5rem; }
+.chart-title-details > summary {
+  list-style: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.chart-title-details > summary::-webkit-details-marker { display: none; }
+.chart-title-details > summary::after {
+  content: "▾";
+  font-size: 1.5rem;
+  line-height: 0.6;
+  color: var(--fg-muted);
+  transition: transform 0.15s;
+}
+.chart-title-details[open] > summary::after { transform: rotate(180deg); }
+
+.chart-title {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 1.4rem;
+  line-height: 1.25;
+  color: #000;
+  margin: 0;
+  display: inline;
+}
+.chart-title-details > summary:hover .chart-title { color: var(--accent); }
+.chart-title-details > summary:hover::after { color: var(--accent); }
+
+.chart-description {
+  font-size: 0.9rem;
+  color: var(--fg-muted);
+  line-height: 1.55;
+  margin-top: 0.5rem;
+  max-width: 760px;
+}
+.chart-description a { color: var(--accent); text-decoration: none; }
+.chart-description a:hover { text-decoration: underline; }
+
+/* Permanent controls — sit between title and chart, no surrounding frame.
+   row-gap is matched to the .controls-bar + .controls-bar gap so wrapped
+   items don't jump to a much wider vertical step than the explicit two
+   rows have. */
+.controls-bar {
+  display: flex;
+  gap: 0.2rem 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 0.2rem 0;
+}
+.controls-bar + .controls-bar { margin-top: 0.15rem; }
+.controls-bar:last-of-type { margin-bottom: 0.1rem; }
+
 .control-group { display: flex; align-items: center; gap: 0.5rem; }
 .control-group label { font-weight: 500; font-size: 0.85rem; color: var(--fg-muted); }
 
 #task-select {
-  padding: 0.35rem 0.5rem; font-family: var(--font); font-size: 0.85rem;
+  padding: 0.3rem 0.5rem; font-family: var(--font-sans); font-size: 0.85rem;
   border: 1px solid var(--border); border-radius: 6px;
-  background: var(--bg); color: var(--fg); outline: none;
-  /* Size to the selected option's text length rather than the widest option
-     (so picking "max" doesn't reserve room for "Aggregate by evaluation type"). */
+  background: var(--surface); color: var(--fg); outline: none;
   field-sizing: content;
   max-width: 100%;
 }
@@ -63,8 +268,8 @@ main { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 1.5rem; }
 
 .shot-toggle { display: flex; gap: 0; }
 .shot-btn {
-  padding: 0.35rem 0.85rem; border: 1px solid var(--border); background: var(--surface);
-  cursor: pointer; font-family: var(--font); font-size: 0.8rem; font-weight: 500;
+  padding: 0.3rem 0.8rem; border: 1px solid var(--border); background: var(--surface);
+  cursor: pointer; font-family: var(--font-sans); font-size: 0.8rem; font-weight: 500;
   color: var(--fg-muted); transition: all 0.15s;
 }
 .shot-btn:first-child { border-radius: 6px 0 0 6px; }
@@ -74,8 +279,8 @@ main { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 1.5rem; }
 .shot-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
 
 .control-select {
-  padding: 0.35rem 0.5rem; font-family: var(--font); font-size: 0.85rem;
-  border: 1px solid var(--border); border-radius: 6px; background: var(--bg);
+  padding: 0.3rem 0.5rem; font-family: var(--font-sans); font-size: 0.85rem;
+  border: 1px solid var(--border); border-radius: 6px; background: var(--surface);
   color: var(--fg); outline: none;
   field-sizing: content;
 }
@@ -87,39 +292,16 @@ main { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 1.5rem; }
 }
 .toggle-label input[type="checkbox"] { accent-color: var(--accent); cursor: pointer; }
 
-/* ───── Task description banner ───── */
-.task-description {
-  font-size: 0.85rem; color: var(--fg-muted); padding: 0.6rem 0.9rem;
-  background: var(--accent-light); border-radius: var(--radius);
-  margin-bottom: 0.75rem; line-height: 1.5;
-}
-.metric-description {
-  display: block; margin-top: 0.4rem; color: var(--fg-muted);
-}
-
-/* ───── Chart container ───── */
-#chart-container {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 0.25rem; margin-bottom: 1rem;
-}
-#chart { width: 100%; height: 480px; }
-
-/* Chart header with size slider (noreval comparison only) */
-.chart-header {
-  display: flex; justify-content: flex-end; padding: 0.4rem 0.5rem 0;
-}
-
-/* ───── Size slider (noreval comparison) ───── */
+/* Size slider */
 .size-slider-container {
-  display: flex; align-items: center; gap: 0.6rem; padding: 0.3rem 0.7rem;
-  background: var(--bg); border-radius: var(--radius); border: 1px solid var(--border);
-  font-size: 0.8rem; font-weight: 500; color: var(--fg-muted); max-width: 380px;
+  display: flex; align-items: center; gap: 0.6rem;
+  font-size: 0.85rem; font-weight: 500; color: var(--fg-muted);
 }
-.size-slider-container label { white-space: nowrap; }
+.size-slider-container > label { white-space: nowrap; }
 .size-label { font-weight: 600; color: var(--fg); min-width: 2.5rem; text-align: center; }
 .size-sep { color: var(--fg-muted); }
 .range-slider {
-  position: relative; flex: 1; height: 24px; min-width: 120px;
+  position: relative; flex: 1; height: 22px; min-width: 160px; max-width: 240px;
   user-select: none; touch-action: none;
 }
 .range-track {
@@ -131,7 +313,7 @@ main { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 1.5rem; }
   background: var(--accent); border-radius: 2px; pointer-events: none;
 }
 .range-thumb {
-  position: absolute; top: 50%; width: 18px; height: 18px; border-radius: 50%;
+  position: absolute; top: 50%; width: 16px; height: 16px; border-radius: 50%;
   background: var(--accent); border: 2px solid var(--surface);
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   transform: translate(-50%, -50%); cursor: grab; z-index: 2;
@@ -142,186 +324,269 @@ main { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem 1.5rem; }
 }
 .range-thumb.active { cursor: grabbing; }
 
-/* Fully-open filter (noreval comparison) */
-.fully-open-container {
-  display: flex; align-items: center; padding: 0.3rem 0.7rem;
-  background: var(--bg); border-radius: var(--radius); border: 1px solid var(--border);
-  font-size: 0.8rem; font-weight: 500; color: var(--fg-muted);
-}
 .fully-open-label {
-  display: flex; align-items: center; gap: 0.35rem; cursor: pointer;
-  user-select: none; white-space: nowrap;
+  display: flex; align-items: center; gap: 0.35rem;
+  cursor: pointer; user-select: none; white-space: nowrap;
+  font-size: 0.85rem; font-weight: 500; color: var(--fg-muted);
 }
 .fully-open-label input[type="checkbox"] { accent-color: var(--accent); cursor: pointer; }
 
-/* ───── Checkbox section ───── */
-.task-checkboxes {
-  padding: 0.9rem; background: var(--surface); border-radius: var(--radius);
-  border: 1px solid var(--border); margin-bottom: 1rem;
+/* ────────────────────────────────────────────────────────────
+   Chart canvas — extends 5 rem to the LEFT of the band-inner
+   content area. Plotly's `margin.l` in JS is matched to this
+   (≈80 px CSS + ~25 px for the y-tick label width), so:
+     • y-axis numbers sit flush with the title's left margin
+     • rotated x-axis labels have room to overflow LEFT of the
+       column without being clipped by the SVG boundary
+   The right edge of the canvas still sits at column-content-right
+   so the modebar lines up with the title's right margin.
+   ──────────────────────────────────────────────────────────── */
+
+#chart {
+  margin-left: -5rem;
+  width: calc(100% + 5rem);
+  height: 500px;
 }
-.checkbox-header {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;
+
+/* ────────────────────────────────────────────────────────────
+   Modules section — dark band with light text/controls
+   ──────────────────────────────────────────────────────────── */
+
+.modules-section { padding: 2.5rem 0 3rem; }
+
+.module {
+  margin-bottom: 3rem;
 }
-.checkbox-header h3 { font-size: 0.9rem; font-weight: 600; color: var(--fg); }
-.checkbox-actions { display: flex; gap: 0.4rem; }
+.module:last-child { margin-bottom: 0; }
+
+/* Module section header: subtitle + action buttons inline, vertically
+   centered so the buttons sit at the title's mid-line. */
+.module-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.module-header h3 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #000;
+}
+
+.module-actions {
+  display: flex;
+  gap: 0.4rem;
+}
 
 .small-btn {
-  padding: 0.2rem 0.6rem; font-family: var(--font); font-size: 0.75rem; font-weight: 500;
-  border: 1px solid var(--border); border-radius: 5px; background: var(--surface);
-  color: var(--fg-muted); cursor: pointer; transition: all 0.15s;
+  padding: 0.2rem 0.65rem; font-family: var(--font-sans); font-size: 0.78rem;
+  font-weight: 500; border: 1px solid var(--border); border-radius: 5px;
+  background: var(--surface); color: var(--fg-muted); cursor: pointer;
+  transition: all 0.15s;
 }
 .small-btn:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
 
 .checkbox-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.6rem;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.75rem 1.25rem;
 }
 .checkbox-category-header {
-  display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.15rem;
-  padding-bottom: 0.15rem; border-bottom: 1px solid var(--border-light); cursor: pointer;
+  display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem;
+  padding-bottom: 0.2rem; border-bottom: 1px solid var(--border); cursor: pointer;
 }
 .checkbox-category-header input[type="checkbox"] {
   accent-color: var(--accent); cursor: pointer; flex-shrink: 0;
 }
 .checkbox-category h4 {
-  margin: 0; font-size: 0.8rem; font-weight: 600; color: var(--accent);
-  text-transform: uppercase; letter-spacing: 0.04em;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.9rem; font-weight: 700; color: #000;
 }
-.checkbox-category label {
-  display: block; padding: 0.15rem 0.25rem 0.15rem 1rem; font-size: 0.8rem;
-  cursor: pointer; border-radius: 4px; transition: background 0.1s; color: var(--fg);
+.checkbox-category input[type="checkbox"] {
+  margin-right: 0.25rem; accent-color: var(--accent);
 }
-.checkbox-category label:hover { background: var(--accent-light); }
-.checkbox-category input[type="checkbox"] { margin-right: 0.25rem; accent-color: var(--accent); }
 
-/* ───── Model panels (noreval comparison) ───── */
-.model-panels { margin-bottom: 1rem; }
-.model-panels-row { display: flex; flex-direction: column; gap: 1rem; }
-.model-panel {
-  padding: 0.9rem; background: var(--surface); border-radius: var(--radius);
-  border: 1px solid var(--border);
+/* Each task is a <details> with the checkbox + name in <summary>; clicking
+   the name expands the description inline below. The checkbox stops click
+   propagation so it doesn't toggle the details when you select/deselect. */
+.checkbox-category details.task-item { display: block; }
+.checkbox-category details.task-item > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.18rem 0.3rem 0.18rem 1rem;
+  font-size: 0.82rem;
+  border-radius: 4px;
+  transition: background 0.1s;
+  color: var(--fg);
 }
+.checkbox-category details.task-item > summary::-webkit-details-marker { display: none; }
+.checkbox-category details.task-item > summary::after {
+  content: "▾";
+  margin-left: auto;
+  font-size: 1.15rem;
+  line-height: 0.6;
+  color: var(--fg-muted);
+  transition: transform 0.15s;
+}
+.checkbox-category details.task-item[open] > summary::after { transform: rotate(180deg); }
+.checkbox-category details.task-item > summary:hover { background: rgba(99, 102, 241, 0.08); }
+.checkbox-category details.task-item > summary:hover::after { color: var(--accent); }
+.checkbox-category .task-name { flex: 1; min-width: 0; }
+
+.task-description-inline {
+  font-size: 0.78rem;
+  color: var(--fg-muted);
+  line-height: 1.5;
+  padding: 0.3rem 0.6rem 0.5rem 1.85rem;
+}
+.task-description-inline a { color: var(--accent); text-decoration: none; word-break: break-all; }
+.task-description-inline a:hover { text-decoration: underline; }
+
+.model-panel + .model-panel { margin-top: 2.5rem; }
+
 .model-checkbox-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0.6rem; align-items: start;
+  gap: 0.75rem 1rem; align-items: start;
 }
 .model-org-header {
-  display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.15rem;
-  padding-bottom: 0.15rem; border-bottom: 1px solid var(--border-light); cursor: pointer;
+  display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem;
+  padding-bottom: 0.2rem; border-bottom: 1px solid var(--border); cursor: pointer;
 }
 .model-org-header input[type="checkbox"] {
   accent-color: var(--accent); cursor: pointer; flex-shrink: 0;
 }
 .model-org-group h4 {
-  margin: 0; font-size: 0.8rem; font-weight: 600; color: var(--accent);
-  text-transform: uppercase; letter-spacing: 0.04em;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.9rem; font-weight: 700; color: #000;
 }
 .model-org-group { display: grid; grid-template-columns: 1fr; gap: 0; }
-.model-checkbox-grid label {
-  display: flex; align-items: center; gap: 0.3rem; font-size: 0.8rem;
-  cursor: pointer; padding: 0.15rem 0.25rem 0.15rem 1rem;
-  border-radius: 4px; transition: background 0.1s;
-}
-.model-checkbox-grid label:hover { background: var(--accent-light); }
 .model-checkbox-grid input[type="checkbox"] { accent-color: var(--accent); }
+
+/* Each model is a <details>; same pattern as task-item. */
+.model-checkbox-grid details.model-item { display: block; }
+.model-checkbox-grid details.model-item > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.18rem 0.3rem 0.18rem 1rem;
+  font-size: 0.82rem;
+  border-radius: 4px;
+  transition: background 0.1s;
+  color: var(--fg);
+}
+.model-checkbox-grid details.model-item > summary::-webkit-details-marker { display: none; }
+.model-checkbox-grid details.model-item > summary::after {
+  content: "▾";
+  margin-left: auto;
+  font-size: 1.15rem;
+  line-height: 0.6;
+  color: var(--fg-muted);
+  transition: transform 0.15s;
+}
+.model-checkbox-grid details.model-item[open] > summary::after { transform: rotate(180deg); }
+.model-checkbox-grid details.model-item > summary:hover { background: rgba(99, 102, 241, 0.08); }
+.model-checkbox-grid details.model-item > summary:hover::after { color: var(--accent); }
+.model-checkbox-grid .model-name { flex: 1; min-width: 0; }
+
+.model-description-inline {
+  font-size: 0.78rem;
+  color: var(--fg-muted);
+  line-height: 1.5;
+  padding: 0.3rem 0.6rem 0.5rem 1.85rem;
+}
+.model-description-inline .meta {
+  font-size: 0.72rem;
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--fg-muted);
+}
+.model-description-inline a { color: var(--accent); text-decoration: none; word-break: break-all; }
+.model-description-inline a:hover { text-decoration: underline; }
+
 .model-color-dot {
-  display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  display: inline-block; width: 10px; height: 10px;
+  border-radius: 50%; flex-shrink: 0;
 }
 
-/* ───── Custom tooltip ───── */
+/* ────────────────────────────────────────────────────────────
+   Tooltip — always rendered on a light background since it's
+   `position: fixed` over the page; explicitly keep light colors.
+   ──────────────────────────────────────────────────────────── */
+
 .custom-tooltip {
-  display: none; position: fixed; z-index: 1000; max-width: 360px;
-  padding: 0.65rem 0.85rem; background: var(--surface); border: 1px solid var(--border);
-  border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-  font-size: 0.8rem; line-height: 1.5; color: var(--fg); pointer-events: none;
+  display: none; position: fixed; z-index: 1000; max-width: 420px;
+  padding: 0.7rem 0.9rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  font-family: var(--font-sans); font-size: 0.82rem; line-height: 1.5;
+  color: #1e293b; pointer-events: none;
 }
 .custom-tooltip.visible { display: block; }
-.tooltip-title { font-weight: 600; margin-bottom: 0.2rem; }
-.tooltip-meta { color: var(--fg-muted); font-size: 0.73rem; opacity: 0.85; margin-bottom: 0.35rem; }
-.tooltip-body { color: var(--fg-muted); margin-bottom: 0.35rem; }
+.tooltip-title {
+  font-family: var(--font-serif); font-weight: 700;
+  font-size: 0.95rem; margin-bottom: 0.25rem; color: #1e293b;
+}
+.tooltip-meta {
+  color: #64748b; font-size: 0.72rem;
+  opacity: 0.9; margin-bottom: 0.35rem;
+}
+.tooltip-body { color: #475569; margin-bottom: 0.35rem; }
 .tooltip-footer { color: var(--accent); font-size: 0.75rem; word-break: break-all; }
 
-/* ───── Plotly modebar ───── */
-.modebar-container { top: 8px !important; right: 8px !important; }
-.modebar-group {
-  background: var(--surface) !important; border: 1px solid var(--border) !important;
-  border-radius: 6px !important; padding: 2px !important;
+/* Plotly modebar — pinned to the chart canvas right edge, which now
+   aligns with the column's right text margin. */
+.modebar-container {
+  top: 6px !important;
+  right: 0 !important;
 }
-.modebar-btn path { fill: var(--fg-muted) !important; }
+.modebar-group {
+  background: transparent !important;
+  border: none !important;
+  padding: 2px !important;
+}
+.modebar-btn path { fill: #64748b !important; }
 .modebar-btn:hover path { fill: var(--accent) !important; }
 .modebar-btn.active path { fill: var(--accent) !important; }
 
-/* ───── About panel (collapsible <details>) ───── */
-.about-panel {
-  margin-top: 1rem; padding: 0; background: var(--surface);
-  border: 1px solid var(--border); border-radius: var(--radius);
-  overflow: hidden;
-}
-.about-panel summary {
-  padding: 0.7rem 1rem; cursor: pointer; user-select: none;
-  font-size: 0.9rem; font-weight: 600; color: var(--fg);
-  list-style: none; display: flex; align-items: center; gap: 0.5rem;
-}
-.about-panel summary::-webkit-details-marker { display: none; }
-.about-panel summary::before {
-  content: "▸"; font-size: 0.8rem; color: var(--accent);
-  transition: transform 0.15s; display: inline-block;
-}
-.about-panel[open] summary::before { transform: rotate(90deg); }
-.about-panel summary:hover { background: var(--accent-light); }
-.about-content { padding: 0 1.25rem 1.25rem; max-width: 760px; margin: 0 auto; }
-.about-section + .about-section { margin-top: 1.25rem; }
-.about-section h2 { font-size: 1.1rem; font-weight: 600; color: var(--fg); margin-bottom: 0.5rem; }
-.about-section h3 { font-size: 0.95rem; font-weight: 600; color: var(--fg); margin-bottom: 0.4rem; }
-.about-section p {
-  font-size: 0.88rem; color: var(--fg); line-height: 1.65; margin-bottom: 0.5rem;
-}
-.about-section p:last-child { margin-bottom: 0; }
-.about-section ul { padding-left: 1.25rem; margin-bottom: 0.5rem; }
-.about-section ul:last-child { margin-bottom: 0; }
-.about-section li {
-  font-size: 0.88rem; color: var(--fg); line-height: 1.65; margin-bottom: 0.4rem;
-}
-.about-section a { color: var(--accent); text-decoration: none; }
-.about-section a:hover { text-decoration: underline; }
-.about-formula {
-  font-family: "Courier New", monospace; background: var(--bg);
-  padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--border-light);
-  font-size: 0.83rem; color: var(--fg);
-}
-.about-citation {
-  font-size: 0.78rem; line-height: 1.6; background: var(--bg);
-  padding: 0.75rem 1rem; border-radius: 6px; border: 1px solid var(--border-light);
-  overflow-x: auto; color: var(--fg); white-space: pre-wrap;
-}
+/* ────────────────────────────────────────────────────────────
+   HPLT-E filter panel (multisynt only)
+   ──────────────────────────────────────────────────────────── */
 
-/* ───── Footer ───── */
-footer {
-  text-align: center; padding: 1.5rem 1rem; color: var(--fg-muted); font-size: 0.85rem;
-}
-footer a { color: var(--accent); text-decoration: none; }
-footer a:hover { text-decoration: underline; }
-
-/* ───── HPLT-E Quality Filter Panel ───── */
 .filter-panel {
-  padding: 0.9rem; background: var(--surface); border-radius: var(--radius);
-  border: 1px solid var(--border); margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
 }
 .filter-panel-header {
   display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
 }
 .filter-panel-header h3 {
-  font-size: 0.9rem; font-weight: 600; color: var(--fg); margin-bottom: 0.2rem;
+  font-family: var(--font-serif); font-weight: 700;
+  font-size: 1.02rem; color: var(--fg); margin-bottom: 0.2rem; margin-top: 0.5rem;
 }
 .filter-panel-header a { color: var(--accent); text-decoration: none; }
 .filter-panel-header a:hover { text-decoration: underline; }
-#filter-panel-content h3 { font-size: 0.9rem; font-weight: 600; margin: 0.6rem 0 0.2rem; }
-.filter-description { font-size: 0.8rem; color: var(--fg-muted); margin-bottom: 0.75rem; }
+#filter-panel-content h3 {
+  font-family: var(--font-serif); font-weight: 700;
+  font-size: 1.02rem; margin: 0.6rem 0 0.2rem;
+}
+.filter-description { font-size: 0.85rem; color: var(--fg-muted); margin-bottom: 0.75rem; }
 .filter-criteria-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 0.6rem;
 }
 .filter-criterion {
-  padding: 0.5rem 0.6rem; border: 1px solid var(--border-light);
-  border-radius: 8px; background: var(--bg); transition: opacity 0.15s;
+  padding: 0.55rem 0.7rem; border: 1px solid var(--border-light);
+  border-radius: 8px; background: var(--surface); transition: opacity 0.15s;
 }
 .filter-criterion.disabled { opacity: 0.45; }
 .filter-criterion-header {
@@ -342,28 +607,18 @@ footer a:hover { text-decoration: underline; }
   display: flex; align-items: center; gap: 0.25rem;
 }
 .filter-criterion-controls input[type="number"] {
-  width: 70px; padding: 0.2rem 0.35rem; font-family: var(--font); font-size: 0.8rem;
+  width: 70px; padding: 0.2rem 0.35rem; font-family: var(--font-sans); font-size: 0.8rem;
   border: 1px solid var(--border); border-radius: 5px; background: var(--surface); color: var(--fg);
 }
 .filter-criterion-controls .threshold-input { width: 60px; }
-.filter-criterion-controls .direction-label {
-  font-size: 0.75rem; color: var(--fg-muted); font-weight: 500;
-}
 
-/* HPLT-E filter results table */
-.filter-table-container {
-  padding: 0.9rem; background: var(--surface); border-radius: var(--radius);
-  border: 1px solid var(--border); margin-bottom: 0.75rem;
-}
-.filter-table-header {
-  display: flex; align-items: center; gap: 0.75rem;
-}
 .filter-summary { font-size: 0.85rem; color: var(--fg-muted); }
 .filter-table-content { overflow-x: auto; }
 .filter-table {
   width: 100%; border-collapse: collapse; font-size: 0.78rem; margin-top: 0.6rem;
 }
 .filter-table th {
+  font-family: var(--font-sans);
   font-weight: 600; text-align: center; padding: 0.35rem 0.5rem;
   border-bottom: 2px solid var(--border); color: var(--fg-muted);
   font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap;
@@ -375,21 +630,33 @@ footer a:hover { text-decoration: underline; }
 .filter-table td:first-child { text-align: left; font-weight: 500; white-space: nowrap; }
 .filter-table td.pass { background: #dcfce7; color: #166534; }
 .filter-table td.fail { background: #fef2f2; color: #991b1b; }
-.filter-table td.na { background: var(--bg); color: var(--fg-muted); }
-.filter-table tr.pass-row td:first-child { color: #166534; }
-.filter-table tr.fail-row td:first-child { color: #991b1b; }
-.filter-table td.overall-pass { color: #166534; font-weight: 600; }
-.filter-table td.overall-fail { color: #991b1b; font-weight: 600; }
+.filter-table td.na { background: rgba(255,255,255,0.06); color: var(--fg-muted); }
+.filter-table tr.pass-row td:first-child { color: #4ade80; }
+.filter-table tr.fail-row td:first-child { color: #f87171; }
 
-/* ───── Responsive ───── */
+/* ────────────────────────────────────────────────────────────
+   Footer (same dark band as modules)
+   ──────────────────────────────────────────────────────────── */
+
+footer.dashboard-footer {
+  padding: 1.5rem 0 1.5rem;
+  color: var(--fg-muted); font-size: 0.85rem;
+  text-align: left;
+}
+footer.dashboard-footer a { color: var(--accent); text-decoration: none; }
+footer.dashboard-footer a:hover { text-decoration: underline; }
+
+/* ────────────────────────────────────────────────────────────
+   Responsive
+   ──────────────────────────────────────────────────────────── */
+
 @media (max-width: 768px) {
-  .controls { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-  #task-select { min-width: 100%; }
+  header.dashboard-header { padding: 2rem 0 1.25rem; gap: 0.75rem; }
+  header.dashboard-header h1 { font-size: 1.7rem; }
+  .header-icon { width: 36px; }
+  .chart-title { font-size: 1.2rem; }
+  .controls-bar { gap: 0.75rem; padding: 0.5rem 0.6rem; }
   .checkbox-grid { grid-template-columns: 1fr; }
-  header h1 { font-size: 1.3rem; }
-  #chart { height: 360px; }
-  .chart-header { justify-content: stretch; }
-  .size-slider-container { max-width: none; }
-  .filter-criteria-grid { grid-template-columns: 1fr; }
-  .filter-table { font-size: 0.7rem; }
+  #chart { height: 380px; }
+  .module-header h3 { font-size: 1rem; }
 }

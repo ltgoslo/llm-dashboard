@@ -3,111 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MultiSynt evaluation dashboard</title>
+    <title>MultiSynt dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/style.css">
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
 </head>
 <body>
-    <header>
-        <h1>MultiSynt evaluation dashboard</h1>
-        <p class="subtitle">Multilingual training-progress evaluation across Spanish, French, Finnish, and Norwegian models</p>
-    </header>
 
-    <main>
-        <nav class="tab-nav" id="tab-nav">
-            <!-- Tabs dynamically populated from data -->
-        </nav>
+    <div class="band band-tint">
+        <div class="band-inner">
+            <header class="dashboard-header">
+                <div class="header-titles">
+                    <h1>MultiSynt dashboard</h1>
+                    <details class="about-inline">
+                        <summary>Multilingual training-progress evaluation — click here for more information</summary>
+                        <div class="about-content">
+                            <div class="about-section">
+                                <h2>About MultiSynt</h2>
+                                <p>
+                                    MultiSynt tracks the training trajectories of several pretraining runs across four languages
+                                    (Spanish, French, Finnish, and Norwegian), evaluated at multiple checkpoints. Each language has
+                                    its own set of benchmarks, with at least a few prompt variants per benchmark.
+                                </p>
+                                <p>
+                                    The "Signal-filtered tasks" option in the task dropdown applies HPLT-E-style quality criteria
+                                    (monotonicity, signal-to-noise ratio, prompt sensitivity, cross-model ranking consistency, etc.)
+                                    to identify benchmarks with reliable training signal.
+                                </p>
+                            </div>
 
-        <div class="controls">
-            <div class="control-group">
-                <label for="task-select">Task:</label>
-                <select id="task-select">
-                    <option value="__filtered__" title="Micro-average over tasks passing HPLT-E signal-quality criteria (monotonicity, SNR, CV, prompt sensitivity). Excludes noisy or unreliable benchmarks.">Signal-filtered tasks</option>
-                    <option value="__all_macro__" title="Scores are first averaged within each task category, then averaged across categories. This gives equal weight to each category regardless of how many tasks it contains.">All (category-average)</option>
-                    <option value="__all__" title="Simple average across all tasks. Each task contributes equally regardless of category.">All (task-average)</option>
-                    <option value="__custom__" hidden>Custom (task-average)</option>
-                </select>
-            </div>
+                            <div class="about-section">
+                                <h3>Error bands</h3>
+                                <p>Shaded bands show combined uncertainty from sampling error (from each metric's variance) and
+                                    prompt-template deviation (SD across prompt variants / &radic;(k)), added in quadrature.
+                                    Toggle the <em>prompt uncertainty</em> checkbox to exclude the prompt-deviation component.</p>
+                            </div>
 
-            <div class="control-group">
-                <label>Shots:</label>
-                <div class="shot-toggle">
-                    <button class="shot-btn" data-shot="0">0-shot</button>
-                    <button class="shot-btn active" data-shot="5">5-shot</button>
+                            <div class="about-section">
+                                <h3>Normalization</h3>
+                                <p>The default <em>random baseline</em> normalization subtracts each task's random baseline
+                                    (clamped at 0) and rescales to a 0–100 range, so different tasks can be averaged on a common scale.</p>
+                            </div>
+                        </div>
+                    </details>
                 </div>
-            </div>
-
-            <div class="control-group">
-                <label for="prompt-agg-select">Prompt aggregation:</label>
-                <select id="prompt-agg-select" class="control-select">
-                    <option value="max" selected>max</option>
-                    <option value="mean">mean</option>
-                    <option value="median">median</option>
-                    <option value="min">min</option>
-                    <option value="first">first</option>
-                    <option value="stdev">stdev</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label for="norm-select">Normalization:</label>
-                <select id="norm-select" class="control-select">
-                    <option value="none">none</option>
-                    <option value="baseline" selected>random baseline</option>
-                </select>
-            </div>
-
-            <div class="control-group" id="metric-control" style="display:none;">
-                <label for="metric-select">Metric:</label>
-                <select id="metric-select" class="control-select"></select>
-            </div>
-
-            <div class="control-group">
-                <label class="toggle-label">
-                    <input type="checkbox" id="prompt-dev-toggle" checked>
-                    <span id="prompt-dev-label">Prompt uncertainty</span>
-                </label>
-            </div>
+            </header>
         </div>
+    </div>
 
-        <div id="task-description" class="task-description" style="display:none;"></div>
-
-        <div id="filter-panel" class="filter-panel" style="display:none;">
-            <div class="filter-panel-header">
-                <button id="filter-panel-toggle" class="small-btn">Show signal criteria</button>
-                <button id="filter-download-btn" class="small-btn" title="Download criteria settings as JSON">↓ Download</button>
-                <button id="filter-upload-btn" class="small-btn" title="Upload criteria settings from JSON">↑ Upload</button>
-                <input type="file" id="filter-upload-input" accept=".json" style="display:none;">
-                <span id="filter-summary" class="filter-summary"></span>
-            </div>
-            <div id="filter-panel-content" style="display:none;">
-                <h3>Task-signal criteria</h3>
-                <p class="filter-description">Based on <a href="https://github.com/hplt-project/hplt-e">HPLT-E</a> task selection. Only benchmarks passing all enabled criteria are aggregated.</p>
-                <div id="filter-criteria-grid" class="filter-criteria-grid"></div>
-                <div id="filter-table-content" class="filter-table-content">
-                    <table id="filter-table" class="filter-table"></table>
+    <div class="band band-white">
+        <div class="band-inner">
+            <nav class="tab-nav" id="tab-nav">
+                <!-- Tabs populated by app.js from data.languages -->
+            </nav>
+            <section class="chart-section">
+                <div id="filter-panel" class="filter-panel" style="display:none;">
+                    <div class="filter-panel-header">
+                        <button id="filter-panel-toggle" class="small-btn">Show signal criteria</button>
+                        <button id="filter-download-btn" class="small-btn" title="Download criteria settings as JSON">↓ Download</button>
+                        <button id="filter-upload-btn" class="small-btn" title="Upload criteria settings from JSON">↑ Upload</button>
+                        <input type="file" id="filter-upload-input" accept=".json" style="display:none;">
+                        <span id="filter-summary" class="filter-summary"></span>
+                    </div>
+                    <div id="filter-panel-content" style="display:none;">
+                        <h3>Task-signal criteria</h3>
+                        <p class="filter-description">Based on <a href="https://github.com/hplt-project/hplt-e">HPLT-E</a> task selection. Only benchmarks passing all enabled criteria are aggregated.</p>
+                        <div id="filter-criteria-grid" class="filter-criteria-grid"></div>
+                        <div id="filter-table-content" class="filter-table-content">
+                            <table id="filter-table" class="filter-table"></table>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <div id="chart-container">
-            <div id="chart"></div>
-        </div>
+                <div class="chart-zone">
+                    <details class="chart-title-details">
+                        <summary><span class="chart-title" id="chart-title">&nbsp;</span></summary>
+                        <div class="chart-description" id="chart-description"></div>
+                    </details>
+                    <div class="controls-bar">
+                        <div class="control-group">
+                            <label for="task-select">Task:</label>
+                            <select id="task-select">
+                                <option value="__filtered__" title="Micro-average over tasks passing HPLT-E signal-quality criteria">Signal-filtered tasks</option>
+                                <option value="__all_macro__" title="Scores averaged within categories, then averaged across categories">All (category-average)</option>
+                                <option value="__all__" title="Simple average across all tasks">All (task-average)</option>
+                                <option value="__custom__" hidden>Custom (task-average)</option>
+                            </select>
+                        </div>
 
-        <div id="task-checkboxes" class="task-checkboxes">
-            <div class="checkbox-header">
-                <h3>Tasks included in aggregation</h3>
-                <div class="checkbox-actions">
-                    <button id="select-all-btn" class="small-btn">Select all</button>
-                    <button id="select-none-btn" class="small-btn">Select none</button>
+                        <div class="control-group">
+                            <label>Shots:</label>
+                            <div class="shot-toggle">
+                                <button class="shot-btn" data-shot="0">0-shot</button>
+                                <button class="shot-btn active" data-shot="5">5-shot</button>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="prompt-agg-select">Prompt aggregation:</label>
+                            <select id="prompt-agg-select" class="control-select">
+                                <option value="max" selected>max</option>
+                                <option value="mean">mean</option>
+                                <option value="median">median</option>
+                                <option value="min">min</option>
+                                <option value="first">first</option>
+                                <option value="stdev">stdev</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="norm-select">Normalization:</label>
+                            <select id="norm-select" class="control-select">
+                                <option value="none">none</option>
+                                <option value="baseline" selected>random baseline</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" id="metric-control" style="display:none;">
+                            <label for="metric-select">Metric:</label>
+                            <select id="metric-select" class="control-select"></select>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="prompt-dev-toggle" checked>
+                                <span id="prompt-dev-label">Prompt uncertainty</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div id="chart"></div>
                 </div>
-            </div>
-            <div id="checkbox-grid" class="checkbox-grid"></div>
+            </section>
         </div>
-    </main>
+    </div>
+
+    <div class="band band-tint">
+        <div class="band-inner">
+            <section class="modules-section">
+                <div id="task-checkboxes" class="module">
+                    <div class="module-header">
+                        <h3>Tasks included in aggregation</h3>
+                        <div class="module-actions">
+                            <button id="select-all-btn" class="small-btn">Select all</button>
+                            <button id="select-none-btn" class="small-btn">Select none</button>
+                        </div>
+                    </div>
+                    <div id="checkbox-grid" class="checkbox-grid"></div>
+                </div>
+            </section>
+            <footer class="dashboard-footer">
+                <p>Made by <a href="https://www.mn.uio.no/ifi/english/research/groups/ltg/">Language Technology Group</a>, University of Oslo</p>
+            </footer>
+        </div>
+    </div>
 
     <div id="custom-tooltip" class="custom-tooltip">
         <div class="tooltip-title" id="tooltip-title"></div>
@@ -115,10 +165,6 @@
         <div class="tooltip-body" id="tooltip-body"></div>
         <div class="tooltip-footer" id="tooltip-footer"></div>
     </div>
-
-    <footer>
-        <p>Made by <a href="https://www.mn.uio.no/ifi/english/research/groups/ltg/">Language Technology Group</a>, University of Oslo</p>
-    </footer>
 
     <script type="module" src="app.js"></script>
 </body>

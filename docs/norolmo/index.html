@@ -3,127 +3,152 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NorOLMo progress dashboard</title>
+    <title>NorOLMo dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/style.css">
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
 </head>
 <body>
-    <header>
-        <h1>NorOLMo training progress &#127475;&#127476;</h1>
-        <p class="subtitle">NorOLMo 13B trajectory across 33 training checkpoints + late-stage ablations, evaluated with the <a href="https://aclanthology.org/2025.findings-acl.181/">NorEval benchmark</a></p>
-    </header>
 
-    <main>
-        <details class="about-panel">
-            <summary>About</summary>
-            <div class="about-content">
-                <div class="about-section">
-                    <h2>About NorOLMo</h2>
-                    <p>
-                        NorOLMo is a fully-open Norwegian language model continually-trained on OLMo2 (13B stage 2) by the
-                        <a href="https://www.mn.uio.no/ifi/english/research/groups/ltg/">Language Technology Group</a>
-                        at the University of Oslo. This view tracks NorOLMo's performance across 33 training checkpoints
-                        (steps 1k–33k) plus several late-stage ablation runs, evaluated on the NorEval benchmark
-                        (<a href="https://aclanthology.org/2025.findings-acl.181/">Mikhailov et al., 2025</a>).
-                    </p>
+    <div class="band band-tint">
+        <div class="band-inner">
+            <header class="dashboard-header">
+                <div class="header-titles">
+                    <h1>NorOLMo dashboard</h1>
+                    <details class="about-inline">
+                        <summary>Norwegian training-progress evaluation — click here for more information</summary>
+                        <div class="about-content">
+                            <div class="about-section">
+                                <h2>About NorOLMo</h2>
+                                <p>
+                                    NorOLMo is a fully-open Norwegian language model continually-trained on OLMo2 (13B stage 2) by the
+                                    <a href="https://www.mn.uio.no/ifi/english/research/groups/ltg/">Language Technology Group</a>
+                                    at the University of Oslo. This view tracks NorOLMo's performance across 33 training checkpoints
+                                    (steps 1k–33k) plus several late-stage ablation runs, evaluated on the NorEval benchmark
+                                    (<a href="https://aclanthology.org/2025.findings-acl.181/">Mikhailov et al., 2025</a>).
+                                </p>
+                            </div>
+
+                            <div class="about-section">
+                                <h3>Ablations</h3>
+                                <p>The dashboard includes several ablations of NorOLMo's late training stages:</p>
+                                <ul>
+                                    <li><strong>Stage 2 (stage 1 data, full decay).</strong> No length extension; stage-2 schedule continues training on stage-1 data with full LR decay.</li>
+                                    <li><strong>Stage 2 (stage 1/2 data, ½ decay).</strong> Variants that halve the LR decay rate during stage 2.</li>
+                                    <li><strong>Stage 3 (RoPE scaling / no RoPE scaling).</strong> Length-extension experiments at stage 3.</li>
+                                </ul>
+                                <p>Ablation lines start at different training steps, reflecting where each experiment diverges from the main run.</p>
+                            </div>
+
+                            <div class="about-section">
+                                <h3>Error bars</h3>
+                                <p>Shaded bands show combined uncertainty from two independent sources, added in quadrature:</p>
+                                <ul>
+                                    <li><strong>Sampling error.</strong> For classification metrics, SE = &radic;(v&middot;(1&minus;v)/n). For corpus-level metrics, estimated via bootstrap resampling.</li>
+                                    <li><strong>Prompt deviation.</strong> SD(scores across prompt variants) / &radic;(k).</li>
+                                </ul>
+                            </div>
+
+                            <div class="about-section">
+                                <h3>Normalization</h3>
+                                <p>Aggregate views normalize scores before averaging. The default <em>random baseline</em> normalization maps each score to:</p>
+                                <p class="about-formula">normalized = (raw &minus; random_baseline) / (max_performance &minus; random_baseline) &times; 100</p>
+                                <p>where 0 = random chance and 100 = perfect performance.</p>
+                            </div>
+                        </div>
+                    </details>
                 </div>
-
-                <div class="about-section">
-                    <h3>Ablations</h3>
-                    <p>The dashboard includes several ablations of NorOLMo's late training stages:</p>
-                    <ul>
-                        <li><strong>Stage 2 (stage 1 data, full decay).</strong> No length extension; stage-2 schedule continues training on stage-1 data with full LR decay.</li>
-                        <li><strong>Stage 2 (stage 1/2 data, ½ decay).</strong> Variants that halve the LR decay rate during stage 2.</li>
-                        <li><strong>Stage 3 (RoPE scaling / no RoPE scaling).</strong> Length-extension experiments at stage 3.</li>
-                    </ul>
-                    <p>Ablation lines start at different training steps, reflecting where each experiment diverges from the main run.</p>
-                </div>
-
-                <div class="about-section">
-                    <h3>Error bars</h3>
-                    <p>Shaded bands show combined uncertainty from two independent sources, added in quadrature:</p>
-                    <ul>
-                        <li><strong>Sampling error.</strong> For classification metrics, SE = &radic;(v&middot;(1&minus;v)/n). For corpus-level metrics, estimated via bootstrap resampling.</li>
-                        <li><strong>Prompt deviation.</strong> SD(scores across prompt variants) / &radic;(k).</li>
-                    </ul>
-                </div>
-
-                <div class="about-section">
-                    <h3>Normalization</h3>
-                    <p>Aggregate views normalize scores before averaging. The default <em>random baseline</em> normalization maps each score to:</p>
-                    <p class="about-formula">normalized = (raw &minus; random_baseline) / (max_performance &minus; random_baseline) &times; 100</p>
-                    <p>where 0 = random chance and 100 = perfect performance.</p>
-                </div>
-            </div>
-        </details>
-
-        <div class="controls">
-            <div class="control-group">
-                <label for="task-select">Task:</label>
-                <select id="task-select">
-                    <option value="__all_macro__">All (category average)</option>
-                    <option value="__all__">All (task average)</option>
-                    <option value="__custom__" hidden>Custom (task average)</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label>Shots:</label>
-                <div class="shot-toggle">
-                    <button class="shot-btn" data-shot="0">0-shot</button>
-                    <button class="shot-btn" data-shot="1">1-shot</button>
-                    <button class="shot-btn active" data-shot="5">5-shot</button>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <label for="prompt-agg-select">Prompt aggregation:</label>
-                <select id="prompt-agg-select" class="control-select">
-                    <option value="max" selected>max</option>
-                    <option value="mean">mean</option>
-                    <option value="median">median</option>
-                    <option value="min">min</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label for="norm-select">Normalization:</label>
-                <select id="norm-select" class="control-select">
-                    <option value="none">none</option>
-                    <option value="baseline" selected>random baseline</option>
-                    <option value="minmax">min-max (observed)</option>
-                    <option value="zscore">z-score</option>
-                    <option value="percentile">percentile</option>
-                </select>
-            </div>
-
-            <div class="control-group" id="metric-control" style="display:none;">
-                <label for="metric-select">Metric:</label>
-                <select id="metric-select" class="control-select"></select>
-            </div>
+                <svg class="header-icon" viewBox="0 0 22 16" xmlns="http://www.w3.org/2000/svg" aria-label="Flag of Norway">
+                    <rect width="22" height="16" fill="#BA0C2F"/>
+                    <rect x="6" width="4" height="16" fill="#FFFFFF"/>
+                    <rect y="6" width="22" height="4" fill="#FFFFFF"/>
+                    <rect x="7" width="2" height="16" fill="#00205B"/>
+                    <rect y="7" width="22" height="2" fill="#00205B"/>
+                </svg>
+            </header>
         </div>
+    </div>
 
-        <div id="task-description" class="task-description" style="display:none;"></div>
+    <div class="band band-white">
+        <div class="band-inner">
+            <section class="chart-section">
+                <div class="chart-zone">
+                    <details class="chart-title-details">
+                        <summary><span class="chart-title" id="chart-title">&nbsp;</span></summary>
+                        <div class="chart-description" id="chart-description"></div>
+                    </details>
+                    <div class="controls-bar">
+                        <div class="control-group">
+                            <label for="task-select">Task:</label>
+                            <select id="task-select">
+                                <option value="__all_macro__">All (category average)</option>
+                                <option value="__all__">All (task average)</option>
+                                <option value="__custom__" hidden>Custom (task average)</option>
+                            </select>
+                        </div>
 
-        <div id="chart-container">
-            <div id="chart"></div>
-        </div>
+                        <div class="control-group">
+                            <label>Shots:</label>
+                            <div class="shot-toggle">
+                                <button class="shot-btn" data-shot="0">0-shot</button>
+                                <button class="shot-btn" data-shot="1">1-shot</button>
+                                <button class="shot-btn active" data-shot="5">5-shot</button>
+                            </div>
+                        </div>
 
-        <div id="task-checkboxes" class="task-checkboxes">
-            <div class="checkbox-header">
-                <h3>Tasks included in aggregation</h3>
-                <div class="checkbox-actions">
-                    <button id="select-all-btn" class="small-btn">Select all</button>
-                    <button id="select-none-btn" class="small-btn">Select none</button>
+                        <div class="control-group">
+                            <label for="prompt-agg-select">Prompt aggregation:</label>
+                            <select id="prompt-agg-select" class="control-select">
+                                <option value="max" selected>max</option>
+                                <option value="mean">mean</option>
+                                <option value="median">median</option>
+                                <option value="min">min</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="norm-select">Normalization:</label>
+                            <select id="norm-select" class="control-select">
+                                <option value="none">none</option>
+                                <option value="baseline" selected>random baseline</option>
+                                <option value="minmax">min-max (observed)</option>
+                                <option value="zscore">z-score</option>
+                                <option value="percentile">percentile</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" id="metric-control" style="display:none;">
+                            <label for="metric-select">Metric:</label>
+                            <select id="metric-select" class="control-select"></select>
+                        </div>
+                    </div>
+                    <div id="chart"></div>
                 </div>
-            </div>
-            <div id="checkbox-grid" class="checkbox-grid"></div>
+            </section>
         </div>
+    </div>
 
-    </main>
+    <div class="band band-tint">
+        <div class="band-inner">
+            <section class="modules-section">
+                <div id="task-checkboxes" class="module">
+                    <div class="module-header">
+                        <h3>Tasks included in aggregation</h3>
+                        <div class="module-actions">
+                            <button id="select-all-btn" class="small-btn">Select all</button>
+                            <button id="select-none-btn" class="small-btn">Select none</button>
+                        </div>
+                    </div>
+                    <div id="checkbox-grid" class="checkbox-grid"></div>
+                </div>
+            </section>
+            <footer class="dashboard-footer">
+                <p>Made by <a href="https://www.mn.uio.no/ifi/english/research/groups/ltg/">Language Technology Group</a>, University of Oslo</p>
+            </footer>
+        </div>
+    </div>
 
     <div id="custom-tooltip" class="custom-tooltip">
         <div class="tooltip-title" id="tooltip-title"></div>
@@ -131,10 +156,6 @@
         <div class="tooltip-body" id="tooltip-body"></div>
         <div class="tooltip-footer" id="tooltip-footer"></div>
     </div>
-
-    <footer>
-        <p>Made by <a href="https://www.mn.uio.no/ifi/english/research/groups/ltg/">Language Technology Group</a>, University of Oslo</p>
-    </footer>
 
     <script type="module" src="app.js"></script>
 </body>

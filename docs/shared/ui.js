@@ -54,15 +54,25 @@ export function attachTooltip(element, contentFn) {
   element.addEventListener("mouseleave", () => hideTooltip());
 }
 
-export function attachTaskTooltip(element, bench) {
-  attachTooltip(element, () => {
-    const info = state.metricsSetup[bench];
-    if (!info) return null;
-    const body = info.description || "";
-    const footer = info.url ? info.url.replace("https://huggingface.co/", "hf.co/") : "";
-    return { title: info.pretty_name, body, footer };
-  });
+/** Module sections are wrapped in <details>/<summary>. The summary line
+ *  contains action buttons like "Select all" / "Select none". Without
+ *  intervention, clicking those buttons would also toggle the <details>
+ *  open/closed because the click event bubbles to the summary. This
+ *  installs a single document-level listener (capture phase) that stops
+ *  propagation of clicks originating inside .module-actions. */
+let moduleActionsBound = false;
+export function bindModuleActionStopPropagation() {
+  if (moduleActionsBound) return;
+  moduleActionsBound = true;
+  document.addEventListener("click", (e) => {
+    if (e.target.closest && e.target.closest(".module-actions")) {
+      e.stopPropagation();
+    }
+  }, true);
 }
+
+// (attachTaskTooltip was removed when task items became expandable <details>
+//  that show the description inline below the task name instead of on hover.)
 
 // ─────────────────────────────────────────────────────────────
 // Task checkboxes
@@ -135,7 +145,13 @@ export function buildTaskCheckboxes({ filterSourceFn, onChange, displayName }) {
     catDiv.appendChild(headerDiv);
 
     for (const bench of catBenches) {
-      const label = document.createElement("label");
+      // Each task is a <details>; clicking the name expands an inline
+      // description below. The checkbox stops click propagation so clicking
+      // it doesn't toggle the expansion.
+      const item = document.createElement("details");
+      item.className = "task-item";
+
+      const summary = document.createElement("summary");
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.checked = state.checkedTasks.has(bench);
@@ -147,10 +163,33 @@ export function buildTaskCheckboxes({ filterSourceFn, onChange, displayName }) {
         syncTaskCheckboxStates(filterSourceFn);
         onChange();
       });
-      label.appendChild(checkbox);
-      label.appendChild(document.createTextNode(" " + nameFn(bench)));
-      attachTaskTooltip(label, bench);
-      catDiv.appendChild(label);
+      checkbox.addEventListener("click", (e) => e.stopPropagation());
+
+      const nameSpan = document.createElement("span");
+      nameSpan.className = "task-name";
+      nameSpan.textContent = nameFn(bench);
+
+      summary.appendChild(checkbox);
+      summary.appendChild(nameSpan);
+      item.appendChild(summary);
+
+      // Description body (revealed when the user clicks the task name).
+      const info = state.metricsSetup[bench];
+      const desc = document.createElement("div");
+      desc.className = "task-description-inline";
+      if (info?.description) desc.appendChild(document.createTextNode(info.description));
+      if (info?.url) {
+        if (info.description) desc.appendChild(document.createElement("br"));
+        const a = document.createElement("a");
+        a.href = info.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.textContent = info.url.replace("https://huggingface.co/", "hf.co/");
+        desc.appendChild(a);
+      }
+      item.appendChild(desc);
+
+      catDiv.appendChild(item);
     }
     grid.appendChild(catDiv);
   }

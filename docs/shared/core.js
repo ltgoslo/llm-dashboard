@@ -221,12 +221,12 @@ export function isStderrCompatible() {
 // ─────────────────────────────────────────────────────────────
 
 export function getNormYLabel() {
-  if (state.currentPromptAgg === "stdev") return "prompt stdev (0–100)";
-  if (state.currentNormalization === "baseline") return "normalized score (baseline=0, perfect=100)";
-  if (state.currentNormalization === "minmax") return "normalized score (min-max across models)";
-  if (state.currentNormalization === "zscore") return "z-score (standard deviations from mean)";
-  if (state.currentNormalization === "percentile") return "percentile rank (0=worst, 100=best)";
-  return "score (0–100)";
+  if (state.currentPromptAgg === "stdev") return "prompt stdev";
+  if (state.currentNormalization === "baseline") return "normalized score";
+  if (state.currentNormalization === "minmax") return "normalized score";
+  if (state.currentNormalization === "zscore") return "z-score";
+  if (state.currentNormalization === "percentile") return "percentile rank";
+  return "score";
 }
 
 export function getMetricYLabel(benchmark, metric) {

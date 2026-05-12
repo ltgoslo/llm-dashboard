@@ -3,212 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NorEval dashboard – base models</title>
+    <title>NorEval dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/style.css">
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
 </head>
 <body>
-    <header>
-        <h1>NorEval dashboard – base models &#127475;&#127476;</h1>
-        <p class="subtitle">Norwegian base-model evaluation with <a href="https://github.com/EleutherAI/lm-evaluation-harness">lm-eval-harness</a> using the <a href="https://aclanthology.org/2025.findings-acl.181/">NorEval benchmark</a></p>
-    </header>
 
-    <main>
-        <details class="about-panel">
-            <summary>About</summary>
-            <div class="about-content">
-                <div class="about-section">
-                    <h2>About NorEval</h2>
-                    <p>
-                        NorEval is a comprehensive evaluation benchmark for Norwegian language models, described in
-                        <a href="https://aclanthology.org/2025.findings-acl.181/">Mikhailov et al. (2025)</a>.
-                        It consists of 35 tasks spanning linguistic knowledge, language understanding, world knowledge &amp; reasoning,
-                        generation &amp; summarization, and translation. All evaluations are conducted using
-                        <a href="https://github.com/EleutherAI/lm-evaluation-harness">lm-eval-harness</a> v0.4.10.
-                    </p>
-                </div>
+    <div class="band band-tint">
+        <div class="band-inner">
+            <header class="dashboard-header">
+                <div class="header-titles">
+                    <h1>NorEval dashboard</h1>
+                    <details class="about-inline">
+                        <summary>Norwegian base-model evaluation — click here for more information</summary>
+                        <div class="about-content">
+                            <div class="about-section">
+                                <h2>About NorEval</h2>
+                                <p>
+                                    NorEval is a comprehensive evaluation benchmark for Norwegian language models, described in
+                                    <a href="https://aclanthology.org/2025.findings-acl.181/">Mikhailov et al. (2025)</a>.
+                                    It consists of 35 tasks spanning linguistic knowledge, language understanding, world knowledge &amp; reasoning,
+                                    generation &amp; summarization, and translation. All evaluations are conducted using
+                                    <a href="https://github.com/EleutherAI/lm-evaluation-harness">lm-eval-harness</a> v0.4.10.
+                                </p>
+                            </div>
 
-                <div class="about-section">
-                    <h3>Design principles</h3>
-                    <ul>
-                        <li><strong>Native, non-translated datasets.</strong> The benchmarks are built from natively Norwegian sources rather than machine-translated English datasets. This avoids translationese artifacts and better reflects genuine Norwegian language use.</li>
-                        <li><strong>Both written standards.</strong> Norwegian has two official written standards: Bokm&aring;l (nob) and Nynorsk (nno). NorEval includes parallel benchmark variants for both, enabling direct comparison of model performance across the two standards.</li>
-                        <li><strong>Northern S&aacute;mi.</strong> Two translation tasks (nob&harr;sme) and one linguistic acceptability task (MultiBLiMP) cover Northern S&aacute;mi, an endangered Uralic language spoken in Norway, Sweden, and Finland.</li>
-                        <li><strong>Multiple prompt templates.</strong> Most tasks are evaluated with 4&ndash;6 different prompt formulations to measure sensitivity to prompt phrasing. The dashboard reports a configurable summary statistic across prompts (max, mean, median, or min).</li>
-                        <li><strong>Few-shot evaluation.</strong> Each task is evaluated at 0-shot, 1-shot, and 5-shot to assess in-context learning capabilities.</li>
-                    </ul>
-                </div>
+                            <div class="about-section">
+                                <h3>Design principles</h3>
+                                <ul>
+                                    <li><strong>Native, non-translated datasets.</strong> The benchmarks are built from natively Norwegian sources rather than machine-translated English datasets. This avoids translationese artifacts and better reflects genuine Norwegian language use.</li>
+                                    <li><strong>Both written standards.</strong> Norwegian has two official written standards: Bokm&aring;l (nob) and Nynorsk (nno). NorEval includes parallel benchmark variants for both, enabling direct comparison of model performance across the two standards.</li>
+                                    <li><strong>Northern S&aacute;mi.</strong> Two translation tasks (nob&harr;sme) and one linguistic acceptability task (MultiBLiMP) cover Northern S&aacute;mi, an endangered Uralic language spoken in Norway, Sweden, and Finland.</li>
+                                    <li><strong>Multiple prompt templates.</strong> Most tasks are evaluated with 4&ndash;6 different prompt formulations to measure sensitivity to prompt phrasing. The dashboard reports a configurable summary statistic across prompts (max, mean, median, or min).</li>
+                                    <li><strong>Few-shot evaluation.</strong> Each task is evaluated at 0-shot, 1-shot, and 5-shot to assess in-context learning capabilities.</li>
+                                </ul>
+                            </div>
 
-                <div class="about-section">
-                    <h3>Error bars</h3>
-                    <p>Error bars on this dashboard show combined uncertainty from two independent sources, added in quadrature:</p>
-                    <ul>
-                        <li><strong>Sampling error (&plusmn;1 SE).</strong> For classification metrics (accuracy, F1, exact match), SE = &radic;(v&middot;(1&minus;v)/n), where v is the score and n is the number of samples. For corpus-level metrics (BLEU, chrF, ROUGE), SE is estimated via bootstrap resampling (100 iterations).</li>
-                        <li><strong>Prompt deviation.</strong> Computed as SD(scores across prompt variants) / &radic;(k), where k is the number of prompt variants. This captures uncertainty due to prompt formulation. Has no effect on single-prompt benchmarks.</li>
-                    </ul>
-                    <p>The two components are combined as &radic;(SE&sup2; + prompt_SE&sup2;). In aggregate views, SE is propagated as &radic;(&Sigma; SE&sup2;) / N across the N benchmarks being averaged.</p>
-                </div>
+                            <div class="about-section">
+                                <h3>Error bars</h3>
+                                <p>Error bars on this dashboard show combined uncertainty from two independent sources, added in quadrature:</p>
+                                <ul>
+                                    <li><strong>Sampling error (&plusmn;1 SE).</strong> For classification metrics (accuracy, F1, exact match), SE = &radic;(v&middot;(1&minus;v)/n), where v is the score and n is the number of samples. For corpus-level metrics (BLEU, chrF, ROUGE), SE is estimated via bootstrap resampling (100 iterations).</li>
+                                    <li><strong>Prompt deviation.</strong> Computed as SD(scores across prompt variants) / &radic;(k), where k is the number of prompt variants. This captures uncertainty due to prompt formulation. Has no effect on single-prompt benchmarks.</li>
+                                </ul>
+                                <p>The two components are combined as &radic;(SE&sup2; + prompt_SE&sup2;). In aggregate views, SE is propagated as &radic;(&Sigma; SE&sup2;) / N across the N benchmarks being averaged.</p>
+                            </div>
 
-                <div class="about-section">
-                    <h3>Normalization</h3>
-                    <p>Aggregate views normalize scores before averaging to put different metrics on a common scale. The default <em>random baseline</em> normalization maps each score to:</p>
-                    <p class="about-formula">normalized = (raw &minus; random_baseline) / (max_performance &minus; random_baseline) &times; 100</p>
-                    <p>where 0 = random chance and 100 = perfect performance. Other normalization options (min-max, z-score, percentile) are available from the <em>Normalization</em> dropdown.</p>
-                </div>
+                            <div class="about-section">
+                                <h3>Normalization</h3>
+                                <p>Aggregate views normalize scores before averaging to put different metrics on a common scale. The default <em>random baseline</em> normalization maps each score to:</p>
+                                <p class="about-formula">normalized = (raw &minus; random_baseline) / (max_performance &minus; random_baseline) &times; 100</p>
+                                <p>where 0 = random chance and 100 = perfect performance. Other normalization options (min-max, z-score, percentile) are available from the <em>Normalization</em> dropdown.</p>
+                            </div>
 
-                <div class="about-section">
-                    <h3>Dashboard features</h3>
-                    <ul>
-                        <li><strong>Filter by size or openness.</strong> Use the model-size slider above the chart to restrict to a parameter range, or the "Fully open" toggle to limit to fully-open-weight + open-data models.</li>
-                        <li><strong>Select/deselect models &amp; tasks.</strong> Use the checkboxes below the chart to choose exactly which models and tasks contribute to each view.</li>
-                        <li><strong>Task grouping.</strong> Related benchmarks (e.g., Bokm&aring;l/Nynorsk pairs, translation direction pairs) are shown as grouped bar charts for easy comparison.</li>
-                        <li><strong>Metric selector.</strong> Individual task views offer a dropdown to switch between all available metrics for that benchmark.</li>
-                        <li><strong>Chart export.</strong> Charts can be downloaded as PNG or SVG, and the underlying data exported as JSON, via the toolbar buttons.</li>
-                    </ul>
-                </div>
+                            <div class="about-section">
+                                <h3>Dashboard features</h3>
+                                <ul>
+                                    <li><strong>Filter by size or openness.</strong> The bottom row of controls lets you restrict to a model-size range or limit to fully-open-weight models.</li>
+                                    <li><strong>Select/deselect models &amp; tasks.</strong> The two sections below the plot let you choose exactly which models and tasks contribute to each view.</li>
+                                    <li><strong>Task grouping.</strong> Related benchmarks (e.g., Bokm&aring;l/Nynorsk pairs, translation direction pairs) are shown as grouped bar charts for easy comparison.</li>
+                                    <li><strong>Metric selector.</strong> Individual task views offer a dropdown (top control row) to switch between all available metrics for that benchmark.</li>
+                                    <li><strong>Chart export.</strong> Charts can be downloaded as PNG or SVG, and the underlying data exported as JSON, via the toolbar buttons.</li>
+                                </ul>
+                            </div>
 
-                <div class="about-section">
-                    <h3>Citation</h3>
-                    <pre class="about-citation">@inproceedings{mikhailov-etal-2025-noreval,
+                            <div class="about-section">
+                                <h3>Citation</h3>
+                                <pre class="about-citation">@inproceedings{mikhailov-etal-2025-noreval,
     title = "{N}or{E}val: A {N}orwegian Language Understanding and Generation Evaluation Benchmark",
-    author = "Mikhailov, Vladislav  and
-      Enstad, Tita  and
-      Samuel, David  and
-      Farseth{\r{a}}s, Hans Christian  and
-      Kutuzov, Andrey  and
-      Velldal, Erik  and
-      {\O}vrelid, Lilja",
-    editor = "Che, Wanxiang  and
-      Nabende, Joyce  and
-      Shutova, Ekaterina  and
-      Pilehvar, Mohammad Taher",
+    author = "Mikhailov, Vladislav  and Enstad, Tita  and Samuel, David  and
+              Farseth{\r{a}}s, Hans Christian  and Kutuzov, Andrey  and
+              Velldal, Erik  and {\O}vrelid, Lilja",
     booktitle = "Findings of the Association for Computational Linguistics: ACL 2025",
-    month = jul,
     year = "2025",
-    address = "Vienna, Austria",
-    publisher = "Association for Computational Linguistics",
     url = "https://aclanthology.org/2025.findings-acl.181/",
-    doi = "10.18653/v1/2025.findings-acl.181",
-    pages = "3495--3541",
-    ISBN = "979-8-89176-256-5"
 }</pre>
+                            </div>
+                        </div>
+                    </details>
                 </div>
-            </div>
-        </details>
-
-        <div class="controls">
-            <div class="control-group">
-                <label for="task-select">Task:</label>
-                <select id="task-select">
-                    <option value="__all_macro__">All (category average)</option>
-                    <option value="__all__">All (task average)</option>
-                    <option value="__custom__" hidden>Custom (task average)</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label>Shots:</label>
-                <div class="shot-toggle">
-                    <button class="shot-btn" data-shot="0">0-shot</button>
-                    <button class="shot-btn" data-shot="1">1-shot</button>
-                    <button class="shot-btn active" data-shot="5">5-shot</button>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <label for="prompt-agg-select">Prompt aggregation:</label>
-                <select id="prompt-agg-select" class="control-select">
-                    <option value="max" selected>max</option>
-                    <option value="mean">mean</option>
-                    <option value="median">median</option>
-                    <option value="min">min</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label for="norm-select">Normalization:</label>
-                <select id="norm-select" class="control-select">
-                    <option value="none">none</option>
-                    <option value="baseline" selected>random baseline</option>
-                    <option value="minmax">min-max (observed)</option>
-                    <option value="zscore">z-score</option>
-                    <option value="percentile">percentile</option>
-                </select>
-            </div>
-
-            <div class="control-group" id="metric-control" style="display:none;">
-                <label for="metric-select">Metric:</label>
-                <select id="metric-select" class="control-select"></select>
-            </div>
+                <svg class="header-icon" viewBox="0 0 22 16" xmlns="http://www.w3.org/2000/svg" aria-label="Flag of Norway">
+                    <rect width="22" height="16" fill="#BA0C2F"/>
+                    <rect x="6" width="4" height="16" fill="#FFFFFF"/>
+                    <rect y="6" width="22" height="4" fill="#FFFFFF"/>
+                    <rect x="7" width="2" height="16" fill="#00205B"/>
+                    <rect y="7" width="22" height="2" fill="#00205B"/>
+                </svg>
+            </header>
         </div>
+    </div>
 
-        <div id="task-description" class="task-description" style="display:none;"></div>
+    <div class="band band-white">
+        <div class="band-inner">
+            <section class="chart-section">
+                <div class="chart-zone">
+                    <details class="chart-title-details">
+                        <summary><span class="chart-title" id="chart-title">&nbsp;</span></summary>
+                        <div class="chart-description" id="chart-description"></div>
+                    </details>
+                    <div class="controls-bar">
+                        <div class="control-group">
+                            <label for="task-select">Task:</label>
+                            <select id="task-select">
+                                <option value="__all_macro__">All (category average)</option>
+                                <option value="__all__">All (task average)</option>
+                                <option value="__custom__" hidden>Custom (task average)</option>
+                            </select>
+                        </div>
 
-        <div id="chart-container">
-            <div class="chart-header">
-                <div class="size-slider-container" id="size-slider-container">
-                    <label>Model size:</label>
-                    <div class="range-slider" id="range-slider">
-                        <div class="range-track" id="range-track"></div>
-                        <div class="range-fill" id="range-fill"></div>
-                        <div class="range-thumb range-thumb-min" id="thumb-min" tabindex="0"></div>
-                        <div class="range-thumb range-thumb-max" id="thumb-max" tabindex="0"></div>
-                    </div>
-                    <span id="size-min-label" class="size-label">6B</span>
-                    <span class="size-sep">&ndash;</span>
-                    <span id="size-max-label" class="size-label">24B</span>
-                </div>
-                <div class="fully-open-container" id="fully-open-container">
-                    <label for="fully-open-toggle" class="fully-open-label">
-                        <input type="checkbox" id="fully-open-toggle">
-                        <span>Fully open</span>
-                    </label>
-                </div>
-            </div>
-            <div id="chart"></div>
-        </div>
+                        <div class="control-group">
+                            <label>Shots:</label>
+                            <div class="shot-toggle">
+                                <button class="shot-btn" data-shot="0">0-shot</button>
+                                <button class="shot-btn" data-shot="1">1-shot</button>
+                                <button class="shot-btn active" data-shot="5">5-shot</button>
+                            </div>
+                        </div>
 
-        <div id="task-checkboxes" class="task-checkboxes">
-            <div class="checkbox-header">
-                <h3>Tasks included in aggregation</h3>
-                <div class="checkbox-actions">
-                    <button id="select-all-btn" class="small-btn">Select all</button>
-                    <button id="select-none-btn" class="small-btn">Select none</button>
-                </div>
-            </div>
-            <div id="checkbox-grid" class="checkbox-grid"></div>
-        </div>
+                        <div class="control-group">
+                            <label for="prompt-agg-select">Prompt aggregation:</label>
+                            <select id="prompt-agg-select" class="control-select">
+                                <option value="max" selected>max</option>
+                                <option value="mean">mean</option>
+                                <option value="median">median</option>
+                                <option value="min">min</option>
+                            </select>
+                        </div>
 
-        <div id="model-panels" class="model-panels">
-            <div class="model-panels-row">
-                <div id="norwegian-models-panel" class="model-panel">
-                    <div class="checkbox-header">
-                        <h3>Norwegian language models</h3>
-                        <div class="checkbox-actions">
-                            <button class="small-btn model-select-all" data-category="norwegian">Select all</button>
-                            <button class="small-btn model-select-none" data-category="norwegian">Select none</button>
+                        <div class="control-group">
+                            <label for="norm-select">Normalization:</label>
+                            <select id="norm-select" class="control-select">
+                                <option value="none">none</option>
+                                <option value="baseline" selected>random baseline</option>
+                                <option value="minmax">min-max (observed)</option>
+                                <option value="zscore">z-score</option>
+                                <option value="percentile">percentile</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" id="metric-control" style="display:none;">
+                            <label for="metric-select">Metric:</label>
+                            <select id="metric-select" class="control-select"></select>
                         </div>
                     </div>
-                    <div id="norwegian-model-grid" class="model-checkbox-grid"></div>
-                </div>
-
-                <div id="multilingual-models-panel" class="model-panel">
-                    <div class="checkbox-header">
-                        <h3>Multilingual &amp; non-Norwegian language models</h3>
-                        <div class="checkbox-actions">
-                            <button class="small-btn model-select-all" data-category="multilingual">Select all</button>
-                            <button class="small-btn model-select-none" data-category="multilingual">Select none</button>
+                    <div class="controls-bar">
+                        <div class="control-group size-slider-container" id="size-slider-container">
+                            <label>Model size:</label>
+                            <div class="range-slider" id="range-slider">
+                                <div class="range-track" id="range-track"></div>
+                                <div class="range-fill" id="range-fill"></div>
+                                <div class="range-thumb range-thumb-min" id="thumb-min" tabindex="0"></div>
+                                <div class="range-thumb range-thumb-max" id="thumb-max" tabindex="0"></div>
+                            </div>
+                            <span id="size-min-label" class="size-label">6B</span>
+                            <span class="size-sep">&ndash;</span>
+                            <span id="size-max-label" class="size-label">24B</span>
+                        </div>
+                        <div class="control-group" id="fully-open-container">
+                            <label for="fully-open-toggle" class="fully-open-label">
+                                <input type="checkbox" id="fully-open-toggle">
+                                <span>Fully open only</span>
+                            </label>
                         </div>
                     </div>
-                    <div id="multilingual-model-grid" class="model-checkbox-grid"></div>
+                    <div id="chart"></div>
                 </div>
-            </div>
+            </section>
         </div>
+    </div>
 
-    </main>
+    <div class="band band-tint">
+        <div class="band-inner">
+            <section class="modules-section">
+                <div id="task-checkboxes" class="module">
+                    <div class="module-header">
+                        <h3>Tasks included in aggregation</h3>
+                        <div class="module-actions">
+                            <button id="select-all-btn" class="small-btn">Select all</button>
+                            <button id="select-none-btn" class="small-btn">Select none</button>
+                        </div>
+                    </div>
+                    <div id="checkbox-grid" class="checkbox-grid"></div>
+                </div>
+
+                <div id="model-panels">
+                    <div id="norwegian-models-panel" class="module model-panel">
+                        <div class="module-header">
+                            <h3>Norwegian language models</h3>
+                            <div class="module-actions">
+                                <button class="small-btn model-select-all" data-category="norwegian">Select all</button>
+                                <button class="small-btn model-select-none" data-category="norwegian">Select none</button>
+                            </div>
+                        </div>
+                        <div id="norwegian-model-grid" class="model-checkbox-grid"></div>
+                    </div>
+
+                    <div id="multilingual-models-panel" class="module model-panel">
+                        <div class="module-header">
+                            <h3>Multilingual &amp; non-Norwegian language models</h3>
+                            <div class="module-actions">
+                                <button class="small-btn model-select-all" data-category="multilingual">Select all</button>
+                                <button class="small-btn model-select-none" data-category="multilingual">Select none</button>
+                            </div>
+                        </div>
+                        <div id="multilingual-model-grid" class="model-checkbox-grid"></div>
+                    </div>
+                </div>
+            </section>
+            <footer class="dashboard-footer">
+                <p>Made by <a href="https://www.mn.uio.no/ifi/english/research/groups/ltg/">Language Technology Group</a>, University of Oslo</p>
+            </footer>
+        </div>
+    </div>
 
     <div id="custom-tooltip" class="custom-tooltip">
         <div class="tooltip-title" id="tooltip-title"></div>
@@ -216,10 +225,6 @@
         <div class="tooltip-body" id="tooltip-body"></div>
         <div class="tooltip-footer" id="tooltip-footer"></div>
     </div>
-
-    <footer>
-        <p>Made by <a href="https://www.mn.uio.no/ifi/english/research/groups/ltg/">Language Technology Group</a>, University of Oslo</p>
-    </footer>
 
     <script type="module" src="app.js"></script>
 </body>

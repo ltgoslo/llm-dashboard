@@ -21,7 +21,7 @@ import {
 } from "./chart.js";
 import {
   showTooltip, hideTooltip, attachTooltip, populateMetricSelector, hideMetricSelector,
-  buildTaskCheckboxes, syncTaskCheckboxStates,
+  buildTaskCheckboxes, syncTaskCheckboxStates, bindModuleActionStopPropagation,
 } from "./ui.js";
 import { UrlState } from "./url-state.js";
 
@@ -86,6 +86,7 @@ export async function initComparison(config) {
     bindEventListeners();
     buildCheckboxes();
     buildModelCheckboxes();
+    bindModuleActionStopPropagation();
 
     if (hasURL) {
       document.getElementById("task-select").value = state.currentTaskSelection;
@@ -645,6 +646,14 @@ function getModelList() {
     });
 }
 
+/** Numeric x positions for the models — uniformly spaced (1 unit apart).
+ *  Previously this added extra spacing between different organizations, but
+ *  the user found that visually confusing. Kept as a separate function so
+ *  per-org spacing can be re-introduced cheaply if desired. */
+function computeOrgXPositions(modelNames) {
+  return modelNames.map((_, i) => i);
+}
+
 // ─────────────────────────────────────────────────────────────
 // Model checkbox panel
 // ─────────────────────────────────────────────────────────────
@@ -699,8 +708,13 @@ function buildModelCheckboxes() {
       orgDiv.appendChild(headerDiv);
 
       for (const modelDir of models) {
-        const label = document.createElement("label");
-        label.dataset.model = modelDir;
+        // Each model is a <details>; click the name to expand its description
+        // and metadata. Checkbox click stops propagation so it doesn't toggle.
+        const item = document.createElement("details");
+        item.className = "model-item";
+        item.dataset.model = modelDir;
+
+        const summary = document.createElement("summary");
         const cb = document.createElement("input");
         cb.type = "checkbox"; cb.checked = checkedModels.has(modelDir);
         cb.dataset.model = modelDir;
@@ -710,14 +724,51 @@ function buildModelCheckboxes() {
           syncModelCheckboxStates();
           renderChart();
         });
+        cb.addEventListener("click", (e) => e.stopPropagation());
+
         const dot = document.createElement("span");
         dot.className = "model-color-dot";
         dot.style.backgroundColor = getModelColor(modelDir);
-        label.appendChild(cb);
-        label.appendChild(dot);
-        label.appendChild(document.createTextNode(" " + getModelLabel(modelDir)));
-        attachModelTooltip(label, modelDir);
-        orgDiv.appendChild(label);
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "model-name";
+        nameSpan.textContent = getModelLabel(modelDir);
+
+        summary.appendChild(cb);
+        summary.appendChild(dot);
+        summary.appendChild(nameSpan);
+        item.appendChild(summary);
+
+        // Description body
+        const info = state.DATA.model_info?.[modelDir];
+        const desc = document.createElement("div");
+        desc.className = "model-description-inline";
+        if (info) {
+          const params = state.DATA.model_parameters?.[modelDir];
+          const paramsPart = params
+            ? (params < 1 ? `${Math.round(params * 1000)}M parameters` : `${params}B parameters`)
+            : "";
+          const licensePart = info.license ? `License: ${info.license}` : "";
+          const meta = [paramsPart, licensePart, getModelOpenLabel(modelDir)].filter(Boolean).join("  ·  ");
+          if (meta) {
+            const metaEl = document.createElement("span");
+            metaEl.className = "meta";
+            metaEl.textContent = meta;
+            desc.appendChild(metaEl);
+          }
+          if (info.description) desc.appendChild(document.createTextNode(info.description));
+          if (info.huggingface_url) {
+            if (info.description) desc.appendChild(document.createElement("br"));
+            const a = document.createElement("a");
+            a.href = info.huggingface_url;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.textContent = info.huggingface_url.replace("https://huggingface.co/", "hf.co/");
+            desc.appendChild(a);
+          }
+        }
+        item.appendChild(desc);
+        orgDiv.appendChild(item);
       }
       grid.appendChild(orgDiv);
     }
@@ -739,20 +790,6 @@ function syncModelCheckboxStates() {
     const someChecked = models.some((m) => checkedModels.has(m));
     gcb.checked = allChecked;
     gcb.indeterminate = !allChecked && someChecked;
-  });
-}
-
-function attachModelTooltip(element, modelDir) {
-  attachTooltip(element, () => {
-    const info = state.DATA.model_info?.[modelDir];
-    if (!info) return null;
-    const params = state.DATA.model_parameters?.[modelDir];
-    let paramsPart = "";
-    if (params) paramsPart = params < 1 ? `${Math.round(params * 1000)}M parameters` : `${params}B parameters`;
-    const licensePart = info.license ? `License: ${info.license}` : "";
-    const meta = [paramsPart, licensePart, getModelOpenLabel(modelDir)].filter(Boolean).join("  ·  ");
-    const footer = info.huggingface_url ? info.huggingface_url.replace("https://huggingface.co/", "hf.co/") : "";
-    return { title: getModelLabel(modelDir), meta, body: info.description || "", footer };
   });
 }
 
@@ -828,7 +865,7 @@ function renderChart() {
     populateMetricSelector([sel]);
   }
 
-  updateDescription();
+  updateChartTitle();
 
   if (isAggregateSelection(sel)) renderAggregateBarChart();
   else if (sel.startsWith("__group__")) renderGroupedBarChart(sel.slice(9));
@@ -863,9 +900,14 @@ function renderAggregateBarChart() {
     aggStderrs.push(result ? result.stderr : 0);
   }
 
+  const xPositions = computeOrgXPositions(modelNames);
+  const xRange = xPositions.length
+    ? [xPositions[0] - 0.6, xPositions[xPositions.length - 1] + 0.5]
+    : null;
   const fmt = state.currentNormalization === "zscore" ? 2 : 1;
   const trace = {
-    x: labels, y: scores, type: "bar",
+    x: xPositions, y: scores, type: "bar",
+    width: 0.85,
     marker: { color: colors, line: { width: 0 } },
     customdata: taskCounts.map((c, i) => ({ count: c, stderr: aggStderrs[i], modelDir: modelNames[i] })),
     hoverinfo: "none",
@@ -873,20 +915,28 @@ function renderAggregateBarChart() {
   if (wantSE) {
     trace.error_y = {
       type: "data", array: aggStderrs, visible: true,
-      color: "rgba(0,0,0,0.35)", thickness: 1.5, width: 4,
+      color: "rgba(0,0,0,0.5)", thickness: 2.4, width: 5,
     };
   }
 
-  const avgLabel = macro ? "category average" : "task average";
   const yRange = computeAggregateYRange(state.checkedTasks);
   const layout = getPlotlyLayout({
-    title: { text: getAggregateLabel() + " – " + avgLabel + " (" + state.currentShot + "-shot)", font: { size: 16 } },
-    yaxis: { title: getNormYLabel(), range: yRange, showgrid: false, zeroline: state.currentNormalization === "zscore" },
-    xaxis: { title: "", tickangle: computeTickAngle(labels), showgrid: false },
+    yaxis: {
+      title: "", range: yRange,
+      showgrid: true, gridcolor: "#a8b0bd", automargin: false, ticks: "", ticklen: 0,
+      zeroline: state.currentNormalization === "zscore",
+    },
+    xaxis: { automargin: false,
+      title: "",
+      range: xRange,
+      tickvals: xPositions, ticktext: labels,
+      tickangle: computeTickAngle(labels),
+      showgrid: false,
+    },
     showlegend: false,
-    margin: { l: 60, r: 20, t: 50, b: 100 },
+    margin: { l: 105, r: 4, t: 8, b: 100 },
     annotations: labels.map((label, i) => ({
-      x: label, y: scores[i] + (wantSE ? (aggStderrs[i] || 0) : 0),
+      x: xPositions[i], y: scores[i] + (wantSE ? (aggStderrs[i] || 0) : 0),
       text: scores[i].toFixed(fmt), showarrow: false, yshift: 10,
       xanchor: "center",
       font: { size: computeAnnotationFontSize(labels.length) },
@@ -908,6 +958,14 @@ function renderGroupedBarChart(groupName) {
   const fmt = state.currentNormalization === "zscore" ? 2 : 1;
   const groupValuesArr = [], groupSeArrs = [];
 
+  const xPositions = computeOrgXPositions(modelNames);
+  const xRange = xPositions.length
+    ? [xPositions[0] - 0.6, xPositions[xPositions.length - 1] + 0.5]
+    : null;
+  const nBars = group.benchmarks.length;
+  const totalGroupWidth = 0.85;
+  const barWidth = totalGroupWidth / nBars;
+
   const dataTraces = group.benchmarks.map((bench, i) => {
     const allRaw = needAllRaw
       ? modelNames.map((mm) => getScore(state.DATA.models, mm, bench, state.currentShot, metric)).filter((v) => v !== undefined)
@@ -926,16 +984,18 @@ function renderGroupedBarChart(groupName) {
       return i === 0 ? base : darkenColor(base, 0.3);
     });
     const seArr = seValues ? seValues.map((v) => v || 0) : null;
+    // Bar offset (relative to x): place sub-bars side-by-side, centered on x.
+    const offset = -totalGroupWidth / 2 + i * barWidth;
     const trace = {
-      x: labels, y: values, name: group.labels[i], type: "bar",
-      legendgroup: group.labels[i], offsetgroup: String(i),
+      x: xPositions, y: values, name: group.labels[i], type: "bar",
+      width: barWidth, offset,
       marker: { color: barColors, line: { width: 0 } },
       customdata: modelNames.map((m, j) => ({ stderr: seValues ? seValues[j] : null, modelDir: m })),
       hoverinfo: "none", showlegend: true,
     };
     if (wantSE && seArr) {
       trace.error_y = { type: "data", array: seArr, visible: true,
-        color: "rgba(0,0,0,0.35)", thickness: 1.5, width: 4 };
+        color: "rgba(0,0,0,0.5)", thickness: 2.4, width: 5 };
     }
     groupValuesArr.push(values);
     groupSeArrs.push(seArr);
@@ -956,29 +1016,35 @@ function renderGroupedBarChart(groupName) {
   } else {
     yRange = [0, computeRawYMax_display(group.benchmarks, metric)];
   }
-  const nGroups = groupValuesArr.length;
-  const barWidth = 0.8 / nGroups;
   const annotations = [];
   labels.forEach((_, catIdx) => {
     groupValuesArr.forEach((values, gi) => {
       if (values[catIdx] == null) return;
       const se = (wantSE && groupSeArrs[gi]) ? groupSeArrs[gi][catIdx] : 0;
+      // Centre of the i-th sub-bar in [-totalGroupWidth/2 … +totalGroupWidth/2]
+      const subBarCentre = -totalGroupWidth / 2 + (gi + 0.5) * barWidth;
       annotations.push({
-        x: catIdx + (gi - (nGroups - 1) / 2) * barWidth,
+        x: xPositions[catIdx] + subBarCentre,
         y: values[catIdx] + se,
         text: values[catIdx].toFixed(fmt),
         showarrow: false, yshift: 10,
         xanchor: "center",
-        font: { size: computeAnnotationFontSize(labels.length * nGroups) },
+        font: { size: computeAnnotationFontSize(labels.length * nBars) },
       });
     });
   });
   const layout = getPlotlyLayout({
-    title: { text: groupName + " (" + state.currentShot + "-shot)", font: { size: 16 } },
-    yaxis: { title: yLabel, range: yRange, showgrid: false, zeroline: state.currentNormalization === "zscore" },
-    xaxis: { tickangle: computeTickAngle(labels), showgrid: false },
-    barmode: "group",
-    margin: { l: 60, r: 20, t: 50, b: 100 },
+    yaxis: {
+      title: "", range: yRange,
+      showgrid: true, gridcolor: "#a8b0bd", automargin: false, ticks: "", ticklen: 0,
+      zeroline: state.currentNormalization === "zscore",
+    },
+    xaxis: { automargin: false,
+      range: xRange,
+      tickvals: xPositions, ticktext: labels,
+      tickangle: computeTickAngle(labels), showgrid: false,
+    },
+    margin: { l: 105, r: 4, t: 8, b: 100 },
     legend: { orientation: "h", x: 0.01, y: 0.99, xanchor: "left", yanchor: "bottom",
               bgcolor: "rgba(255,255,255,0.8)", bordercolor: "#e2e8f0", borderwidth: 1 },
     annotations,
@@ -1014,24 +1080,36 @@ function renderSingleBenchmarkBarChart(benchmark) {
   const yLabel = state.currentNormalization === "none" ? getMetricYLabel(benchmark, metric) : getNormYLabel();
   const fmt = state.currentNormalization === "zscore" ? 2 : 1;
   const seArr = seValues ? seValues.map((v) => v || 0) : null;
+  const xPositions = computeOrgXPositions(modelNames);
+  const xRange = xPositions.length
+    ? [xPositions[0] - 0.6, xPositions[xPositions.length - 1] + 0.5]
+    : null;
   const trace = {
-    x: labels, y: values, type: "bar",
+    x: xPositions, y: values, type: "bar",
+    width: 0.85,
     marker: { color: colors, line: { width: 0 } },
     customdata: modelNames.map((m, i) => ({ stderr: seValues ? seValues[i] : null, modelDir: m })),
     hoverinfo: "none",
   };
   if (wantSE && seArr) {
     trace.error_y = { type: "data", array: seArr, visible: true,
-      color: "rgba(0,0,0,0.35)", thickness: 1.5, width: 4 };
+      color: "rgba(0,0,0,0.5)", thickness: 2.4, width: 5 };
   }
   const layout = getPlotlyLayout({
-    title: { text: info.pretty_name + " (" + state.currentShot + "-shot)", font: { size: 16 } },
-    yaxis: { title: yLabel, range: yRange, showgrid: false, zeroline: state.currentNormalization === "zscore" },
-    xaxis: { tickangle: computeTickAngle(labels), showgrid: false },
+    yaxis: {
+      title: "", range: yRange,
+      showgrid: true, gridcolor: "#a8b0bd", automargin: false, ticks: "", ticklen: 0,
+      zeroline: state.currentNormalization === "zscore",
+    },
+    xaxis: { automargin: false,
+      range: xRange,
+      tickvals: xPositions, ticktext: labels,
+      tickangle: computeTickAngle(labels), showgrid: false,
+    },
     showlegend: false,
-    margin: { l: 60, r: 20, t: 50, b: 100 },
+    margin: { l: 105, r: 4, t: 8, b: 100 },
     annotations: labels.map((label, i) => ({
-      x: label, y: (values[i] || 0) + (wantSE && seArr ? (seArr[i] || 0) : 0),
+      x: xPositions[i], y: (values[i] || 0) + (wantSE && seArr ? (seArr[i] || 0) : 0),
       text: values[i] != null ? values[i].toFixed(fmt) : "",
       showarrow: false, yshift: 10,
       xanchor: "center",
@@ -1095,19 +1173,35 @@ function computeSingleYRange(benchmark, metric) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Description / labels
+// Chart title & hover description
 // ─────────────────────────────────────────────────────────────
 
-function getAggregateLabel() {
+/** Natural-language plot title for the current state.
+ *  Aggregate views lead with "Category average" (macro) or "Task average" (micro);
+ *  single-task or group views just name the task / group.
+ *  Examples:
+ *    "Category average across all NorEval tasks (5-shot)"
+ *    "Task average across Bokmål tasks (5-shot)"
+ *    "MultiBLiMP (5-shot)"
+ *    "translation (English↔Bokmål) (5-shot)" */
+function getChartTitleText() {
   const sel = state.currentTaskSelection;
-  if (sel === "__all_macro__" || sel === "__all__") return "all tasks";
-  if (sel === "__custom__") return state.checkedTasks.size + " tasks";
-  if (sel.startsWith("__cat__")) return sel.slice(7);
-  if (sel.startsWith("__eval__")) return sel.slice(8) + " tasks";
-  if (sel === "__lang__nob") return "Bokmål tasks";
-  if (sel === "__lang__nno") return "Nynorsk tasks";
-  if (sel === "__lang__sme") return "Northern Sámi tasks";
-  return "aggregate";
+  const shot = state.currentShot + "-shot";
+  const prefix = isMacroSelection() ? "Category average" : "Task average";
+
+  if (sel === "__all_macro__" || sel === "__all__") {
+    return prefix + " across all NorEval tasks (" + shot + ")";
+  }
+  if (sel === "__filtered__") return prefix + " across signal-filtered tasks (" + shot + ")";
+  if (sel === "__custom__") return prefix + " across " + state.checkedTasks.size + " selected tasks (" + shot + ")";
+  if (sel.startsWith("__cat__")) return prefix + " across " + sel.slice(7) + " tasks (" + shot + ")";
+  if (sel.startsWith("__eval__")) return prefix + " across " + sel.slice(8) + " tasks (" + shot + ")";
+  if (sel === "__lang__nob") return prefix + " across Bokmål tasks (" + shot + ")";
+  if (sel === "__lang__nno") return prefix + " across Nynorsk tasks (" + shot + ")";
+  if (sel === "__lang__sme") return prefix + " across Northern Sámi tasks (" + shot + ")";
+  if (sel.startsWith("__group__")) return sel.slice(9) + " (" + shot + ")";
+  if (state.metricsSetup[sel]) return state.metricsSetup[sel].pretty_name + " (" + shot + ")";
+  return "";
 }
 
 function getSubtaskDescription(benchmark, metric) {
@@ -1122,57 +1216,69 @@ function getSubtaskDescription(benchmark, metric) {
   return null;
 }
 
-function updateDescription() {
-  const descEl = document.getElementById("task-description");
-  if (!descEl) return;
+/** Build the hover description shown when the user hovers the chart title.
+ *  Returns { body, footer }. Body is plain text; footer is an optional URL. */
+function getChartTitleDescription() {
   const sel = state.currentTaskSelection;
-  let desc = "", url = "", metricDesc = "";
-
   if (isAggregateSelection(sel)) {
-    desc = getAggregateDescription();
-  } else if (sel.startsWith("__group__")) {
+    return { body: getAggregateDescription(), footer: "" };
+  }
+  let body = "", url = "";
+  if (sel.startsWith("__group__")) {
     const g = state.DATA.task_groups[sel.slice(9)];
     if (g) {
       const info = state.metricsSetup[g.benchmarks[0]];
       if (info) {
-        desc = info.description || "";
+        body = info.description || "";
         url = info.url || "";
         const metric = getEffectiveMetric(g.benchmarks[0]);
         const metricName = METRIC_DISPLAY[metric] || metric;
         const baseMetric = getBaseMetric(metric);
         const subtaskDesc = getSubtaskDescription(g.benchmarks[0], metric);
-        metricDesc = "Metric: " + metricName + ". " + (subtaskDesc || METRIC_DESCRIPTIONS[baseMetric] || METRIC_DESCRIPTIONS[metric] || "");
+        const metricDesc = subtaskDesc || METRIC_DESCRIPTIONS[baseMetric] || METRIC_DESCRIPTIONS[metric] || "";
+        body = (body ? body + " " : "") + "Metric: " + metricName + ". " + metricDesc;
       }
     }
   } else if (state.metricsSetup[sel]) {
-    desc = state.metricsSetup[sel].description || "";
+    body = state.metricsSetup[sel].description || "";
     url = state.metricsSetup[sel].url || "";
     const metric = getEffectiveMetric(sel);
     const metricName = METRIC_DISPLAY[metric] || metric;
     const baseMetric = getBaseMetric(metric);
     const subtaskDesc = getSubtaskDescription(sel, metric);
-    metricDesc = "Metric: " + metricName + ". " + (subtaskDesc || METRIC_DESCRIPTIONS[baseMetric] || METRIC_DESCRIPTIONS[metric] || "");
+    const metricDesc = subtaskDesc || METRIC_DESCRIPTIONS[baseMetric] || METRIC_DESCRIPTIONS[metric] || "";
+    body = (body ? body + " " : "") + "Metric: " + metricName + ". " + metricDesc;
   }
+  const footer = url ? url.replace("https://huggingface.co/", "https://hf.co/") : "";
+  return { body, footer };
+}
+
+/** Capitalize the first letter (used so titles like "multiple-choice QA …"
+ *  or "grammar correction (5-shot)" lead with a capital). */
+function capitalize(s) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+}
+
+/** Update the chart title text and the inline description (shown when the user
+ *  expands the <details> that wraps the title). */
+function updateChartTitle() {
+  const titleEl = document.getElementById("chart-title");
+  if (titleEl) titleEl.textContent = capitalize(getChartTitleText());
+
+  const descEl = document.getElementById("chart-description");
+  if (!descEl) return;
+  const { body, footer } = getChartTitleDescription();
   descEl.innerHTML = "";
-  if (desc) {
-    descEl.appendChild(document.createTextNode(desc));
-    if (url) {
-      descEl.appendChild(document.createElement("br"));
-      const display = url.replace("https://huggingface.co/", "https://hf.co/");
-      const link = document.createElement("a");
-      link.href = url; link.target = "_blank"; link.rel = "noopener noreferrer";
-      link.textContent = display;
-      link.style.color = "var(--accent)";
-      descEl.appendChild(link);
-    }
-    if (metricDesc) {
-      const span = document.createElement("span");
-      span.className = "metric-description";
-      span.textContent = metricDesc;
-      descEl.appendChild(span);
-    }
+  if (body) descEl.appendChild(document.createTextNode(body));
+  if (footer) {
+    if (body) descEl.appendChild(document.createElement("br"));
+    const a = document.createElement("a");
+    a.href = footer.startsWith("hf.co/") ? "https://" + footer : footer;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.textContent = footer;
+    descEl.appendChild(a);
   }
-  descEl.style.display = desc ? "block" : "none";
 }
 
 function getAggregateDescription() {

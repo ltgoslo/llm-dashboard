@@ -28,7 +28,8 @@ import {
   makeBandTrace, computeYRange, computeYMax,
 } from "./chart.js";
 import {
-  showTooltip, hideTooltip, populateMetricSelector, hideMetricSelector,
+  showTooltip, hideTooltip, attachTooltip,
+  populateMetricSelector, hideMetricSelector,
 } from "./ui.js";
 
 const PROGRESS_LEGEND = {
@@ -68,11 +69,11 @@ function legendFor(config) {
 }
 
 /** Resolve titlePrefix (string or function-returning-string). Returns "X – " or "". */
-function titlePrefixFor(config) {
+function resolveTitlePrefix(config) {
   const prefix = typeof config.titlePrefix === "function"
     ? config.titlePrefix()
     : config.titlePrefix;
-  return prefix ? prefix + " – " : "";
+  return prefix || "";
 }
 
 function makeHoverHandler(config) {
@@ -177,12 +178,14 @@ function renderAggregateProgress(config) {
     });
   }
 
-  const avgLabel = macro ? "category average" : "task average";
-  const taskLabel = getAggregateLabel();
   const layout = getPlotlyLayout({
-    title: { text: titlePrefixFor(config) + taskLabel + " – " + avgLabel + " (" + state.currentShot + "-shot)", font: { size: 16 } },
-    xaxis: { title: config.xAxisLabel },
-    yaxis: { title: getNormYLabel(), range: yRange, zeroline: state.currentNormalization === "zscore" },
+    margin: { l: 105, r: 4, t: 8, b: 50 },
+    xaxis: { automargin: false, title: config.xAxisLabel },
+    yaxis: {
+      title: "", range: yRange,
+      showgrid: true, gridcolor: "#a8b0bd", automargin: false, ticks: "", ticklen: 0,
+      zeroline: state.currentNormalization === "zscore",
+    },
     showlegend: trajectories.length > 1,
     legend: legendFor(config),
   });
@@ -247,9 +250,13 @@ function renderGroupedProgress(config, group) {
 
   const yLabel = useNorm ? getNormYLabel() : getMetricYLabel(group.benchmarks[0], metric);
   const layout = getPlotlyLayout({
-    title: { text: titlePrefixFor(config) + group.name + " (" + state.currentShot + "-shot)", font: { size: 16 } },
-    xaxis: { title: config.xAxisLabel },
-    yaxis: { title: yLabel, range: yRange, zeroline: state.currentNormalization === "zscore" },
+    margin: { l: 105, r: 4, t: 8, b: 50 },
+    xaxis: { automargin: false, title: config.xAxisLabel },
+    yaxis: {
+      title: "", range: yRange,
+      showgrid: true, gridcolor: "#a8b0bd", automargin: false, ticks: "", ticklen: 0,
+      zeroline: state.currentNormalization === "zscore",
+    },
     legend: legendFor(config),
   });
   plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), hideTooltip);
@@ -308,9 +315,13 @@ function renderSingleProgress(config, benchmark) {
     ? getNormYLabel()
     : (useNorm ? getNormYLabel() : getMetricYLabel(benchmark, metric));
   const layout = getPlotlyLayout({
-    title: { text: titlePrefixFor(config) + info.pretty_name + " (" + state.currentShot + "-shot)", font: { size: 16 } },
-    xaxis: { title: config.xAxisLabel },
-    yaxis: { title: yLabel, range: yRange, zeroline: state.currentNormalization === "zscore" },
+    margin: { l: 105, r: 4, t: 8, b: 50 },
+    xaxis: { automargin: false, title: config.xAxisLabel },
+    yaxis: {
+      title: "", range: yRange,
+      showgrid: true, gridcolor: "#a8b0bd", automargin: false, ticks: "", ticklen: 0,
+      zeroline: state.currentNormalization === "zscore",
+    },
     showlegend: trajectories.length > 1,
     legend: legendFor(config),
   });
@@ -318,70 +329,96 @@ function renderSingleProgress(config, benchmark) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Description helpers (shared)
+// Chart title & hover description
 // ─────────────────────────────────────────────────────────────
 
-function getAggregateLabel() {
+/** Natural-language chart title.
+ *  config.titlePrefix may add a leading qualifier (e.g. language name for multisynt
+ *  or "NorOLMo" for norolmo). Aggregate views start with "Category average" / "Task average". */
+function getChartTitleText(config) {
   const sel = state.currentTaskSelection;
-  if (sel === "__all_macro__" || sel === "__all__") return "all tasks";
-  if (sel === "__filtered__") return state.checkedTasks.size + " signal-filtered tasks";
-  if (sel === "__custom__") return state.checkedTasks.size + " tasks";
-  if (sel.startsWith("__cat__")) return sel.slice(7);
-  return "aggregate";
+  const shot = state.currentShot + "-shot";
+  const prefix = resolveTitlePrefix(config);
+  const lead = prefix ? prefix + " — " : "";
+  const avg = isMacroSelection() ? "category average" : "task average";
+
+  if (sel === "__all_macro__" || sel === "__all__") return lead + avg + " across all tasks (" + shot + ")";
+  if (sel === "__filtered__") return lead + avg + " across " + state.checkedTasks.size + " signal-filtered tasks (" + shot + ")";
+  if (sel === "__custom__") return lead + avg + " across " + state.checkedTasks.size + " selected tasks (" + shot + ")";
+  if (sel.startsWith("__cat__")) return lead + avg + " across " + sel.slice(7) + " tasks (" + shot + ")";
+  if (sel.startsWith("__eval__")) return lead + avg + " across " + sel.slice(8) + " tasks (" + shot + ")";
+  if (sel === "__lang__nob") return lead + avg + " across Bokmål tasks (" + shot + ")";
+  if (sel === "__lang__nno") return lead + avg + " across Nynorsk tasks (" + shot + ")";
+  if (sel === "__lang__sme") return lead + avg + " across Northern Sámi tasks (" + shot + ")";
+  if (config.groupBenchmarks && sel.startsWith("__group__")) {
+    const g = config.groupBenchmarks(sel.slice(9));
+    if (g) return lead + g.name + " (" + shot + ")";
+  }
+  if (state.metricsSetup[sel]) return lead + state.metricsSetup[sel].pretty_name + " (" + shot + ")";
+  return lead.replace(/ — $/, "");
 }
 
-export function updateProgressDescription(config) {
-  const descEl = document.getElementById("task-description");
-  if (!descEl) return;
+/** Build the hover description for the chart title. */
+function getChartTitleDescription(config) {
   const sel = state.currentTaskSelection;
-  let desc = "", url = "", metricDesc = "";
   if (isAggregateSelection(sel)) {
-    desc = getProgressAggregateDescription(config);
-  } else if (config.groupBenchmarks && sel.startsWith("__group__")) {
+    return { body: getProgressAggregateDescription(), footer: "" };
+  }
+  let body = "", url = "";
+  if (config.groupBenchmarks && sel.startsWith("__group__")) {
     const g = config.groupBenchmarks(sel.slice(9));
     if (g) {
       const info = state.metricsSetup[g.benchmarks[0]];
       if (info) {
-        desc = info.description || "";
+        body = info.description || "";
         url = info.url || "";
         const metric = getEffectiveMetric(g.benchmarks[0]);
         const metricName = METRIC_DISPLAY[metric] || metric;
         const baseMetric = getBaseMetric(metric);
-        metricDesc = "Metric: " + metricName + ". " + (METRIC_DESCRIPTIONS[baseMetric] || METRIC_DESCRIPTIONS[metric] || "");
+        const metricDesc = METRIC_DESCRIPTIONS[baseMetric] || METRIC_DESCRIPTIONS[metric] || "";
+        body = (body ? body + " " : "") + "Metric: " + metricName + ". " + metricDesc;
       }
     }
   } else if (state.metricsSetup[sel]) {
     const info = state.metricsSetup[sel];
-    desc = info.description || "";
+    body = info.description || "";
     url = info.url || "";
     const metric = getEffectiveMetric(sel);
     const metricName = METRIC_DISPLAY[metric] || metric;
     const baseMetric = getBaseMetric(metric);
-    metricDesc = "Metric: " + metricName + ". " + (METRIC_DESCRIPTIONS[baseMetric] || METRIC_DESCRIPTIONS[metric] || "");
+    const metricDesc = METRIC_DESCRIPTIONS[baseMetric] || METRIC_DESCRIPTIONS[metric] || "";
+    body = (body ? body + " " : "") + "Metric: " + metricName + ". " + metricDesc;
   }
-  descEl.innerHTML = "";
-  if (desc) {
-    descEl.appendChild(document.createTextNode(desc));
-    if (url) {
-      descEl.appendChild(document.createElement("br"));
-      const display = url.replace("https://huggingface.co/", "https://hf.co/");
-      const link = document.createElement("a");
-      link.href = url; link.target = "_blank"; link.rel = "noopener noreferrer";
-      link.textContent = display;
-      link.style.color = "var(--accent)";
-      descEl.appendChild(link);
-    }
-    if (metricDesc) {
-      const span = document.createElement("span");
-      span.className = "metric-description";
-      span.textContent = metricDesc;
-      descEl.appendChild(span);
-    }
-  }
-  descEl.style.display = desc ? "block" : "none";
+  const footer = url ? url.replace("https://huggingface.co/", "https://hf.co/") : "";
+  return { body, footer };
 }
 
-function getProgressAggregateDescription(config) {
+/** Capitalize the first letter (so lowercase pretty_names lead with a capital). */
+function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+
+/** Update the chart title and the inline description (shown when the user
+ *  expands the <details> wrapping the title). */
+export function updateProgressTitle(config) {
+  const titleEl = document.getElementById("chart-title");
+  if (titleEl) titleEl.textContent = capitalize(getChartTitleText(config));
+
+  const descEl = document.getElementById("chart-description");
+  if (!descEl) return;
+  const { body, footer } = getChartTitleDescription(config);
+  descEl.innerHTML = "";
+  if (body) descEl.appendChild(document.createTextNode(body));
+  if (footer) {
+    if (body) descEl.appendChild(document.createElement("br"));
+    const a = document.createElement("a");
+    a.href = footer.startsWith("hf.co/") ? "https://" + footer : footer;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.textContent = footer;
+    descEl.appendChild(a);
+  }
+}
+
+function getProgressAggregateDescription() {
   const sel = state.currentTaskSelection;
   const count = sel === "__custom__" || sel === "__filtered__"
     ? state.checkedTasks.size
