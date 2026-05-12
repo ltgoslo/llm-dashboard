@@ -1,0 +1,494 @@
+{
+  "results": {
+    "noridiom_nob_p0": {
+      "alias": "noridiom_nob_p0",
+      "em_first,none": 0.056466876971608834,
+      "em_first_stderr,none": 0.00410028779234094,
+      "em,none": 0.044479495268138804,
+      "em_stderr,none": 0.0036621726187212383,
+      "fscore,none": 0.0523280872649958,
+      "fscore_stderr,none": 0.0037952017462271367
+    },
+    "noridiom_nob_p1": {
+      "alias": "noridiom_nob_p1",
+      "em_first,none": 0.04763406940063091,
+      "em_first_stderr,none": 0.0037835514876326257,
+      "em,none": 0.02113564668769716,
+      "em_stderr,none": 0.0025551000315605747,
+      "fscore,none": 0.02989747634069402,
+      "fscore_stderr,none": 0.002702837655334609
+    },
+    "noridiom_nob_p2": {
+      "alias": "noridiom_nob_p2",
+      "em_first,none": 0.0018927444794952682,
+      "em_first_stderr,none": 0.0007720998725961941,
+      "em,none": 0.0018927444794952682,
+      "em_stderr,none": 0.0007720998725961941,
+      "fscore,none": 0.0018927444794952682,
+      "fscore_stderr,none": 0.0007720998725961941
+    },
+    "noridiom_nob_p3": {
+      "alias": "noridiom_nob_p3",
+      "em_first,none": 0.0028391167192429023,
+      "em_first_stderr,none": 0.0009451769475248195,
+      "em,none": 0.0022082018927444794,
+      "em_stderr,none": 0.000833831378136399,
+      "fscore,none": 0.002534174553101998,
+      "fscore_stderr,none": 0.000857155452863771
+    },
+    "noridiom_nob_p4": {
+      "alias": "noridiom_nob_p4",
+      "em_first,none": 0.050473186119873815,
+      "em_first_stderr,none": 0.003888864912409242,
+      "em,none": 0.03501577287066246,
+      "em_stderr,none": 0.0032653583281683865,
+      "fscore,none": 0.040594843292004204,
+      "fscore_stderr,none": 0.0033606727884449915
+    }
+  },
+  "group_subtasks": {
+    "noridiom_nob_p4": [],
+    "noridiom_nob_p3": [],
+    "noridiom_nob_p2": [],
+    "noridiom_nob_p1": [],
+    "noridiom_nob_p0": []
+  },
+  "configs": {
+    "noridiom_nob_p0": {
+      "task": "noridiom_nob_p0",
+      "tag": "noridiom_nob",
+      "dataset_path": "Sprakbanken/Norwegian_idioms",
+      "test_split": "test",
+      "process_docs": "def filter_dataset_nb(dataset):\n    return dataset.filter(lambda example: example[\"language\"] == \"nob\")\n",
+      "doc_to_text": "Fullfør dette uttrykket: {{idiom_start}}",
+      "doc_to_target": "{{accepted_completions[0]}}",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    prediction = normalize(results[0])\n    prediction_first_word = get_first_word(results[0])\n    completions = [normalize(completion) for completion in doc[\"accepted_completions\"]]\n\n    exact_match_first_word = np.nanmax(\n        [int(prediction_first_word == completion) for completion in completions]\n    )\n    exact_match = np.nanmax(\n        [int(prediction == completion) for completion in completions]\n    )\n    fscore = np.nanmax(\n        [f1(prediction=prediction, completion=completion) for completion in completions]\n    )\n    return {\"em_first\": exact_match_first_word, \"em\": exact_match, \"fscore\": fscore}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_nb at 0x40016ce4aca0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Fullfør dette uttrykket: {{idiom_start}}",
+        "doc_to_choice": null,
+        "doc_to_target": "{{accepted_completions[0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "em_first",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "em",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "fscore",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "do_sample": false,
+        "max_new_tokens": 16,
+        "until": [
+          "\n\n"
+        ]
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.2-1B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9,
+        "tokenizer_mode": "auto"
+      }
+    },
+    "noridiom_nob_p1": {
+      "task": "noridiom_nob_p1",
+      "tag": "noridiom_nob",
+      "dataset_path": "Sprakbanken/Norwegian_idioms",
+      "test_split": "test",
+      "process_docs": "def filter_dataset_nb(dataset):\n    return dataset.filter(lambda example: example[\"language\"] == \"nob\")\n",
+      "doc_to_text": "Skriv fortsettelsen av idiomet {{idiom_start}}",
+      "doc_to_target": "{{accepted_completions[0]}}",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    prediction = normalize(results[0])\n    prediction_first_word = get_first_word(results[0])\n    completions = [normalize(completion) for completion in doc[\"accepted_completions\"]]\n\n    exact_match_first_word = np.nanmax(\n        [int(prediction_first_word == completion) for completion in completions]\n    )\n    exact_match = np.nanmax(\n        [int(prediction == completion) for completion in completions]\n    )\n    fscore = np.nanmax(\n        [f1(prediction=prediction, completion=completion) for completion in completions]\n    )\n    return {\"em_first\": exact_match_first_word, \"em\": exact_match, \"fscore\": fscore}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_nb at 0x40016ce4a020>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Skriv fortsettelsen av idiomet {{idiom_start}}",
+        "doc_to_choice": null,
+        "doc_to_target": "{{accepted_completions[0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "em_first",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "em",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "fscore",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "do_sample": false,
+        "max_new_tokens": 16,
+        "until": [
+          "\n\n"
+        ]
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.2-1B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9,
+        "tokenizer_mode": "auto"
+      }
+    },
+    "noridiom_nob_p2": {
+      "task": "noridiom_nob_p2",
+      "tag": "noridiom_nob",
+      "dataset_path": "Sprakbanken/Norwegian_idioms",
+      "test_split": "test",
+      "process_docs": "def filter_dataset_nb(dataset):\n    return dataset.filter(lambda example: example[\"language\"] == \"nob\")\n",
+      "doc_to_text": "Hvordan fortsetter uttrykket \"{{idiom_start}}\"?",
+      "doc_to_target": "{{accepted_completions[0]}}",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    prediction = normalize(results[0])\n    prediction_first_word = get_first_word(results[0])\n    completions = [normalize(completion) for completion in doc[\"accepted_completions\"]]\n\n    exact_match_first_word = np.nanmax(\n        [int(prediction_first_word == completion) for completion in completions]\n    )\n    exact_match = np.nanmax(\n        [int(prediction == completion) for completion in completions]\n    )\n    fscore = np.nanmax(\n        [f1(prediction=prediction, completion=completion) for completion in completions]\n    )\n    return {\"em_first\": exact_match_first_word, \"em\": exact_match, \"fscore\": fscore}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_nb at 0x40016ce485e0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Hvordan fortsetter uttrykket \"{{idiom_start}}\"?",
+        "doc_to_choice": null,
+        "doc_to_target": "{{accepted_completions[0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "em_first",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "em",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "fscore",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "do_sample": false,
+        "max_new_tokens": 16,
+        "until": [
+          "\n\n"
+        ]
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.2-1B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9,
+        "tokenizer_mode": "auto"
+      }
+    },
+    "noridiom_nob_p3": {
+      "task": "noridiom_nob_p3",
+      "tag": "noridiom_nob",
+      "dataset_path": "Sprakbanken/Norwegian_idioms",
+      "test_split": "test",
+      "process_docs": "def filter_dataset_nb(dataset):\n    return dataset.filter(lambda example: example[\"language\"] == \"nob\")\n",
+      "doc_to_text": "Fullfør vendingen \"{{idiom_start}}\"",
+      "doc_to_target": "{{accepted_completions[0]}}",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    prediction = normalize(results[0])\n    prediction_first_word = get_first_word(results[0])\n    completions = [normalize(completion) for completion in doc[\"accepted_completions\"]]\n\n    exact_match_first_word = np.nanmax(\n        [int(prediction_first_word == completion) for completion in completions]\n    )\n    exact_match = np.nanmax(\n        [int(prediction == completion) for completion in completions]\n    )\n    fscore = np.nanmax(\n        [f1(prediction=prediction, completion=completion) for completion in completions]\n    )\n    return {\"em_first\": exact_match_first_word, \"em\": exact_match, \"fscore\": fscore}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_nb at 0x40016ce48f40>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Fullfør vendingen \"{{idiom_start}}\"",
+        "doc_to_choice": null,
+        "doc_to_target": "{{accepted_completions[0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "em_first",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "em",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "fscore",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "do_sample": false,
+        "max_new_tokens": 16,
+        "until": [
+          "\n\n"
+        ]
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.2-1B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9,
+        "tokenizer_mode": "auto"
+      }
+    },
+    "noridiom_nob_p4": {
+      "task": "noridiom_nob_p4",
+      "tag": "noridiom_nob",
+      "dataset_path": "Sprakbanken/Norwegian_idioms",
+      "test_split": "test",
+      "process_docs": "def filter_dataset_nb(dataset):\n    return dataset.filter(lambda example: example[\"language\"] == \"nob\")\n",
+      "doc_to_text": "{{idiom_start}}",
+      "doc_to_target": "{{accepted_completions[0]}}",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    prediction = normalize(results[0])\n    prediction_first_word = get_first_word(results[0])\n    completions = [normalize(completion) for completion in doc[\"accepted_completions\"]]\n\n    exact_match_first_word = np.nanmax(\n        [int(prediction_first_word == completion) for completion in completions]\n    )\n    exact_match = np.nanmax(\n        [int(prediction == completion) for completion in completions]\n    )\n    fscore = np.nanmax(\n        [f1(prediction=prediction, completion=completion) for completion in completions]\n    )\n    return {\"em_first\": exact_match_first_word, \"em\": exact_match, \"fscore\": fscore}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_nb at 0x40016cc70a40>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{idiom_start}}",
+        "doc_to_choice": null,
+        "doc_to_target": "{{accepted_completions[0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "em_first",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "em",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "fscore",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "do_sample": false,
+        "max_new_tokens": 16,
+        "until": [
+          "\n\n"
+        ]
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.2-1B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9,
+        "tokenizer_mode": "auto"
+      }
+    }
+  },
+  "versions": {
+    "noridiom_nob_p0": 1.0,
+    "noridiom_nob_p1": 1.0,
+    "noridiom_nob_p2": 1.0,
+    "noridiom_nob_p3": 1.0,
+    "noridiom_nob_p4": 1.0
+  },
+  "n-shot": {
+    "noridiom_nob_p0": 1,
+    "noridiom_nob_p1": 1,
+    "noridiom_nob_p2": 1,
+    "noridiom_nob_p3": 1,
+    "noridiom_nob_p4": 1
+  },
+  "higher_is_better": {
+    "noridiom_nob_p0": {
+      "em_first": true,
+      "em": true,
+      "fscore": true
+    },
+    "noridiom_nob_p1": {
+      "em_first": true,
+      "em": true,
+      "fscore": true
+    },
+    "noridiom_nob_p2": {
+      "em_first": true,
+      "em": true,
+      "fscore": true
+    },
+    "noridiom_nob_p3": {
+      "em_first": true,
+      "em": true,
+      "fscore": true
+    },
+    "noridiom_nob_p4": {
+      "em_first": true,
+      "em": true,
+      "fscore": true
+    }
+  },
+  "n-samples": {
+    "noridiom_nob_p0": {
+      "original": 3170,
+      "effective": 3170
+    },
+    "noridiom_nob_p1": {
+      "original": 3170,
+      "effective": 3170
+    },
+    "noridiom_nob_p2": {
+      "original": 3170,
+      "effective": 3170
+    },
+    "noridiom_nob_p3": {
+      "original": 3170,
+      "effective": 3170
+    },
+    "noridiom_nob_p4": {
+      "original": 3170,
+      "effective": 3170
+    }
+  },
+  "config": {
+    "model": "vllm",
+    "model_args": {
+      "pretrained": "models/Llama-3.2-1B",
+      "tensor_parallel_size": 1,
+      "dtype": "auto",
+      "gpu_memory_utilization": 0.9,
+      "tokenizer_mode": "auto",
+      "trust_remote_code": true
+    },
+    "batch_size": "auto",
+    "batch_sizes": [],
+    "device": "cuda:0",
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {},
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": "728b2bc",
+  "date": 1771629835.8572621,
+  "pretty_env_info": "PyTorch version: 2.10.0a0+a36e1d39eb.nvinternal.main.41386253\nIs debug build: False\nCUDA used to build PyTorch: 13.1\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 24.04.3 LTS (aarch64)\nGCC version: (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0\nClang version: Could not collect\nCMake version: Could not collect\nLibc version: glibc-2.39\n\nPython version: 3.12.3 (main, Jan  8 2026, 11:30:50) [GCC 13.3.0] (64-bit runtime)\nPython platform: Linux-6.4.0-150600.23.25_15.0.9-cray_shasta_c_64k-aarch64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: 13.1.115\nCUDA_MODULE_LOADING set to: \nGPU models and configuration: GPU 0: NVIDIA GH200 120GB\nNvidia driver version: 565.57.01\ncuDNN version: Probably one of the following:\n/usr/lib/aarch64-linux-gnu/libcudnn.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_adv.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_cnn.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_runtime_compiled.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_graph.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_heuristic.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_ops.so.9.17.1\nIs XPU available: False\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\n\nCPU:\nArchitecture:                         aarch64\nCPU op-mode(s):                       64-bit\nByte Order:                           Little Endian\nCPU(s):                               288\nOn-line CPU(s) list:                  0-287\nVendor ID:                            ARM\nModel name:                           Neoverse-V2\nModel:                                0\nThread(s) per core:                   1\nCore(s) per socket:                   72\nSocket(s):                            4\nStepping:                             r0p0\nFrequency boost:                      disabled\nCPU(s) scaling MHz:                   106%\nCPU max MHz:                          3447.0000\nCPU min MHz:                          81.0000\nBogoMIPS:                             2000.00\nFlags:                                fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 sve asimdfhm dit uscat ilrcpc flagm sb paca pacg dcpodp sve2 sveaes svepmull svebitperm svesha3 svesm4 flagm2 frint svei8mm svebf16 i8mm bf16 dgh bti\nL1d cache:                            18 MiB (288 instances)\nL1i cache:                            18 MiB (288 instances)\nL2 cache:                             288 MiB (288 instances)\nL3 cache:                             456 MiB (4 instances)\nNUMA node(s):                         36\nNUMA node0 CPU(s):                    0-71\nNUMA node1 CPU(s):                    72-143\nNUMA node2 CPU(s):                    144-215\nNUMA node3 CPU(s):                    216-287\nNUMA node4 CPU(s):                    \nNUMA node5 CPU(s):                    \nNUMA node6 CPU(s):                    \nNUMA node7 CPU(s):                    \nNUMA node8 CPU(s):                    \nNUMA node9 CPU(s):                    \nNUMA node10 CPU(s):                   \nNUMA node11 CPU(s):                   \nNUMA node12 CPU(s):                   \nNUMA node13 CPU(s):                   \nNUMA node14 CPU(s):                   \nNUMA node15 CPU(s):                   \nNUMA node16 CPU(s):                   \nNUMA node17 CPU(s):                   \nNUMA node18 CPU(s):                   \nNUMA node19 CPU(s):                   \nNUMA node20 CPU(s):                   \nNUMA node21 CPU(s):                   \nNUMA node22 CPU(s):                   \nNUMA node23 CPU(s):                   \nNUMA node24 CPU(s):                   \nNUMA node25 CPU(s):                   \nNUMA node26 CPU(s):                   \nNUMA node27 CPU(s):                   \nNUMA node28 CPU(s):                   \nNUMA node29 CPU(s):                   \nNUMA node30 CPU(s):                   \nNUMA node31 CPU(s):                   \nNUMA node32 CPU(s):                   \nNUMA node33 CPU(s):                   \nNUMA node34 CPU(s):                   \nNUMA node35 CPU(s):                   \nVulnerability Gather data sampling:   Not affected\nVulnerability Itlb multihit:          Not affected\nVulnerability L1tf:                   Not affected\nVulnerability Mds:                    Not affected\nVulnerability Meltdown:               Not affected\nVulnerability Mmio stale data:        Not affected\nVulnerability Reg file data sampling: Not affected\nVulnerability Retbleed:               Not affected\nVulnerability Spec rstack overflow:   Not affected\nVulnerability Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:             Mitigation; __user pointer sanitization\nVulnerability Spectre v2:             Not affected\nVulnerability Srbds:                  Not affected\nVulnerability Tsx async abort:        Not affected\n\nVersions of relevant libraries:\n[pip3] numpy==2.1.0\n[pip3] nvidia-cudnn-frontend==1.17.0\n[pip3] torch==2.10.0a0+a36e1d39eb.nvinternal.main.41386253\n[pip3] torchvision==0.25.0a0+6b56de1c.nvinternal.main.41386253\n[pip3] triton==3.5.1+gitcced7793\n[conda] Could not collect",
+  "transformers_version": "4.57.1",
+  "lm_eval_version": "0.4.10",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<|end_of_text|>",
+    "128001"
+  ],
+  "tokenizer_eos_token": [
+    "<|end_of_text|>",
+    "128001"
+  ],
+  "tokenizer_bos_token": [
+    "<|begin_of_text|>",
+    "128000"
+  ],
+  "eot_token_id": 128001,
+  "max_length": 131072,
+  "task_hashes": {
+    "noridiom_nob_p0": "1327f5a3d7394948975fab8a2d03bfa74c5be7d7f981dc33bf3977e1259aedca",
+    "noridiom_nob_p1": "fb7baea8da848fb615d7acc3e25127f3ad81130b920202ef9ea52dc0fa6414c5",
+    "noridiom_nob_p2": "7a58b5b3592ceca454a4ea6e0f86ea1c093983eabf48449942cb9cd06d72f17b",
+    "noridiom_nob_p3": "eefb5de1326c935d22d094f5f13806f633a9c10bad7362f1dbd8388164a53ec1",
+    "noridiom_nob_p4": "433b839c7eed56e41ccaf99c3f1fb2038e5aa49ee88e9368848adb9cadcda5d6"
+  },
+  "model_source": "vllm",
+  "model_name": "models/Llama-3.2-1B",
+  "model_name_sanitized": "models__Llama-3.2-1B",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": null,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "total_evaluation_time_seconds": "56.81915320409462"
+}

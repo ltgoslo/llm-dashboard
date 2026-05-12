@@ -1,0 +1,413 @@
+{
+  "results": {
+    "nrk_quiz_qa_nob_p0": {
+      "alias": "nrk_quiz_qa_nob_p0",
+      "acc,none": 0.6027777777777777,
+      "acc_stderr,none": 0.008156511663790526,
+      "acc_norm,none": 0.6097222222222223,
+      "acc_norm_stderr,none": 0.008131337743639973
+    },
+    "nrk_quiz_qa_nob_p1": {
+      "alias": "nrk_quiz_qa_nob_p1",
+      "acc,none": 0.4236111111111111,
+      "acc_stderr,none": 0.00823664879327726,
+      "acc_norm,none": 0.41,
+      "acc_norm_stderr,none": 0.008198360491836058
+    },
+    "nrk_quiz_qa_nob_p2": {
+      "alias": "nrk_quiz_qa_nob_p2",
+      "acc,none": 0.2797222222222222,
+      "acc_stderr,none": 0.007482083826561058,
+      "acc_norm,none": 0.2797222222222222,
+      "acc_norm_stderr,none": 0.007482083826561058
+    },
+    "nrk_quiz_qa_nob_p3": {
+      "alias": "nrk_quiz_qa_nob_p3",
+      "acc,none": 0.31916666666666665,
+      "acc_stderr,none": 0.007770308217205664,
+      "acc_norm,none": 0.31916666666666665,
+      "acc_norm_stderr,none": 0.007770308217205664
+    },
+    "nrk_quiz_qa_nob_p4": {
+      "alias": "nrk_quiz_qa_nob_p4",
+      "acc,none": 0.4330555555555556,
+      "acc_stderr,none": 0.008259450141011147,
+      "acc_norm,none": 0.41694444444444445,
+      "acc_norm_stderr,none": 0.008218700250802884
+    }
+  },
+  "group_subtasks": {
+    "nrk_quiz_qa_nob_p4": [],
+    "nrk_quiz_qa_nob_p3": [],
+    "nrk_quiz_qa_nob_p2": [],
+    "nrk_quiz_qa_nob_p1": [],
+    "nrk_quiz_qa_nob_p0": []
+  },
+  "configs": {
+    "nrk_quiz_qa_nob_p0": {
+      "task": "nrk_quiz_qa_nob_p0",
+      "tag": "nrk_quiz_qa_nob",
+      "dataset_path": "ltg/nrk_quiz_qa",
+      "dataset_name": "nb",
+      "test_split": "test",
+      "doc_to_text": "def p0_nb(doc):\n    prompt = \"Spørsmål: {question}\\n\\nSvar:\"\n    return prompt.format(question=doc[\"question\"])\n",
+      "doc_to_target": "{{choices.label.index(answer)}}",
+      "unsafe_code": false,
+      "doc_to_choice": "{{choices.text}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p0_nb at 0x400442bcbe20>",
+        "doc_to_choice": "{{choices.text}}",
+        "doc_to_target": "{{choices.label.index(answer)}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/normistral-7b-warm",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "nrk_quiz_qa_nob_p1": {
+      "task": "nrk_quiz_qa_nob_p1",
+      "tag": "nrk_quiz_qa_nob",
+      "dataset_path": "ltg/nrk_quiz_qa",
+      "dataset_name": "nb",
+      "test_split": "test",
+      "doc_to_text": "def p1_nb(doc):\n    prompt = \"{question}\\n\\nSvaralternativer:{choices}\\n\\nHva er riktig svar?\\n\\nSvar:\"\n    choices = \"\".join(list(map(lambda choice: f\"\\n- {choice}\", doc[\"choices\"][\"text\"])))\n    return prompt.format(question=doc[\"question\"], choices=choices)\n",
+      "doc_to_target": "{{choices.label.index(answer)}}",
+      "unsafe_code": false,
+      "doc_to_choice": "{{choices.text}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p1_nb at 0x40044267b740>",
+        "doc_to_choice": "{{choices.text}}",
+        "doc_to_target": "{{choices.label.index(answer)}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/normistral-7b-warm",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "nrk_quiz_qa_nob_p2": {
+      "task": "nrk_quiz_qa_nob_p2",
+      "tag": "nrk_quiz_qa_nob",
+      "dataset_path": "ltg/nrk_quiz_qa",
+      "dataset_name": "nb",
+      "test_split": "test",
+      "doc_to_text": "def p2_nb(doc):\n    prompt = (\n        \"{question}{choices}\\n\\nEr det riktige svaret {enumerated_choices}?\\n\\nSvar:\"\n    )\n    choices = \"\".join(\n        [\n            f\"\\n{label}: {option}\"\n            for label, option in zip(doc[\"choices\"][\"label\"], doc[\"choices\"][\"text\"])\n        ]\n    )\n    enumerated_choices = \", \".join(\n        doc[\"choices\"][\"label\"][:-1]\n    ) + \", eller {latest_choice}\".format(latest_choice=doc[\"choices\"][\"label\"][-1])\n    if len(doc[\"choices\"][\"label\"]) == 2:\n        enumerated_choices = enumerated_choices.replace(\", eller\", \" eller\")\n    return prompt.format(\n        question=doc[\"question\"], choices=choices, enumerated_choices=enumerated_choices\n    )\n",
+      "doc_to_target": "{{choices.label.index(answer)}}",
+      "unsafe_code": false,
+      "doc_to_choice": "{{choices.label}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p2_nb at 0x40044210b060>",
+        "doc_to_choice": "{{choices.label}}",
+        "doc_to_target": "{{choices.label.index(answer)}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/normistral-7b-warm",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "nrk_quiz_qa_nob_p3": {
+      "task": "nrk_quiz_qa_nob_p3",
+      "tag": "nrk_quiz_qa_nob",
+      "dataset_path": "ltg/nrk_quiz_qa",
+      "dataset_name": "nb",
+      "test_split": "test",
+      "doc_to_text": "def p3_nb(doc):\n    prompt = \"Spørsmål: {question}{choices}\\n\\nSvar:\"\n    choices = \"\".join(\n        [\n            f\"\\n{label}: {option}\"\n            for label, option in zip(doc[\"choices\"][\"label\"], doc[\"choices\"][\"text\"])\n        ]\n    )\n    return prompt.format(question=doc[\"question\"], choices=choices)\n",
+      "doc_to_target": "{{choices.label.index(answer)}}",
+      "unsafe_code": false,
+      "doc_to_choice": "{{choices.label}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p3_nb at 0x400441ba2a20>",
+        "doc_to_choice": "{{choices.label}}",
+        "doc_to_target": "{{choices.label.index(answer)}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/normistral-7b-warm",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "nrk_quiz_qa_nob_p4": {
+      "task": "nrk_quiz_qa_nob_p4",
+      "tag": "nrk_quiz_qa_nob",
+      "dataset_path": "ltg/nrk_quiz_qa",
+      "dataset_name": "nb",
+      "test_split": "test",
+      "doc_to_text": "def p4_nb(doc):\n    prompt = \"{question}\\nVelg riktig svar blant disse alternativene:{choices}\\n\\nSvar:\"\n    choices = \"\".join(list(map(lambda choice: f\"\\n- {choice}\", doc[\"choices\"][\"text\"])))\n    return prompt.format(question=doc[\"question\"], choices=choices)\n",
+      "doc_to_target": "{{choices.label.index(answer)}}",
+      "unsafe_code": false,
+      "doc_to_choice": "{{choices.text}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p4_nb at 0x40044090d080>",
+        "doc_to_choice": "{{choices.text}}",
+        "doc_to_target": "{{choices.label.index(answer)}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/normistral-7b-warm",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    }
+  },
+  "versions": {
+    "nrk_quiz_qa_nob_p0": 1.0,
+    "nrk_quiz_qa_nob_p1": 1.0,
+    "nrk_quiz_qa_nob_p2": 1.0,
+    "nrk_quiz_qa_nob_p3": 1.0,
+    "nrk_quiz_qa_nob_p4": 1.0
+  },
+  "n-shot": {
+    "nrk_quiz_qa_nob_p0": 0,
+    "nrk_quiz_qa_nob_p1": 0,
+    "nrk_quiz_qa_nob_p2": 0,
+    "nrk_quiz_qa_nob_p3": 0,
+    "nrk_quiz_qa_nob_p4": 0
+  },
+  "higher_is_better": {
+    "nrk_quiz_qa_nob_p0": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "nrk_quiz_qa_nob_p1": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "nrk_quiz_qa_nob_p2": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "nrk_quiz_qa_nob_p3": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "nrk_quiz_qa_nob_p4": {
+      "acc": true,
+      "acc_norm": true
+    }
+  },
+  "n-samples": {
+    "nrk_quiz_qa_nob_p0": {
+      "original": 3600,
+      "effective": 3600
+    },
+    "nrk_quiz_qa_nob_p1": {
+      "original": 3600,
+      "effective": 3600
+    },
+    "nrk_quiz_qa_nob_p2": {
+      "original": 3600,
+      "effective": 3600
+    },
+    "nrk_quiz_qa_nob_p3": {
+      "original": 3600,
+      "effective": 3600
+    },
+    "nrk_quiz_qa_nob_p4": {
+      "original": 3600,
+      "effective": 3600
+    }
+  },
+  "config": {
+    "model": "vllm",
+    "model_args": {
+      "pretrained": "models/normistral-7b-warm",
+      "tensor_parallel_size": 1,
+      "dtype": "auto",
+      "gpu_memory_utilization": 0.9,
+      "trust_remote_code": true
+    },
+    "batch_size": "auto",
+    "batch_sizes": [],
+    "device": "cuda:0",
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {},
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": "728b2bc",
+  "date": 1770238336.755127,
+  "pretty_env_info": "PyTorch version: 2.10.0a0+a36e1d39eb.nvinternal.main.41386253\nIs debug build: False\nCUDA used to build PyTorch: 13.1\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 24.04.3 LTS (aarch64)\nGCC version: (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0\nClang version: Could not collect\nCMake version: Could not collect\nLibc version: glibc-2.39\n\nPython version: 3.12.3 (main, Jan  8 2026, 11:30:50) [GCC 13.3.0] (64-bit runtime)\nPython platform: Linux-6.4.0-150600.23.25_15.0.9-cray_shasta_c_64k-aarch64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: 13.1.115\nCUDA_MODULE_LOADING set to: \nGPU models and configuration: GPU 0: NVIDIA GH200 120GB\nNvidia driver version: 565.57.01\ncuDNN version: Probably one of the following:\n/usr/lib/aarch64-linux-gnu/libcudnn.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_adv.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_cnn.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_runtime_compiled.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_graph.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_heuristic.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_ops.so.9.17.1\nIs XPU available: False\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\n\nCPU:\nArchitecture:                         aarch64\nCPU op-mode(s):                       64-bit\nByte Order:                           Little Endian\nCPU(s):                               288\nOn-line CPU(s) list:                  0-287\nVendor ID:                            ARM\nModel name:                           Neoverse-V2\nModel:                                0\nThread(s) per core:                   1\nCore(s) per socket:                   72\nSocket(s):                            4\nStepping:                             r0p0\nFrequency boost:                      disabled\nCPU(s) scaling MHz:                   102%\nCPU max MHz:                          3456.0000\nCPU min MHz:                          81.0000\nBogoMIPS:                             2000.00\nFlags:                                fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 sve asimdfhm dit uscat ilrcpc flagm sb paca pacg dcpodp sve2 sveaes svepmull svebitperm svesha3 svesm4 flagm2 frint svei8mm svebf16 i8mm bf16 dgh bti\nL1d cache:                            18 MiB (288 instances)\nL1i cache:                            18 MiB (288 instances)\nL2 cache:                             288 MiB (288 instances)\nL3 cache:                             456 MiB (4 instances)\nNUMA node(s):                         36\nNUMA node0 CPU(s):                    0-71\nNUMA node1 CPU(s):                    72-143\nNUMA node2 CPU(s):                    144-215\nNUMA node3 CPU(s):                    216-287\nNUMA node4 CPU(s):                    \nNUMA node5 CPU(s):                    \nNUMA node6 CPU(s):                    \nNUMA node7 CPU(s):                    \nNUMA node8 CPU(s):                    \nNUMA node9 CPU(s):                    \nNUMA node10 CPU(s):                   \nNUMA node11 CPU(s):                   \nNUMA node12 CPU(s):                   \nNUMA node13 CPU(s):                   \nNUMA node14 CPU(s):                   \nNUMA node15 CPU(s):                   \nNUMA node16 CPU(s):                   \nNUMA node17 CPU(s):                   \nNUMA node18 CPU(s):                   \nNUMA node19 CPU(s):                   \nNUMA node20 CPU(s):                   \nNUMA node21 CPU(s):                   \nNUMA node22 CPU(s):                   \nNUMA node23 CPU(s):                   \nNUMA node24 CPU(s):                   \nNUMA node25 CPU(s):                   \nNUMA node26 CPU(s):                   \nNUMA node27 CPU(s):                   \nNUMA node28 CPU(s):                   \nNUMA node29 CPU(s):                   \nNUMA node30 CPU(s):                   \nNUMA node31 CPU(s):                   \nNUMA node32 CPU(s):                   \nNUMA node33 CPU(s):                   \nNUMA node34 CPU(s):                   \nNUMA node35 CPU(s):                   \nVulnerability Gather data sampling:   Not affected\nVulnerability Itlb multihit:          Not affected\nVulnerability L1tf:                   Not affected\nVulnerability Mds:                    Not affected\nVulnerability Meltdown:               Not affected\nVulnerability Mmio stale data:        Not affected\nVulnerability Reg file data sampling: Not affected\nVulnerability Retbleed:               Not affected\nVulnerability Spec rstack overflow:   Not affected\nVulnerability Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:             Mitigation; __user pointer sanitization\nVulnerability Spectre v2:             Not affected\nVulnerability Srbds:                  Not affected\nVulnerability Tsx async abort:        Not affected\n\nVersions of relevant libraries:\n[pip3] numpy==2.1.0\n[pip3] nvidia-cudnn-frontend==1.17.0\n[pip3] torch==2.10.0a0+a36e1d39eb.nvinternal.main.41386253\n[pip3] torchvision==0.25.0a0+6b56de1c.nvinternal.main.41386253\n[pip3] triton==3.5.1+gitcced7793\n[conda] Could not collect",
+  "transformers_version": "4.57.1",
+  "lm_eval_version": "0.4.10",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<unk>",
+    "0"
+  ],
+  "tokenizer_eos_token": [
+    "</s>",
+    "2"
+  ],
+  "tokenizer_bos_token": [
+    "<s>",
+    "1"
+  ],
+  "eot_token_id": 2,
+  "max_length": 2048,
+  "task_hashes": {
+    "nrk_quiz_qa_nob_p0": "371ad5090c1990c7ff14d04b26e6fa81feb9c3eac166a9e4a5d6f752a22ec1e0",
+    "nrk_quiz_qa_nob_p1": "1680a8c54e2e8de329cdfcc629a3163f96e74692bc099afb51bc24ce36258632",
+    "nrk_quiz_qa_nob_p2": "da777a2a5cca46ba026dc779bd8f16dafa0a303f9a4c1d98fb095741a7ff95fd",
+    "nrk_quiz_qa_nob_p3": "45f877283e08813f067db1e4d3ff0da64816f80260bd25d80be4bd8457c2a09f",
+    "nrk_quiz_qa_nob_p4": "daa6fb28f4f0abc6675d7435c56d7b030f4855a30c2edf726e64f67654bf1a51"
+  },
+  "model_source": "vllm",
+  "model_name": "models/normistral-7b-warm",
+  "model_name_sanitized": "models__normistral-7b-warm",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": null,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "total_evaluation_time_seconds": "223.67224454903044"
+}

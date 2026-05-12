@@ -1,0 +1,217 @@
+# Norwegian instruction-tuned models
+normistral-11b-thinking-full:
+  display_name: "NorMistral 11B Thinking"
+  category: norwegian
+  organization: LTG/UiO
+  parameters: 11.4
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned Norwegian language model with reasoning capabilities, fine-tuned from NorMistral 11B using SFT and reinforcement learning (d-RLAIF). Supports reasoning with <think> tokens."
+  huggingface_url: https://huggingface.co/norallm/normistral-11b-thinking
+  default: true
+  color: "#DD0000"
+
+normistral-11b-thinking-base-like:
+  display_name: "NorMistral 11B Thinking (base-like)"
+  category: norwegian
+  organization: LTG/UiO
+  parameters: 11.4
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Same model as NorMistral 11B Thinking, but evaluated as a base model without chat template or reasoning traces."
+  huggingface_url: https://huggingface.co/norallm/normistral-11b-thinking
+  default: true
+  color: "#DD0000"
+
+borealis-1b-instruct-preview:
+  display_name: "Borealis 1B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 1.0
+  license: "Gemma Terms of Use"
+  fully_open: false
+  description: "Norwegian instruction-tuned preview model fine-tuned from Gemma3 1B IT by the National Library of Norway (NbAiLab). Designed for Norwegian-centric assistant-style tasks."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis-1b-instruct-preview
+  default: true
+  color: "#40263f"
+
+borealis-4b-instruct-preview:
+  display_name: "Borealis 4B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 4.3
+  license: "Gemma Terms of Use"
+  fully_open: false
+  description: "Norwegian instruction-tuned preview model fine-tuned from Gemma3 4B IT by the National Library of Norway (NbAiLab). Designed for Norwegian-centric assistant-style tasks."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis-4b-instruct-preview
+  default: true
+  color: "#40263f"
+
+borealis-12b-instruct-preview:
+  display_name: "Borealis 12B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 12.2
+  license: "Gemma Terms of Use"
+  fully_open: false
+  description: "Norwegian instruction-tuned preview model fine-tuned from Gemma3 12B IT by the National Library of Norway (NbAiLab). Designed for Norwegian-centric assistant-style tasks."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis-12b-instruct-preview
+  default: true
+  color: "#40263f"
+
+borealis-27b-instruct-preview:
+  display_name: "Borealis 27B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 27.4
+  license: "Gemma Terms of Use"
+  fully_open: false
+  description: "Norwegian instruction-tuned preview model fine-tuned from Gemma3 27B IT by the National Library of Norway (NbAiLab). Designed for Norwegian-centric assistant-style tasks."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis-27b-instruct-preview
+  default: true
+  color: "#40263f"
+
+nb-notram-llama-3.2-1b-instruct:
+  display_name: "NB-NoTram Llama3.2 1B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 1.2
+  license: "Llama 3.2 Community License"
+  fully_open: false
+  description: "Norwegian instruction-tuned model fine-tuned from Llama-3.2-1B-Instruct by the National Library of Norway. Trained on publicly available data using SFT and DPO."
+  huggingface_url: https://huggingface.co/NbAiLab/nb-notram-llama-3.2-1b-instruct
+  default: true
+  color: "#40263f"
+
+nb-notram-llama-3.2-3b-instruct:
+  display_name: "NB-NoTram Llama3.2 3B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 3.2
+  license: "Llama 3.2 Community License"
+  fully_open: false
+  description: "Norwegian instruction-tuned model fine-tuned from Llama-3.2-3B-Instruct by the National Library of Norway. Trained on publicly available data using SFT and DPO."
+  huggingface_url: https://huggingface.co/NbAiLab/nb-notram-llama-3.2-3b-instruct
+  default: true
+  color: "#40263f"
+
+nb-notram-llama-3.1-8b-instruct:
+  display_name: "NB-NoTram Llama3.1 8B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 8.0
+  license: "Llama 3.1 Community License"
+  fully_open: false
+  description: "Norwegian instruction-tuned model fine-tuned from Llama-3.1-8B-Instruct by the National Library of Norway. Trained on publicly available data using SFT and DPO."
+  huggingface_url: https://huggingface.co/NbAiLab/nb-notram-llama-3.1-8b-instruct
+  default: true
+  color: "#40263f"
+
+nb-notram-llama-3.3-70b-instruct:
+  display_name: "NB-NoTram Llama3.3 70B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 70.6
+  license: "Llama 3.3 Community License"
+  fully_open: false
+  description: "Norwegian instruction-tuned model fine-tuned from Llama-3.3-70B-Instruct by the National Library of Norway. Trained on publicly available data using SFT and DPO."
+  huggingface_url: https://huggingface.co/NbAiLab/nb-notram-llama-3.3-70b-instruct
+  default: true
+  color: "#40263f"
+
+# Multilingual instruction-tuned models
+gemma-3-1b-it:
+  display_name: "Gemma3 1B IT"
+  category: multilingual
+  organization: Google
+  parameters: 1.0
+  license: "Gemma Terms of Use"
+  fully_open: false
+  description: "Instruction-tuned model from Google's Gemma 3 family. Supports 140+ languages."
+  huggingface_url: https://huggingface.co/google/gemma-3-1b-it
+  default: true
+  color: "#3aab58"
+
+gemma-3-4b-it-full:
+  display_name: "Gemma3 4B IT"
+  category: multilingual
+  organization: Google
+  parameters: 4.3
+  license: "Gemma Terms of Use"
+  fully_open: false
+  description: "Instruction-tuned model from Google's Gemma 3 family. Supports 140+ languages."
+  huggingface_url: https://huggingface.co/google/gemma-3-4b-it
+  default: true
+  color: "#3aab58"
+
+gemma-3-12b-it-full:
+  display_name: "Gemma3 12B IT"
+  category: multilingual
+  organization: Google
+  parameters: 12.2
+  license: "Gemma Terms of Use"
+  fully_open: false
+  description: "Instruction-tuned multimodal model from Google's Gemma 3 family. Supports 140+ languages with text and image input."
+  huggingface_url: https://huggingface.co/google/gemma-3-12b-it
+  default: true
+  color: "#3aab58"
+
+gemma-3-27b-it:
+  display_name: "Gemma3 27B IT"
+  category: multilingual
+  organization: Google
+  parameters: 27.4
+  license: "Gemma Terms of Use"
+  fully_open: false
+  description: "Instruction-tuned multimodal model from Google's Gemma 3 family. Supports 140+ languages with 128k context window."
+  huggingface_url: https://huggingface.co/google/gemma-3-27b-it
+  default: true
+  color: "#3aab58"
+
+Llama-3.2-1B-Instruct:
+  display_name: "Llama3.2 1B Instruct"
+  category: multilingual
+  organization: Meta
+  parameters: 1.2
+  license: "Llama 3.2 Community License"
+  fully_open: false
+  description: "Instruction-tuned lightweight multilingual language model from Meta supporting 8 languages. 128k context length."
+  huggingface_url: https://huggingface.co/meta-llama/Llama-3.2-1B-Instruct
+  default: true
+  color: "#0a8af8"
+
+Llama-3.2-3B-Instruct-full:
+  display_name: "Llama3.2 3B Instruct"
+  category: multilingual
+  organization: Meta
+  parameters: 3.2
+  license: "Llama 3.2 Community License"
+  fully_open: false
+  description: "Instruction-tuned lightweight multilingual language model from Meta supporting 8 languages. 128k context length."
+  huggingface_url: https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct
+  default: true
+  color: "#0a8af8"
+
+Llama-3.1-8B-Instruct-full:
+  display_name: "Llama3.1 8B Instruct"
+  category: multilingual
+  organization: Meta
+  parameters: 8.0
+  license: "Llama 3.1 Community License"
+  fully_open: false
+  description: "Instruction-tuned multilingual language model from Meta supporting 8 languages. 128k context length."
+  huggingface_url: https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct
+  default: true
+  color: "#0a8af8"
+
+Llama-3.3-70B-Instruct-full:
+  display_name: "Llama3.3 70B Instruct"
+  category: multilingual
+  organization: Meta
+  parameters: 70.6
+  license: "Llama 3.3 Community License"
+  fully_open: false
+  description: "Instruction-tuned multilingual language model from Meta. 128k context length."
+  huggingface_url: https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct
+  default: true
+  color: "#0a8af8"

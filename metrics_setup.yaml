@@ -1,0 +1,355 @@
+ask_gec:
+  pretty_name: grammar correction
+  description: "Grammar correction based on the ASK-GEC dataset. The main metric is ERRANT F0.5, which emphasizes precision over recall in grammar correction tasks."
+  main_metric: errant_f05
+  random_baseline: 0.0
+  category: linguistic knowledge
+  evaluation_type: generation
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/ask-gec
+ncb:
+  pretty_name: linguistic acceptability (punctuation)
+  description: "Linguistic acceptability based on the NCB dataset, which focuses on correct placement of commas. The main metric is accuracy, with a random baseline of 0.5."
+  main_metric: acc
+  random_baseline: 0.5
+  category: linguistic knowledge
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/hcfa/ncb
+nocola:
+  pretty_name: linguistic acceptability (cola)
+  description: "Linguistic acceptability based on the BLiMP-like NoCoLA dataset, which includes a variety of linguistic phenomena. The main metric is accuracy, with a random baseline of 0.5."
+  main_metric: acc
+  random_baseline: 0.5
+  category: linguistic knowledge
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/nocola
+norbelebele:
+  pretty_name: reading comprehension (belebele)
+  description: "Reading comprehension based on the NorBelebele dataset, which includes questions about a given passage. The main metric is accuracy, with a random baseline of 0.25."
+  main_metric: acc
+  random_baseline: 0.25
+  category: language understanding
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/norbelebele
+norcommonsenseqa_nno:
+  pretty_name: multiple-choice QA (commonsense)
+  description: "Commonsense question-answering based on the NorCommonsenseQA dataset, which includes multiple-choice questions that require commonsense reasoning. The main metric is accuracy, with a random baseline of 0.2."
+  main_metric: acc
+  random_baseline: 0.2
+  category: world knowledge & reasoning
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/norcommonsenseqa
+norcommonsenseqa_nob:
+  pretty_name: multiple-choice QA (commonsense)
+  description: "Commonsense question-answering based on the NorCommonsenseQA dataset, which includes multiple-choice questions that require commonsense reasoning. The main metric is accuracy, with a random baseline of 0.2."
+  main_metric: acc
+  random_baseline: 0.2
+  category: world knowledge & reasoning
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/norcommonsenseqa
+norec_document:
+  pretty_name: sentiment analysis (document)
+  description: "Binary document-level sentiment analysis based on the NoReC dataset. The main metric is F1 score, with a random baseline of 0.5."
+  main_metric: f1
+  random_baseline: 0.5
+  category: language understanding
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/norec_document
+norec_sentence:
+  pretty_name: sentiment analysis (sentence)
+  description: "Binary sentence-level sentiment analysis based on the NoReC dataset. The main metric is F1 score, with a random baseline of 0.5."
+  main_metric: f1
+  random_baseline: 0.5
+  category: language understanding
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/norec_sentence
+noreval_multiblimp:
+  pretty_name: linguistic acceptability (multiblimp)
+  description: "Linguistic-acceptability test for Northern Sámi based on the MultiBLiMP dataset, a multilingual benchmark of minimal pairs. For Northern Sámi, it tests subject-verb and subject-participle agreement for person (1st/2nd/3rd) and number (singular/dual/plural). The agreement is tested on finite verbs, auxiliaries, and participles. The model must assign higher probability to the grammatical sentence in each minimal pair. The main metric is micro-averaged accuracy across all subtasks, with a random baseline of 0.5."
+  main_metric: acc
+  random_baseline: 0.5
+  category: linguistic knowledge
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/jumelet/multiblimp
+  subtasks:
+    "1-2":
+      pretty_name: "Person: 1→2"
+      description: "Correct sentence has 1st person agreement; distractor has 2nd person. Mostly subject-participle agreement (n=24)."
+    "1-3":
+      pretty_name: "Person: 1→3"
+      description: "Correct sentence has 1st person agreement; distractor has 3rd person. Mostly subject-participle agreement (n=24)."
+    "1-23":
+      pretty_name: "Person: 1→2|3"
+      description: "Correct sentence has 1st person agreement; distractor has 2nd or 3rd person. Subject-participle agreement (n=2)."
+    "2-1":
+      pretty_name: "Person: 2→1"
+      description: "Correct sentence has 2nd person agreement; distractor has 1st person. Subject-verb agreement on finite verbs and auxiliaries (n=75)."
+    "2-3":
+      pretty_name: "Person: 2→3"
+      description: "Correct sentence has 2nd person agreement; distractor has 3rd person. Subject-verb agreement on finite verbs and auxiliaries (n=84)."
+    "3-1":
+      pretty_name: "Person: 3→1"
+      description: "Correct sentence has 3rd person agreement; distractor has 1st person. Subject-verb agreement on finite verbs and auxiliaries (n=380)."
+    "3-2":
+      pretty_name: "Person: 3→2"
+      description: "Correct sentence has 3rd person agreement; distractor has 2nd person. Subject-verb agreement on finite verbs and auxiliaries (n=371)."
+    "SG-PL":
+      pretty_name: "Number: SG→PL"
+      description: "Correct sentence has singular agreement; distractor has plural. Mostly subject-verb agreement on finite verbs and auxiliaries (n=356)."
+    "PL-SG":
+      pretty_name: "Number: PL→SG"
+      description: "Correct sentence has plural agreement; distractor has singular. Subject-verb agreement on finite verbs and auxiliaries (n=341)."
+    "SG-DU":
+      pretty_name: "Number: SG→DU"
+      description: "Correct sentence has singular agreement; distractor has dual. Mostly subject-verb agreement on finite verbs and auxiliaries (n=373)."
+    "DU-SG":
+      pretty_name: "Number: DU→SG"
+      description: "Correct sentence has dual agreement; distractor has singular. Subject-verb agreement on finite verbs and auxiliaries (n=89)."
+    "PL-DU":
+      pretty_name: "Number: PL→DU"
+      description: "Correct sentence has plural agreement; distractor has dual. Subject-verb agreement on finite verbs and auxiliaries (n=333)."
+    "DU-PL":
+      pretty_name: "Number: DU→PL"
+      description: "Correct sentence has dual agreement; distractor has plural. Subject-verb agreement on finite verbs and auxiliaries (n=84)."
+noridiom_nno:
+  pretty_name: idiom completion
+  description: "Idiom completion based on the NorIdiom dataset, the model is given the first N-1 words of an idiom and must generate the completion. The main metric is em_first (exact match of the first generated word against the correct completion word), with a random baseline of 0.0. Additional metrics include em (exact match of the full completion) and fscore (token overlap F1)."
+  main_metric: em_first
+  random_baseline: 0.0
+  category: linguistic knowledge
+  evaluation_type: generation
+  metric_scale: unit
+  url: https://huggingface.co/datasets/Sprakbanken/Norwegian_idioms
+noridiom_nob:
+  pretty_name: idiom completion
+  description: "Idiom completion based on the NorIdiom dataset, the model is given the first N-1 words of an idiom and must generate the completion. The main metric is em_first (exact match of the first generated word against the correct completion word), with a random baseline of 0.0. Additional metrics include em (exact match of the full completion) and fscore (token overlap F1)."
+  main_metric: em_first
+  random_baseline: 0.0
+  category: linguistic knowledge
+  evaluation_type: generation
+  metric_scale: unit
+  url: https://huggingface.co/datasets/Sprakbanken/Norwegian_idioms
+noropenbookqa_nno:
+  pretty_name: reading comprehension (openbookqa)
+  description: "Reading comprehension based on the NorOpenBookQA dataset, which includes multiple-choice questions about a given factual statement. The main metric is accuracy, with a random baseline of 0.25."
+  main_metric: acc
+  random_baseline: 0.25
+  category: language understanding
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/noropenbookqa
+noropenbookqa_nob:
+  pretty_name: reading comprehension (openbookqa)
+  description: "Reading comprehension based on the NorOpenBookQA dataset, which includes multiple-choice questions about a given factual statement. The main metric is accuracy, with a random baseline of 0.25."
+  main_metric: acc
+  random_baseline: 0.25
+  category: language understanding
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/noropenbookqa
+noropenbookqa_no_fact_nno:
+  pretty_name: multiple-choice QA (openbookqa)
+  description: "Openbook question-answering based on the NorOpenBookQA dataset, but without the factual statement provided. The model must rely on its own knowledge to answer the questions. The main metric is accuracy, with a random baseline of 0.25."
+  main_metric: acc
+  random_baseline: 0.25
+  category: world knowledge & reasoning
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/noropenbookqa
+noropenbookqa_no_fact_nob:
+  pretty_name: multiple-choice QA (openbookqa)
+  description: "Openbook question-answering based on the NorOpenBookQA dataset, but without the factual statement provided. The model must rely on its own knowledge to answer the questions. The main metric is accuracy, with a random baseline of 0.25."
+  main_metric: acc
+  random_baseline: 0.25
+  category: world knowledge & reasoning
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/noropenbookqa
+norquad:
+  pretty_name: reading comprehension (norquad)
+  description: "Reading comprehension based on the NorQuAD dataset, which includes questions about a given passage. The main metric is F1 score, with a random baseline of 0.0 since the model must predict specific spans of text."
+  main_metric: f1
+  random_baseline: 0.0
+  category: language understanding
+  evaluation_type: generation
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/norquad
+norrewrite_instruct:
+  pretty_name: instruction-following
+  description: "Instruction-following based on the NorRewrite dataset, which includes tasks where the model must rewrite a given text according to specific instructions. The main metric is BLEU score, with a random baseline of 0.0 since the model must generate specific text."
+  main_metric: bleu
+  random_baseline: 0.0
+  category: generation & summarization
+  evaluation_type: generation
+  metric_scale: percent
+  url: https://huggingface.co/datasets/ltg/norrewrite-instruct
+norsummarize_instruct:
+  pretty_name: summarization (instructed)
+  description: "Summarization based on the NorSummarize dataset, which includes tasks where the model must summarize a given text according to specific instructions. The main metric is BLEU score, with a random baseline of 0.0 since the model must generate specific text."
+  main_metric: bleu
+  random_baseline: 0.0
+  category: generation & summarization
+  evaluation_type: generation
+  metric_scale: percent
+  url: https://huggingface.co/datasets/ltg/norsummarize-instruct
+norsumm_nob:
+  pretty_name: summarization (norsumm)
+  description: "Summarization based on the NorSumm dataset, which includes tasks where the model must summarize a given text. The main metric is ROUGE-L, with a random baseline of 0.0 since the model must generate specific text."
+  main_metric: rougeL_max
+  random_baseline: 0.0
+  category: generation & summarization
+  evaluation_type: generation
+  metric_scale: percent
+  url: https://huggingface.co/datasets/SamiaT/NorSumm
+norsumm_nno:
+  pretty_name: summarization (norsumm)
+  description: "Summarization based on the NorSumm dataset, which includes tasks where the model must summarize a given text. The main metric is ROUGE-L, with a random baseline of 0.0 since the model must generate specific text."
+  main_metric: rougeL_max
+  random_baseline: 0.0
+  category: generation & summarization
+  evaluation_type: generation
+  metric_scale: percent
+  url: https://huggingface.co/datasets/SamiaT/NorSumm
+norsumm_nob_nno_translation:
+  pretty_name: "translation (Bokmål → Nynorsk)"
+  description: "Translation based on the NorSumm dataset, the model has to translate paragraphs between Nynorsk and Bokmål. The main metric is BLEU score, with a random baseline of 0.0 since the model must generate specific text."
+  main_metric: bleu
+  random_baseline: 0.0
+  category: translation
+  evaluation_type: generation
+  metric_scale: percent
+  url: https://huggingface.co/datasets/ltg/norsumm-nob-nno-translation
+norsumm_nno_nob_translation:
+  pretty_name: "translation (Nynorsk → Bokmål)"
+  description: "Translation based on the NorSumm dataset, the model has to translate paragraphs between Nynorsk and Bokmål. The main metric is BLEU score, with a random baseline of 0.0 since the model must generate specific text."
+  main_metric: bleu
+  random_baseline: 0.0
+  category: translation
+  evaluation_type: generation
+  metric_scale: percent
+  url: https://huggingface.co/datasets/ltg/norsumm-nob-nno-translation
+nortruthfulqa_gen_nno:
+  pretty_name: generative QA (truthfulqa)
+  description: "Generative question-answering based on the TruthfulQA dataset, which includes questions questions that some humans would answer falsely due to a false belief or misconception. The model must generate an answer to each question, and the main metric is ROUGE-L, which measures the overlap between the generated answer and reference answers. The random baseline is 0.0 since the model must generate specific text."
+  main_metric: rougeL_max
+  random_baseline: 0.0
+  category: world knowledge & reasoning
+  evaluation_type: generation
+  metric_scale: percent
+  url: https://huggingface.co/datasets/ltg/nortruthfulqa_gen
+nortruthfulqa_gen_nob:
+  pretty_name: generative QA (truthfulqa)
+  description: "Generative question-answering based on the TruthfulQA dataset, which includes questions questions that some humans would answer falsely due to a false belief or misconception. The model must generate an answer to each question, and the main metric is ROUGE-L, which measures the overlap between the generated answer and reference answers. The random baseline is 0.0 since the model must generate specific text."
+  main_metric: rougeL_max
+  random_baseline: 0.0
+  category: world knowledge & reasoning
+  evaluation_type: generation
+  metric_scale: percent
+  url: https://huggingface.co/datasets/ltg/nortruthfulqa_gen
+nortruthfulqa_mc_nno:
+  pretty_name: multiple-choice QA (truthfulqa)
+  description: "Multiple-choice question-answering based on the TruthfulQA dataset, which includes questions that some humans would answer falsely due to a false belief or misconception. The model must select the correct answer from multiple choices, and the main metric is accuracy. The random baseline is approximately 0.233 since the model must choose the correct answer from multiple options."
+  main_metric: acc
+  random_baseline: 0.23311814890762259
+  category: world knowledge & reasoning
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/nortruthfulqa_mc
+nortruthfulqa_mc_nob:
+  pretty_name: multiple-choice QA (truthfulqa)
+  description: "Multiple-choice question-answering based on the TruthfulQA dataset, which includes questions that some humans would answer falsely due to a false belief or misconception. The model must select the correct answer from multiple choices, and the main metric is accuracy."
+  main_metric: acc
+  random_baseline: 0.23170337745132827
+  category: world knowledge & reasoning
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/nortruthfulqa_mc
+nrk_quiz_qa_nno:
+  pretty_name: multiple-choice QA (nrk-quiz)
+  description: "Multiple-choice question-answering based on the NRK quiz dataset. The model must select the correct answer from multiple choices, and the main metric is accuracy. The random baseline is approximately 0.279 since the model must choose the correct answer from multiple options."
+  main_metric: acc
+  random_baseline: 0.27884711779448623
+  category: world knowledge & reasoning
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/nrk_quiz_qa
+nrk_quiz_qa_nob:
+  pretty_name: multiple-choice QA (nrk-quiz)
+  description: "Multiple-choice question-answering based on the NRK quiz dataset. The model must select the correct answer from multiple choices, and the main metric is accuracy."
+  main_metric: acc
+  random_baseline: 0.2836296296296296
+  category: world knowledge & reasoning
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/nrk_quiz_qa
+slide:
+  pretty_name: Scandinavian LID
+  description: "Language identification based on the multi-labeled SLIDE dataset, which includes sentences in various Scandinavian languages. The model must identify the language of each sentence, and the main metric is accuracy. The random baseline is approximately 0.213 since there are multiple languages to choose from."
+  main_metric: acc
+  random_baseline: 0.21289208633093526
+  category: linguistic knowledge
+  evaluation_type: classification
+  metric_scale: unit
+  url: https://huggingface.co/datasets/ltg/slide
+tatoeba_eng_nno:
+  pretty_name: "translation (English → Nynorsk)"
+  description: "Translation based on the Tatoeba dataset, the model has to translate sentences between Nynorsk and English. The main metric is BLEU score, with a random baseline of 0.0 since the model must generate specific text."
+  main_metric: bleu
+  random_baseline: 0.0
+  category: translation
+  evaluation_type: generation
+  metric_scale: percent
+  url: https://huggingface.co/datasets/Helsinki-NLP/tatoeba_mt
+tatoeba_eng_nob:
+  pretty_name: "translation (English → Bokmål)"
+  description: "Translation based on the Tatoeba dataset, the model has to translate sentences between Norwegian Bokmål and English. The main metric is BLEU score, with a random baseline of 0.0 since the model must generate specific text."
+  main_metric: bleu
+  random_baseline: 0.0
+  category: translation
+  evaluation_type: generation
+  metric_scale: percent
+  url: https://huggingface.co/datasets/Helsinki-NLP/tatoeba_mt
+tatoeba_nno_eng:
+  pretty_name: "translation (Nynorsk → English)"
+  description: "Translation based on the Tatoeba dataset, the model has to translate sentences between Nynorsk and English. The main metric is BLEU score, with a random baseline of 0.0 since the model must generate specific text."
+  main_metric: bleu
+  random_baseline: 0.0
+  category: translation
+  evaluation_type: generation
+  metric_scale: percent
+  url: https://huggingface.co/datasets/Helsinki-NLP/tatoeba_mt
+tatoeba_nob_eng:
+  pretty_name: "translation (Bokmål → English)"
+  description: "Translation based on the Tatoeba dataset, the model has to translate sentences between Norwegian Bokmål and English. The main metric is BLEU score, with a random baseline of 0.0 since the model must generate specific text."
+  main_metric: bleu
+  random_baseline: 0.0
+  category: translation
+  evaluation_type: generation
+  metric_scale: percent
+  url: https://huggingface.co/datasets/Helsinki-NLP/tatoeba_mt
+tatoeba_nob_sme:
+  pretty_name: "translation (Bokmål → Sámi)"
+  description: "Translation based on the Tatoeba dataset, the model has to translate sentences between Norwegian Bokmål and Northern Sámi. The main metric is BLEU score, with a random baseline of 0.0 since the model must generate specific text."
+  main_metric: bleu
+  random_baseline: 0.0
+  category: translation
+  evaluation_type: generation
+  metric_scale: percent
+  url: https://huggingface.co/datasets/ltg/saami-tatoeba
+tatoeba_sme_nob:
+  pretty_name: "translation (Sámi → Bokmål)"
+  description: "Translation based on the Tatoeba dataset, the model has to translate sentences between Norwegian Bokmål and Northern Sámi. The main metric is BLEU score, with a random baseline of 0.0 since the model must generate specific text."
+  main_metric: bleu
+  random_baseline: 0.0
+  category: translation
+  evaluation_type: generation
+  metric_scale: percent
+  url: https://huggingface.co/datasets/ltg/saami-tatoeba

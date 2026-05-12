@@ -1,0 +1,602 @@
+{
+  "results": {
+    "norsumm_nob_p0": {
+      "alias": "norsumm_nob_p0",
+      "bleu_max,none": 22.926797969478994,
+      "bleu_max_stderr,none": 4.2066134427443105,
+      "bleu_avg,none": 12.276014230297433,
+      "bleu_avg_stderr,none": 1.81219450891234,
+      "rougeL_max,none": 34.86059296411835,
+      "rougeL_max_stderr,none": 3.830023399986996,
+      "rougeL_avg,none": 24.871163965008613,
+      "rougeL_avg_stderr,none": 2.0664389441152533
+    },
+    "norsumm_nob_p1": {
+      "alias": "norsumm_nob_p1",
+      "bleu_max,none": 21.817346553009365,
+      "bleu_max_stderr,none": 4.154479985888994,
+      "bleu_avg,none": 11.561925475937594,
+      "bleu_avg_stderr,none": 1.7337352662619394,
+      "rougeL_max,none": 33.756938449393814,
+      "rougeL_max_stderr,none": 3.8665417056737152,
+      "rougeL_avg,none": 24.06096875423612,
+      "rougeL_avg_stderr,none": 2.014414519733473
+    },
+    "norsumm_nob_p2": {
+      "alias": "norsumm_nob_p2",
+      "bleu_max,none": 4.34689808871152,
+      "bleu_max_stderr,none": 1.7997869871267091,
+      "bleu_avg,none": 2.4926927507663987,
+      "bleu_avg_stderr,none": 1.0144158041773061,
+      "rougeL_max,none": 7.3191948378047975,
+      "rougeL_max_stderr,none": 2.644307522878396,
+      "rougeL_avg,none": 5.519783745970697,
+      "rougeL_avg_stderr,none": 1.932233561662804
+    },
+    "norsumm_nob_p3": {
+      "alias": "norsumm_nob_p3",
+      "bleu_max,none": 1.881678658132028,
+      "bleu_max_stderr,none": 0.6628184852475962,
+      "bleu_avg,none": 1.1761339734453036,
+      "bleu_avg_stderr,none": 0.3387613106641132,
+      "rougeL_max,none": 10.773037146602128,
+      "rougeL_max_stderr,none": 1.0021047492269464,
+      "rougeL_avg,none": 8.626596948475207,
+      "rougeL_avg_stderr,none": 0.8210426016160303
+    },
+    "norsumm_nob_p4": {
+      "alias": "norsumm_nob_p4",
+      "bleu_max,none": 21.127586067253905,
+      "bleu_max_stderr,none": 4.004273038044267,
+      "bleu_avg,none": 10.99472118464275,
+      "bleu_avg_stderr,none": 1.626287409337669,
+      "rougeL_max,none": 32.97883561558963,
+      "rougeL_max_stderr,none": 3.755002177910548,
+      "rougeL_avg,none": 23.2773359189832,
+      "rougeL_avg_stderr,none": 1.922254789030015
+    },
+    "norsumm_nob_p5": {
+      "alias": "norsumm_nob_p5",
+      "bleu_max,none": 21.501457416614315,
+      "bleu_max_stderr,none": 4.005980141215948,
+      "bleu_avg,none": 11.128020427983563,
+      "bleu_avg_stderr,none": 1.614068490882414,
+      "rougeL_max,none": 33.202491911522976,
+      "rougeL_max_stderr,none": 3.701741786652522,
+      "rougeL_avg,none": 23.48171856455457,
+      "rougeL_avg_stderr,none": 1.9241621602701307
+    }
+  },
+  "group_subtasks": {
+    "norsumm_nob_p5": [],
+    "norsumm_nob_p4": [],
+    "norsumm_nob_p3": [],
+    "norsumm_nob_p2": [],
+    "norsumm_nob_p1": [],
+    "norsumm_nob_p0": []
+  },
+  "configs": {
+    "norsumm_nob_p0": {
+      "task": "norsumm_nob_p0",
+      "tag": "norsumm_nob",
+      "dataset_path": "SamiaT/NorSumm",
+      "dataset_name": "nb",
+      "test_split": "test",
+      "process_docs": "def clean_summaries(dataset):\n    \"\"\"Clean newlines from all summaries in the dataset.\"\"\"\n    def clean_doc(doc):\n        doc[\"summaries\"] = [clean_summary_text(s) for s in doc[\"summaries\"]]\n        return doc\n    \n    return dataset.map(clean_doc)\n",
+      "doc_to_text": "Skriv en oppsummering av følgende artikkel med kun noen få punkter: {{article}}\nOppsummering:",
+      "doc_to_target": "summaries",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    completion = results[0]\n    references = doc[\"summaries\"]\n\n    bleu_scores = [bleu([[reference]], [completion]) for reference in references]\n    bleu_max = np.nanmax(bleu_scores)\n    bleu_avg = np.nanmean(bleu_scores)\n\n    rouge_scores = [rouge([reference], [completion]) for reference in references]\n    rougeL_scores = [score[\"rougeLsum\"] for score in rouge_scores]\n    rougeL_max = np.nanmax(rougeL_scores)\n    rougeL_avg = np.nanmean(rougeL_scores)\n\n    # bertscore_f1s = [\n    #     bertscore_f1(references=[reference], predictions=[completion])\n    #     for reference in references\n    # ]\n    # bertscore_f1_max = np.nanmax(bertscore_f1s)\n    # bertscore_f1_avg = np.nanmean(bertscore_f1s)\n\n    return {\n        \"bleu_max\": bleu_max,\n        \"bleu_avg\": bleu_avg,\n        \"rougeL_max\": rougeL_max,\n        \"rougeL_avg\": rougeL_avg,\n        # \"bertscore_f1_max\": bertscore_f1_max,\n        # \"bertscore_f1_avg\": bertscore_f1_avg,\n    }\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function clean_summaries at 0x400547c3e5c0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Skriv en oppsummering av følgende artikkel med kun noen få punkter: {{article}}\nOppsummering:",
+        "doc_to_choice": null,
+        "doc_to_target": "summaries",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_avg",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_avg",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 256
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Mistral-Nemo-Base-2407"
+      }
+    },
+    "norsumm_nob_p1": {
+      "task": "norsumm_nob_p1",
+      "tag": "norsumm_nob",
+      "dataset_path": "SamiaT/NorSumm",
+      "dataset_name": "nb",
+      "test_split": "test",
+      "process_docs": "def clean_summaries(dataset):\n    \"\"\"Clean newlines from all summaries in the dataset.\"\"\"\n    def clean_doc(doc):\n        doc[\"summaries\"] = [clean_summary_text(s) for s in doc[\"summaries\"]]\n        return doc\n    \n    return dataset.map(clean_doc)\n",
+      "doc_to_text": "Oppsummer følgende artikkel med noen få setninger: {{article}}\nOppsummering:",
+      "doc_to_target": "summaries",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    completion = results[0]\n    references = doc[\"summaries\"]\n\n    bleu_scores = [bleu([[reference]], [completion]) for reference in references]\n    bleu_max = np.nanmax(bleu_scores)\n    bleu_avg = np.nanmean(bleu_scores)\n\n    rouge_scores = [rouge([reference], [completion]) for reference in references]\n    rougeL_scores = [score[\"rougeLsum\"] for score in rouge_scores]\n    rougeL_max = np.nanmax(rougeL_scores)\n    rougeL_avg = np.nanmean(rougeL_scores)\n\n    # bertscore_f1s = [\n    #     bertscore_f1(references=[reference], predictions=[completion])\n    #     for reference in references\n    # ]\n    # bertscore_f1_max = np.nanmax(bertscore_f1s)\n    # bertscore_f1_avg = np.nanmean(bertscore_f1s)\n\n    return {\n        \"bleu_max\": bleu_max,\n        \"bleu_avg\": bleu_avg,\n        \"rougeL_max\": rougeL_max,\n        \"rougeL_avg\": rougeL_avg,\n        # \"bertscore_f1_max\": bertscore_f1_max,\n        # \"bertscore_f1_avg\": bertscore_f1_avg,\n    }\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function clean_summaries at 0x400547c3da80>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Oppsummer følgende artikkel med noen få setninger: {{article}}\nOppsummering:",
+        "doc_to_choice": null,
+        "doc_to_target": "summaries",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_avg",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_avg",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 256
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Mistral-Nemo-Base-2407"
+      }
+    },
+    "norsumm_nob_p2": {
+      "task": "norsumm_nob_p2",
+      "tag": "norsumm_nob",
+      "dataset_path": "SamiaT/NorSumm",
+      "dataset_name": "nb",
+      "test_split": "test",
+      "process_docs": "def clean_summaries(dataset):\n    \"\"\"Clean newlines from all summaries in the dataset.\"\"\"\n    def clean_doc(doc):\n        doc[\"summaries\"] = [clean_summary_text(s) for s in doc[\"summaries\"]]\n        return doc\n    \n    return dataset.map(clean_doc)\n",
+      "doc_to_text": "{{article}}\nSkriv en kort og presis oppsummering av teksten over. Språket må være klart og lett å forstå. Sørg for å ikke introdusere feil. Oppsummeringen må dekke følgende spørsmål: hvem, hva, hvor, når, og hvorfor er denne saken viktig å vite om. Oppsummeringen må være engasjerende og fremheve nøkkelinformasjon fra artikkelen. Oppsummeringen skal inneholde maksimalt 700 tegn, inkludert mellomrom.",
+      "doc_to_target": "summaries",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    completion = results[0]\n    references = doc[\"summaries\"]\n\n    bleu_scores = [bleu([[reference]], [completion]) for reference in references]\n    bleu_max = np.nanmax(bleu_scores)\n    bleu_avg = np.nanmean(bleu_scores)\n\n    rouge_scores = [rouge([reference], [completion]) for reference in references]\n    rougeL_scores = [score[\"rougeLsum\"] for score in rouge_scores]\n    rougeL_max = np.nanmax(rougeL_scores)\n    rougeL_avg = np.nanmean(rougeL_scores)\n\n    # bertscore_f1s = [\n    #     bertscore_f1(references=[reference], predictions=[completion])\n    #     for reference in references\n    # ]\n    # bertscore_f1_max = np.nanmax(bertscore_f1s)\n    # bertscore_f1_avg = np.nanmean(bertscore_f1s)\n\n    return {\n        \"bleu_max\": bleu_max,\n        \"bleu_avg\": bleu_avg,\n        \"rougeL_max\": rougeL_max,\n        \"rougeL_avg\": rougeL_avg,\n        # \"bertscore_f1_max\": bertscore_f1_max,\n        # \"bertscore_f1_avg\": bertscore_f1_avg,\n    }\n",
+      "description": "",
+      "target_delimiter": "\n",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function clean_summaries at 0x400547c3cea0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{article}}\nSkriv en kort og presis oppsummering av teksten over. Språket må være klart og lett å forstå. Sørg for å ikke introdusere feil. Oppsummeringen må dekke følgende spørsmål: hvem, hva, hvor, når, og hvorfor er denne saken viktig å vite om. Oppsummeringen må være engasjerende og fremheve nøkkelinformasjon fra artikkelen. Oppsummeringen skal inneholde maksimalt 700 tegn, inkludert mellomrom.",
+        "doc_to_choice": null,
+        "doc_to_target": "summaries",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": "\n"
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_avg",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_avg",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 256
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Mistral-Nemo-Base-2407"
+      }
+    },
+    "norsumm_nob_p3": {
+      "task": "norsumm_nob_p3",
+      "tag": "norsumm_nob",
+      "dataset_path": "SamiaT/NorSumm",
+      "dataset_name": "nb",
+      "test_split": "test",
+      "process_docs": "def clean_summaries(dataset):\n    \"\"\"Clean newlines from all summaries in the dataset.\"\"\"\n    def clean_doc(doc):\n        doc[\"summaries\"] = [clean_summary_text(s) for s in doc[\"summaries\"]]\n        return doc\n    \n    return dataset.map(clean_doc)\n",
+      "doc_to_text": "Gi et kortfattet sammendrag av følgende tekst: {{article}}",
+      "doc_to_target": "summaries",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    completion = results[0]\n    references = doc[\"summaries\"]\n\n    bleu_scores = [bleu([[reference]], [completion]) for reference in references]\n    bleu_max = np.nanmax(bleu_scores)\n    bleu_avg = np.nanmean(bleu_scores)\n\n    rouge_scores = [rouge([reference], [completion]) for reference in references]\n    rougeL_scores = [score[\"rougeLsum\"] for score in rouge_scores]\n    rougeL_max = np.nanmax(rougeL_scores)\n    rougeL_avg = np.nanmean(rougeL_scores)\n\n    # bertscore_f1s = [\n    #     bertscore_f1(references=[reference], predictions=[completion])\n    #     for reference in references\n    # ]\n    # bertscore_f1_max = np.nanmax(bertscore_f1s)\n    # bertscore_f1_avg = np.nanmean(bertscore_f1s)\n\n    return {\n        \"bleu_max\": bleu_max,\n        \"bleu_avg\": bleu_avg,\n        \"rougeL_max\": rougeL_max,\n        \"rougeL_avg\": rougeL_avg,\n        # \"bertscore_f1_max\": bertscore_f1_max,\n        # \"bertscore_f1_avg\": bertscore_f1_avg,\n    }\n",
+      "description": "",
+      "target_delimiter": "\n",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function clean_summaries at 0x400547c3c400>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Gi et kortfattet sammendrag av følgende tekst: {{article}}",
+        "doc_to_choice": null,
+        "doc_to_target": "summaries",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": "\n"
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_avg",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_avg",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 256
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Mistral-Nemo-Base-2407"
+      }
+    },
+    "norsumm_nob_p4": {
+      "task": "norsumm_nob_p4",
+      "tag": "norsumm_nob",
+      "dataset_path": "SamiaT/NorSumm",
+      "dataset_name": "nb",
+      "test_split": "test",
+      "process_docs": "def clean_summaries(dataset):\n    \"\"\"Clean newlines from all summaries in the dataset.\"\"\"\n    def clean_doc(doc):\n        doc[\"summaries\"] = [clean_summary_text(s) for s in doc[\"summaries\"]]\n        return doc\n    \n    return dataset.map(clean_doc)\n",
+      "doc_to_text": "Lag en kort oppsummering som sammenfatter den følgende teksten i noen få punkter:\n{{article}}\n\nOppsummering:",
+      "doc_to_target": "summaries",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    completion = results[0]\n    references = doc[\"summaries\"]\n\n    bleu_scores = [bleu([[reference]], [completion]) for reference in references]\n    bleu_max = np.nanmax(bleu_scores)\n    bleu_avg = np.nanmean(bleu_scores)\n\n    rouge_scores = [rouge([reference], [completion]) for reference in references]\n    rougeL_scores = [score[\"rougeLsum\"] for score in rouge_scores]\n    rougeL_max = np.nanmax(rougeL_scores)\n    rougeL_avg = np.nanmean(rougeL_scores)\n\n    # bertscore_f1s = [\n    #     bertscore_f1(references=[reference], predictions=[completion])\n    #     for reference in references\n    # ]\n    # bertscore_f1_max = np.nanmax(bertscore_f1s)\n    # bertscore_f1_avg = np.nanmean(bertscore_f1s)\n\n    return {\n        \"bleu_max\": bleu_max,\n        \"bleu_avg\": bleu_avg,\n        \"rougeL_max\": rougeL_max,\n        \"rougeL_avg\": rougeL_avg,\n        # \"bertscore_f1_max\": bertscore_f1_max,\n        # \"bertscore_f1_avg\": bertscore_f1_avg,\n    }\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function clean_summaries at 0x400547c03240>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Lag en kort oppsummering som sammenfatter den følgende teksten i noen få punkter:\n{{article}}\n\nOppsummering:",
+        "doc_to_choice": null,
+        "doc_to_target": "summaries",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_avg",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_avg",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 256
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Mistral-Nemo-Base-2407"
+      }
+    },
+    "norsumm_nob_p5": {
+      "task": "norsumm_nob_p5",
+      "tag": "norsumm_nob",
+      "dataset_path": "SamiaT/NorSumm",
+      "dataset_name": "nb",
+      "test_split": "test",
+      "process_docs": "def clean_summaries(dataset):\n    \"\"\"Clean newlines from all summaries in the dataset.\"\"\"\n    def clean_doc(doc):\n        doc[\"summaries\"] = [clean_summary_text(s) for s in doc[\"summaries\"]]\n        return doc\n    \n    return dataset.map(clean_doc)\n",
+      "doc_to_text": "Hele artikkelen:\n{{article}}\n\nHovedpunkter:",
+      "doc_to_target": "summaries",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    completion = results[0]\n    references = doc[\"summaries\"]\n\n    bleu_scores = [bleu([[reference]], [completion]) for reference in references]\n    bleu_max = np.nanmax(bleu_scores)\n    bleu_avg = np.nanmean(bleu_scores)\n\n    rouge_scores = [rouge([reference], [completion]) for reference in references]\n    rougeL_scores = [score[\"rougeLsum\"] for score in rouge_scores]\n    rougeL_max = np.nanmax(rougeL_scores)\n    rougeL_avg = np.nanmean(rougeL_scores)\n\n    # bertscore_f1s = [\n    #     bertscore_f1(references=[reference], predictions=[completion])\n    #     for reference in references\n    # ]\n    # bertscore_f1_max = np.nanmax(bertscore_f1s)\n    # bertscore_f1_avg = np.nanmean(bertscore_f1s)\n\n    return {\n        \"bleu_max\": bleu_max,\n        \"bleu_avg\": bleu_avg,\n        \"rougeL_max\": rougeL_max,\n        \"rougeL_avg\": rougeL_avg,\n        # \"bertscore_f1_max\": bertscore_f1_max,\n        # \"bertscore_f1_avg\": bertscore_f1_avg,\n    }\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function clean_summaries at 0x400547ba6480>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Hele artikkelen:\n{{article}}\n\nHovedpunkter:",
+        "doc_to_choice": null,
+        "doc_to_target": "summaries",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_avg",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_avg",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 256
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Mistral-Nemo-Base-2407"
+      }
+    }
+  },
+  "versions": {
+    "norsumm_nob_p0": 1.0,
+    "norsumm_nob_p1": 1.0,
+    "norsumm_nob_p2": 1.0,
+    "norsumm_nob_p3": 1.0,
+    "norsumm_nob_p4": 1.0,
+    "norsumm_nob_p5": 1.0
+  },
+  "n-shot": {
+    "norsumm_nob_p0": 1,
+    "norsumm_nob_p1": 1,
+    "norsumm_nob_p2": 1,
+    "norsumm_nob_p3": 1,
+    "norsumm_nob_p4": 1,
+    "norsumm_nob_p5": 1
+  },
+  "higher_is_better": {
+    "norsumm_nob_p0": {
+      "bleu_max": true,
+      "bleu_avg": true,
+      "rougeL_max": true,
+      "rougeL_avg": true
+    },
+    "norsumm_nob_p1": {
+      "bleu_max": true,
+      "bleu_avg": true,
+      "rougeL_max": true,
+      "rougeL_avg": true
+    },
+    "norsumm_nob_p2": {
+      "bleu_max": true,
+      "bleu_avg": true,
+      "rougeL_max": true,
+      "rougeL_avg": true
+    },
+    "norsumm_nob_p3": {
+      "bleu_max": true,
+      "bleu_avg": true,
+      "rougeL_max": true,
+      "rougeL_avg": true
+    },
+    "norsumm_nob_p4": {
+      "bleu_max": true,
+      "bleu_avg": true,
+      "rougeL_max": true,
+      "rougeL_avg": true
+    },
+    "norsumm_nob_p5": {
+      "bleu_max": true,
+      "bleu_avg": true,
+      "rougeL_max": true,
+      "rougeL_avg": true
+    }
+  },
+  "n-samples": {
+    "norsumm_nob_p0": {
+      "original": 33,
+      "effective": 33
+    },
+    "norsumm_nob_p1": {
+      "original": 33,
+      "effective": 33
+    },
+    "norsumm_nob_p2": {
+      "original": 33,
+      "effective": 33
+    },
+    "norsumm_nob_p3": {
+      "original": 33,
+      "effective": 33
+    },
+    "norsumm_nob_p4": {
+      "original": 33,
+      "effective": 33
+    },
+    "norsumm_nob_p5": {
+      "original": 33,
+      "effective": 33
+    }
+  },
+  "config": {
+    "model": "hf",
+    "model_args": {
+      "pretrained": "models/Mistral-Nemo-Base-2407",
+      "trust_remote_code": true
+    },
+    "model_num_parameters": 12247782400,
+    "model_dtype": "torch.bfloat16",
+    "model_revision": "main",
+    "model_sha": "",
+    "batch_size": "8",
+    "batch_sizes": [],
+    "device": "cuda:0",
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {},
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": "728b2bc",
+  "date": 1770589855.9769282,
+  "pretty_env_info": "PyTorch version: 2.7.0a0+79aa17489c.nv25.04\nIs debug build: False\nCUDA used to build PyTorch: 12.9\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 24.04.2 LTS (aarch64)\nGCC version: (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0\nClang version: Could not collect\nCMake version: version 3.31.6\nLibc version: glibc-2.39\n\nPython version: 3.12.3 (main, Feb  4 2025, 14:48:35) [GCC 13.3.0] (64-bit runtime)\nPython platform: Linux-6.4.0-150600.23.25_15.0.9-cray_shasta_c_64k-aarch64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: 12.9.41\nCUDA_MODULE_LOADING set to: LAZY\nGPU models and configuration: GPU 0: NVIDIA GH200 120GB\nNvidia driver version: 565.57.01\ncuDNN version: Probably one of the following:\n/usr/lib/aarch64-linux-gnu/libcudnn.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_adv.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_cnn.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_precompiled.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_runtime_compiled.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_graph.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_heuristic.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_ops.so.9.9.0\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\n\nCPU:\nArchitecture:                         aarch64\nCPU op-mode(s):                       64-bit\nByte Order:                           Little Endian\nCPU(s):                               288\nOn-line CPU(s) list:                  0-287\nVendor ID:                            ARM\nModel name:                           Neoverse-V2\nModel:                                0\nThread(s) per core:                   1\nCore(s) per socket:                   72\nSocket(s):                            4\nStepping:                             r0p0\nFrequency boost:                      disabled\nCPU(s) scaling MHz:                   100%\nCPU max MHz:                          3438.0000\nCPU min MHz:                          81.0000\nBogoMIPS:                             2000.00\nFlags:                                fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 sve asimdfhm dit uscat ilrcpc flagm sb paca pacg dcpodp sve2 sveaes svepmull svebitperm svesha3 svesm4 flagm2 frint svei8mm svebf16 i8mm bf16 dgh bti\nL1d cache:                            18 MiB (288 instances)\nL1i cache:                            18 MiB (288 instances)\nL2 cache:                             288 MiB (288 instances)\nL3 cache:                             456 MiB (4 instances)\nNUMA node(s):                         36\nNUMA node0 CPU(s):                    0-71\nNUMA node1 CPU(s):                    72-143\nNUMA node2 CPU(s):                    144-215\nNUMA node3 CPU(s):                    216-287\nNUMA node4 CPU(s):                    \nNUMA node5 CPU(s):                    \nNUMA node6 CPU(s):                    \nNUMA node7 CPU(s):                    \nNUMA node8 CPU(s):                    \nNUMA node9 CPU(s):                    \nNUMA node10 CPU(s):                   \nNUMA node11 CPU(s):                   \nNUMA node12 CPU(s):                   \nNUMA node13 CPU(s):                   \nNUMA node14 CPU(s):                   \nNUMA node15 CPU(s):                   \nNUMA node16 CPU(s):                   \nNUMA node17 CPU(s):                   \nNUMA node18 CPU(s):                   \nNUMA node19 CPU(s):                   \nNUMA node20 CPU(s):                   \nNUMA node21 CPU(s):                   \nNUMA node22 CPU(s):                   \nNUMA node23 CPU(s):                   \nNUMA node24 CPU(s):                   \nNUMA node25 CPU(s):                   \nNUMA node26 CPU(s):                   \nNUMA node27 CPU(s):                   \nNUMA node28 CPU(s):                   \nNUMA node29 CPU(s):                   \nNUMA node30 CPU(s):                   \nNUMA node31 CPU(s):                   \nNUMA node32 CPU(s):                   \nNUMA node33 CPU(s):                   \nNUMA node34 CPU(s):                   \nNUMA node35 CPU(s):                   \nVulnerability Gather data sampling:   Not affected\nVulnerability Itlb multihit:          Not affected\nVulnerability L1tf:                   Not affected\nVulnerability Mds:                    Not affected\nVulnerability Meltdown:               Not affected\nVulnerability Mmio stale data:        Not affected\nVulnerability Reg file data sampling: Not affected\nVulnerability Retbleed:               Not affected\nVulnerability Spec rstack overflow:   Not affected\nVulnerability Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:             Mitigation; __user pointer sanitization\nVulnerability Spectre v2:             Not affected\nVulnerability Srbds:                  Not affected\nVulnerability Tsx async abort:        Not affected\n\nVersions of relevant libraries:\n[pip3] mypy-extensions==1.0.0\n[pip3] numpy==1.26.4\n[pip3] nvidia-cudnn-frontend==1.11.0\n[pip3] nvtx==0.2.11\n[pip3] onnx==1.17.0\n[pip3] optree==0.14.1\n[pip3] pynvjitlink==0.3.0\n[pip3] pytorch-triton==3.2.0+git4b3bb1f8b.nvinternal\n[pip3] torch==2.7.0a0+79aa17489c.nv25.4\n[pip3] torch-geometric==2.6.1\n[pip3] torch_tensorrt==2.7.0a0\n[pip3] torchprofile==0.0.4\n[pip3] torchvision==0.22.0a0\n[conda] Could not collect",
+  "transformers_version": "4.57.1",
+  "lm_eval_version": "0.4.10",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<s>",
+    "1"
+  ],
+  "tokenizer_eos_token": [
+    "</s>",
+    "2"
+  ],
+  "tokenizer_bos_token": [
+    "<s>",
+    "1"
+  ],
+  "eot_token_id": 2,
+  "max_length": 131072,
+  "task_hashes": {},
+  "model_source": "hf",
+  "model_name": "models/Mistral-Nemo-Base-2407",
+  "model_name_sanitized": "models__Mistral-Nemo-Base-2407",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": null,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "total_evaluation_time_seconds": "514.4091401449405"
+}

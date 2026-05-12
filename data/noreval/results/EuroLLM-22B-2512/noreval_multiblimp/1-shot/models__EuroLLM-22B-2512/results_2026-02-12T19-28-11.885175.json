@@ -1,0 +1,997 @@
+{
+  "results": {
+    "noreval_multiblimp": {
+      "acc,none": 0.7125394321766562,
+      "acc_stderr,none": 0.008033578067992667,
+      "alias": "noreval_multiblimp"
+    },
+    "noreval_multiblimp_1-2": {
+      "alias": " - noreval_multiblimp_1-2",
+      "acc,none": 0.8333333333333334,
+      "acc_stderr,none": 0.07770873402002616,
+      "acc_norm,none": 0.8333333333333334,
+      "acc_norm_stderr,none": 0.07770873402002616
+    },
+    "noreval_multiblimp_1-23": {
+      "alias": " - noreval_multiblimp_1-23",
+      "acc,none": 1.0,
+      "acc_stderr,none": 0.0,
+      "acc_norm,none": 1.0,
+      "acc_norm_stderr,none": 0.0
+    },
+    "noreval_multiblimp_1-3": {
+      "alias": " - noreval_multiblimp_1-3",
+      "acc,none": 0.75,
+      "acc_stderr,none": 0.09028938981432691,
+      "acc_norm,none": 0.8333333333333334,
+      "acc_norm_stderr,none": 0.07770873402002616
+    },
+    "noreval_multiblimp_2-1": {
+      "alias": " - noreval_multiblimp_2-1",
+      "acc,none": 0.5066666666666667,
+      "acc_stderr,none": 0.05811865258054231,
+      "acc_norm,none": 0.6666666666666666,
+      "acc_norm_stderr,none": 0.05479966243511909
+    },
+    "noreval_multiblimp_2-3": {
+      "alias": " - noreval_multiblimp_2-3",
+      "acc,none": 0.35714285714285715,
+      "acc_stderr,none": 0.052594360036480284,
+      "acc_norm,none": 0.7142857142857143,
+      "acc_norm_stderr,none": 0.04958643817861595
+    },
+    "noreval_multiblimp_3-1": {
+      "alias": " - noreval_multiblimp_3-1",
+      "acc,none": 0.7526315789473684,
+      "acc_stderr,none": 0.02216377546342304,
+      "acc_norm,none": 0.6263157894736842,
+      "acc_norm_stderr,none": 0.024850174865448677
+    },
+    "noreval_multiblimp_3-2": {
+      "alias": " - noreval_multiblimp_3-2",
+      "acc,none": 0.7951482479784366,
+      "acc_stderr,none": 0.020981813986148797,
+      "acc_norm,none": 0.6118598382749326,
+      "acc_norm_stderr,none": 0.02533491216766953
+    },
+    "noreval_multiblimp_DU-PL": {
+      "alias": " - noreval_multiblimp_DU-PL",
+      "acc,none": 0.39285714285714285,
+      "acc_stderr,none": 0.05360727429546049,
+      "acc_norm,none": 0.3333333333333333,
+      "acc_norm_stderr,none": 0.0517433683804222
+    },
+    "noreval_multiblimp_DU-SG": {
+      "alias": " - noreval_multiblimp_DU-SG",
+      "acc,none": 0.20224719101123595,
+      "acc_stderr,none": 0.0428187597931015,
+      "acc_norm,none": 0.3595505617977528,
+      "acc_norm_stderr,none": 0.051154173750965946
+    },
+    "noreval_multiblimp_PL-DU": {
+      "alias": " - noreval_multiblimp_PL-DU",
+      "acc,none": 0.9129129129129129,
+      "acc_stderr,none": 0.015474709872299607,
+      "acc_norm,none": 0.8168168168168168,
+      "acc_norm_stderr,none": 0.021229320524829863
+    },
+    "noreval_multiblimp_PL-SG": {
+      "alias": " - noreval_multiblimp_PL-SG",
+      "acc,none": 0.4809384164222874,
+      "acc_stderr,none": 0.02709659496904003,
+      "acc_norm,none": 0.7038123167155426,
+      "acc_norm_stderr,none": 0.024761244596857846
+    },
+    "noreval_multiblimp_SG-DU": {
+      "alias": " - noreval_multiblimp_SG-DU",
+      "acc,none": 0.9705093833780161,
+      "acc_stderr,none": 0.008771428469820654,
+      "acc_norm,none": 0.8445040214477212,
+      "acc_norm_stderr,none": 0.018788364278859646
+    },
+    "noreval_multiblimp_SG-PL": {
+      "alias": " - noreval_multiblimp_SG-PL",
+      "acc,none": 0.6657303370786517,
+      "acc_stderr,none": 0.025037068595668614,
+      "acc_norm,none": 0.4101123595505618,
+      "acc_norm_stderr,none": 0.026104891997123836
+    }
+  },
+  "groups": {
+    "noreval_multiblimp": {
+      "acc,none": 0.7125394321766562,
+      "acc_stderr,none": 0.008033578067992667,
+      "alias": "noreval_multiblimp"
+    }
+  },
+  "group_subtasks": {
+    "noreval_multiblimp": [
+      "noreval_multiblimp_1-2",
+      "noreval_multiblimp_2-1",
+      "noreval_multiblimp_1-3",
+      "noreval_multiblimp_3-1",
+      "noreval_multiblimp_2-3",
+      "noreval_multiblimp_3-2",
+      "noreval_multiblimp_1-23",
+      "noreval_multiblimp_SG-PL",
+      "noreval_multiblimp_PL-SG",
+      "noreval_multiblimp_SG-DU",
+      "noreval_multiblimp_DU-SG",
+      "noreval_multiblimp_PL-DU",
+      "noreval_multiblimp_DU-PL"
+    ]
+  },
+  "configs": {
+    "noreval_multiblimp_1-2": {
+      "task": "noreval_multiblimp_1-2",
+      "tag": "noreval_multiblimp_1-2",
+      "dataset_path": "jumelet/multiblimp",
+      "dataset_name": "sme",
+      "test_split": "train",
+      "process_docs": "def filter_dataset_1_2(dataset):\n    return dataset.filter(lambda example: example[\"feature_vals\"] == \"1 -> 2\")\n",
+      "doc_to_text": "",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{[sen, wrong_sen]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_1_2 at 0x400149e35ee0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "",
+        "doc_to_choice": "{{[sen, wrong_sen]}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/EuroLLM-22B-2512",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "noreval_multiblimp_1-23": {
+      "task": "noreval_multiblimp_1-23",
+      "tag": "noreval_multiblimp_1-23",
+      "dataset_path": "jumelet/multiblimp",
+      "dataset_name": "sme",
+      "test_split": "train",
+      "process_docs": "def filter_dataset_1_23(dataset):\n    return dataset.filter(lambda example: example[\"feature_vals\"] == \"1 -> 2|3\")\n",
+      "doc_to_text": "",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{[sen, wrong_sen]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_1_23 at 0x40014b87a3e0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "",
+        "doc_to_choice": "{{[sen, wrong_sen]}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/EuroLLM-22B-2512",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "noreval_multiblimp_1-3": {
+      "task": "noreval_multiblimp_1-3",
+      "tag": "noreval_multiblimp_1-3",
+      "dataset_path": "jumelet/multiblimp",
+      "dataset_name": "sme",
+      "test_split": "train",
+      "process_docs": "def filter_dataset_1_3(dataset):\n    return dataset.filter(lambda example: example[\"feature_vals\"] == \"1 -> 3\")\n",
+      "doc_to_text": "",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{[sen, wrong_sen]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_1_3 at 0x400149e03c40>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "",
+        "doc_to_choice": "{{[sen, wrong_sen]}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/EuroLLM-22B-2512",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "noreval_multiblimp_2-1": {
+      "task": "noreval_multiblimp_2-1",
+      "tag": "noreval_multiblimp_2-1",
+      "dataset_path": "jumelet/multiblimp",
+      "dataset_name": "sme",
+      "test_split": "train",
+      "process_docs": "def filter_dataset_2_1(dataset):\n    return dataset.filter(lambda example: example[\"feature_vals\"] == \"2 -> 1\")\n",
+      "doc_to_text": "",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{[sen, wrong_sen]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_2_1 at 0x400149e35080>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "",
+        "doc_to_choice": "{{[sen, wrong_sen]}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/EuroLLM-22B-2512",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "noreval_multiblimp_2-3": {
+      "task": "noreval_multiblimp_2-3",
+      "tag": "noreval_multiblimp_2-3",
+      "dataset_path": "jumelet/multiblimp",
+      "dataset_name": "sme",
+      "test_split": "train",
+      "process_docs": "def filter_dataset_2_3(dataset):\n    return dataset.filter(lambda example: example[\"feature_vals\"] == \"2 -> 3\")\n",
+      "doc_to_text": "",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{[sen, wrong_sen]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_2_3 at 0x400149288400>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "",
+        "doc_to_choice": "{{[sen, wrong_sen]}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/EuroLLM-22B-2512",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "noreval_multiblimp_3-1": {
+      "task": "noreval_multiblimp_3-1",
+      "tag": "noreval_multiblimp_3-1",
+      "dataset_path": "jumelet/multiblimp",
+      "dataset_name": "sme",
+      "test_split": "train",
+      "process_docs": "def filter_dataset_3_1(dataset):\n    return dataset.filter(lambda example: example[\"feature_vals\"] == \"3 -> 1\")\n",
+      "doc_to_text": "",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{[sen, wrong_sen]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_3_1 at 0x40014928a8e0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "",
+        "doc_to_choice": "{{[sen, wrong_sen]}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/EuroLLM-22B-2512",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "noreval_multiblimp_3-2": {
+      "task": "noreval_multiblimp_3-2",
+      "tag": "noreval_multiblimp_3-2",
+      "dataset_path": "jumelet/multiblimp",
+      "dataset_name": "sme",
+      "test_split": "train",
+      "process_docs": "def filter_dataset_3_2(dataset):\n    return dataset.filter(lambda example: example[\"feature_vals\"] == \"3 -> 2\")\n",
+      "doc_to_text": "",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{[sen, wrong_sen]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_3_2 at 0x40014b87b6a0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "",
+        "doc_to_choice": "{{[sen, wrong_sen]}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/EuroLLM-22B-2512",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "noreval_multiblimp_DU-PL": {
+      "task": "noreval_multiblimp_DU-PL",
+      "tag": "noreval_multiblimp_DU-PL",
+      "dataset_path": "jumelet/multiblimp",
+      "dataset_name": "sme",
+      "test_split": "train",
+      "process_docs": "def filter_dataset_du_pl(dataset):\n    return dataset.filter(lambda example: example[\"feature_vals\"] == \"DU -> PL\")\n",
+      "doc_to_text": "",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{[sen, wrong_sen]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_du_pl at 0x4001472a67a0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "",
+        "doc_to_choice": "{{[sen, wrong_sen]}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/EuroLLM-22B-2512",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "noreval_multiblimp_DU-SG": {
+      "task": "noreval_multiblimp_DU-SG",
+      "tag": "noreval_multiblimp_DU-SG",
+      "dataset_path": "jumelet/multiblimp",
+      "dataset_name": "sme",
+      "test_split": "train",
+      "process_docs": "def filter_dataset_du_sg(dataset):\n    return dataset.filter(lambda example: example[\"feature_vals\"] == \"DU -> SG\")\n",
+      "doc_to_text": "",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{[sen, wrong_sen]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_du_sg at 0x40014b440ea0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "",
+        "doc_to_choice": "{{[sen, wrong_sen]}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/EuroLLM-22B-2512",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "noreval_multiblimp_PL-DU": {
+      "task": "noreval_multiblimp_PL-DU",
+      "tag": "noreval_multiblimp_PL-DU",
+      "dataset_path": "jumelet/multiblimp",
+      "dataset_name": "sme",
+      "test_split": "train",
+      "process_docs": "def filter_dataset_pl_du(dataset):\n    return dataset.filter(lambda example: example[\"feature_vals\"] == \"PL -> DU\")\n",
+      "doc_to_text": "",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{[sen, wrong_sen]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_pl_du at 0x400150fc82c0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "",
+        "doc_to_choice": "{{[sen, wrong_sen]}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/EuroLLM-22B-2512",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "noreval_multiblimp_PL-SG": {
+      "task": "noreval_multiblimp_PL-SG",
+      "tag": "noreval_multiblimp_PL-SG",
+      "dataset_path": "jumelet/multiblimp",
+      "dataset_name": "sme",
+      "test_split": "train",
+      "process_docs": "def filter_dataset_pl_sg(dataset):\n    return dataset.filter(lambda example: example[\"feature_vals\"] == \"PL -> SG\")\n",
+      "doc_to_text": "",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{[sen, wrong_sen]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_pl_sg at 0x40014b57c720>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "",
+        "doc_to_choice": "{{[sen, wrong_sen]}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/EuroLLM-22B-2512",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "noreval_multiblimp_SG-DU": {
+      "task": "noreval_multiblimp_SG-DU",
+      "tag": "noreval_multiblimp_SG-DU",
+      "dataset_path": "jumelet/multiblimp",
+      "dataset_name": "sme",
+      "test_split": "train",
+      "process_docs": "def filter_dataset_sg_du(dataset):\n    return dataset.filter(lambda example: example[\"feature_vals\"] == \"SG -> DU\")\n",
+      "doc_to_text": "",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{[sen, wrong_sen]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_sg_du at 0x40014b4407c0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "",
+        "doc_to_choice": "{{[sen, wrong_sen]}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/EuroLLM-22B-2512",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "noreval_multiblimp_SG-PL": {
+      "task": "noreval_multiblimp_SG-PL",
+      "tag": "noreval_multiblimp_SG-PL",
+      "dataset_path": "jumelet/multiblimp",
+      "dataset_name": "sme",
+      "test_split": "train",
+      "process_docs": "def filter_dataset_sg_pl(dataset):\n    return dataset.filter(lambda example: example[\"feature_vals\"] == \"SG -> PL\")\n",
+      "doc_to_text": "",
+      "doc_to_target": 0,
+      "unsafe_code": false,
+      "doc_to_choice": "{{[sen, wrong_sen]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function filter_dataset_sg_pl at 0x40014b89d440>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "",
+        "doc_to_choice": "{{[sen, wrong_sen]}}",
+        "doc_to_target": 0,
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/EuroLLM-22B-2512",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    }
+  },
+  "versions": {
+    "noreval_multiblimp": 1.0,
+    "noreval_multiblimp_1-2": 1.0,
+    "noreval_multiblimp_1-23": 1.0,
+    "noreval_multiblimp_1-3": 1.0,
+    "noreval_multiblimp_2-1": 1.0,
+    "noreval_multiblimp_2-3": 1.0,
+    "noreval_multiblimp_3-1": 1.0,
+    "noreval_multiblimp_3-2": 1.0,
+    "noreval_multiblimp_DU-PL": 1.0,
+    "noreval_multiblimp_DU-SG": 1.0,
+    "noreval_multiblimp_PL-DU": 1.0,
+    "noreval_multiblimp_PL-SG": 1.0,
+    "noreval_multiblimp_SG-DU": 1.0,
+    "noreval_multiblimp_SG-PL": 1.0
+  },
+  "n-shot": {
+    "noreval_multiblimp_1-2": 1,
+    "noreval_multiblimp_1-23": 1,
+    "noreval_multiblimp_1-3": 1,
+    "noreval_multiblimp_2-1": 1,
+    "noreval_multiblimp_2-3": 1,
+    "noreval_multiblimp_3-1": 1,
+    "noreval_multiblimp_3-2": 1,
+    "noreval_multiblimp_DU-PL": 1,
+    "noreval_multiblimp_DU-SG": 1,
+    "noreval_multiblimp_PL-DU": 1,
+    "noreval_multiblimp_PL-SG": 1,
+    "noreval_multiblimp_SG-DU": 1,
+    "noreval_multiblimp_SG-PL": 1
+  },
+  "higher_is_better": {
+    "noreval_multiblimp": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "noreval_multiblimp_1-2": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "noreval_multiblimp_1-23": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "noreval_multiblimp_1-3": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "noreval_multiblimp_2-1": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "noreval_multiblimp_2-3": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "noreval_multiblimp_3-1": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "noreval_multiblimp_3-2": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "noreval_multiblimp_DU-PL": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "noreval_multiblimp_DU-SG": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "noreval_multiblimp_PL-DU": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "noreval_multiblimp_PL-SG": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "noreval_multiblimp_SG-DU": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "noreval_multiblimp_SG-PL": {
+      "acc": true,
+      "acc_norm": true
+    }
+  },
+  "n-samples": {
+    "noreval_multiblimp_1-2": {
+      "original": 24,
+      "effective": 24
+    },
+    "noreval_multiblimp_2-1": {
+      "original": 75,
+      "effective": 75
+    },
+    "noreval_multiblimp_1-3": {
+      "original": 24,
+      "effective": 24
+    },
+    "noreval_multiblimp_3-1": {
+      "original": 380,
+      "effective": 380
+    },
+    "noreval_multiblimp_2-3": {
+      "original": 84,
+      "effective": 84
+    },
+    "noreval_multiblimp_3-2": {
+      "original": 371,
+      "effective": 371
+    },
+    "noreval_multiblimp_1-23": {
+      "original": 2,
+      "effective": 2
+    },
+    "noreval_multiblimp_SG-PL": {
+      "original": 356,
+      "effective": 356
+    },
+    "noreval_multiblimp_PL-SG": {
+      "original": 341,
+      "effective": 341
+    },
+    "noreval_multiblimp_SG-DU": {
+      "original": 373,
+      "effective": 373
+    },
+    "noreval_multiblimp_DU-SG": {
+      "original": 89,
+      "effective": 89
+    },
+    "noreval_multiblimp_PL-DU": {
+      "original": 333,
+      "effective": 333
+    },
+    "noreval_multiblimp_DU-PL": {
+      "original": 84,
+      "effective": 84
+    }
+  },
+  "config": {
+    "model": "vllm",
+    "model_args": {
+      "pretrained": "models/EuroLLM-22B-2512",
+      "tensor_parallel_size": 1,
+      "dtype": "auto",
+      "gpu_memory_utilization": 0.9,
+      "trust_remote_code": true
+    },
+    "batch_size": "auto",
+    "batch_sizes": [],
+    "device": "cuda:0",
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {},
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": "728b2bc",
+  "date": 1770920769.3826416,
+  "pretty_env_info": "PyTorch version: 2.10.0a0+a36e1d39eb.nvinternal.main.41386253\nIs debug build: False\nCUDA used to build PyTorch: 13.1\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 24.04.3 LTS (aarch64)\nGCC version: (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0\nClang version: Could not collect\nCMake version: Could not collect\nLibc version: glibc-2.39\n\nPython version: 3.12.3 (main, Jan  8 2026, 11:30:50) [GCC 13.3.0] (64-bit runtime)\nPython platform: Linux-6.4.0-150600.23.25_15.0.9-cray_shasta_c_64k-aarch64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: 13.1.115\nCUDA_MODULE_LOADING set to: \nGPU models and configuration: GPU 0: NVIDIA GH200 120GB\nNvidia driver version: 565.57.01\ncuDNN version: Probably one of the following:\n/usr/lib/aarch64-linux-gnu/libcudnn.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_adv.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_cnn.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_runtime_compiled.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_graph.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_heuristic.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_ops.so.9.17.1\nIs XPU available: False\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\n\nCPU:\nArchitecture:                         aarch64\nCPU op-mode(s):                       64-bit\nByte Order:                           Little Endian\nCPU(s):                               288\nOn-line CPU(s) list:                  0-287\nVendor ID:                            ARM\nModel name:                           Neoverse-V2\nModel:                                0\nThread(s) per core:                   1\nCore(s) per socket:                   72\nSocket(s):                            4\nStepping:                             r0p0\nFrequency boost:                      disabled\nCPU(s) scaling MHz:                   106%\nCPU max MHz:                          3447.0000\nCPU min MHz:                          81.0000\nBogoMIPS:                             2000.00\nFlags:                                fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 sve asimdfhm dit uscat ilrcpc flagm sb paca pacg dcpodp sve2 sveaes svepmull svebitperm svesha3 svesm4 flagm2 frint svei8mm svebf16 i8mm bf16 dgh bti\nL1d cache:                            18 MiB (288 instances)\nL1i cache:                            18 MiB (288 instances)\nL2 cache:                             288 MiB (288 instances)\nL3 cache:                             456 MiB (4 instances)\nNUMA node(s):                         36\nNUMA node0 CPU(s):                    0-71\nNUMA node1 CPU(s):                    72-143\nNUMA node2 CPU(s):                    144-215\nNUMA node3 CPU(s):                    216-287\nNUMA node4 CPU(s):                    \nNUMA node5 CPU(s):                    \nNUMA node6 CPU(s):                    \nNUMA node7 CPU(s):                    \nNUMA node8 CPU(s):                    \nNUMA node9 CPU(s):                    \nNUMA node10 CPU(s):                   \nNUMA node11 CPU(s):                   \nNUMA node12 CPU(s):                   \nNUMA node13 CPU(s):                   \nNUMA node14 CPU(s):                   \nNUMA node15 CPU(s):                   \nNUMA node16 CPU(s):                   \nNUMA node17 CPU(s):                   \nNUMA node18 CPU(s):                   \nNUMA node19 CPU(s):                   \nNUMA node20 CPU(s):                   \nNUMA node21 CPU(s):                   \nNUMA node22 CPU(s):                   \nNUMA node23 CPU(s):                   \nNUMA node24 CPU(s):                   \nNUMA node25 CPU(s):                   \nNUMA node26 CPU(s):                   \nNUMA node27 CPU(s):                   \nNUMA node28 CPU(s):                   \nNUMA node29 CPU(s):                   \nNUMA node30 CPU(s):                   \nNUMA node31 CPU(s):                   \nNUMA node32 CPU(s):                   \nNUMA node33 CPU(s):                   \nNUMA node34 CPU(s):                   \nNUMA node35 CPU(s):                   \nVulnerability Gather data sampling:   Not affected\nVulnerability Itlb multihit:          Not affected\nVulnerability L1tf:                   Not affected\nVulnerability Mds:                    Not affected\nVulnerability Meltdown:               Not affected\nVulnerability Mmio stale data:        Not affected\nVulnerability Reg file data sampling: Not affected\nVulnerability Retbleed:               Not affected\nVulnerability Spec rstack overflow:   Not affected\nVulnerability Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:             Mitigation; __user pointer sanitization\nVulnerability Spectre v2:             Not affected\nVulnerability Srbds:                  Not affected\nVulnerability Tsx async abort:        Not affected\n\nVersions of relevant libraries:\n[pip3] numpy==2.1.0\n[pip3] nvidia-cudnn-frontend==1.17.0\n[pip3] torch==2.10.0a0+a36e1d39eb.nvinternal.main.41386253\n[pip3] torchvision==0.25.0a0+6b56de1c.nvinternal.main.41386253\n[pip3] triton==3.5.1+gitcced7793\n[conda] Could not collect",
+  "transformers_version": "4.57.1",
+  "lm_eval_version": "0.4.10",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<unk>",
+    "0"
+  ],
+  "tokenizer_eos_token": [
+    "</s>",
+    "2"
+  ],
+  "tokenizer_bos_token": [
+    "<s>",
+    "1"
+  ],
+  "eot_token_id": 2,
+  "max_length": 32768,
+  "task_hashes": {
+    "noreval_multiblimp_1-2": "eb13b57a66df7ffc4fafbca40caff416c2e26dd8818c8485e2013c51e3ad826a",
+    "noreval_multiblimp_2-1": "3a7db6ebb0cfbbc1adb8aa0d80fdfcae4e62951039a1bfd310b2d5ae2b72bff1",
+    "noreval_multiblimp_1-3": "d6a8fce0610802e0ce932c83885bbbf9e7305cc4290537587d679588c6a12dce",
+    "noreval_multiblimp_3-1": "39c94e533b03df652d5c7d37815d79f9a2046784c4f5f9042ff01eb63ebfc6d9",
+    "noreval_multiblimp_2-3": "fa6715aa1fd329324e893fb09c30ec8cf72b8c3f67ebb7bbf2370a4c635cfa74",
+    "noreval_multiblimp_3-2": "bc5e6c77450145468c25d8d15c7955114752f2de644bfc522ca477e77fe57183",
+    "noreval_multiblimp_1-23": "1e53d088d6a88c461c4acecf80d77b8a1fd803028f4a0c7bd2f14ba8cba34177",
+    "noreval_multiblimp_SG-PL": "1813039798af04c32c75f7cbae2a7843d7d29a03277c65c7404bef41cb2ffa3e",
+    "noreval_multiblimp_PL-SG": "234486f8463329e6faf9ac316c416aec09d5764e4f17ccc6563231af49e85d04",
+    "noreval_multiblimp_SG-DU": "fc3aa394e497f15c1c2d9fbc5f720c54f75e6695c38b06dc0a8fc8349c6de08e",
+    "noreval_multiblimp_DU-SG": "e31a10b6c105b1eb4e54f249cc61a31ef0b3c1347ea67b76398580c488cbf68a",
+    "noreval_multiblimp_PL-DU": "938fc278c470ddfb279ff015cb645254372848bd334e3440c2a116a5515bc50a",
+    "noreval_multiblimp_DU-PL": "556a8ca39c7ecacf8e055d4be27de7ee9fe34c0d816fa0d2effb55cd5cb783d8"
+  },
+  "model_source": "vllm",
+  "model_name": "models/EuroLLM-22B-2512",
+  "model_name_sanitized": "models__EuroLLM-22B-2512",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": null,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "total_evaluation_time_seconds": "142.73073447821662"
+}

@@ -1,0 +1,428 @@
+{
+  "results": {
+    "slide_p0": {
+      "alias": "slide_p0",
+      "acc,none": 0.5952517985611511,
+      "acc_stderr,none": 0.0058881879763124055
+    },
+    "slide_p1": {
+      "alias": "slide_p1",
+      "acc,none": 0.738273381294964,
+      "acc_stderr,none": 0.005273165432149028
+    },
+    "slide_p2": {
+      "alias": "slide_p2",
+      "acc,none": 0.360863309352518,
+      "acc_stderr,none": 0.005761122140944091
+    },
+    "slide_p3": {
+      "alias": "slide_p3",
+      "acc,none": 0.4,
+      "acc_stderr,none": 0.005876848092529044
+    },
+    "slide_p4": {
+      "alias": "slide_p4",
+      "acc,none": 0.5313669064748201,
+      "acc_stderr,none": 0.005986218609120273
+    }
+  },
+  "group_subtasks": {
+    "slide_p4": [],
+    "slide_p3": [],
+    "slide_p2": [],
+    "slide_p1": [],
+    "slide_p0": []
+  },
+  "configs": {
+    "slide_p0": {
+      "task": "slide_p0",
+      "tag": "slide",
+      "dataset_path": "ltg/slide",
+      "training_split": "train",
+      "validation_split": "validation",
+      "test_split": "test",
+      "fewshot_split": "validation",
+      "doc_to_text": "Hvilket språk er det i følgende setning?\n{{text}}\nEr det bokmål, nynorsk, dansk, svensk, eller et annet språk?\nSvar:",
+      "doc_to_target": "{{correct_indices[0]}}",
+      "unsafe_code": false,
+      "doc_to_choice": [
+        "bokmål",
+        "nynorsk",
+        "dansk",
+        "svensk",
+        "et annet språk"
+      ],
+      "process_results": "def process_multilabel(doc, results):\n    # results contains log-likelihoods for each choice\n    # Find the index with highest likelihood\n    predicted_idx = results.index(max(results))\n    correct_indices = doc[\"correct_indices\"]\n    \n    # Check if prediction is among correct answers\n    is_correct = predicted_idx in correct_indices\n    \n    return {\"acc\": int(is_correct)}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": "validation",
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Hvilket språk er det i følgende setning?\n{{text}}\nEr det bokmål, nynorsk, dansk, svensk, eller et annet språk?\nSvar:",
+        "doc_to_choice": [
+          "bokmål",
+          "nynorsk",
+          "dansk",
+          "svensk",
+          "et annet språk"
+        ],
+        "doc_to_target": "{{correct_indices[0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Mistral-Nemo-Base-2407"
+      }
+    },
+    "slide_p1": {
+      "task": "slide_p1",
+      "tag": "slide",
+      "dataset_path": "ltg/slide",
+      "training_split": "train",
+      "validation_split": "validation",
+      "test_split": "test",
+      "fewshot_split": "validation",
+      "doc_to_text": "Tekst: {{text}}\nHvilket språk er teksten skrevet på? Alternativer:\n- A) Bokmål\n- B) Nynorsk\n- C) Dansk\n- D) Svensk\n- E) Et annet språk\nRiktig svar:",
+      "doc_to_target": "{{correct_indices[0]}}",
+      "unsafe_code": false,
+      "doc_to_choice": [
+        "A)",
+        "B)",
+        "C)",
+        "D)",
+        "E)"
+      ],
+      "process_results": "def process_multilabel(doc, results):\n    # results contains log-likelihoods for each choice\n    # Find the index with highest likelihood\n    predicted_idx = results.index(max(results))\n    correct_indices = doc[\"correct_indices\"]\n    \n    # Check if prediction is among correct answers\n    is_correct = predicted_idx in correct_indices\n    \n    return {\"acc\": int(is_correct)}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": "validation",
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Tekst: {{text}}\nHvilket språk er teksten skrevet på? Alternativer:\n- A) Bokmål\n- B) Nynorsk\n- C) Dansk\n- D) Svensk\n- E) Et annet språk\nRiktig svar:",
+        "doc_to_choice": [
+          "A)",
+          "B)",
+          "C)",
+          "D)",
+          "E)"
+        ],
+        "doc_to_target": "{{correct_indices[0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Mistral-Nemo-Base-2407"
+      }
+    },
+    "slide_p2": {
+      "task": "slide_p2",
+      "tag": "slide",
+      "dataset_path": "ltg/slide",
+      "training_split": "train",
+      "validation_split": "validation",
+      "test_split": "test",
+      "fewshot_split": "validation",
+      "doc_to_text": "Se på følgende setning: {{text}}\nDet er et godt eksempel på en setning skrevet på",
+      "doc_to_target": "{{correct_indices[0]}}",
+      "unsafe_code": false,
+      "doc_to_choice": [
+        "bokmål",
+        "nynorsk",
+        "dansk",
+        "svensk",
+        "et annet språk"
+      ],
+      "process_results": "def process_multilabel(doc, results):\n    # results contains log-likelihoods for each choice\n    # Find the index with highest likelihood\n    predicted_idx = results.index(max(results))\n    correct_indices = doc[\"correct_indices\"]\n    \n    # Check if prediction is among correct answers\n    is_correct = predicted_idx in correct_indices\n    \n    return {\"acc\": int(is_correct)}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": "validation",
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Se på følgende setning: {{text}}\nDet er et godt eksempel på en setning skrevet på",
+        "doc_to_choice": [
+          "bokmål",
+          "nynorsk",
+          "dansk",
+          "svensk",
+          "et annet språk"
+        ],
+        "doc_to_target": "{{correct_indices[0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Mistral-Nemo-Base-2407"
+      }
+    },
+    "slide_p3": {
+      "task": "slide_p3",
+      "tag": "slide",
+      "dataset_path": "ltg/slide",
+      "training_split": "train",
+      "validation_split": "validation",
+      "test_split": "test",
+      "fewshot_split": "validation",
+      "doc_to_text": "Setning å vurdere: {{text}}\nEr denne setningen skrevet på bokmål, nynorsk, dansk, svensk eller et annet språk? Hvis jeg må velge, vil jeg si at den er skrevet på",
+      "doc_to_target": "{{correct_indices[0]}}",
+      "unsafe_code": false,
+      "doc_to_choice": [
+        "bokmål",
+        "nynorsk",
+        "dansk",
+        "svensk",
+        "et annet språk"
+      ],
+      "process_results": "def process_multilabel(doc, results):\n    # results contains log-likelihoods for each choice\n    # Find the index with highest likelihood\n    predicted_idx = results.index(max(results))\n    correct_indices = doc[\"correct_indices\"]\n    \n    # Check if prediction is among correct answers\n    is_correct = predicted_idx in correct_indices\n    \n    return {\"acc\": int(is_correct)}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": "validation",
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Setning å vurdere: {{text}}\nEr denne setningen skrevet på bokmål, nynorsk, dansk, svensk eller et annet språk? Hvis jeg må velge, vil jeg si at den er skrevet på",
+        "doc_to_choice": [
+          "bokmål",
+          "nynorsk",
+          "dansk",
+          "svensk",
+          "et annet språk"
+        ],
+        "doc_to_target": "{{correct_indices[0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Mistral-Nemo-Base-2407"
+      }
+    },
+    "slide_p4": {
+      "task": "slide_p4",
+      "tag": "slide",
+      "dataset_path": "ltg/slide",
+      "training_split": "train",
+      "validation_split": "validation",
+      "test_split": "test",
+      "fewshot_split": "validation",
+      "doc_to_text": "Folk skriver på mange språk, som bokmål, nynorsk, dansk, svensk eller på mange andre språk. «{{text}}» er et eksempel på en setning skrevet på",
+      "doc_to_target": "{{correct_indices[0]}}",
+      "unsafe_code": false,
+      "doc_to_choice": [
+        "bokmål",
+        "nynorsk",
+        "dansk",
+        "svensk",
+        "et annet språk"
+      ],
+      "process_results": "def process_multilabel(doc, results):\n    # results contains log-likelihoods for each choice\n    # Find the index with highest likelihood\n    predicted_idx = results.index(max(results))\n    correct_indices = doc[\"correct_indices\"]\n    \n    # Check if prediction is among correct answers\n    is_correct = predicted_idx in correct_indices\n    \n    return {\"acc\": int(is_correct)}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": "validation",
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Folk skriver på mange språk, som bokmål, nynorsk, dansk, svensk eller på mange andre språk. «{{text}}» er et eksempel på en setning skrevet på",
+        "doc_to_choice": [
+          "bokmål",
+          "nynorsk",
+          "dansk",
+          "svensk",
+          "et annet språk"
+        ],
+        "doc_to_target": "{{correct_indices[0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Mistral-Nemo-Base-2407"
+      }
+    }
+  },
+  "versions": {
+    "slide_p0": 1.0,
+    "slide_p1": 1.0,
+    "slide_p2": 1.0,
+    "slide_p3": 1.0,
+    "slide_p4": 1.0
+  },
+  "n-shot": {
+    "slide_p0": 1,
+    "slide_p1": 1,
+    "slide_p2": 1,
+    "slide_p3": 1,
+    "slide_p4": 1
+  },
+  "higher_is_better": {
+    "slide_p0": {
+      "acc": true
+    },
+    "slide_p1": {
+      "acc": true
+    },
+    "slide_p2": {
+      "acc": true
+    },
+    "slide_p3": {
+      "acc": true
+    },
+    "slide_p4": {
+      "acc": true
+    }
+  },
+  "n-samples": {
+    "slide_p0": {
+      "original": 6950,
+      "effective": 6950
+    },
+    "slide_p1": {
+      "original": 6950,
+      "effective": 6950
+    },
+    "slide_p2": {
+      "original": 6950,
+      "effective": 6950
+    },
+    "slide_p3": {
+      "original": 6950,
+      "effective": 6950
+    },
+    "slide_p4": {
+      "original": 6950,
+      "effective": 6950
+    }
+  },
+  "config": {
+    "model": "hf",
+    "model_args": {
+      "pretrained": "models/Mistral-Nemo-Base-2407",
+      "trust_remote_code": true
+    },
+    "model_num_parameters": 12247782400,
+    "model_dtype": "torch.bfloat16",
+    "model_revision": "main",
+    "model_sha": "",
+    "batch_size": "8",
+    "batch_sizes": [],
+    "device": "cuda:0",
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {},
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": "728b2bc",
+  "date": 1770590174.0473793,
+  "pretty_env_info": "PyTorch version: 2.7.0a0+79aa17489c.nv25.04\nIs debug build: False\nCUDA used to build PyTorch: 12.9\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 24.04.2 LTS (aarch64)\nGCC version: (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0\nClang version: Could not collect\nCMake version: version 3.31.6\nLibc version: glibc-2.39\n\nPython version: 3.12.3 (main, Feb  4 2025, 14:48:35) [GCC 13.3.0] (64-bit runtime)\nPython platform: Linux-6.4.0-150600.23.25_15.0.9-cray_shasta_c_64k-aarch64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: 12.9.41\nCUDA_MODULE_LOADING set to: LAZY\nGPU models and configuration: GPU 0: NVIDIA GH200 120GB\nNvidia driver version: 565.57.01\ncuDNN version: Probably one of the following:\n/usr/lib/aarch64-linux-gnu/libcudnn.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_adv.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_cnn.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_precompiled.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_runtime_compiled.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_graph.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_heuristic.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_ops.so.9.9.0\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\n\nCPU:\nArchitecture:                         aarch64\nCPU op-mode(s):                       64-bit\nByte Order:                           Little Endian\nCPU(s):                               288\nOn-line CPU(s) list:                  0-287\nVendor ID:                            ARM\nModel name:                           Neoverse-V2\nModel:                                0\nThread(s) per core:                   1\nCore(s) per socket:                   72\nSocket(s):                            4\nStepping:                             r0p0\nFrequency boost:                      disabled\nCPU(s) scaling MHz:                   102%\nCPU max MHz:                          3447.0000\nCPU min MHz:                          81.0000\nBogoMIPS:                             2000.00\nFlags:                                fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 sve asimdfhm dit uscat ilrcpc flagm sb paca pacg dcpodp sve2 sveaes svepmull svebitperm svesha3 svesm4 flagm2 frint svei8mm svebf16 i8mm bf16 dgh bti\nL1d cache:                            18 MiB (288 instances)\nL1i cache:                            18 MiB (288 instances)\nL2 cache:                             288 MiB (288 instances)\nL3 cache:                             456 MiB (4 instances)\nNUMA node(s):                         36\nNUMA node0 CPU(s):                    0-71\nNUMA node1 CPU(s):                    72-143\nNUMA node2 CPU(s):                    144-215\nNUMA node3 CPU(s):                    216-287\nNUMA node4 CPU(s):                    \nNUMA node5 CPU(s):                    \nNUMA node6 CPU(s):                    \nNUMA node7 CPU(s):                    \nNUMA node8 CPU(s):                    \nNUMA node9 CPU(s):                    \nNUMA node10 CPU(s):                   \nNUMA node11 CPU(s):                   \nNUMA node12 CPU(s):                   \nNUMA node13 CPU(s):                   \nNUMA node14 CPU(s):                   \nNUMA node15 CPU(s):                   \nNUMA node16 CPU(s):                   \nNUMA node17 CPU(s):                   \nNUMA node18 CPU(s):                   \nNUMA node19 CPU(s):                   \nNUMA node20 CPU(s):                   \nNUMA node21 CPU(s):                   \nNUMA node22 CPU(s):                   \nNUMA node23 CPU(s):                   \nNUMA node24 CPU(s):                   \nNUMA node25 CPU(s):                   \nNUMA node26 CPU(s):                   \nNUMA node27 CPU(s):                   \nNUMA node28 CPU(s):                   \nNUMA node29 CPU(s):                   \nNUMA node30 CPU(s):                   \nNUMA node31 CPU(s):                   \nNUMA node32 CPU(s):                   \nNUMA node33 CPU(s):                   \nNUMA node34 CPU(s):                   \nNUMA node35 CPU(s):                   \nVulnerability Gather data sampling:   Not affected\nVulnerability Itlb multihit:          Not affected\nVulnerability L1tf:                   Not affected\nVulnerability Mds:                    Not affected\nVulnerability Meltdown:               Not affected\nVulnerability Mmio stale data:        Not affected\nVulnerability Reg file data sampling: Not affected\nVulnerability Retbleed:               Not affected\nVulnerability Spec rstack overflow:   Not affected\nVulnerability Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:             Mitigation; __user pointer sanitization\nVulnerability Spectre v2:             Not affected\nVulnerability Srbds:                  Not affected\nVulnerability Tsx async abort:        Not affected\n\nVersions of relevant libraries:\n[pip3] mypy-extensions==1.0.0\n[pip3] numpy==1.26.4\n[pip3] nvidia-cudnn-frontend==1.11.0\n[pip3] nvtx==0.2.11\n[pip3] onnx==1.17.0\n[pip3] optree==0.14.1\n[pip3] pynvjitlink==0.3.0\n[pip3] pytorch-triton==3.2.0+git4b3bb1f8b.nvinternal\n[pip3] torch==2.7.0a0+79aa17489c.nv25.4\n[pip3] torch-geometric==2.6.1\n[pip3] torch_tensorrt==2.7.0a0\n[pip3] torchprofile==0.0.4\n[pip3] torchvision==0.22.0a0\n[conda] Could not collect",
+  "transformers_version": "4.57.1",
+  "lm_eval_version": "0.4.10",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<s>",
+    "1"
+  ],
+  "tokenizer_eos_token": [
+    "</s>",
+    "2"
+  ],
+  "tokenizer_bos_token": [
+    "<s>",
+    "1"
+  ],
+  "eot_token_id": 2,
+  "max_length": 131072,
+  "task_hashes": {},
+  "model_source": "hf",
+  "model_name": "models/Mistral-Nemo-Base-2407",
+  "model_name_sanitized": "models__Mistral-Nemo-Base-2407",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": null,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "total_evaluation_time_seconds": "1346.174986878992"
+}

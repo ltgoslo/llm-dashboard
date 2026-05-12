@@ -1,0 +1,628 @@
+arc_challenge_fi_cf_fbv2:
+  category: world knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: ARC Challenge (Finnish, CF)
+  random_baseline: 0.25
+arc_challenge_fi_mcf_fbv2:
+  category: world knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: ARC Challenge (Finnish, MCF)
+  random_baseline: 0.25
+ask_gec:
+  category: linguistic knowledge
+  main_metric: errant
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: ASK GEC
+  random_baseline: 0.0
+belebele_fin_cf_fbv2:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: Belebele (Finnish, CF)
+  random_baseline: 0.25
+belebele_fin_mcf_fbv2:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: Belebele (Finnish, MCF)
+  random_baseline: 0.25
+cocoteros_es:
+  category: generation & summarization
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: Cocoteros (Spanish)
+  random_baseline: 0.0
+copa_es:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: COPA (Spanish)
+  random_baseline: 0.25
+escola:
+  category: linguistic knowledge
+  main_metric: mcc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: EsCoLA
+  random_baseline: 0.0
+finbench_analogies_cf_fbv2:
+  category: linguistic knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: FinnBench Analogies (CF)
+  random_baseline: 0.2
+finbench_analogies_mcf_fbv2:
+  category: linguistic knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: FinnBench Analogies (MCF)
+  random_baseline: 0.2
+finbench_emotions_1k_cf_fbv2:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: FinnBench Emotions (CF)
+  random_baseline: 0.125
+finbench_emotions_1k_mcf_fbv2:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: FinnBench Emotions (MCF)
+  random_baseline: 0.125
+finbench_general_knowledge_cf_fbv2:
+  category: world knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: FinnBench General Knowledge (CF)
+  random_baseline: 0.133
+finbench_general_knowledge_mcf_fbv2:
+  category: world knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: FinnBench General Knowledge (MCF)
+  random_baseline: 0.133
+finbench_hhh_alignment_cf_fbv2:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: FinnBench HHH Alignment (CF)
+  random_baseline: 0.5
+finbench_hhh_alignment_mcf_fbv2:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: FinnBench HHH Alignment (MCF)
+  random_baseline: 0.5
+finbench_similarities_abstraction_cf_fbv2:
+  category: linguistic knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: FinnBench Similarities (CF)
+  random_baseline: 0.25
+finbench_similarities_abstraction_mcf_fbv2:
+  category: linguistic knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: FinnBench Similarities (MCF)
+  random_baseline: 0.25
+flores_en-es:
+  category: translation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: FLORES (EN→ES)
+  random_baseline: 0.0
+fquad:
+  category: language understanding
+  main_metric: exact
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: FQuAD
+  random_baseline: 0.0
+frabelebele:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: Belebele (French)
+  random_baseline: 0.25
+french_bench_arc_challenge:
+  category: world knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: French Bench ARC Challenge
+  random_baseline: 0.25
+french_bench_boolqa:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: French Bench BoolQ
+  random_baseline: 0.5
+french_bench_grammar:
+  category: linguistic knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: French Bench Grammar
+  random_baseline: 0.25
+french_bench_hellaswag:
+  category: language understanding
+  main_metric: acc_norm
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: French Bench HellaSwag
+  random_baseline: 0.25
+french_bench_multifquad:
+  category: language understanding
+  main_metric: exact
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: French Bench MultiFQuAD
+  random_baseline: 0.0
+french_bench_reading:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: French Bench Reading
+  random_baseline: 0.25
+french_bench_trivia:
+  category: world knowledge
+  main_metric: exact
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: French Bench Trivia
+  random_baseline: 0.0
+french_bench_vocabulary:
+  category: linguistic knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: French Bench Vocabulary
+  random_baseline: 0.25
+french_xnli:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: XNLI (French)
+  random_baseline: 0.333333
+global_mmlu_french:
+  category: world knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: Global MMLU (French)
+  random_baseline: 0.25
+global_mmlu_spanish:
+  category: world knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: Global MMLU (Spanish)
+  random_baseline: 0.25
+goldenswag_ht_fi_cf_fbv2:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: GoldenSwag (Finnish, CF)
+  random_baseline: 0.25
+goldenswag_ht_fi_mcf_fbv2:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: GoldenSwag (Finnish, MCF)
+  random_baseline: 0.25
+include_french:
+  category: world knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: IncludeFrench
+  random_baseline: 0.25
+include_spanish:
+  category: world knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: IncludeSpanish
+  random_baseline: 0.25
+mgsm_direct_es:
+  category: math reasoning
+  main_metric: exact_match
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: MGSM Direct (Spanish)
+  random_baseline: 0.0
+ncb:
+  category: linguistic knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: NCB (Norwegian Cloze)
+  random_baseline: 0.5
+nocola:
+  category: linguistic knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: NoCoLA
+  random_baseline: 0.5
+norbelebele:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: Belebele (Norwegian)
+  random_baseline: 0.25
+norcommonsenseqa_nno:
+  category: world knowledge & reasoning
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: CommonsenseQA (Nynorsk)
+  random_baseline: 0.2
+norcommonsenseqa_nob:
+  category: world knowledge & reasoning
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: CommonsenseQA (Bokmål)
+  random_baseline: 0.2
+norec_document:
+  category: language understanding
+  main_metric: f1
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: NoReC Document Sentiment
+  random_baseline: 0.5
+norec_sentence:
+  category: language understanding
+  main_metric: f1
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: NoReC Sentence Sentiment
+  random_baseline: 0.5
+noreval_multiblimp:
+  aggregator: multiblimp
+  category: linguistic knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: MultiBLiMP (Sámi)
+  random_baseline: 0.5
+noridiom_nno:
+  category: linguistic knowledge
+  main_metric: em_first
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: NorIdiom (Nynorsk)
+  random_baseline: 0.0
+noridiom_nob:
+  category: linguistic knowledge
+  main_metric: em_first
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: NorIdiom (Bokmål)
+  random_baseline: 0.0
+noropenbookqa_nno:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  path: noropenbookqa/noropenbookqa_nno
+  pretty_name: OpenBookQA (Nynorsk)
+  random_baseline: 0.25
+noropenbookqa_no_fact_nno:
+  category: world knowledge & reasoning
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  path: noropenbookqa/noropenbookqa_no_fact_nno
+  pretty_name: OpenBookQA No-Fact (Nynorsk)
+  random_baseline: 0.25
+noropenbookqa_no_fact_nob:
+  category: world knowledge & reasoning
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  path: noropenbookqa/noropenbookqa_no_fact_nob
+  pretty_name: OpenBookQA No-Fact (Bokmål)
+  random_baseline: 0.25
+noropenbookqa_nob:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  path: noropenbookqa/noropenbookqa_nob
+  pretty_name: OpenBookQA (Bokmål)
+  random_baseline: 0.25
+norquad:
+  category: language understanding
+  main_metric: f1
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: NorQuAD
+  random_baseline: 0.0
+norrewrite_instruct:
+  category: generation & summarization
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: NorRewrite Instruct
+  random_baseline: 0.0
+norsumm_nno:
+  category: generation & summarization
+  main_metric: rougeL_max
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: NorSumm (Nynorsk)
+  random_baseline: 0.0
+norsumm_nob:
+  category: generation & summarization
+  main_metric: rougeL_max
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: NorSumm (Bokmål)
+  random_baseline: 0.0
+norsummarize_instruct:
+  category: generation & summarization
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: NorSummarize Instruct
+  random_baseline: 0.0
+nortruthfulqa_gen_nno:
+  category: world knowledge & reasoning
+  main_metric: rougeL_max
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: TruthfulQA Gen (Nynorsk)
+  random_baseline: 0.0
+nortruthfulqa_gen_nob:
+  category: world knowledge & reasoning
+  main_metric: rougeL_max
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: TruthfulQA Gen (Bokmål)
+  random_baseline: 0.0
+nortruthfulqa_mc_nno:
+  category: world knowledge & reasoning
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: TruthfulQA MC (Nynorsk)
+  random_baseline: 0.233118
+nortruthfulqa_mc_nob:
+  category: world knowledge & reasoning
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: TruthfulQA MC (Bokmål)
+  random_baseline: 0.231703
+nrk_quiz_qa_nno:
+  category: world knowledge & reasoning
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: NRK Quiz QA (Nynorsk)
+  random_baseline: 0.278847
+nrk_quiz_qa_nob:
+  category: world knowledge & reasoning
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: NRK Quiz QA (Bokmål)
+  random_baseline: 0.28363
+ogx_truthfulqax_gen_fi_fbv2:
+  category: world knowledge
+  main_metric: bleu_max
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: TruthfulQA Gen (Finnish)
+  random_baseline: 0.0
+ogx_truthfulqax_mc1_fi_fbv2:
+  category: world knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: TruthfulQA MC1 (Finnish)
+  random_baseline: 0.25
+ogx_truthfulqax_mc2_fi_fbv2:
+  category: world knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: TruthfulQA MC2 (Finnish)
+  random_baseline: 0.5
+openbookqa_es:
+  category: world knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: OpenBookQA (Spanish)
+  random_baseline: 0.25
+paws_es:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: PAWS (Spanish)
+  random_baseline: 0.5
+scandisent_fi_cf_fbv2:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: ScandiSent (Finnish, CF)
+  random_baseline: 0.333333
+scandisent_fi_mcf_fbv2:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: ScandiSent (Finnish, MCF)
+  random_baseline: 0.333333
+sib200_fi_cf_fbv2:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: SIB-200 (Finnish, CF)
+  random_baseline: 0.142857
+sib200_fi_mcf_fbv2:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: SIB-200 (Finnish, MCF)
+  random_baseline: 0.142857
+slide:
+  category: linguistic knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: SLIDE (Scandinavian LID)
+  random_baseline: 0.212892
+spabelebele:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: Belebele (Spanish)
+  random_baseline: 0.25
+squad_fi_gen_fbv2:
+  category: language understanding
+  main_metric: f1
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: SQuAD (Finnish, Gen)
+  random_baseline: 0.0
+tatoeba_eng_nno:
+  category: translation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: Tatoeba (EN→Nynorsk)
+  random_baseline: 0.0
+tatoeba_eng_nob:
+  category: translation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: Tatoeba (EN→Bokmål)
+  random_baseline: 0.0
+tatoeba_nno_eng:
+  category: translation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: Tatoeba (Nynorsk→EN)
+  random_baseline: 0.0
+tatoeba_nob_eng:
+  category: translation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: Tatoeba (Bokmål→EN)
+  random_baseline: 0.0
+tatoeba_nob_sme:
+  category: translation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: Tatoeba (Bokmål→Sámi)
+  random_baseline: 0.0
+tatoeba_sme_nob:
+  category: translation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: Tatoeba (Sámi→Bokmål)
+  random_baseline: 0.0
+topic_based_nli:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: Topic-Based NLI
+  random_baseline: 0.333333
+veritasqa_es_gen:
+  category: world knowledge
+  main_metric: bleu_max
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: TruthfulQA Gen (Spanish)
+  random_baseline: 0.0
+veritasqa_es_mc1:
+  category: world knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: TruthfulQA MC1 (Spanish)
+  random_baseline: 0.243
+veritasqa_es_mc2:
+  category: world knowledge
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: TruthfulQA MC2 (Spanish)
+  random_baseline: 0.154
+wmt14-en-fr:
+  category: translation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: WMT14 (EN→FR)
+  random_baseline: 0.0
+wmt14-fr-en:
+  category: translation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: WMT14 (FR→EN)
+  random_baseline: 0.0
+xnli_es:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: XNLI (Spanish)
+  random_baseline: 0.333333
+xquad_es:
+  category: language understanding
+  main_metric: exact_match
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: XQuAD (Spanish)
+  random_baseline: 0.0
+xstorycloze_es:
+  category: language understanding
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: XStoryCloze (Spanish)
+  random_baseline: 0.5

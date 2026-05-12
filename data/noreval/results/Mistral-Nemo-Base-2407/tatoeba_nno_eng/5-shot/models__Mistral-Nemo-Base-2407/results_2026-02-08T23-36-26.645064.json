@@ -1,0 +1,348 @@
+{
+  "results": {
+    "tatoeba_nno_eng_p0": {
+      "alias": "tatoeba_nno_eng_p0",
+      "bleu,none": 57.42903532272202,
+      "bleu_stderr,none": 1.8203736173231404,
+      "chrf,none": 70.46641588177371,
+      "chrf_stderr,none": 1.2968763086896091
+    },
+    "tatoeba_nno_eng_p1": {
+      "alias": "tatoeba_nno_eng_p1",
+      "bleu,none": 57.57426728351111,
+      "bleu_stderr,none": 1.7990887945926033,
+      "chrf,none": 70.39633970803641,
+      "chrf_stderr,none": 1.2978200633021966
+    },
+    "tatoeba_nno_eng_p2": {
+      "alias": "tatoeba_nno_eng_p2",
+      "bleu,none": 57.30178904319005,
+      "bleu_stderr,none": 1.8113368497074926,
+      "chrf,none": 70.14726688195451,
+      "chrf_stderr,none": 1.3097717778311124
+    },
+    "tatoeba_nno_eng_p3": {
+      "alias": "tatoeba_nno_eng_p3",
+      "bleu,none": 57.93702042070944,
+      "bleu_stderr,none": 1.8305716776379246,
+      "chrf,none": 70.3453234894242,
+      "chrf_stderr,none": 1.328447611221854
+    }
+  },
+  "group_subtasks": {
+    "tatoeba_nno_eng_p3": [],
+    "tatoeba_nno_eng_p2": [],
+    "tatoeba_nno_eng_p1": [],
+    "tatoeba_nno_eng_p0": []
+  },
+  "configs": {
+    "tatoeba_nno_eng_p0": {
+      "task": "tatoeba_nno_eng_p0",
+      "tag": "tatoeba_nno_eng",
+      "dataset_path": "Helsinki-NLP/tatoeba_mt",
+      "dataset_name": "eng-nno",
+      "training_split": "validation",
+      "test_split": "test",
+      "doc_to_text": "Nynorsk: {{targetString}}\nEngelsk:",
+      "doc_to_target": "sourceString",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Nynorsk: {{targetString}}\nEngelsk:",
+        "doc_to_choice": null,
+        "doc_to_target": "sourceString",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "bleu",
+          "higher_is_better": true
+        },
+        {
+          "metric": "chrf",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 256
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Mistral-Nemo-Base-2407"
+      }
+    },
+    "tatoeba_nno_eng_p1": {
+      "task": "tatoeba_nno_eng_p1",
+      "tag": "tatoeba_nno_eng",
+      "dataset_path": "Helsinki-NLP/tatoeba_mt",
+      "dataset_name": "eng-nno",
+      "training_split": "validation",
+      "test_split": "test",
+      "doc_to_text": "Omsett følgande setning til engelsk: {{targetString}}\nEngelsk:",
+      "doc_to_target": "sourceString",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Omsett følgande setning til engelsk: {{targetString}}\nEngelsk:",
+        "doc_to_choice": null,
+        "doc_to_target": "sourceString",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "bleu",
+          "higher_is_better": true
+        },
+        {
+          "metric": "chrf",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 256
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Mistral-Nemo-Base-2407"
+      }
+    },
+    "tatoeba_nno_eng_p2": {
+      "task": "tatoeba_nno_eng_p2",
+      "tag": "tatoeba_nno_eng",
+      "dataset_path": "Helsinki-NLP/tatoeba_mt",
+      "dataset_name": "eng-nno",
+      "training_split": "validation",
+      "test_split": "test",
+      "doc_to_text": "Gje ei engelsk omsetjing av denne setninga: {{targetString}}\nEngelsk:",
+      "doc_to_target": "sourceString",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Gje ei engelsk omsetjing av denne setninga: {{targetString}}\nEngelsk:",
+        "doc_to_choice": null,
+        "doc_to_target": "sourceString",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "bleu",
+          "higher_is_better": true
+        },
+        {
+          "metric": "chrf",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 256
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Mistral-Nemo-Base-2407"
+      }
+    },
+    "tatoeba_nno_eng_p3": {
+      "task": "tatoeba_nno_eng_p3",
+      "tag": "tatoeba_nno_eng",
+      "dataset_path": "Helsinki-NLP/tatoeba_mt",
+      "dataset_name": "eng-nno",
+      "training_split": "validation",
+      "test_split": "test",
+      "doc_to_text": "Kva blir \"{{targetString}}\" på engelsk?\nEngelsk:",
+      "doc_to_target": "sourceString",
+      "unsafe_code": false,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Kva blir \"{{targetString}}\" på engelsk?\nEngelsk:",
+        "doc_to_choice": null,
+        "doc_to_target": "sourceString",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "bleu",
+          "higher_is_better": true
+        },
+        {
+          "metric": "chrf",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 256
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Mistral-Nemo-Base-2407"
+      }
+    }
+  },
+  "versions": {
+    "tatoeba_nno_eng_p0": 1.0,
+    "tatoeba_nno_eng_p1": 1.0,
+    "tatoeba_nno_eng_p2": 1.0,
+    "tatoeba_nno_eng_p3": 1.0
+  },
+  "n-shot": {
+    "tatoeba_nno_eng_p0": 5,
+    "tatoeba_nno_eng_p1": 5,
+    "tatoeba_nno_eng_p2": 5,
+    "tatoeba_nno_eng_p3": 5
+  },
+  "higher_is_better": {
+    "tatoeba_nno_eng_p0": {
+      "bleu": true,
+      "chrf": true
+    },
+    "tatoeba_nno_eng_p1": {
+      "bleu": true,
+      "chrf": true
+    },
+    "tatoeba_nno_eng_p2": {
+      "bleu": true,
+      "chrf": true
+    },
+    "tatoeba_nno_eng_p3": {
+      "bleu": true,
+      "chrf": true
+    }
+  },
+  "n-samples": {
+    "tatoeba_nno_eng_p0": {
+      "original": 459,
+      "effective": 459
+    },
+    "tatoeba_nno_eng_p1": {
+      "original": 459,
+      "effective": 459
+    },
+    "tatoeba_nno_eng_p2": {
+      "original": 459,
+      "effective": 459
+    },
+    "tatoeba_nno_eng_p3": {
+      "original": 459,
+      "effective": 459
+    }
+  },
+  "config": {
+    "model": "hf",
+    "model_args": {
+      "pretrained": "models/Mistral-Nemo-Base-2407",
+      "trust_remote_code": true
+    },
+    "model_num_parameters": 12247782400,
+    "model_dtype": "torch.bfloat16",
+    "model_revision": "main",
+    "model_sha": "",
+    "batch_size": "8",
+    "batch_sizes": [],
+    "device": "cuda:0",
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {},
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": "728b2bc",
+  "date": 1770590008.242725,
+  "pretty_env_info": "PyTorch version: 2.7.0a0+79aa17489c.nv25.04\nIs debug build: False\nCUDA used to build PyTorch: 12.9\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 24.04.2 LTS (aarch64)\nGCC version: (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0\nClang version: Could not collect\nCMake version: version 3.31.6\nLibc version: glibc-2.39\n\nPython version: 3.12.3 (main, Feb  4 2025, 14:48:35) [GCC 13.3.0] (64-bit runtime)\nPython platform: Linux-6.4.0-150600.23.25_15.0.9-cray_shasta_c_64k-aarch64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: 12.9.41\nCUDA_MODULE_LOADING set to: LAZY\nGPU models and configuration: GPU 0: NVIDIA GH200 120GB\nNvidia driver version: 565.57.01\ncuDNN version: Probably one of the following:\n/usr/lib/aarch64-linux-gnu/libcudnn.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_adv.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_cnn.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_precompiled.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_runtime_compiled.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_graph.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_heuristic.so.9.9.0\n/usr/lib/aarch64-linux-gnu/libcudnn_ops.so.9.9.0\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\n\nCPU:\nArchitecture:                         aarch64\nCPU op-mode(s):                       64-bit\nByte Order:                           Little Endian\nCPU(s):                               288\nOn-line CPU(s) list:                  0-287\nVendor ID:                            ARM\nModel name:                           Neoverse-V2\nModel:                                0\nThread(s) per core:                   1\nCore(s) per socket:                   72\nSocket(s):                            4\nStepping:                             r0p0\nFrequency boost:                      disabled\nCPU(s) scaling MHz:                   102%\nCPU max MHz:                          3447.0000\nCPU min MHz:                          81.0000\nBogoMIPS:                             2000.00\nFlags:                                fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 sve asimdfhm dit uscat ilrcpc flagm sb paca pacg dcpodp sve2 sveaes svepmull svebitperm svesha3 svesm4 flagm2 frint svei8mm svebf16 i8mm bf16 dgh bti\nL1d cache:                            18 MiB (288 instances)\nL1i cache:                            18 MiB (288 instances)\nL2 cache:                             288 MiB (288 instances)\nL3 cache:                             456 MiB (4 instances)\nNUMA node(s):                         36\nNUMA node0 CPU(s):                    0-71\nNUMA node1 CPU(s):                    72-143\nNUMA node2 CPU(s):                    144-215\nNUMA node3 CPU(s):                    216-287\nNUMA node4 CPU(s):                    \nNUMA node5 CPU(s):                    \nNUMA node6 CPU(s):                    \nNUMA node7 CPU(s):                    \nNUMA node8 CPU(s):                    \nNUMA node9 CPU(s):                    \nNUMA node10 CPU(s):                   \nNUMA node11 CPU(s):                   \nNUMA node12 CPU(s):                   \nNUMA node13 CPU(s):                   \nNUMA node14 CPU(s):                   \nNUMA node15 CPU(s):                   \nNUMA node16 CPU(s):                   \nNUMA node17 CPU(s):                   \nNUMA node18 CPU(s):                   \nNUMA node19 CPU(s):                   \nNUMA node20 CPU(s):                   \nNUMA node21 CPU(s):                   \nNUMA node22 CPU(s):                   \nNUMA node23 CPU(s):                   \nNUMA node24 CPU(s):                   \nNUMA node25 CPU(s):                   \nNUMA node26 CPU(s):                   \nNUMA node27 CPU(s):                   \nNUMA node28 CPU(s):                   \nNUMA node29 CPU(s):                   \nNUMA node30 CPU(s):                   \nNUMA node31 CPU(s):                   \nNUMA node32 CPU(s):                   \nNUMA node33 CPU(s):                   \nNUMA node34 CPU(s):                   \nNUMA node35 CPU(s):                   \nVulnerability Gather data sampling:   Not affected\nVulnerability Itlb multihit:          Not affected\nVulnerability L1tf:                   Not affected\nVulnerability Mds:                    Not affected\nVulnerability Meltdown:               Not affected\nVulnerability Mmio stale data:        Not affected\nVulnerability Reg file data sampling: Not affected\nVulnerability Retbleed:               Not affected\nVulnerability Spec rstack overflow:   Not affected\nVulnerability Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:             Mitigation; __user pointer sanitization\nVulnerability Spectre v2:             Not affected\nVulnerability Srbds:                  Not affected\nVulnerability Tsx async abort:        Not affected\n\nVersions of relevant libraries:\n[pip3] mypy-extensions==1.0.0\n[pip3] numpy==1.26.4\n[pip3] nvidia-cudnn-frontend==1.11.0\n[pip3] nvtx==0.2.11\n[pip3] onnx==1.17.0\n[pip3] optree==0.14.1\n[pip3] pynvjitlink==0.3.0\n[pip3] pytorch-triton==3.2.0+git4b3bb1f8b.nvinternal\n[pip3] torch==2.7.0a0+79aa17489c.nv25.4\n[pip3] torch-geometric==2.6.1\n[pip3] torch_tensorrt==2.7.0a0\n[pip3] torchprofile==0.0.4\n[pip3] torchvision==0.22.0a0\n[conda] Could not collect",
+  "transformers_version": "4.57.1",
+  "lm_eval_version": "0.4.10",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<s>",
+    "1"
+  ],
+  "tokenizer_eos_token": [
+    "</s>",
+    "2"
+  ],
+  "tokenizer_bos_token": [
+    "<s>",
+    "1"
+  ],
+  "eot_token_id": 2,
+  "max_length": 131072,
+  "task_hashes": {},
+  "model_source": "hf",
+  "model_name": "models/Mistral-Nemo-Base-2407",
+  "model_name_sanitized": "models__Mistral-Nemo-Base-2407",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": null,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "total_evaluation_time_seconds": "182.92723450099584"
+}

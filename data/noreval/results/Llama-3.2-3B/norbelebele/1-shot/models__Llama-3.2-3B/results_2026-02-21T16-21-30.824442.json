@@ -1,0 +1,589 @@
+{
+  "results": {
+    "norbelebele_p0": {
+      "alias": "norbelebele_p0",
+      "acc,none": 0.59,
+      "acc_stderr,none": 0.016403559124367105,
+      "acc_norm,none": 0.59,
+      "acc_norm_stderr,none": 0.016403559124367105
+    },
+    "norbelebele_p1": {
+      "alias": "norbelebele_p1",
+      "acc,none": 0.43333333333333335,
+      "acc_stderr,none": 0.016527038403576017,
+      "acc_norm,none": 0.42777777777777776,
+      "acc_norm_stderr,none": 0.016501051660868925
+    },
+    "norbelebele_p2": {
+      "alias": "norbelebele_p2",
+      "acc,none": 0.3622222222222222,
+      "acc_stderr,none": 0.016030327346260677,
+      "acc_norm,none": 0.3622222222222222,
+      "acc_norm_stderr,none": 0.016030327346260677
+    },
+    "norbelebele_p3": {
+      "alias": "norbelebele_p3",
+      "acc,none": 0.27555555555555555,
+      "acc_stderr,none": 0.014901407215241979,
+      "acc_norm,none": 0.27444444444444444,
+      "acc_norm_stderr,none": 0.014882733736391495
+    },
+    "norbelebele_p4": {
+      "alias": "norbelebele_p4",
+      "acc,none": 0.3522222222222222,
+      "acc_stderr,none": 0.015930945547061166,
+      "acc_norm,none": 0.3522222222222222,
+      "acc_norm_stderr,none": 0.015930945547061166
+    },
+    "norbelebele_p5": {
+      "alias": "norbelebele_p5",
+      "acc,none": 0.4111111111111111,
+      "acc_stderr,none": 0.016410297014042667,
+      "acc_norm,none": 0.3844444444444444,
+      "acc_norm_stderr,none": 0.016224472156351383
+    },
+    "norbelebele_p6": {
+      "alias": "norbelebele_p6",
+      "acc,none": 0.41333333333333333,
+      "acc_stderr,none": 0.016423513654705058,
+      "acc_norm,none": 0.4088888888888889,
+      "acc_norm_stderr,none": 0.01639673471360031
+    }
+  },
+  "group_subtasks": {
+    "norbelebele_p6": [],
+    "norbelebele_p5": [],
+    "norbelebele_p4": [],
+    "norbelebele_p3": [],
+    "norbelebele_p2": [],
+    "norbelebele_p1": [],
+    "norbelebele_p0": []
+  },
+  "configs": {
+    "norbelebele_p0": {
+      "task": "norbelebele_p0",
+      "tag": "norbelebele",
+      "dataset_path": "ltg/norbelebele",
+      "test_split": "test",
+      "fewshot_split": "test",
+      "doc_to_text": "Tekst: {{flores_passage}}\nSpørsmål: {{question}}\nA: {{mc_answer1}}\nB: {{mc_answer2}}\nC: {{mc_answer3}}\nD: {{mc_answer4}}\nSvar:",
+      "doc_to_target": "{{['1', '2', '3', '4'].index(correct_answer_num)}}",
+      "unsafe_code": false,
+      "doc_to_choice": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "first_n",
+        "split": "test",
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Tekst: {{flores_passage}}\nSpørsmål: {{question}}\nA: {{mc_answer1}}\nB: {{mc_answer2}}\nC: {{mc_answer3}}\nD: {{mc_answer4}}\nSvar:",
+        "doc_to_choice": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "doc_to_target": "{{['1', '2', '3', '4'].index(correct_answer_num)}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.2-3B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.7,
+        "tokenizer_mode": "auto"
+      }
+    },
+    "norbelebele_p1": {
+      "task": "norbelebele_p1",
+      "tag": "norbelebele",
+      "dataset_path": "ltg/norbelebele",
+      "test_split": "test",
+      "fewshot_split": "test",
+      "doc_to_text": "Bakgrunn: {{flores_passage}}\nSpørsmål:{{question}}\nSvaralternativer:\n- {{mc_answer1}}\n- {{mc_answer2}}\n- {{mc_answer3}}\n- {{mc_answer4}}\nRiktig svar:",
+      "doc_to_target": "{{['1', '2', '3', '4'].index(correct_answer_num)}}",
+      "unsafe_code": false,
+      "doc_to_choice": "{{[mc_answer1, mc_answer2, mc_answer3, mc_answer4]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "first_n",
+        "split": "test",
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Bakgrunn: {{flores_passage}}\nSpørsmål:{{question}}\nSvaralternativer:\n- {{mc_answer1}}\n- {{mc_answer2}}\n- {{mc_answer3}}\n- {{mc_answer4}}\nRiktig svar:",
+        "doc_to_choice": "{{[mc_answer1, mc_answer2, mc_answer3, mc_answer4]}}",
+        "doc_to_target": "{{['1', '2', '3', '4'].index(correct_answer_num)}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.2-3B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.7,
+        "tokenizer_mode": "auto"
+      }
+    },
+    "norbelebele_p2": {
+      "task": "norbelebele_p2",
+      "tag": "norbelebele",
+      "dataset_path": "ltg/norbelebele",
+      "test_split": "test",
+      "fewshot_split": "test",
+      "doc_to_text": "{{question}}\nHvilket av følgende mulige svar er det riktige?\nA: {{mc_answer1}}\nB: {{mc_answer2}}\nC: {{mc_answer3}}\nD: {{mc_answer4}}\nSvar:",
+      "doc_to_target": "{{['1', '2', '3', '4'].index(correct_answer_num)}}",
+      "unsafe_code": false,
+      "doc_to_choice": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "first_n",
+        "split": "test",
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{question}}\nHvilket av følgende mulige svar er det riktige?\nA: {{mc_answer1}}\nB: {{mc_answer2}}\nC: {{mc_answer3}}\nD: {{mc_answer4}}\nSvar:",
+        "doc_to_choice": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "doc_to_target": "{{['1', '2', '3', '4'].index(correct_answer_num)}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.2-3B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.7,
+        "tokenizer_mode": "auto"
+      }
+    },
+    "norbelebele_p3": {
+      "task": "norbelebele_p3",
+      "tag": "norbelebele",
+      "dataset_path": "ltg/norbelebele",
+      "test_split": "test",
+      "fewshot_split": "test",
+      "doc_to_text": "Svar på følgende spørsmål: {{question}}\nSvaret skal baseres på følgende tekst:\n{{flores_passage}}\nVelg et svar fra denne listen:\n– {{mc_answer1}}\n– {{mc_answer2}},\n– {{mc_answer3}}\n– {{mc_answer4}}",
+      "doc_to_target": "{{['1', '2', '3', '4'].index(correct_answer_num)}}",
+      "unsafe_code": false,
+      "doc_to_choice": "{{[mc_answer1, mc_answer2, mc_answer3, mc_answer4]}}",
+      "description": "",
+      "target_delimiter": "\n",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "first_n",
+        "split": "test",
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Svar på følgende spørsmål: {{question}}\nSvaret skal baseres på følgende tekst:\n{{flores_passage}}\nVelg et svar fra denne listen:\n– {{mc_answer1}}\n– {{mc_answer2}},\n– {{mc_answer3}}\n– {{mc_answer4}}",
+        "doc_to_choice": "{{[mc_answer1, mc_answer2, mc_answer3, mc_answer4]}}",
+        "doc_to_target": "{{['1', '2', '3', '4'].index(correct_answer_num)}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": "\n"
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.2-3B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.7,
+        "tokenizer_mode": "auto"
+      }
+    },
+    "norbelebele_p4": {
+      "task": "norbelebele_p4",
+      "tag": "norbelebele",
+      "dataset_path": "ltg/norbelebele",
+      "test_split": "test",
+      "fewshot_split": "test",
+      "doc_to_text": "{{flores_passage}}\n\n{{question}}\n\nA: {{mc_answer1}}\nB: {{mc_answer2}}\nC: {{mc_answer3}}\nD: {{mc_answer4}}\n\nEr det riktige svaret A, B, C, eller D?",
+      "doc_to_target": "{{['1', '2', '3', '4'].index(correct_answer_num)}}",
+      "unsafe_code": false,
+      "doc_to_choice": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "first_n",
+        "split": "test",
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{flores_passage}}\n\n{{question}}\n\nA: {{mc_answer1}}\nB: {{mc_answer2}}\nC: {{mc_answer3}}\nD: {{mc_answer4}}\n\nEr det riktige svaret A, B, C, eller D?",
+        "doc_to_choice": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "doc_to_target": "{{['1', '2', '3', '4'].index(correct_answer_num)}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.2-3B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.7,
+        "tokenizer_mode": "auto"
+      }
+    },
+    "norbelebele_p5": {
+      "task": "norbelebele_p5",
+      "tag": "norbelebele",
+      "dataset_path": "ltg/norbelebele",
+      "test_split": "test",
+      "fewshot_split": "test",
+      "doc_to_text": "Tekst: {{flores_passage}}\nSpørsmål: {{question}}\nSvar:",
+      "doc_to_target": "{{['1', '2', '3', '4'].index(correct_answer_num)}}",
+      "unsafe_code": false,
+      "doc_to_choice": "{{[mc_answer1, mc_answer2, mc_answer3, mc_answer4]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "first_n",
+        "split": "test",
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Tekst: {{flores_passage}}\nSpørsmål: {{question}}\nSvar:",
+        "doc_to_choice": "{{[mc_answer1, mc_answer2, mc_answer3, mc_answer4]}}",
+        "doc_to_target": "{{['1', '2', '3', '4'].index(correct_answer_num)}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.2-3B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.7,
+        "tokenizer_mode": "auto"
+      }
+    },
+    "norbelebele_p6": {
+      "task": "norbelebele_p6",
+      "tag": "norbelebele",
+      "dataset_path": "ltg/norbelebele",
+      "test_split": "test",
+      "fewshot_split": "test",
+      "doc_to_text": "Bakgrunn: {{flores_passage}}\nSpørsmål:{{question}}\nRiktig svar:",
+      "doc_to_target": "{{['1', '2', '3', '4'].index(correct_answer_num)}}",
+      "unsafe_code": false,
+      "doc_to_choice": "{{[mc_answer1, mc_answer2, mc_answer3, mc_answer4]}}",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "first_n",
+        "split": "test",
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Bakgrunn: {{flores_passage}}\nSpørsmål:{{question}}\nRiktig svar:",
+        "doc_to_choice": "{{[mc_answer1, mc_answer2, mc_answer3, mc_answer4]}}",
+        "doc_to_target": "{{['1', '2', '3', '4'].index(correct_answer_num)}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 1,
+      "metric_list": [
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Llama-3.2-3B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.7,
+        "tokenizer_mode": "auto"
+      }
+    }
+  },
+  "versions": {
+    "norbelebele_p0": 1.0,
+    "norbelebele_p1": 1.0,
+    "norbelebele_p2": 1.0,
+    "norbelebele_p3": 1.0,
+    "norbelebele_p4": 1.0,
+    "norbelebele_p5": 1.0,
+    "norbelebele_p6": 1.0
+  },
+  "n-shot": {
+    "norbelebele_p0": 1,
+    "norbelebele_p1": 1,
+    "norbelebele_p2": 1,
+    "norbelebele_p3": 1,
+    "norbelebele_p4": 1,
+    "norbelebele_p5": 1,
+    "norbelebele_p6": 1
+  },
+  "higher_is_better": {
+    "norbelebele_p0": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "norbelebele_p1": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "norbelebele_p2": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "norbelebele_p3": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "norbelebele_p4": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "norbelebele_p5": {
+      "acc": true,
+      "acc_norm": true
+    },
+    "norbelebele_p6": {
+      "acc": true,
+      "acc_norm": true
+    }
+  },
+  "n-samples": {
+    "norbelebele_p0": {
+      "original": 900,
+      "effective": 900
+    },
+    "norbelebele_p1": {
+      "original": 900,
+      "effective": 900
+    },
+    "norbelebele_p2": {
+      "original": 900,
+      "effective": 900
+    },
+    "norbelebele_p3": {
+      "original": 900,
+      "effective": 900
+    },
+    "norbelebele_p4": {
+      "original": 900,
+      "effective": 900
+    },
+    "norbelebele_p5": {
+      "original": 900,
+      "effective": 900
+    },
+    "norbelebele_p6": {
+      "original": 900,
+      "effective": 900
+    }
+  },
+  "config": {
+    "model": "vllm",
+    "model_args": {
+      "pretrained": "models/Llama-3.2-3B",
+      "tensor_parallel_size": 1,
+      "dtype": "auto",
+      "gpu_memory_utilization": 0.7,
+      "tokenizer_mode": "auto",
+      "trust_remote_code": true
+    },
+    "batch_size": "auto",
+    "batch_sizes": [],
+    "device": "cuda:0",
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {},
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": "728b2bc",
+  "date": 1771687018.9203558,
+  "pretty_env_info": "PyTorch version: 2.10.0a0+a36e1d39eb.nvinternal.main.41386253\nIs debug build: False\nCUDA used to build PyTorch: 13.1\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 24.04.3 LTS (aarch64)\nGCC version: (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0\nClang version: Could not collect\nCMake version: Could not collect\nLibc version: glibc-2.39\n\nPython version: 3.12.3 (main, Jan  8 2026, 11:30:50) [GCC 13.3.0] (64-bit runtime)\nPython platform: Linux-6.4.0-150600.23.25_15.0.9-cray_shasta_c_64k-aarch64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: 13.1.115\nCUDA_MODULE_LOADING set to: \nGPU models and configuration: GPU 0: NVIDIA GH200 120GB\nNvidia driver version: 565.57.01\ncuDNN version: Probably one of the following:\n/usr/lib/aarch64-linux-gnu/libcudnn.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_adv.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_cnn.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_runtime_compiled.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_graph.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_heuristic.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_ops.so.9.17.1\nIs XPU available: False\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\n\nCPU:\nArchitecture:                         aarch64\nCPU op-mode(s):                       64-bit\nByte Order:                           Little Endian\nCPU(s):                               288\nOn-line CPU(s) list:                  0-287\nVendor ID:                            ARM\nModel name:                           Neoverse-V2\nModel:                                0\nThread(s) per core:                   1\nCore(s) per socket:                   72\nSocket(s):                            4\nStepping:                             r0p0\nFrequency boost:                      disabled\nCPU(s) scaling MHz:                   101%\nCPU max MHz:                          3465.0000\nCPU min MHz:                          81.0000\nBogoMIPS:                             2000.00\nFlags:                                fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 sve asimdfhm dit uscat ilrcpc flagm sb paca pacg dcpodp sve2 sveaes svepmull svebitperm svesha3 svesm4 flagm2 frint svei8mm svebf16 i8mm bf16 dgh bti\nL1d cache:                            18 MiB (288 instances)\nL1i cache:                            18 MiB (288 instances)\nL2 cache:                             288 MiB (288 instances)\nL3 cache:                             456 MiB (4 instances)\nNUMA node(s):                         36\nNUMA node0 CPU(s):                    0-71\nNUMA node1 CPU(s):                    72-143\nNUMA node2 CPU(s):                    144-215\nNUMA node3 CPU(s):                    216-287\nNUMA node4 CPU(s):                    \nNUMA node5 CPU(s):                    \nNUMA node6 CPU(s):                    \nNUMA node7 CPU(s):                    \nNUMA node8 CPU(s):                    \nNUMA node9 CPU(s):                    \nNUMA node10 CPU(s):                   \nNUMA node11 CPU(s):                   \nNUMA node12 CPU(s):                   \nNUMA node13 CPU(s):                   \nNUMA node14 CPU(s):                   \nNUMA node15 CPU(s):                   \nNUMA node16 CPU(s):                   \nNUMA node17 CPU(s):                   \nNUMA node18 CPU(s):                   \nNUMA node19 CPU(s):                   \nNUMA node20 CPU(s):                   \nNUMA node21 CPU(s):                   \nNUMA node22 CPU(s):                   \nNUMA node23 CPU(s):                   \nNUMA node24 CPU(s):                   \nNUMA node25 CPU(s):                   \nNUMA node26 CPU(s):                   \nNUMA node27 CPU(s):                   \nNUMA node28 CPU(s):                   \nNUMA node29 CPU(s):                   \nNUMA node30 CPU(s):                   \nNUMA node31 CPU(s):                   \nNUMA node32 CPU(s):                   \nNUMA node33 CPU(s):                   \nNUMA node34 CPU(s):                   \nNUMA node35 CPU(s):                   \nVulnerability Gather data sampling:   Not affected\nVulnerability Itlb multihit:          Not affected\nVulnerability L1tf:                   Not affected\nVulnerability Mds:                    Not affected\nVulnerability Meltdown:               Not affected\nVulnerability Mmio stale data:        Not affected\nVulnerability Reg file data sampling: Not affected\nVulnerability Retbleed:               Not affected\nVulnerability Spec rstack overflow:   Not affected\nVulnerability Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:             Mitigation; __user pointer sanitization\nVulnerability Spectre v2:             Not affected\nVulnerability Srbds:                  Not affected\nVulnerability Tsx async abort:        Not affected\n\nVersions of relevant libraries:\n[pip3] numpy==2.1.0\n[pip3] nvidia-cudnn-frontend==1.17.0\n[pip3] torch==2.10.0a0+a36e1d39eb.nvinternal.main.41386253\n[pip3] torchvision==0.25.0a0+6b56de1c.nvinternal.main.41386253\n[pip3] triton==3.5.1+gitcced7793\n[conda] Could not collect",
+  "transformers_version": "4.57.1",
+  "lm_eval_version": "0.4.10",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<|end_of_text|>",
+    "128001"
+  ],
+  "tokenizer_eos_token": [
+    "<|end_of_text|>",
+    "128001"
+  ],
+  "tokenizer_bos_token": [
+    "<|begin_of_text|>",
+    "128000"
+  ],
+  "eot_token_id": 128001,
+  "max_length": 131072,
+  "task_hashes": {
+    "norbelebele_p0": "bc2af9784228f39b204bc44067cb9e1856cd9fcbf2488023abd1ab1d42e028d3",
+    "norbelebele_p1": "a683ce25e6245c71fb8d899bb542d57247d3b4f13a1e8bf70c16af16d4ed206b",
+    "norbelebele_p2": "62d9697c67aa27e1a8c9e2e6660640631905b25e42b650c25faab387ffe4692f",
+    "norbelebele_p3": "b4ec044e7abc7d4e1a54d4dc9d2ee856ee1e3ce30b6838325227662a889555ff",
+    "norbelebele_p4": "3e8a3f612eda8e51f14aeb0f9954d75848238d0abf87282f8d7c995ad2609ba0",
+    "norbelebele_p5": "730dce510c18b2f05a86af35e2550d9fc77709b0c3b6f27fd2e30d026ed74b94",
+    "norbelebele_p6": "df5c62a6cff54d63402aed79e473a1692bd8e00cea20ff9e24bb66aa94d3a336"
+  },
+  "model_source": "vllm",
+  "model_name": "models/Llama-3.2-3B",
+  "model_name_sanitized": "models__Llama-3.2-3B",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": null,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "total_evaluation_time_seconds": "291.7496676039882"
+}

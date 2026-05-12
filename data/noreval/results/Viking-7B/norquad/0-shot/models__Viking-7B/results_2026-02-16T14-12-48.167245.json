@@ -1,0 +1,458 @@
+{
+  "results": {
+    "norquad_p0": {
+      "alias": "norquad_p0",
+      "f1,none": 0.3574629681034823,
+      "f1_stderr,none": 0.016569226831750977,
+      "exact_match,none": 0.1461864406779661,
+      "exact_match_stderr,none": 0.01627888354100359
+    },
+    "norquad_p1": {
+      "alias": "norquad_p1",
+      "f1,none": 0.4057811470577263,
+      "f1_stderr,none": 0.01857813101844453,
+      "exact_match,none": 0.2055084745762712,
+      "exact_match_stderr,none": 0.01861868690387804
+    },
+    "norquad_p2": {
+      "alias": "norquad_p2",
+      "f1,none": 0.3821355935617623,
+      "f1_stderr,none": 0.016933036281213624,
+      "exact_match,none": 0.1673728813559322,
+      "exact_match_stderr,none": 0.01720114546761887
+    },
+    "norquad_p3": {
+      "alias": "norquad_p3",
+      "f1,none": 0.201652272435996,
+      "f1_stderr,none": 0.014160898076699197,
+      "exact_match,none": 0.07627118644067797,
+      "exact_match_stderr,none": 0.012230438913124215
+    },
+    "norquad_p4": {
+      "alias": "norquad_p4",
+      "f1,none": 0.3857021334438725,
+      "f1_stderr,none": 0.01855956999543114,
+      "exact_match,none": 0.20127118644067796,
+      "exact_match_stderr,none": 0.018474811908430602
+    }
+  },
+  "group_subtasks": {
+    "norquad_p4": [],
+    "norquad_p3": [],
+    "norquad_p2": [],
+    "norquad_p1": [],
+    "norquad_p0": []
+  },
+  "configs": {
+    "norquad_p0": {
+      "task": "norquad_p0",
+      "tag": "norquad",
+      "dataset_path": "ltg/norquad",
+      "training_split": "train",
+      "validation_split": "validation",
+      "test_split": "test",
+      "process_docs": "def process_docs(dataset: datasets.Dataset):\n    def _helper(doc):\n        doc[\"title\"] = doc[\"context\"].strip().split(\"\\n\")[0].strip()\n        doc[\"passage\"] = \"\\n\".join(doc[\"context\"].strip().split(\"\\n\")[1:]).strip()\n        doc[\"question\"] = \" \".join(doc[\"question\"].strip().split())\n        return doc\n\n    return dataset.map(_helper)\n",
+      "doc_to_text": "def p0(doc):\n    title = doc[\"title\"]\n    passage = doc[\"passage\"]\n    question = doc[\"question\"]\n    prompt = f\"Tittel: {title}\\n\\nTekst: {passage}\\n\\nSpørsmål: {question}\\n\\nSvar:\"\n    return prompt\n",
+      "doc_to_target": "{{answers[\"text\"][0]}}",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    preds = results[0]\n    reference = doc[\"answers\"][\"text\"][0]\n    f1_sum = squad_metrics.compute_f1(reference, preds)\n    exact_match = squad_metrics.compute_exact(reference, preds)\n    return {\"f1\": f1_sum, \"exact_match\": exact_match}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x4004f4148860>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p0 at 0x4004f3f9bf60>",
+        "doc_to_choice": null,
+        "doc_to_target": "{{answers[\"text\"][0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "exact_match",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 32
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Viking-7B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "norquad_p1": {
+      "task": "norquad_p1",
+      "tag": "norquad",
+      "dataset_path": "ltg/norquad",
+      "training_split": "train",
+      "validation_split": "validation",
+      "test_split": "test",
+      "process_docs": "def process_docs(dataset: datasets.Dataset):\n    def _helper(doc):\n        doc[\"title\"] = doc[\"context\"].strip().split(\"\\n\")[0].strip()\n        doc[\"passage\"] = \"\\n\".join(doc[\"context\"].strip().split(\"\\n\")[1:]).strip()\n        doc[\"question\"] = \" \".join(doc[\"question\"].strip().split())\n        return doc\n\n    return dataset.map(_helper)\n",
+      "doc_to_text": "def p1(doc):\n    title = doc[\"title\"]\n    passage = doc[\"passage\"]\n    question = doc[\"question\"]\n    prompt = f'Tittel: {title}\\n\\nTekst: {passage}\\n\\nGitt teksten over, hva er svaret på følgende spørsmål? \"{question}\"\\n\\nSvar:'\n    return prompt\n",
+      "doc_to_target": "{{answers[\"text\"][0]}}",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    preds = results[0]\n    reference = doc[\"answers\"][\"text\"][0]\n    f1_sum = squad_metrics.compute_f1(reference, preds)\n    exact_match = squad_metrics.compute_exact(reference, preds)\n    return {\"f1\": f1_sum, \"exact_match\": exact_match}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x4004f2e87600>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p1 at 0x4004f2e86de0>",
+        "doc_to_choice": null,
+        "doc_to_target": "{{answers[\"text\"][0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "exact_match",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 32
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Viking-7B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "norquad_p2": {
+      "task": "norquad_p2",
+      "tag": "norquad",
+      "dataset_path": "ltg/norquad",
+      "training_split": "train",
+      "validation_split": "validation",
+      "test_split": "test",
+      "process_docs": "def process_docs(dataset: datasets.Dataset):\n    def _helper(doc):\n        doc[\"title\"] = doc[\"context\"].strip().split(\"\\n\")[0].strip()\n        doc[\"passage\"] = \"\\n\".join(doc[\"context\"].strip().split(\"\\n\")[1:]).strip()\n        doc[\"question\"] = \" \".join(doc[\"question\"].strip().split())\n        return doc\n\n    return dataset.map(_helper)\n",
+      "doc_to_text": "def p2(doc):\n    title = doc[\"title\"]\n    passage = doc[\"passage\"]\n    question = doc[\"question\"]\n    prompt = (\n        f\"Tittel: {title}\\n\\nTekst: {passage}\\n\\nSvar på følgende: {question}\\n\\nSvar:\"\n    )\n    return prompt\n",
+      "doc_to_target": "{{answers[\"text\"][0]}}",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    preds = results[0]\n    reference = doc[\"answers\"][\"text\"][0]\n    f1_sum = squad_metrics.compute_f1(reference, preds)\n    exact_match = squad_metrics.compute_exact(reference, preds)\n    return {\"f1\": f1_sum, \"exact_match\": exact_match}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x4004f1979ee0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p2 at 0x4004f1979bc0>",
+        "doc_to_choice": null,
+        "doc_to_target": "{{answers[\"text\"][0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "exact_match",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 32
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Viking-7B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "norquad_p3": {
+      "task": "norquad_p3",
+      "tag": "norquad",
+      "dataset_path": "ltg/norquad",
+      "training_split": "train",
+      "validation_split": "validation",
+      "test_split": "test",
+      "process_docs": "def process_docs(dataset: datasets.Dataset):\n    def _helper(doc):\n        doc[\"title\"] = doc[\"context\"].strip().split(\"\\n\")[0].strip()\n        doc[\"passage\"] = \"\\n\".join(doc[\"context\"].strip().split(\"\\n\")[1:]).strip()\n        doc[\"question\"] = \" \".join(doc[\"question\"].strip().split())\n        return doc\n\n    return dataset.map(_helper)\n",
+      "doc_to_text": "def p3(doc):\n    title = doc[\"title\"]\n    passage = doc[\"passage\"]\n    question = doc[\"question\"]\n    prompt = f'Tittel: {title}\\n\\nTekst: {passage}\\n\\nHvordan kan man svare på spørsmålet \"{question}\", gitt teksten over?\\n\\nSvar:'\n    return prompt\n",
+      "doc_to_target": "{{answers[\"text\"][0]}}",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    preds = results[0]\n    reference = doc[\"answers\"][\"text\"][0]\n    f1_sum = squad_metrics.compute_f1(reference, preds)\n    exact_match = squad_metrics.compute_exact(reference, preds)\n    return {\"f1\": f1_sum, \"exact_match\": exact_match}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x4004f1f9cfe0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p3 at 0x4004f1f9c900>",
+        "doc_to_choice": null,
+        "doc_to_target": "{{answers[\"text\"][0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "exact_match",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 32
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Viking-7B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    },
+    "norquad_p4": {
+      "task": "norquad_p4",
+      "tag": "norquad",
+      "dataset_path": "ltg/norquad",
+      "training_split": "train",
+      "validation_split": "validation",
+      "test_split": "test",
+      "process_docs": "def process_docs(dataset: datasets.Dataset):\n    def _helper(doc):\n        doc[\"title\"] = doc[\"context\"].strip().split(\"\\n\")[0].strip()\n        doc[\"passage\"] = \"\\n\".join(doc[\"context\"].strip().split(\"\\n\")[1:]).strip()\n        doc[\"question\"] = \" \".join(doc[\"question\"].strip().split())\n        return doc\n\n    return dataset.map(_helper)\n",
+      "doc_to_text": "def p4(doc):\n    title = doc[\"title\"]\n    passage = doc[\"passage\"]\n    question = doc[\"question\"]\n    prompt = f'Tittel: {title}\\n\\nTekst:{passage}\\n\\nGitt teksten over, besvar følgende spørsmål: \"{question}\"\\n\\nSvar:'\n    return prompt\n",
+      "doc_to_target": "{{answers[\"text\"][0]}}",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    preds = results[0]\n    reference = doc[\"answers\"][\"text\"][0]\n    f1_sum = squad_metrics.compute_f1(reference, preds)\n    exact_match = squad_metrics.compute_exact(reference, preds)\n    return {\"f1\": f1_sum, \"exact_match\": exact_match}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x4004dbeacb80>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "<function p4 at 0x4004dbeac540>",
+        "doc_to_choice": null,
+        "doc_to_target": "{{answers[\"text\"][0]}}",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "exact_match",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 32
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "pretrained": "models/Viking-7B",
+        "tensor_parallel_size": 1,
+        "dtype": "auto",
+        "gpu_memory_utilization": 0.9
+      }
+    }
+  },
+  "versions": {
+    "norquad_p0": 1.0,
+    "norquad_p1": 1.0,
+    "norquad_p2": 1.0,
+    "norquad_p3": 1.0,
+    "norquad_p4": 1.0
+  },
+  "n-shot": {
+    "norquad_p0": 0,
+    "norquad_p1": 0,
+    "norquad_p2": 0,
+    "norquad_p3": 0,
+    "norquad_p4": 0
+  },
+  "higher_is_better": {
+    "norquad_p0": {
+      "exact_match": true,
+      "f1": true
+    },
+    "norquad_p1": {
+      "exact_match": true,
+      "f1": true
+    },
+    "norquad_p2": {
+      "exact_match": true,
+      "f1": true
+    },
+    "norquad_p3": {
+      "exact_match": true,
+      "f1": true
+    },
+    "norquad_p4": {
+      "exact_match": true,
+      "f1": true
+    }
+  },
+  "n-samples": {
+    "norquad_p0": {
+      "original": 472,
+      "effective": 472
+    },
+    "norquad_p1": {
+      "original": 472,
+      "effective": 472
+    },
+    "norquad_p2": {
+      "original": 472,
+      "effective": 472
+    },
+    "norquad_p3": {
+      "original": 472,
+      "effective": 472
+    },
+    "norquad_p4": {
+      "original": 472,
+      "effective": 472
+    }
+  },
+  "config": {
+    "model": "vllm",
+    "model_args": {
+      "pretrained": "models/Viking-7B",
+      "tensor_parallel_size": 1,
+      "dtype": "auto",
+      "gpu_memory_utilization": 0.9,
+      "trust_remote_code": true
+    },
+    "batch_size": "auto",
+    "batch_sizes": [],
+    "device": "cuda:0",
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {},
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": "728b2bc",
+  "date": 1771247494.882206,
+  "pretty_env_info": "PyTorch version: 2.10.0a0+a36e1d39eb.nvinternal.main.41386253\nIs debug build: False\nCUDA used to build PyTorch: 13.1\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 24.04.3 LTS (aarch64)\nGCC version: (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0\nClang version: Could not collect\nCMake version: Could not collect\nLibc version: glibc-2.39\n\nPython version: 3.12.3 (main, Jan  8 2026, 11:30:50) [GCC 13.3.0] (64-bit runtime)\nPython platform: Linux-6.4.0-150600.23.25_15.0.9-cray_shasta_c_64k-aarch64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: 13.1.115\nCUDA_MODULE_LOADING set to: \nGPU models and configuration: GPU 0: NVIDIA GH200 120GB\nNvidia driver version: 565.57.01\ncuDNN version: Probably one of the following:\n/usr/lib/aarch64-linux-gnu/libcudnn.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_adv.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_cnn.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_runtime_compiled.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_graph.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_heuristic.so.9.17.1\n/usr/lib/aarch64-linux-gnu/libcudnn_ops.so.9.17.1\nIs XPU available: False\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\n\nCPU:\nArchitecture:                         aarch64\nCPU op-mode(s):                       64-bit\nByte Order:                           Little Endian\nCPU(s):                               288\nOn-line CPU(s) list:                  0-287\nVendor ID:                            ARM\nModel name:                           Neoverse-V2\nModel:                                0\nThread(s) per core:                   1\nCore(s) per socket:                   72\nSocket(s):                            4\nStepping:                             r0p0\nFrequency boost:                      disabled\nCPU(s) scaling MHz:                   105%\nCPU max MHz:                          3456.0000\nCPU min MHz:                          81.0000\nBogoMIPS:                             2000.00\nFlags:                                fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 sve asimdfhm dit uscat ilrcpc flagm sb paca pacg dcpodp sve2 sveaes svepmull svebitperm svesha3 svesm4 flagm2 frint svei8mm svebf16 i8mm bf16 dgh bti\nL1d cache:                            18 MiB (288 instances)\nL1i cache:                            18 MiB (288 instances)\nL2 cache:                             288 MiB (288 instances)\nL3 cache:                             456 MiB (4 instances)\nNUMA node(s):                         36\nNUMA node0 CPU(s):                    0-71\nNUMA node1 CPU(s):                    72-143\nNUMA node2 CPU(s):                    144-215\nNUMA node3 CPU(s):                    216-287\nNUMA node4 CPU(s):                    \nNUMA node5 CPU(s):                    \nNUMA node6 CPU(s):                    \nNUMA node7 CPU(s):                    \nNUMA node8 CPU(s):                    \nNUMA node9 CPU(s):                    \nNUMA node10 CPU(s):                   \nNUMA node11 CPU(s):                   \nNUMA node12 CPU(s):                   \nNUMA node13 CPU(s):                   \nNUMA node14 CPU(s):                   \nNUMA node15 CPU(s):                   \nNUMA node16 CPU(s):                   \nNUMA node17 CPU(s):                   \nNUMA node18 CPU(s):                   \nNUMA node19 CPU(s):                   \nNUMA node20 CPU(s):                   \nNUMA node21 CPU(s):                   \nNUMA node22 CPU(s):                   \nNUMA node23 CPU(s):                   \nNUMA node24 CPU(s):                   \nNUMA node25 CPU(s):                   \nNUMA node26 CPU(s):                   \nNUMA node27 CPU(s):                   \nNUMA node28 CPU(s):                   \nNUMA node29 CPU(s):                   \nNUMA node30 CPU(s):                   \nNUMA node31 CPU(s):                   \nNUMA node32 CPU(s):                   \nNUMA node33 CPU(s):                   \nNUMA node34 CPU(s):                   \nNUMA node35 CPU(s):                   \nVulnerability Gather data sampling:   Not affected\nVulnerability Itlb multihit:          Not affected\nVulnerability L1tf:                   Not affected\nVulnerability Mds:                    Not affected\nVulnerability Meltdown:               Not affected\nVulnerability Mmio stale data:        Not affected\nVulnerability Reg file data sampling: Not affected\nVulnerability Retbleed:               Not affected\nVulnerability Spec rstack overflow:   Not affected\nVulnerability Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:             Mitigation; __user pointer sanitization\nVulnerability Spectre v2:             Not affected\nVulnerability Srbds:                  Not affected\nVulnerability Tsx async abort:        Not affected\n\nVersions of relevant libraries:\n[pip3] numpy==2.1.0\n[pip3] nvidia-cudnn-frontend==1.17.0\n[pip3] torch==2.10.0a0+a36e1d39eb.nvinternal.main.41386253\n[pip3] torchvision==0.25.0a0+6b56de1c.nvinternal.main.41386253\n[pip3] triton==3.5.1+gitcced7793\n[conda] Could not collect",
+  "transformers_version": "4.57.1",
+  "lm_eval_version": "0.4.10",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<pad>",
+    "3"
+  ],
+  "tokenizer_eos_token": [
+    "</s>",
+    "2"
+  ],
+  "tokenizer_bos_token": [
+    "<s>",
+    "1"
+  ],
+  "eot_token_id": 2,
+  "max_length": 4096,
+  "task_hashes": {
+    "norquad_p0": "02dd005c1fc70c0f92cf7c0425de5916ad00bc6b64bc11430e34b73389a81a9f",
+    "norquad_p1": "9c1d8ed0ed995a5034517ee671c132d5eca3c7ac983343db0346bf60847c99e4",
+    "norquad_p2": "0a9eb6786f64d8c2941b2294f2c07da907b8a198ab17ec438cbe7f7ce0bf6f51",
+    "norquad_p3": "0ba48bea0be0279cef6953b56e3eca34d1ce79e78e06faec91aa09282981f906",
+    "norquad_p4": "cce9e8bdf67336244b3920591c8350f87070b60d6e5373a7b30630da68811f4a"
+  },
+  "model_source": "vllm",
+  "model_name": "models/Viking-7B",
+  "model_name_sanitized": "models__Viking-7B",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": null,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "total_evaluation_time_seconds": "139.91791683528572"
+}
