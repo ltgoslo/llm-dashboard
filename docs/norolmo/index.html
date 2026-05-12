@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NorOLMo Progress Dashboard</title>
+    <title>NorOLMo progress dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,11 +12,54 @@
 </head>
 <body>
     <header>
-        <h1>NorOLMo Training Progress &#127475;&#127476;</h1>
+        <h1>NorOLMo training progress &#127475;&#127476;</h1>
         <p class="subtitle">NorOLMo 13B trajectory across 33 training checkpoints + late-stage ablations, evaluated with the <a href="https://aclanthology.org/2025.findings-acl.181/">NorEval benchmark</a></p>
     </header>
 
     <main>
+        <details class="about-panel">
+            <summary>About</summary>
+            <div class="about-content">
+                <div class="about-section">
+                    <h2>About NorOLMo</h2>
+                    <p>
+                        NorOLMo is a fully-open Norwegian language model continually-trained on OLMo2 (13B stage 2) by the
+                        <a href="https://www.mn.uio.no/ifi/english/research/groups/ltg/">Language Technology Group</a>
+                        at the University of Oslo. This view tracks NorOLMo's performance across 33 training checkpoints
+                        (steps 1k–33k) plus several late-stage ablation runs, evaluated on the NorEval benchmark
+                        (<a href="https://aclanthology.org/2025.findings-acl.181/">Mikhailov et al., 2025</a>).
+                    </p>
+                </div>
+
+                <div class="about-section">
+                    <h3>Ablations</h3>
+                    <p>The dashboard includes several ablations of NorOLMo's late training stages:</p>
+                    <ul>
+                        <li><strong>Stage 2 (stage 1 data, full decay).</strong> No length extension; stage-2 schedule continues training on stage-1 data with full LR decay.</li>
+                        <li><strong>Stage 2 (stage 1/2 data, ½ decay).</strong> Variants that halve the LR decay rate during stage 2.</li>
+                        <li><strong>Stage 3 (RoPE scaling / no RoPE scaling).</strong> Length-extension experiments at stage 3.</li>
+                    </ul>
+                    <p>Ablation lines start at different training steps, reflecting where each experiment diverges from the main run.</p>
+                </div>
+
+                <div class="about-section">
+                    <h3>Error bars</h3>
+                    <p>Shaded bands show combined uncertainty from two independent sources, added in quadrature:</p>
+                    <ul>
+                        <li><strong>Sampling error.</strong> For classification metrics, SE = &radic;(v&middot;(1&minus;v)/n). For corpus-level metrics, estimated via bootstrap resampling.</li>
+                        <li><strong>Prompt deviation.</strong> SD(scores across prompt variants) / &radic;(k).</li>
+                    </ul>
+                </div>
+
+                <div class="about-section">
+                    <h3>Normalization</h3>
+                    <p>Aggregate views normalize scores before averaging. The default <em>random baseline</em> normalization maps each score to:</p>
+                    <p class="about-formula">normalized = (raw &minus; random_baseline) / (max_performance &minus; random_baseline) &times; 100</p>
+                    <p>where 0 = random chance and 100 = perfect performance.</p>
+                </div>
+            </div>
+        </details>
+
         <div class="controls">
             <div class="control-group">
                 <label for="task-select">Task:</label>
@@ -80,48 +123,6 @@
             <div id="checkbox-grid" class="checkbox-grid"></div>
         </div>
 
-        <details class="about-panel">
-            <summary>About</summary>
-            <div class="about-content">
-                <div class="about-section">
-                    <h2>About NorOLMo</h2>
-                    <p>
-                        NorOLMo is a fully-open Norwegian language model continually-trained on OLMo2 (13B stage 2) by the
-                        <a href="https://www.mn.uio.no/ifi/english/research/groups/ltg/">Language Technology Group</a>
-                        at the University of Oslo. This view tracks NorOLMo's performance across 33 training checkpoints
-                        (steps 1k–33k) plus several late-stage ablation runs, evaluated on the NorEval benchmark
-                        (<a href="https://aclanthology.org/2025.findings-acl.181/">Mikhailov et al., 2025</a>).
-                    </p>
-                </div>
-
-                <div class="about-section">
-                    <h3>Ablations</h3>
-                    <p>The dashboard includes several ablations of NorOLMo's late training stages:</p>
-                    <ul>
-                        <li><strong>Stage 2 (stage 1 data, full decay).</strong> No length extension; stage-2 schedule continues training on stage-1 data with full LR decay.</li>
-                        <li><strong>Stage 2 (stage 1/2 data, ½ decay).</strong> Variants that halve the LR decay rate during stage 2.</li>
-                        <li><strong>Stage 3 (RoPE scaling / no RoPE scaling).</strong> Length-extension experiments at stage 3.</li>
-                    </ul>
-                    <p>Ablation lines start at different training steps, reflecting where each experiment diverges from the main run.</p>
-                </div>
-
-                <div class="about-section">
-                    <h3>Error bars</h3>
-                    <p>Shaded bands show combined uncertainty from two independent sources, added in quadrature:</p>
-                    <ul>
-                        <li><strong>Sampling error.</strong> For classification metrics, SE = &radic;(v&middot;(1&minus;v)/n). For corpus-level metrics, estimated via bootstrap resampling.</li>
-                        <li><strong>Prompt deviation.</strong> SD(scores across prompt variants) / &radic;(k).</li>
-                    </ul>
-                </div>
-
-                <div class="about-section">
-                    <h3>Normalization</h3>
-                    <p>Aggregate views normalize scores before averaging. The default <em>random baseline</em> normalization maps each score to:</p>
-                    <p class="about-formula">normalized = (raw &minus; random_baseline) / (max_performance &minus; random_baseline) &times; 100</p>
-                    <p>where 0 = random chance and 100 = perfect performance.</p>
-                </div>
-            </div>
-        </details>
     </main>
 
     <div id="custom-tooltip" class="custom-tooltip">

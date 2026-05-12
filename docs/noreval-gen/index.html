@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NorEval Dashboard – Instruction-Tuned Models</title>
+    <title>NorEval dashboard – instruction-tuned models</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,11 +12,59 @@
 </head>
 <body>
     <header>
-        <h1>NorEval Dashboard – Instruction-Tuned Models &#127475;&#127476;</h1>
+        <h1>NorEval dashboard – instruction-tuned models &#127475;&#127476;</h1>
         <p class="subtitle">Norwegian instruction-tuned model evaluation with <a href="https://github.com/EleutherAI/lm-evaluation-harness">lm-eval-harness</a> using the <a href="https://aclanthology.org/2025.findings-acl.181/">NorEval benchmark</a></p>
     </header>
 
     <main>
+        <details class="about-panel">
+            <summary>About</summary>
+            <div class="about-content">
+                <div class="about-section">
+                    <h2>About NorEval</h2>
+                    <p>
+                        NorEval is a comprehensive evaluation benchmark for Norwegian language models, described in
+                        <a href="https://aclanthology.org/2025.findings-acl.181/">Mikhailov et al. (2025)</a>.
+                        It consists of 35 tasks spanning linguistic knowledge, language understanding, world knowledge &amp; reasoning,
+                        generation &amp; summarization, and translation. All evaluations are conducted using
+                        <a href="https://github.com/EleutherAI/lm-evaluation-harness">lm-eval-harness</a> v0.4.10.
+                    </p>
+                    <p>
+                        This view compares <strong>instruction-tuned</strong> models &mdash; Norwegian fine-tunes and multilingual instruct models.
+                        Models are evaluated at 0-shot by default since instruction-tuning typically improves zero-shot performance.
+                    </p>
+                </div>
+
+                <div class="about-section">
+                    <h3>Error bars</h3>
+                    <p>Error bars on this dashboard show combined uncertainty from two independent sources, added in quadrature:</p>
+                    <ul>
+                        <li><strong>Sampling error (&plusmn;1 SE).</strong> For classification metrics (accuracy, F1, exact match), SE = &radic;(v&middot;(1&minus;v)/n), where v is the score and n is the number of samples. For corpus-level metrics (BLEU, chrF, ROUGE), SE is estimated via bootstrap resampling (100 iterations).</li>
+                        <li><strong>Prompt deviation.</strong> Computed as SD(scores across prompt variants) / &radic;(k), where k is the number of prompt variants. This captures uncertainty due to prompt formulation. Has no effect on single-prompt benchmarks.</li>
+                    </ul>
+                    <p>The two components are combined as &radic;(SE&sup2; + prompt_SE&sup2;). In aggregate views, SE is propagated as &radic;(&Sigma; SE&sup2;) / N across the N benchmarks being averaged.</p>
+                </div>
+
+                <div class="about-section">
+                    <h3>Normalization</h3>
+                    <p>Aggregate views normalize scores before averaging to put different metrics on a common scale. The default <em>random baseline</em> normalization maps each score to:</p>
+                    <p class="about-formula">normalized = (raw &minus; random_baseline) / (max_performance &minus; random_baseline) &times; 100</p>
+                    <p>where 0 = random chance and 100 = perfect performance. Other normalization options (min-max, z-score, percentile) are available from the <em>Normalization</em> dropdown.</p>
+                </div>
+
+                <div class="about-section">
+                    <h3>Citation</h3>
+                    <pre class="about-citation">@inproceedings{mikhailov-etal-2025-noreval,
+    title = "{N}or{E}val: A {N}orwegian Language Understanding and Generation Evaluation Benchmark",
+    author = "Mikhailov, Vladislav  and Enstad, Tita  and Samuel, David  and Farseth{\r{a}}s, Hans Christian  and Kutuzov, Andrey  and Velldal, Erik  and {\O}vrelid, Lilja",
+    booktitle = "Findings of the Association for Computational Linguistics: ACL 2025",
+    year = "2025",
+    url = "https://aclanthology.org/2025.findings-acl.181/",
+}</pre>
+                </div>
+            </div>
+        </details>
+
         <div class="controls">
             <div class="control-group">
                 <label for="task-select">Task:</label>
@@ -126,53 +174,6 @@
             </div>
         </div>
 
-        <details class="about-panel">
-            <summary>About</summary>
-            <div class="about-content">
-                <div class="about-section">
-                    <h2>About NorEval</h2>
-                    <p>
-                        NorEval is a comprehensive evaluation benchmark for Norwegian language models, described in
-                        <a href="https://aclanthology.org/2025.findings-acl.181/">Mikhailov et al. (2025)</a>.
-                        It consists of 35 tasks spanning linguistic knowledge, language understanding, world knowledge &amp; reasoning,
-                        generation &amp; summarization, and translation. All evaluations are conducted using
-                        <a href="https://github.com/EleutherAI/lm-evaluation-harness">lm-eval-harness</a> v0.4.10.
-                    </p>
-                    <p>
-                        This view compares <strong>instruction-tuned</strong> models &mdash; Norwegian fine-tunes and multilingual instruct models.
-                        Models are evaluated at 0-shot by default since instruction-tuning typically improves zero-shot performance.
-                    </p>
-                </div>
-
-                <div class="about-section">
-                    <h3>Error bars</h3>
-                    <p>Error bars on this dashboard show combined uncertainty from two independent sources, added in quadrature:</p>
-                    <ul>
-                        <li><strong>Sampling error (&plusmn;1 SE).</strong> For classification metrics (accuracy, F1, exact match), SE = &radic;(v&middot;(1&minus;v)/n), where v is the score and n is the number of samples. For corpus-level metrics (BLEU, chrF, ROUGE), SE is estimated via bootstrap resampling (100 iterations).</li>
-                        <li><strong>Prompt deviation.</strong> Computed as SD(scores across prompt variants) / &radic;(k), where k is the number of prompt variants. This captures uncertainty due to prompt formulation. Has no effect on single-prompt benchmarks.</li>
-                    </ul>
-                    <p>The two components are combined as &radic;(SE&sup2; + prompt_SE&sup2;). In aggregate views, SE is propagated as &radic;(&Sigma; SE&sup2;) / N across the N benchmarks being averaged.</p>
-                </div>
-
-                <div class="about-section">
-                    <h3>Normalization</h3>
-                    <p>Aggregate views normalize scores before averaging to put different metrics on a common scale. The default <em>random baseline</em> normalization maps each score to:</p>
-                    <p class="about-formula">normalized = (raw &minus; random_baseline) / (max_performance &minus; random_baseline) &times; 100</p>
-                    <p>where 0 = random chance and 100 = perfect performance. Other normalization options (min-max, z-score, percentile) are available from the <em>Normalization</em> dropdown.</p>
-                </div>
-
-                <div class="about-section">
-                    <h3>Citation</h3>
-                    <pre class="about-citation">@inproceedings{mikhailov-etal-2025-noreval,
-    title = "{N}or{E}val: A {N}orwegian Language Understanding and Generation Evaluation Benchmark",
-    author = "Mikhailov, Vladislav  and Enstad, Tita  and Samuel, David  and Farseth{\r{a}}s, Hans Christian  and Kutuzov, Andrey  and Velldal, Erik  and {\O}vrelid, Lilja",
-    booktitle = "Findings of the Association for Computational Linguistics: ACL 2025",
-    year = "2025",
-    url = "https://aclanthology.org/2025.findings-acl.181/",
-}</pre>
-                </div>
-            </div>
-        </details>
     </main>
 
     <div id="custom-tooltip" class="custom-tooltip">

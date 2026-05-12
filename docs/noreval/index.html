@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NorEval Dashboard – Base Models</title>
+    <title>NorEval dashboard – base models</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,120 +12,11 @@
 </head>
 <body>
     <header>
-        <h1>NorEval Dashboard – Base Models &#127475;&#127476;</h1>
+        <h1>NorEval dashboard – base models &#127475;&#127476;</h1>
         <p class="subtitle">Norwegian base-model evaluation with <a href="https://github.com/EleutherAI/lm-evaluation-harness">lm-eval-harness</a> using the <a href="https://aclanthology.org/2025.findings-acl.181/">NorEval benchmark</a></p>
     </header>
 
     <main>
-        <div class="controls">
-            <div class="control-group">
-                <label for="task-select">Task:</label>
-                <select id="task-select">
-                    <option value="__all_macro__">All (category average)</option>
-                    <option value="__all__">All (task average)</option>
-                    <option value="__custom__" hidden>Custom (task average)</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label>Shots:</label>
-                <div class="shot-toggle">
-                    <button class="shot-btn" data-shot="0">0-shot</button>
-                    <button class="shot-btn" data-shot="1">1-shot</button>
-                    <button class="shot-btn active" data-shot="5">5-shot</button>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <label for="prompt-agg-select">Prompt aggregation:</label>
-                <select id="prompt-agg-select" class="control-select">
-                    <option value="max" selected>max</option>
-                    <option value="mean">mean</option>
-                    <option value="median">median</option>
-                    <option value="min">min</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label for="norm-select">Normalization:</label>
-                <select id="norm-select" class="control-select">
-                    <option value="none">none</option>
-                    <option value="baseline" selected>random baseline</option>
-                    <option value="minmax">min-max (observed)</option>
-                    <option value="zscore">z-score</option>
-                    <option value="percentile">percentile</option>
-                </select>
-            </div>
-
-            <div class="control-group" id="metric-control" style="display:none;">
-                <label for="metric-select">Metric:</label>
-                <select id="metric-select" class="control-select"></select>
-            </div>
-        </div>
-
-        <div id="task-description" class="task-description" style="display:none;"></div>
-
-        <div id="chart-container">
-            <div class="chart-header">
-                <div class="size-slider-container" id="size-slider-container">
-                    <label>Model size:</label>
-                    <div class="range-slider" id="range-slider">
-                        <div class="range-track" id="range-track"></div>
-                        <div class="range-fill" id="range-fill"></div>
-                        <div class="range-thumb range-thumb-min" id="thumb-min" tabindex="0"></div>
-                        <div class="range-thumb range-thumb-max" id="thumb-max" tabindex="0"></div>
-                    </div>
-                    <span id="size-min-label" class="size-label">7B</span>
-                    <span class="size-sep">&ndash;</span>
-                    <span id="size-max-label" class="size-label">14B</span>
-                </div>
-                <div class="fully-open-container" id="fully-open-container">
-                    <label for="fully-open-toggle" class="fully-open-label">
-                        <input type="checkbox" id="fully-open-toggle">
-                        <span>Fully open</span>
-                    </label>
-                </div>
-            </div>
-            <div id="chart"></div>
-        </div>
-
-        <div id="task-checkboxes" class="task-checkboxes">
-            <div class="checkbox-header">
-                <h3>Tasks included in aggregation</h3>
-                <div class="checkbox-actions">
-                    <button id="select-all-btn" class="small-btn">Select all</button>
-                    <button id="select-none-btn" class="small-btn">Select none</button>
-                </div>
-            </div>
-            <div id="checkbox-grid" class="checkbox-grid"></div>
-        </div>
-
-        <div id="model-panels" class="model-panels">
-            <div class="model-panels-row">
-                <div id="norwegian-models-panel" class="model-panel">
-                    <div class="checkbox-header">
-                        <h3>Norwegian language models</h3>
-                        <div class="checkbox-actions">
-                            <button class="small-btn model-select-all" data-category="norwegian">Select all</button>
-                            <button class="small-btn model-select-none" data-category="norwegian">Select none</button>
-                        </div>
-                    </div>
-                    <div id="norwegian-model-grid" class="model-checkbox-grid"></div>
-                </div>
-
-                <div id="multilingual-models-panel" class="model-panel">
-                    <div class="checkbox-header">
-                        <h3>Multilingual &amp; non-Norwegian language models</h3>
-                        <div class="checkbox-actions">
-                            <button class="small-btn model-select-all" data-category="multilingual">Select all</button>
-                            <button class="small-btn model-select-none" data-category="multilingual">Select none</button>
-                        </div>
-                    </div>
-                    <div id="multilingual-model-grid" class="model-checkbox-grid"></div>
-                </div>
-            </div>
-        </div>
-
         <details class="about-panel">
             <summary>About</summary>
             <div class="about-content">
@@ -207,6 +98,116 @@
                 </div>
             </div>
         </details>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="task-select">Task:</label>
+                <select id="task-select">
+                    <option value="__all_macro__">All (category average)</option>
+                    <option value="__all__">All (task average)</option>
+                    <option value="__custom__" hidden>Custom (task average)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>Shots:</label>
+                <div class="shot-toggle">
+                    <button class="shot-btn" data-shot="0">0-shot</button>
+                    <button class="shot-btn" data-shot="1">1-shot</button>
+                    <button class="shot-btn active" data-shot="5">5-shot</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label for="prompt-agg-select">Prompt aggregation:</label>
+                <select id="prompt-agg-select" class="control-select">
+                    <option value="max" selected>max</option>
+                    <option value="mean">mean</option>
+                    <option value="median">median</option>
+                    <option value="min">min</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="norm-select">Normalization:</label>
+                <select id="norm-select" class="control-select">
+                    <option value="none">none</option>
+                    <option value="baseline" selected>random baseline</option>
+                    <option value="minmax">min-max (observed)</option>
+                    <option value="zscore">z-score</option>
+                    <option value="percentile">percentile</option>
+                </select>
+            </div>
+
+            <div class="control-group" id="metric-control" style="display:none;">
+                <label for="metric-select">Metric:</label>
+                <select id="metric-select" class="control-select"></select>
+            </div>
+        </div>
+
+        <div id="task-description" class="task-description" style="display:none;"></div>
+
+        <div id="chart-container">
+            <div class="chart-header">
+                <div class="size-slider-container" id="size-slider-container">
+                    <label>Model size:</label>
+                    <div class="range-slider" id="range-slider">
+                        <div class="range-track" id="range-track"></div>
+                        <div class="range-fill" id="range-fill"></div>
+                        <div class="range-thumb range-thumb-min" id="thumb-min" tabindex="0"></div>
+                        <div class="range-thumb range-thumb-max" id="thumb-max" tabindex="0"></div>
+                    </div>
+                    <span id="size-min-label" class="size-label">6B</span>
+                    <span class="size-sep">&ndash;</span>
+                    <span id="size-max-label" class="size-label">24B</span>
+                </div>
+                <div class="fully-open-container" id="fully-open-container">
+                    <label for="fully-open-toggle" class="fully-open-label">
+                        <input type="checkbox" id="fully-open-toggle">
+                        <span>Fully open</span>
+                    </label>
+                </div>
+            </div>
+            <div id="chart"></div>
+        </div>
+
+        <div id="task-checkboxes" class="task-checkboxes">
+            <div class="checkbox-header">
+                <h3>Tasks included in aggregation</h3>
+                <div class="checkbox-actions">
+                    <button id="select-all-btn" class="small-btn">Select all</button>
+                    <button id="select-none-btn" class="small-btn">Select none</button>
+                </div>
+            </div>
+            <div id="checkbox-grid" class="checkbox-grid"></div>
+        </div>
+
+        <div id="model-panels" class="model-panels">
+            <div class="model-panels-row">
+                <div id="norwegian-models-panel" class="model-panel">
+                    <div class="checkbox-header">
+                        <h3>Norwegian language models</h3>
+                        <div class="checkbox-actions">
+                            <button class="small-btn model-select-all" data-category="norwegian">Select all</button>
+                            <button class="small-btn model-select-none" data-category="norwegian">Select none</button>
+                        </div>
+                    </div>
+                    <div id="norwegian-model-grid" class="model-checkbox-grid"></div>
+                </div>
+
+                <div id="multilingual-models-panel" class="model-panel">
+                    <div class="checkbox-header">
+                        <h3>Multilingual &amp; non-Norwegian language models</h3>
+                        <div class="checkbox-actions">
+                            <button class="small-btn model-select-all" data-category="multilingual">Select all</button>
+                            <button class="small-btn model-select-none" data-category="multilingual">Select none</button>
+                        </div>
+                    </div>
+                    <div id="multilingual-model-grid" class="model-checkbox-grid"></div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <div id="custom-tooltip" class="custom-tooltip">

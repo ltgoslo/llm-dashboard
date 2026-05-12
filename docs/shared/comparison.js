@@ -29,9 +29,10 @@ let CFG = null;            // Dashboard configuration (set in initComparison)
 let plotlyConfig = null;   // Built from CFG.filenamePrefix
 let urlState = null;
 
-// Comparison-specific state (not in shared/state.js).
-let currentSizeMin = 7;
-let currentSizeMax = 14;
+// Comparison-specific state (not in shared/state.js). These are overwritten
+// by the dashboard's initComparison() defaults before first render.
+let currentSizeMin = 6;
+let currentSizeMax = 24;
 let fullyOpenOnly = false;
 
 // Model checkbox state.
@@ -46,8 +47,8 @@ export async function initComparison(config) {
   CFG = Object.assign({
     title: "Model Comparison",
     defaultShot: "5",
-    defaultSizeMin: 7,
-    defaultSizeMax: 14,
+    defaultSizeMin: 6,
+    defaultSizeMax: 24,
     sizeRangeMin: 1,
     sizeRangeMax: 73,
     filenamePrefix: "comparison-chart",
@@ -320,7 +321,7 @@ function populateTaskDropdown() {
       (categories[info.category] = categories[info.category] || []).push(bench);
     }
     const catGroup = document.createElement("optgroup");
-    catGroup.label = "Aggregate by Category";
+    catGroup.label = "Aggregate by category";
     for (const catName of Object.keys(categories).sort()) {
       const opt = document.createElement("option");
       opt.value = "__cat__" + catName;
@@ -338,7 +339,7 @@ function populateTaskDropdown() {
     }
     if (Object.keys(evalTypes).length > 0) {
       const evalGroup = document.createElement("optgroup");
-      evalGroup.label = "Aggregate by Evaluation Type";
+      evalGroup.label = "Aggregate by evaluation type";
       for (const etName of Object.keys(evalTypes).sort()) {
         const opt = document.createElement("option");
         opt.value = "__eval__" + etName;
@@ -351,7 +352,7 @@ function populateTaskDropdown() {
 
   if (CFG.enableLanguageGroups) {
     const langGroup = document.createElement("optgroup");
-    langGroup.label = "Aggregate by Language";
+    langGroup.label = "Aggregate by language";
     for (const [val, label] of [["__lang__nob", "Bokmål"], ["__lang__nno", "Nynorsk"], ["__lang__sme", "Northern Sámi"]]) {
       const opt = document.createElement("option");
       opt.value = val; opt.textContent = label;
@@ -361,7 +362,7 @@ function populateTaskDropdown() {
   }
 
   const taskGroup = document.createElement("optgroup");
-  taskGroup.label = "Individual Tasks";
+  taskGroup.label = "Individual tasks";
   const entries = [];
   if (CFG.enableTaskGroups && state.DATA.task_groups) {
     for (const groupName of Object.keys(state.DATA.task_groups)) {

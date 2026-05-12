@@ -153,7 +153,7 @@ function populateTaskDropdown() {
     (categories[info.category] = categories[info.category] || []).push(bench);
   }
   const catGroup = document.createElement("optgroup");
-  catGroup.label = "Aggregate by Category";
+  catGroup.label = "Aggregate by category";
   for (const catName of Object.keys(categories).sort()) {
     const opt = document.createElement("option");
     opt.value = "__cat__" + catName;
@@ -168,7 +168,7 @@ function populateTaskDropdown() {
   }
   if (Object.keys(evalTypes).length > 0) {
     const evalGroup = document.createElement("optgroup");
-    evalGroup.label = "Aggregate by Evaluation Type";
+    evalGroup.label = "Aggregate by evaluation type";
     for (const etName of Object.keys(evalTypes).sort()) {
       const opt = document.createElement("option");
       opt.value = "__eval__" + etName;
@@ -179,7 +179,7 @@ function populateTaskDropdown() {
   }
 
   const langGroup = document.createElement("optgroup");
-  langGroup.label = "Aggregate by Language";
+  langGroup.label = "Aggregate by language";
   for (const [val, label] of [["__lang__nob", "Bokmål"], ["__lang__nno", "Nynorsk"], ["__lang__sme", "Northern Sámi"]]) {
     const opt = document.createElement("option");
     opt.value = val; opt.textContent = label;
@@ -188,7 +188,7 @@ function populateTaskDropdown() {
   select.appendChild(langGroup);
 
   const taskGroup = document.createElement("optgroup");
-  taskGroup.label = "Individual Tasks";
+  taskGroup.label = "Individual tasks";
   const entries = [];
   if (state.DATA.task_groups) {
     for (const groupName of Object.keys(state.DATA.task_groups)) {

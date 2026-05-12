@@ -214,7 +214,7 @@ function populateTaskDropdown() {
   }
   if (Object.keys(categories).length > 1) {
     const catGroup = document.createElement("optgroup");
-    catGroup.label = "Aggregate by Category";
+    catGroup.label = "Aggregate by category";
     for (const catName of Object.keys(categories).sort()) {
       const opt = document.createElement("option");
       opt.value = "__cat__" + catName;
@@ -225,7 +225,7 @@ function populateTaskDropdown() {
   }
 
   const taskGroup = document.createElement("optgroup");
-  taskGroup.label = "Individual Tasks";
+  taskGroup.label = "Individual tasks";
   const entries = Object.entries(ms).map(([bench, info]) => ({ value: bench, label: info.pretty_name }));
   entries.sort((a, b) => a.label.localeCompare(b.label));
   for (const entry of entries) {
