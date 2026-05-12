@@ -139,7 +139,7 @@ export function buildTaskCheckboxes({ filterSourceFn, onChange, displayName }) {
     });
 
     const h4 = document.createElement("h4");
-    h4.textContent = cat;
+    h4.textContent = cat ? cat.charAt(0).toUpperCase() + cat.slice(1) : cat;
     headerDiv.appendChild(groupCheckbox);
     headerDiv.appendChild(h4);
     catDiv.appendChild(headerDiv);

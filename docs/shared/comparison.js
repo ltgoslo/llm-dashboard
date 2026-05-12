@@ -326,7 +326,7 @@ function populateTaskDropdown() {
     for (const catName of Object.keys(categories).sort()) {
       const opt = document.createElement("option");
       opt.value = "__cat__" + catName;
-      opt.textContent = catName;
+      opt.textContent = capitalize(catName);
       catGroup.appendChild(opt);
     }
     select.appendChild(catGroup);
@@ -344,7 +344,7 @@ function populateTaskDropdown() {
       for (const etName of Object.keys(evalTypes).sort()) {
         const opt = document.createElement("option");
         opt.value = "__eval__" + etName;
-        opt.textContent = etName;
+        opt.textContent = capitalize(etName);
         evalGroup.appendChild(opt);
       }
       select.appendChild(evalGroup);
@@ -367,13 +367,13 @@ function populateTaskDropdown() {
   const entries = [];
   if (CFG.enableTaskGroups && state.DATA.task_groups) {
     for (const groupName of Object.keys(state.DATA.task_groups)) {
-      entries.push({ value: "__group__" + groupName, label: groupName });
+      entries.push({ value: "__group__" + groupName, label: capitalize(groupName) });
     }
   }
   const standalones = state.DATA.standalone_benchmarks || Object.keys(state.metricsSetup);
   for (const bench of standalones) {
     const info = state.metricsSetup[bench];
-    if (info) entries.push({ value: bench, label: info.pretty_name });
+    if (info) entries.push({ value: bench, label: capitalize(info.pretty_name) });
   }
   entries.sort((a, b) => a.label.localeCompare(b.label));
   for (const entry of entries) {
@@ -646,6 +646,25 @@ function getModelList() {
     });
 }
 
+/** Populate (or clear) the HTML chart legend in the Model-size controls bar.
+ *  Pass an array of {name, color} entries to render the legend; pass [] to clear.
+ *  CSS hides the element automatically when empty. */
+function updateChartLegend(entries) {
+  const el = document.getElementById("chart-legend");
+  if (!el) return;
+  el.innerHTML = "";
+  for (const e of entries || []) {
+    const item = document.createElement("span");
+    item.className = "legend-item";
+    const dot = document.createElement("span");
+    dot.className = "legend-dot";
+    dot.style.backgroundColor = e.color;
+    item.appendChild(dot);
+    item.appendChild(document.createTextNode(e.name));
+    el.appendChild(item);
+  }
+}
+
 /** Numeric x positions for the models — uniformly spaced (1 unit apart).
  *  Previously this added extra spacing between different organizations, but
  *  the user found that visually confusing. Kept as a separate function so
@@ -875,6 +894,7 @@ function renderChart() {
 }
 
 function renderAggregateBarChart() {
+  updateChartLegend([]);
   const modelNames = getModelList();
   const labels = modelNames.map(getModelLabel);
   const colors = modelNames.map(getModelColor);
@@ -923,7 +943,7 @@ function renderAggregateBarChart() {
   const layout = getPlotlyLayout({
     yaxis: {
       title: "", range: yRange,
-      showgrid: true, gridcolor: "#a8b0bd", automargin: false, ticks: "", ticklen: 0,
+      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
       zeroline: state.currentNormalization === "zscore",
     },
     xaxis: { automargin: false,
@@ -1036,7 +1056,7 @@ function renderGroupedBarChart(groupName) {
   const layout = getPlotlyLayout({
     yaxis: {
       title: "", range: yRange,
-      showgrid: true, gridcolor: "#a8b0bd", automargin: false, ticks: "", ticklen: 0,
+      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
       zeroline: state.currentNormalization === "zscore",
     },
     xaxis: { automargin: false,
@@ -1045,14 +1065,22 @@ function renderGroupedBarChart(groupName) {
       tickangle: computeTickAngle(labels), showgrid: false,
     },
     margin: { l: 105, r: 4, t: 8, b: 100 },
-    legend: { orientation: "h", x: 0.01, y: 0.99, xanchor: "left", yanchor: "bottom",
-              bgcolor: "rgba(255,255,255,0.8)", bordercolor: "#e2e8f0", borderwidth: 1 },
+    showlegend: false,
     annotations,
   });
+  // Populate the HTML legend in the Model-size controls bar.
+  // Per-model bar colors vary; the legend uses a representative shade so the
+  // viewer can see WHICH sub-bar (light vs darkened) is which label.
+  const repColor = MODEL_COLORS[0];
+  updateChartLegend(group.benchmarks.map((_, i) => ({
+    name: group.labels[i],
+    color: i === 0 ? repColor : darkenColor(repColor, 0.3),
+  })));
   plotChart(dataTraces, layout, plotlyConfig, onChartHover, hideTooltip);
 }
 
 function renderSingleBenchmarkBarChart(benchmark) {
+  updateChartLegend([]);
   const info = state.metricsSetup[benchmark];
   if (!info) return;
   const metric = getEffectiveMetric(benchmark);
@@ -1098,7 +1126,7 @@ function renderSingleBenchmarkBarChart(benchmark) {
   const layout = getPlotlyLayout({
     yaxis: {
       title: "", range: yRange,
-      showgrid: true, gridcolor: "#a8b0bd", automargin: false, ticks: "", ticklen: 0,
+      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
       zeroline: state.currentNormalization === "zscore",
     },
     xaxis: { automargin: false,
@@ -1128,6 +1156,7 @@ const ALL_SHOTS = ["0", "1", "5"];
 function computeAggregateYRange(benchmarks) {
   const allAvgs = [];
   const needAllRaw = ["minmax", "zscore", "percentile"].includes(state.currentNormalization);
+  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
   const macro = isMacroSelection();
   const modelNames = Object.keys(state.DATA.models).filter((e) => checkedModels.has(e) && isModelInSizeRange(e));
   for (const entity of Object.keys(state.DATA.models)) {
@@ -1135,24 +1164,33 @@ function computeAggregateYRange(benchmarks) {
     const result = aggregateScores(benchmarks, (bench) => {
       const raw = getScore(state.DATA.models, entity, bench, state.currentShot);
       if (raw === undefined) return undefined;
-      if (needAllRaw) {
-        const allRaw = modelNames.map((mm) => getScore(state.DATA.models, mm, bench, state.currentShot)).filter((v) => v !== undefined);
-        return applyNorm(raw, bench, allRaw);
-      }
-      return applyNorm(raw, bench, null);
+      const allRaw = needAllRaw
+        ? modelNames.map((mm) => getScore(state.DATA.models, mm, bench, state.currentShot)).filter((v) => v !== undefined)
+        : null;
+      const score = applyNorm(raw, bench, allRaw);
+      const se = wantSE ? scaleStderr(getCombinedSE(state.DATA.models, entity, bench, state.currentShot), bench, undefined, allRaw) : undefined;
+      return { score, stderr: se };
     }, macro);
-    if (result) allAvgs.push(result.score);
+    // Include error-bar top in the range so very large stderrs don't clip.
+    if (result) allAvgs.push(result.score + (result.stderr || 0));
   }
   return computeYRange(allAvgs);
 }
 
 function computeRawYMax_display(benchmarks, metric) {
   const vals = [];
+  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
   for (const entity of Object.keys(state.DATA.models)) {
     if (!checkedModels.has(entity) || !isModelInSizeRange(entity)) continue;
     for (const bench of benchmarks) {
       const v = getScore(state.DATA.models, entity, bench, state.currentShot, metric);
-      if (v != null) vals.push(toDisplayScale(v, bench, metric));
+      if (v != null) {
+        const displayV = toDisplayScale(v, bench, metric);
+        const se = wantSE
+          ? scaleStderr(getCombinedSE(state.DATA.models, entity, bench, state.currentShot, metric), bench, metric)
+          : 0;
+        vals.push(displayV + (se || 0));
+      }
     }
   }
   if (!vals.length) return 100;
@@ -1162,12 +1200,20 @@ function computeRawYMax_display(benchmarks, metric) {
 
 function computeSingleYRange(benchmark, metric) {
   const vals = [];
+  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
   const entities = Object.keys(state.DATA.models).filter((e) => checkedModels.has(e) && isModelInSizeRange(e));
   const raws = entities.map((e) => getScore(state.DATA.models, e, benchmark, state.currentShot, metric))
     .filter((v) => v !== undefined);
-  for (const raw of raws) {
-    if (state.currentNormalization === "none") vals.push(toDisplayScale(raw, benchmark, metric));
-    else vals.push(applyNorm(raw, benchmark, raws, metric));
+  for (const e of entities) {
+    const raw = getScore(state.DATA.models, e, benchmark, state.currentShot, metric);
+    if (raw === undefined) continue;
+    const displayV = state.currentNormalization === "none"
+      ? toDisplayScale(raw, benchmark, metric)
+      : applyNorm(raw, benchmark, raws, metric);
+    const se = wantSE
+      ? scaleStderr(getCombinedSE(state.DATA.models, e, benchmark, state.currentShot, metric), benchmark, metric, raws)
+      : 0;
+    vals.push(displayV + (se || 0));
   }
   return computeYRange(vals);
 }

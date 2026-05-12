@@ -148,6 +148,7 @@ function autoSetNormalization() {
 
 function populateTaskDropdown() {
   const select = document.getElementById("task-select");
+  const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
   const categories = {};
   for (const [bench, info] of Object.entries(state.metricsSetup)) {
     (categories[info.category] = categories[info.category] || []).push(bench);
@@ -157,7 +158,7 @@ function populateTaskDropdown() {
   for (const catName of Object.keys(categories).sort()) {
     const opt = document.createElement("option");
     opt.value = "__cat__" + catName;
-    opt.textContent = catName;
+    opt.textContent = cap(catName);
     catGroup.appendChild(opt);
   }
   select.appendChild(catGroup);
@@ -172,7 +173,7 @@ function populateTaskDropdown() {
     for (const etName of Object.keys(evalTypes).sort()) {
       const opt = document.createElement("option");
       opt.value = "__eval__" + etName;
-      opt.textContent = etName;
+      opt.textContent = cap(etName);
       evalGroup.appendChild(opt);
     }
     select.appendChild(evalGroup);
@@ -192,13 +193,13 @@ function populateTaskDropdown() {
   const entries = [];
   if (state.DATA.task_groups) {
     for (const groupName of Object.keys(state.DATA.task_groups)) {
-      entries.push({ value: "__group__" + groupName, label: groupName });
+      entries.push({ value: "__group__" + groupName, label: cap(groupName) });
     }
   }
   const standalones = state.DATA.standalone_benchmarks || Object.keys(state.metricsSetup);
   for (const bench of standalones) {
     const info = state.metricsSetup[bench];
-    if (info) entries.push({ value: bench, label: info.pretty_name });
+    if (info) entries.push({ value: bench, label: cap(info.pretty_name) });
   }
   entries.sort((a, b) => a.label.localeCompare(b.label));
   for (const entry of entries) {

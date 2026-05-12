@@ -213,13 +213,14 @@ function populateTaskDropdown() {
   for (const [bench, info] of Object.entries(ms)) {
     (categories[info.category] = categories[info.category] || []).push(bench);
   }
+  const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
   if (Object.keys(categories).length > 1) {
     const catGroup = document.createElement("optgroup");
     catGroup.label = "Aggregate by category";
     for (const catName of Object.keys(categories).sort()) {
       const opt = document.createElement("option");
       opt.value = "__cat__" + catName;
-      opt.textContent = catName;
+      opt.textContent = cap(catName);
       catGroup.appendChild(opt);
     }
     select.appendChild(catGroup);
@@ -227,7 +228,7 @@ function populateTaskDropdown() {
 
   const taskGroup = document.createElement("optgroup");
   taskGroup.label = "Individual tasks";
-  const entries = Object.entries(ms).map(([bench, info]) => ({ value: bench, label: info.pretty_name }));
+  const entries = Object.entries(ms).map(([bench, info]) => ({ value: bench, label: cap(info.pretty_name) }));
   entries.sort((a, b) => a.label.localeCompare(b.label));
   for (const entry of entries) {
     const opt = document.createElement("option");

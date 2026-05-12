@@ -183,7 +183,7 @@ function renderAggregateProgress(config) {
     xaxis: { automargin: false, title: config.xAxisLabel },
     yaxis: {
       title: "", range: yRange,
-      showgrid: true, gridcolor: "#a8b0bd", automargin: false, ticks: "", ticklen: 0,
+      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
       zeroline: state.currentNormalization === "zscore",
     },
     showlegend: trajectories.length > 1,
@@ -254,7 +254,7 @@ function renderGroupedProgress(config, group) {
     xaxis: { automargin: false, title: config.xAxisLabel },
     yaxis: {
       title: "", range: yRange,
-      showgrid: true, gridcolor: "#a8b0bd", automargin: false, ticks: "", ticklen: 0,
+      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
       zeroline: state.currentNormalization === "zscore",
     },
     legend: legendFor(config),
@@ -319,7 +319,7 @@ function renderSingleProgress(config, benchmark) {
     xaxis: { automargin: false, title: config.xAxisLabel },
     yaxis: {
       title: "", range: yRange,
-      showgrid: true, gridcolor: "#a8b0bd", automargin: false, ticks: "", ticklen: 0,
+      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
       zeroline: state.currentNormalization === "zscore",
     },
     showlegend: trajectories.length > 1,
