@@ -64,11 +64,11 @@ let moduleActionsBound = false;
 export function bindModuleActionStopPropagation() {
   if (moduleActionsBound) return;
   moduleActionsBound = true;
-  document.addEventListener("click", (e) => {
-    if (e.target.closest && e.target.closest(".module-actions")) {
+  document.querySelectorAll(".module-actions").forEach((el) => {
+    el.addEventListener("click", (e) => {
       e.stopPropagation();
-    }
-  }, true);
+    });
+  });
 }
 
 // (attachTaskTooltip was removed when task items became expandable <details>
