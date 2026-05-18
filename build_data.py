@@ -571,9 +571,9 @@ def multisynt_extract(results_json_path, benchmark_name, task_config_entry):
             metric_name, metric_suffix = key.rsplit(",", 1)
             if metric_name in bench_exclusions:
                 continue
-            if isinstance(val, (int, float)):
+            if isinstance(val, (int, float)) and math.isfinite(val):
                 se = task_results.get(f"{metric_name}_stderr,{metric_suffix}")
-                if not isinstance(se, (int, float)):
+                if not (isinstance(se, (int, float)) and math.isfinite(se)):
                     se = estimate_stderr(val, n_samples, metric_scale)
                 metrics[metric_name] = (val, se)
 
@@ -590,9 +590,9 @@ def multisynt_extract(results_json_path, benchmark_name, task_config_entry):
             metric_name, metric_suffix = key.rsplit(",", 1)
             if metric_name in bench_exclusions:
                 continue
-            if isinstance(val, (int, float)):
+            if isinstance(val, (int, float)) and math.isfinite(val):
                 se = gr_results.get(f"{metric_name}_stderr,{metric_suffix}")
-                if not isinstance(se, (int, float)):
+                if not (isinstance(se, (int, float)) and math.isfinite(se)):
                     se = estimate_stderr(val, n_samples, metric_scale)
                 metrics[metric_name] = (val, se)
 
