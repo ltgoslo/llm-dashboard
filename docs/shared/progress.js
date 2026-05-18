@@ -167,11 +167,12 @@ function renderAggregateProgress(config) {
     const seVals = aggResults.map((r) => r ? r.stderr : null);
 
     if (wantSE) {
-      const band = makeBandTrace(xs, scores, seVals, traj.color);
+      const band = makeBandTrace(xs, scores, seVals, traj.color, traj.name);
       if (band) traces.push(band);
     }
     traces.push({
       x: xs, y: scores, mode: "lines+markers", name: traj.name,
+      legendgroup: traj.name,
       line: { color: traj.color, width: 2.5 }, marker: { size: 5 },
       customdata: aggResults.map((r) => r ? { count: r.count, stderr: r.stderr } : null),
       hoverinfo: "none",
@@ -234,13 +235,15 @@ function renderGroupedProgress(config, group) {
         return scaleStderr(se, bench, metric, allRaw);
       }) : null;
       const lineColor = i === 0 ? traj.color : darkenColor(traj.color, 0.3);
+      const traceName = (trajectories.length > 1 ? traj.name + " — " : "") + group.labels[i];
       if (wantSE && ses) {
-        const band = makeBandTrace(xs, ys, ses, lineColor);
+        const band = makeBandTrace(xs, ys, ses, lineColor, traceName);
         if (band) traces.push(band);
       }
       traces.push({
         x: xs, y: ys, mode: "lines+markers",
-        name: (trajectories.length > 1 ? traj.name + " — " : "") + group.labels[i],
+        name: traceName,
+        legendgroup: traceName,
         line: { color: lineColor, width: 2.5 }, marker: { size: 5 },
         customdata: ses || ys.map(() => null),
         hoverinfo: "none",
@@ -300,11 +303,12 @@ function renderSingleProgress(config, benchmark) {
       return scaleStderr(se, benchmark, metric);
     }) : null;
     if (wantSE && ses) {
-      const band = makeBandTrace(xs, ys, ses, traj.color);
+      const band = makeBandTrace(xs, ys, ses, traj.color, traj.name);
       if (band) traces.push(band);
     }
     traces.push({
       x: xs, y: ys, mode: "lines+markers", name: traj.name,
+      legendgroup: traj.name,
       line: { color: traj.color, width: 2.5 }, marker: { size: 5 },
       customdata: ses || ys.map(() => null),
       hoverinfo: "none",

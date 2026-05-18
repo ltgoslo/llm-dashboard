@@ -183,8 +183,10 @@ export function computeAnnotationFontSize(totalPositions) {
 // Line-chart helpers (progress views)
 // ─────────────────────────────────────────────────────────────
 
-/** Create a shaded band trace around a line for ±SE visualization. */
-export function makeBandTrace(xValues, yValues, seValues, color) {
+/** Create a shaded band trace around a line for ±SE visualization.
+ *  Pass the matching line trace's `name` as `legendGroup` so legend clicks
+ *  toggle the band along with its line. */
+export function makeBandTrace(xValues, yValues, seValues, color, legendGroup) {
   const upper = [], lower = [], xs = [];
   for (let i = 0; i < xValues.length; i++) {
     if (yValues[i] != null && seValues[i] != null) {
@@ -194,7 +196,7 @@ export function makeBandTrace(xValues, yValues, seValues, color) {
     }
   }
   if (xs.length === 0) return null;
-  return {
+  const trace = {
     x: xs.concat(xs.slice().reverse()),
     y: upper.concat(lower.slice().reverse()),
     fill: "toself",
@@ -203,6 +205,8 @@ export function makeBandTrace(xValues, yValues, seValues, color) {
     showlegend: false,
     hoverinfo: "skip",
   };
+  if (legendGroup != null) trace.legendgroup = legendGroup;
+  return trace;
 }
 
 // ─────────────────────────────────────────────────────────────
