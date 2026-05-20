@@ -962,6 +962,9 @@ function renderAggregateBarChart() {
       font: { size: computeAnnotationFontSize(labels.length) },
     })),
   });
+  layout._annAnim = labels.map((_, i) => ({
+    score: scores[i], se: wantSE ? (aggStderrs[i] || 0) : 0,
+  }));
   plotChart([trace], layout, plotlyConfig, onChartHover, hideTooltip);
 }
 
@@ -1037,6 +1040,7 @@ function renderGroupedBarChart(groupName) {
     yRange = [0, computeRawYMax_display(group.benchmarks, metric)];
   }
   const annotations = [];
+  const annAnim = [];
   labels.forEach((_, catIdx) => {
     groupValuesArr.forEach((values, gi) => {
       if (values[catIdx] == null) return;
@@ -1051,6 +1055,7 @@ function renderGroupedBarChart(groupName) {
         xanchor: "center",
         font: { size: computeAnnotationFontSize(labels.length * nBars) },
       });
+      annAnim.push({ score: values[catIdx], se: se || 0 });
     });
   });
   const layout = getPlotlyLayout({
@@ -1068,6 +1073,7 @@ function renderGroupedBarChart(groupName) {
     showlegend: false,
     annotations,
   });
+  layout._annAnim = annAnim;
   // Populate the HTML legend in the Model-size controls bar.
   // Per-model bar colors vary; the legend uses a representative shade so the
   // viewer can see WHICH sub-bar (light vs darkened) is which label.
@@ -1144,6 +1150,9 @@ function renderSingleBenchmarkBarChart(benchmark) {
       font: { size: computeAnnotationFontSize(labels.length) },
     })),
   });
+  layout._annAnim = labels.map((_, i) => ({
+    score: values[i] || 0, se: wantSE && seArr ? (seArr[i] || 0) : 0,
+  }));
   plotChart([trace], layout, plotlyConfig, onChartHover, hideTooltip);
 }
 

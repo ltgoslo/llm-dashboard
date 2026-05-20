@@ -127,12 +127,155 @@ export function getPlotlyLayout(overrides) {
   return result;
 }
 
-/** Plotly.newPlot + register hover handlers. */
+// Bar "grow-up" animation. Debounced so rapid renders (e.g. dragging the size
+// slider) don't constantly re-animate. We do the animation by hand with a
+// requestAnimationFrame loop rather than via Plotly.animate, because
+// Plotly.animate's bar-trace transitions are flaky in Firefox.
+//
+// Two phases driven by one clock:
+//   Phase 1 (BAR_ANIM_DURATION): bars grow 0 → score.
+//   Phase 2 (ERR_ANIM_DURATION): error bars grow 0 → se. Phase 2 starts
+//     PHASE_OVERLAP ms before phase 1 ends, so the tail of the bar grow-up
+//     overlaps with the start of the error-bar grow-up.
+// Annotation y is the clean combined formula  score*e1 + se*e2  — this is
+// correct in all three regions (pre-overlap, overlap, post-phase-1).
+//
+// Callers can attach `_annAnim` to the layout — an array parallel to
+// `layout.annotations` of `{score, se}` records giving the bar value and
+// error magnitude for each label. The key is stripped before reaching Plotly.
+const BAR_ANIM_DURATION = 500;
+const ERR_ANIM_DURATION = 250;
+const PHASE_OVERLAP = 250;   // ms by which phase 2 overlaps the tail of phase 1
+const BAR_ANIM_DEBOUNCE = 250;
+let lastPlotTime = 0;
+let currentAnim = 0;   // monotonic id; in-flight rAF callbacks abort if outdated
+const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+/** Plotly.newPlot + register hover handlers. Bar traces animate from y=0
+ *  to their target values on each render (debounced). */
 export function plotChart(traces, layout, config, onHover, onUnhover) {
-  Plotly.newPlot("chart", traces, layout, config);
+  const now = Date.now();
+  const barIndices = [];
+  traces.forEach((t, i) => { if (t.type === "bar") barIndices.push(i); });
+  const shouldAnimate = barIndices.length > 0 && (now - lastPlotTime) > BAR_ANIM_DEBOUNCE;
+  lastPlotTime = now;
+  const animId = ++currentAnim;   // invalidate any in-flight animation
+
+  // Pull the annotation animation metadata off the layout before handing it
+  // to Plotly (which would otherwise warn about an unknown key).
+  const annAnim = layout._annAnim || null;
+  const plotLayout = Object.assign({}, layout);
+  delete plotLayout._annAnim;
+
   const chartEl = document.getElementById("chart");
+
+  if (!shouldAnimate) {
+    Plotly.newPlot("chart", traces, plotLayout, config);
+    if (onHover) chartEl.on("plotly_hover", onHover);
+    if (onUnhover) chartEl.on("plotly_unhover", onUnhover);
+    return;
+  }
+
+  // Build starting traces with y=0 (and zeroed error bars) for bar traces.
+  const startTraces = traces.map((t) => {
+    if (t.type !== "bar") return t;
+    const start = Object.assign({}, t, { y: t.y.map(() => 0) });
+    if (t.error_y && t.error_y.array) {
+      start.error_y = Object.assign({}, t.error_y,
+        { array: t.error_y.array.map(() => 0) });
+    }
+    return start;
+  });
+
+  // Start annotations at y=0 (sitting on the floor) with opacity 0; they'll
+  // ride up and fade in alongside the bars during phase 1.
+  const annotationsTarget = plotLayout.annotations || [];
+  const startLayout = Object.assign({}, plotLayout);
+  if (annotationsTarget.length) {
+    startLayout.annotations = annotationsTarget.map(
+      (a) => Object.assign({}, a, { y: 0, opacity: 0 }));
+  }
+
+  Plotly.newPlot("chart", startTraces, startLayout, config);
   if (onHover) chartEl.on("plotly_hover", onHover);
   if (onUnhover) chartEl.on("plotly_unhover", onUnhover);
+
+  const barYTargets = barIndices.map((i) => traces[i].y);
+  // Indices (into barIndices) of bar traces that actually carry error bars,
+  // along with the target arrays — precomputed for the phase-2 loop.
+  const errBarIdx = [], errBarTargets = [];
+  barIndices.forEach((traceIdx) => {
+    if (traces[traceIdx].error_y && traces[traceIdx].error_y.array) {
+      errBarIdx.push(traceIdx);
+      errBarTargets.push(traces[traceIdx].error_y.array);
+    }
+  });
+
+  const hasErrBars = errBarIdx.length > 0;
+  const phase2StartOffset = BAR_ANIM_DURATION - PHASE_OVERLAP;
+  const totalDuration = hasErrBars
+    ? phase2StartOffset + ERR_ANIM_DURATION
+    : BAR_ANIM_DURATION;
+
+  let animStart = null;
+  function tick(t) {
+    if (animId !== currentAnim) return;   // a newer render took over
+    if (animStart === null) animStart = t;
+    const elapsed = t - animStart;
+
+    const p1 = Math.min(1, elapsed / BAR_ANIM_DURATION);
+    const e1 = easeOutCubic(p1);
+    const p2 = hasErrBars
+      ? Math.max(0, Math.min(1, (elapsed - phase2StartOffset) / ERR_ANIM_DURATION))
+      : 0;
+    const e2 = easeOutCubic(p2);
+
+    // Build a single trace update covering whichever phases are active.
+    // During the overlap, both `y` and `error_y.array` ride in the same call.
+    // Assumes errBarIdx === barIndices when both are active — true here, since
+    // each chart's bar traces either all carry error bars or none do.
+    const traceUpdate = {};
+    let traceIdx = null;
+    if (elapsed <= BAR_ANIM_DURATION) {
+      traceUpdate.y = barYTargets.map((arr) => arr.map((v) => v == null ? null : v * e1));
+      traceIdx = barIndices;
+    }
+    if (hasErrBars && elapsed >= phase2StartOffset) {
+      traceUpdate["error_y.array"] = errBarTargets.map(
+        (arr) => arr.map((v) => v == null ? 0 : v * e2));
+      if (traceIdx === null) traceIdx = errBarIdx;
+    }
+
+    // Annotations — y = score*e1 + se*e2 tracks the (bar + error-bar) top.
+    let layoutUpdate = null;
+    if (annotationsTarget.length) {
+      const newAnnotations = annotationsTarget.map((a, i) => {
+        const meta = annAnim && annAnim[i];
+        let y;
+        if (meta) y = meta.score * e1 + meta.se * e2;
+        else y = typeof a.y === "number" ? a.y * e1 : a.y;
+        return Object.assign({}, a, { y, opacity: p1 });
+      });
+      layoutUpdate = { annotations: newAnnotations };
+    }
+
+    // One Plotly call per frame so Firefox does a single render pass.
+    const hasTrace = traceIdx !== null;
+    if (hasTrace && layoutUpdate) {
+      Plotly.update("chart", traceUpdate, layoutUpdate, traceIdx);
+    } else if (hasTrace) {
+      Plotly.restyle("chart", traceUpdate, traceIdx);
+    } else if (layoutUpdate) {
+      Plotly.relayout("chart", layoutUpdate);
+    }
+
+    if (elapsed < totalDuration) requestAnimationFrame(tick);
+  }
+
+  // Defer one frame so the y=0 start state is painted before we begin
+  // interpolating — without this, Firefox can skip the first paint and
+  // appear to jump straight to the target.
+  requestAnimationFrame(() => requestAnimationFrame(tick));
 }
 
 // ─────────────────────────────────────────────────────────────
