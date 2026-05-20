@@ -1,3 +1,28 @@
+/* ════════════════════════════════════════════════════════════════════
+   llm-dashboard — shared stylesheet
+   Used by every dashboard (noreval, noreval-gen, norolmo, multisynt).
+
+   Page layout, top → bottom:
+     • Header (white band)        — title + flag icon + collapsible About
+     • Multisynt language tabs    — only on the multisynt dashboard
+     • Chart section (white band) — title, description, two rows of
+                                    controls, the Plotly canvas, the
+                                    chart legend pinned to the right
+     • Modules section (dark band)— task checkbox grid, model panels
+                                    grouped by organization, HPLT-E
+                                    filter panel (multisynt only)
+     • Footer (dark band)
+
+   Other concerns scattered through the file:
+     • CSS variables / palette          (:root, .band-black re-scope)
+     • Bands & responsive shadow band   (.band, .band-white, .band-black)
+     • Hover tooltip                    (.custom-tooltip — fixed overlay)
+     • Plotly modebar overrides         (.modebar-container, .modebar-btn)
+     • Bar hover scale animation        (driven by chart.js, see #chart
+                                         .barlayer path)
+     • Responsive narrow-viewport tweaks (@media bottom of file)
+   ════════════════════════════════════════════════════════════════════ */
+
 :root {
   /* Palette */
   --surface: #ffffff;          /* the white plot band */
@@ -13,8 +38,8 @@
   --radius: 10px;
 
   /* Type */
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
-  --font-serif: "Merriweather", "Source Serif Pro", Georgia, serif;
+  --font-sans: 'Mona Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-serif: 'Mona Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -46,11 +71,12 @@ body {
   position: relative;
   /* Soft drop shadow on the top and bottom edges of the white plot band.
      Two layers: a tight near-shadow + a moderately diffuse one. */
-  box-shadow:
+  /* box-shadow:
+    0 0px 2px 0px rgba(0, 0, 0, 0.2),
     0 2px 4px -2px rgba(15, 23, 42, 0.05),
     0 -2px 4px -2px rgba(15, 23, 42, 0.03),
     0 12px 24px -12px rgba(15, 23, 42, 0.08),
-    0 -12px 24px -12px rgba(15, 23, 42, 0.05);
+    0 -12px 24px -12px rgba(15, 23, 42, 0.05); */
 }
 .band-black {
   background: var(--black);
@@ -81,7 +107,7 @@ body {
    ──────────────────────────────────────────────────────────── */
 
 header.dashboard-header {
-  padding: 3rem 0 2rem;
+  padding: 1rem 0 1.5rem;
   display: flex;
   align-items: flex-start;
   gap: 1.5rem;
@@ -92,29 +118,29 @@ header.dashboard-header {
 header.dashboard-header h1 {
   font-family: var(--font-serif);
   font-weight: 700;
-  font-size: 2.4rem;
+  font-size: 0.8rem;
   line-height: 1.1;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.00em;
   color: #000;
   margin: 0;
 }
 
 .header-icon {
   flex-shrink: 0;
-  width: 56px;
+  width: 29px;
   height: auto;
-  /* Soften the flag's red so it doesn't fight the title */
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
   border-radius: 2px;
   overflow: hidden;
+  margin: 0.5rem 0 0;
 }
 
-.about-inline { margin-top: 0.5rem; }
+/* ──── About panel — collapsible <details> under the header title ──── */
+.about-inline { margin-top: 0.0rem; }
 .about-inline > summary {
   list-style: none;
   cursor: pointer;
-  color: var(--fg-muted);
-  font-size: 0.92rem;
+  color: var(--fg);
+  font-size: 0.8rem;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -140,16 +166,16 @@ header.dashboard-header h1 {
 }
 .about-section h3 {
   font-family: var(--font-serif); font-weight: 700;
-  font-size: 1.02rem; color: #000; margin-bottom: 0.4rem;
+  font-size: 1.0rem; color: #000; margin-bottom: 0.4rem;
 }
 .about-section p {
-  font-size: 0.92rem; color: var(--fg); line-height: 1.65; margin-bottom: 0.5rem;
+  font-size: 0.8rem; color: var(--fg); line-height: 1.65; margin-bottom: 0.5rem;
 }
 .about-section p:last-child { margin-bottom: 0; }
 .about-section ul { padding-left: 1.25rem; margin-bottom: 0.5rem; }
 .about-section ul:last-child { margin-bottom: 0; }
 .about-section li {
-  font-size: 0.92rem; color: var(--fg); line-height: 1.65; margin-bottom: 0.4rem;
+  font-size: 0.8rem; color: var(--fg); line-height: 1.65; margin-bottom: 0.4rem;
 }
 .about-section a { color: var(--accent); text-decoration: none; }
 .about-section a:hover { text-decoration: underline; }
@@ -171,7 +197,8 @@ header.dashboard-header h1 {
 }
 
 /* ────────────────────────────────────────────────────────────
-   Multisynt language tabs
+   Multisynt language tabs — top-of-page tab strip that swaps
+   datasets on the multisynt dashboard only.
    ──────────────────────────────────────────────────────────── */
 
 .tab-nav {
@@ -181,16 +208,21 @@ header.dashboard-header h1 {
 }
 .tab-btn {
   padding: 0.6rem 1.25rem; border: none; background: none; cursor: pointer;
-  font-family: var(--font-sans); font-size: 0.9rem; font-weight: 500;
+  font-family: var(--font-sans); font-size: 0.8rem; font-weight: 500;
   color: var(--fg-muted); border-bottom: 2px solid transparent;
   transition: color 0.15s, border-color 0.15s; margin-bottom: -1px;
 }
 .tab-btn:hover { color: var(--fg); }
 .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-/* ────────────────────────────────────────────────────────────
-   Chart section — full-width white band
-   ──────────────────────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════
+   Chart section — full-width white band.
+   Contents, in DOM order:
+     1.  Chart title (a <details>; clicking expands a description)
+     2.  Two .controls-bar rows of controls (shots, task, prompt,
+         normalization, size slider, fully-open toggle, legend)
+     3.  #chart — the Plotly canvas (with bar hover scale)
+   ════════════════════════════════════════════════════════════ */
 
 .chart-section { padding: 1.5rem 0 1.5rem; }
 
@@ -211,9 +243,10 @@ header.dashboard-header h1 {
 .chart-title-details > summary::-webkit-details-marker { display: none; }
 .chart-title-details > summary::after {
   content: "▾";
-  font-size: 1.5rem;
+  font-weight: 700;
+  font-size: 1.6rem;
   line-height: 0.6;
-  color: var(--fg-muted);
+  color: #000;
   transition: transform 0.15s;
 }
 .chart-title-details[open] > summary::after { transform: rotate(180deg); }
@@ -221,24 +254,31 @@ header.dashboard-header h1 {
 .chart-title {
   font-family: var(--font-serif);
   font-weight: 700;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
   line-height: 1.25;
   color: #000;
-  margin: 0;
+  margin: 0 0 10px 0;
   display: inline;
 }
 .chart-title-details > summary:hover .chart-title { color: var(--accent); }
 .chart-title-details > summary:hover::after { color: var(--accent); }
 
 .chart-description {
-  font-size: 0.9rem;
-  color: var(--fg-muted);
-  line-height: 1.55;
+  font-size: 0.8rem;
+  color: var(--fg);
+  line-height: 1.65;
   margin-top: 0.5rem;
   max-width: 760px;
 }
 .chart-description a { color: var(--accent); text-decoration: none; }
 .chart-description a:hover { text-decoration: underline; }
+
+/* ──── Controls bar — two flex rows of inline controls ────
+   Layout: each row is a .controls-bar; items inside are
+   .control-group (label + control). Specific controls below
+   each have their own block (shot toggle, task select, size
+   slider, etc.). */
 
 /* Permanent controls — sit between title and chart, no surrounding frame.
    row-gap is matched to the .controls-bar + .controls-bar gap so wrapped
@@ -251,14 +291,15 @@ header.dashboard-header h1 {
   flex-wrap: wrap;
   padding: 0.2rem 0;
 }
-.controls-bar + .controls-bar { margin-top: 0.15rem; }
-.controls-bar:last-of-type { margin-bottom: 0.1rem; }
+.controls-bar + .controls-bar { margin-top: 0.0rem; margin-bottom: 1.0rem; }
+.controls-bar:last-of-type { margin-bottom: 100.1rem; }
 
 .control-group { display: flex; align-items: center; gap: 0.5rem; }
-.control-group label { font-weight: 500; font-size: 0.85rem; color: var(--fg-muted); }
+.control-group label { font-weight: 500; font-size: 0.8rem; color: var(--fg-muted); }
 
+/* Task dropdown — the "what to plot" selector. */
 #task-select {
-  padding: 0.3rem 0.5rem; font-family: var(--font-sans); font-size: 0.85rem;
+  padding: 0.3rem 0.5rem; font-family: var(--font-sans); font-size: 0.8rem;
   border: 1px solid var(--border); border-radius: 6px;
   background: var(--surface); color: var(--fg); outline: none;
   field-sizing: content;
@@ -266,10 +307,11 @@ header.dashboard-header h1 {
 }
 #task-select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
 
+/* Shot toggle — segmented 0/1/5-shot button group. */
 .shot-toggle { display: flex; gap: 0; }
 .shot-btn {
   padding: 0.3rem 0.8rem; border: 1px solid var(--border); background: var(--surface);
-  cursor: pointer; font-family: var(--font-sans); font-size: 0.8rem; font-weight: 500;
+  cursor: pointer; font-family: var(--font-sans); font-size: 0.8rem;
   color: var(--fg-muted); transition: all 0.15s;
 }
 .shot-btn:first-child { border-radius: 6px 0 0 6px; }
@@ -278,24 +320,28 @@ header.dashboard-header h1 {
 .shot-btn:hover { background: var(--accent-light); color: var(--accent); }
 .shot-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
 
+/* Generic small select (prompt aggregation, normalization, metric). */
 .control-select {
-  padding: 0.3rem 0.5rem; font-family: var(--font-sans); font-size: 0.85rem;
+  padding: 0.3rem 0.5rem; font-family: var(--font-sans); font-size: 0.8rem;
   border: 1px solid var(--border); border-radius: 6px; background: var(--surface);
   color: var(--fg); outline: none;
   field-sizing: content;
 }
 .control-select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
 
+/* Small checkbox + label combo (e.g. "Show std err"). */
 .toggle-label {
   display: flex; align-items: center; gap: 0.35rem; cursor: pointer;
-  user-select: none; font-size: 0.85rem; font-weight: 500; color: var(--fg-muted);
+  user-select: none; font-size: 0.8rem; font-weight: 500; color: var(--fg-muted);
 }
 .toggle-label input[type="checkbox"] { accent-color: var(--accent); cursor: pointer; }
 
-/* Size slider */
+/* ──── Size slider — custom two-thumb range for model-parameter
+   filtering. The track is .range-track, the highlighted span between
+   thumbs is .range-fill, and the draggable handles are .range-thumb. */
 .size-slider-container {
   display: flex; align-items: center; gap: 0.6rem;
-  font-size: 0.85rem; font-weight: 500; color: var(--fg-muted);
+  font-size: 0.8rem; font-weight: 500; color: var(--fg-muted);
 }
 .size-slider-container > label { white-space: nowrap; }
 .size-label { font-weight: 600; color: var(--fg); min-width: 2.5rem; text-align: center; }
@@ -324,14 +370,16 @@ header.dashboard-header h1 {
 }
 .range-thumb.active { cursor: grabbing; }
 
+/* "Fully open" filter toggle — restrict to models with public weights+data. */
 .fully-open-label {
   display: flex; align-items: center; gap: 0.35rem;
   cursor: pointer; user-select: none; white-space: nowrap;
-  font-size: 0.85rem; font-weight: 500; color: var(--fg-muted);
+  font-size: 0.8rem; font-weight: 500; color: var(--fg-muted);
 }
 .fully-open-label input[type="checkbox"] { accent-color: var(--accent); cursor: pointer; }
 
-/* HTML legend rendered inside the second controls-bar row.
+/* ──── Chart legend — colored dots + labels for grouped bar charts. ────
+   HTML legend rendered inside the second controls-bar row.
    `margin-left: auto` pushes it to the right end of the row, where it's
    vertically centered with the Model-size slider via flex align-items: center
    on .controls-bar. Populated by JS for grouped (e.g. Bokmål/Nynorsk) charts;
@@ -341,7 +389,7 @@ header.dashboard-header h1 {
   display: flex;
   gap: 0.85rem;
   align-items: center;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--fg);
 }
 .chart-legend:empty { display: none; }
@@ -370,14 +418,28 @@ header.dashboard-header h1 {
    ──────────────────────────────────────────────────────────── */
 
 #chart {
-  margin-left: -5rem;
-  width: calc(100% + 5rem);
+  margin-left: -5.5rem;
+  width: calc(100% + 5.5rem);
   height: 500px;
 }
 
-/* ────────────────────────────────────────────────────────────
-   Modules section — dark band with light text/controls
-   ──────────────────────────────────────────────────────────── */
+/* Bar hover: every bar path gets a transform transition + bottom-centre
+   origin; chart.js adds an inline `transform: scaleX(...)` on the hovered
+   one via Plotly's plotly_hover event (Plotly's drag overlay swallows the
+   native :hover, so CSS-only hover doesn't work). Pure transform so it's
+   GPU-accelerated and never triggers a Plotly recompute. */
+#chart .barlayer path {
+  transition: transform 140ms ease-out;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+/* ════════════════════════════════════════════════════════════
+   Modules section — dark band below the chart.
+   Contains the user-configurable selectors: tasks checkbox
+   grid (multiple categories), model panels grouped by org,
+   and on multisynt, the HPLT-E filter panel.
+   ════════════════════════════════════════════════════════════ */
 
 .modules-section { padding: 2.5rem 0 3rem; }
 
@@ -386,8 +448,8 @@ header.dashboard-header h1 {
 }
 .module:last-child { margin-bottom: 0; }
 
-/* Module section header: subtitle + action buttons inline, vertically
-   centered so the buttons sit at the title's mid-line. */
+/* Module section header — subtitle + "Select all / none" buttons
+   inline, vertically centred so the buttons sit at the title's mid-line. */
 .module-header {
   display: flex;
   align-items: center;
@@ -398,7 +460,7 @@ header.dashboard-header h1 {
 .module-header h3 {
   font-family: var(--font-serif);
   font-weight: 700;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   color: #000;
 }
 
@@ -415,6 +477,11 @@ header.dashboard-header h1 {
 }
 .small-btn:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
 
+/* ──── Task checkbox grid — used in the "Tasks" module ────
+   Outer grid (.checkbox-grid) → category columns
+     (.checkbox-category) → category header + task <details> items.
+   Each task is a <details> whose summary holds the checkbox + name;
+   expanding shows .task-description-inline below. */
 .checkbox-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 0.75rem 1.25rem;
@@ -429,7 +496,7 @@ header.dashboard-header h1 {
 .checkbox-category h4 {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 0.9rem; font-weight: 700; color: #000;
+  font-size: 0.8rem; font-weight: 700; color: #000;
 }
 .checkbox-category input[type="checkbox"] {
   margin-right: 0.25rem; accent-color: var(--accent);
@@ -466,18 +533,24 @@ header.dashboard-header h1 {
 .checkbox-category .task-name { flex: 1; min-width: 0; }
 
 .task-description-inline {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: var(--fg-muted);
   line-height: 1.5;
-  padding: 0.3rem 0.6rem 0.5rem 1.85rem;
+  padding: 0.3rem 0.0rem 0.5rem 1.0rem;
 }
 .task-description-inline a { color: var(--accent); text-decoration: none; word-break: break-all; }
 .task-description-inline a:hover { text-decoration: underline; }
 
+/* ──── Model panel — used in the "Models" module(s) ────
+   One .model-panel per category (e.g. Norwegian / Multilingual).
+   Inside, models are grouped by organization (.model-org-group)
+   each with its own header and a column of <details> model items.
+   Item structure mirrors the task grid: summary holds the
+   checkbox + colour dot + name; expanding shows .model-description-inline. */
 .model-panel + .model-panel { margin-top: 2.5rem; }
 
 .model-checkbox-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 0.75rem 1rem; align-items: start;
 }
 .model-org-header {
@@ -490,7 +563,7 @@ header.dashboard-header h1 {
 .model-org-group h4 {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 0.9rem; font-weight: 700; color: #000;
+  font-size: 0.8rem; font-weight: 700; color: #000;
 }
 .model-org-group { display: grid; grid-template-columns: 1fr; gap: 0; }
 .model-checkbox-grid input[type="checkbox"] { accent-color: var(--accent); }
@@ -503,7 +576,7 @@ header.dashboard-header h1 {
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  padding: 0.18rem 0.3rem 0.18rem 1rem;
+  padding: 0.18rem 0.0rem 0.18rem 1rem;
   font-size: 0.82rem;
   border-radius: 4px;
   transition: background 0.1s;
@@ -524,10 +597,10 @@ header.dashboard-header h1 {
 .model-checkbox-grid .model-name { flex: 1; min-width: 0; }
 
 .model-description-inline {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: var(--fg-muted);
   line-height: 1.5;
-  padding: 0.3rem 0.6rem 0.5rem 1.85rem;
+  padding: 0.3rem 0.6rem 0.5rem 1.0rem;
 }
 .model-description-inline .meta {
   font-size: 0.72rem;
@@ -550,7 +623,7 @@ header.dashboard-header h1 {
 
 .custom-tooltip {
   display: none; position: fixed; z-index: 1000; max-width: 420px;
-  padding: 0.7rem 0.9rem;
+  padding: 0.7rem 0.8rem;
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
@@ -561,7 +634,7 @@ header.dashboard-header h1 {
 .custom-tooltip.visible { display: block; }
 .tooltip-title {
   font-family: var(--font-serif); font-weight: 700;
-  font-size: 0.95rem; margin-bottom: 0.25rem; color: #1e293b;
+  font-size: 0.8rem; margin-bottom: 0.25rem; color: #1e293b;
 }
 .tooltip-meta {
   color: #64748b; font-size: 0.72rem;
@@ -570,8 +643,14 @@ header.dashboard-header h1 {
 .tooltip-body { color: #475569; margin-bottom: 0.35rem; }
 .tooltip-footer { color: var(--accent); font-size: 0.75rem; word-break: break-all; }
 
-/* Plotly modebar — pinned to the chart canvas right edge, which now
-   aligns with the column's right text margin. */
+/* ────────────────────────────────────────────────────────────
+   Plotly modebar — the top-right cluster of icon buttons over
+   the chart (zoom, pan, PNG/SVG/JSON export). Overrides defeat
+   Plotly's default white background + border so the buttons
+   blend into the white band; icon fill follows the page accent.
+   Pinned to the chart canvas right edge, which aligns with the
+   column's right text margin.
+   ──────────────────────────────────────────────────────────── */
 .modebar-container {
   top: 6px !important;
   right: 0 !important;
@@ -586,7 +665,10 @@ header.dashboard-header h1 {
 .modebar-btn.active path { fill: var(--accent) !important; }
 
 /* ────────────────────────────────────────────────────────────
-   HPLT-E filter panel (multisynt only)
+   HPLT-E filter panel — multisynt dashboard only.
+   A collapsible panel above the task grid: a row of criteria
+   the user can enable + threshold (each with pass/fail thresholds),
+   plus a downstream table showing each model's pass/fail per criterion.
    ──────────────────────────────────────────────────────────── */
 
 .filter-panel {
@@ -667,14 +749,16 @@ header.dashboard-header h1 {
 
 footer.dashboard-footer {
   padding: 1.5rem 0 1.5rem;
-  color: var(--fg-muted); font-size: 0.85rem;
+  color: var(--fg-muted); font-size: 0.8rem;
   text-align: left;
 }
 footer.dashboard-footer a { color: var(--accent); text-decoration: none; }
 footer.dashboard-footer a:hover { text-decoration: underline; }
 
 /* ────────────────────────────────────────────────────────────
-   Responsive
+   Responsive — narrow-viewport tweaks (tighten paddings, shrink
+   headings, collapse task grid to a single column, drop chart
+   height a bit so mobile shows the full chart without scroll).
    ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {

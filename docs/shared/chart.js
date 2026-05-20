@@ -151,6 +151,38 @@ let lastPlotTime = 0;
 let currentAnim = 0;   // monotonic id; in-flight rAF callbacks abort if outdated
 const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
+// Scale applied to the hovered bar; matched in style.css's transition.
+const BAR_HOVER_SCALE = 1.12;
+
+/** Wire plotly_hover/plotly_unhover events to set an inline transform on the
+ *  hovered bar's <path>. Plotly's drag overlay swallows native :hover, so we
+ *  drive the visual through Plotly's own hit-test events. */
+function attachBarHoverHighlight(chartEl) {
+  function findBarPath(curveNumber, pointNumber) {
+    const allData = chartEl.data || [];
+    // Map curveNumber (index in gd.data) → index among bar traces only,
+    // since `.barlayer .trace.bars` only contains bar traces.
+    let barIdx = 0;
+    for (let i = 0; i < curveNumber; i++) {
+      if (allData[i] && allData[i].type === "bar") barIdx++;
+    }
+    const traceEl = chartEl.querySelectorAll(".barlayer .trace.bars")[barIdx];
+    if (!traceEl) return null;
+    return traceEl.querySelectorAll("path")[pointNumber] || null;
+  }
+  chartEl.on("plotly_hover", (data) => {
+    const pt = data.points && data.points[0];
+    if (!pt || !pt.data || pt.data.type !== "bar") return;
+    const path = findBarPath(pt.curveNumber, pt.pointNumber);
+    if (path) path.style.transform = `scaleX(${BAR_HOVER_SCALE})`;
+  });
+  chartEl.on("plotly_unhover", () => {
+    chartEl.querySelectorAll(".barlayer path").forEach((el) => {
+      if (el.style.transform) el.style.transform = "";
+    });
+  });
+}
+
 /** Plotly.newPlot + register hover handlers. Bar traces animate from y=0
  *  to their target values on each render (debounced). */
 export function plotChart(traces, layout, config, onHover, onUnhover) {
@@ -173,6 +205,7 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
     Plotly.newPlot("chart", traces, plotLayout, config);
     if (onHover) chartEl.on("plotly_hover", onHover);
     if (onUnhover) chartEl.on("plotly_unhover", onUnhover);
+    if (barIndices.length) attachBarHoverHighlight(chartEl);
     return;
   }
 
@@ -199,6 +232,7 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
   Plotly.newPlot("chart", startTraces, startLayout, config);
   if (onHover) chartEl.on("plotly_hover", onHover);
   if (onUnhover) chartEl.on("plotly_unhover", onUnhover);
+  attachBarHoverHighlight(chartEl);
 
   const barYTargets = barIndices.map((i) => traces[i].y);
   // Indices (into barIndices) of bar traces that actually carry error bars,
