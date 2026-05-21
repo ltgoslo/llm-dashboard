@@ -33,13 +33,17 @@
   --accent: #6366f1;
   --accent-hover: #4f46e5;
   --accent-light: #eef2ff;
-  --border: #e2e8f0;
+  --border: #d2d9e4;
   --border-light: #eef0f3;
   --radius: 10px;
 
-  /* Type */
+  /* Type — Mona Sans for body text, Hubot Sans for titles/headings.
+     Both are GitHub's variable fonts loaded from Google Fonts in each
+     dashboard's index.html. --font-serif is misnamed for historical
+     reasons (it's no longer a serif) but is used wherever a title font
+     is wanted (h1/h2/h3, chart-title, tooltip-title, etc.). */
   --font-sans: 'Mona Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-serif: 'Mona Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-serif: 'Hubot Sans', 'Mona Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -146,13 +150,22 @@ header.dashboard-header h1 {
   gap: 0.45rem;
 }
 .about-inline > summary::-webkit-details-marker { display: none; }
+/* Two-line chevron drawn from the right + bottom borders of an empty
+   inline-block, rotated 45° so the corner becomes a downward V — same
+   look as the native <select> dropdown arrow. Open-state rotates an
+   extra 180° (so 45 → 225) to flip it pointing up. */
 .about-inline > summary::after {
-  content: "▾";
-  font-size: 1.4rem;
-  line-height: 0.7;
+  content: "";
+  display: inline-block;
+  width: 0.4em;
+  height: 0.4em;
+  border-right: 0.1em solid currentColor;
+  border-bottom: 0.1em solid currentColor;
+  transform: rotate(45deg);
+  vertical-align: middle;
   transition: transform 0.15s;
 }
-.about-inline[open] > summary::after { transform: rotate(180deg); }
+.about-inline[open] > summary::after { transform: rotate(225deg); }
 .about-inline > summary:hover { color: var(--accent); }
 
 .about-content {
@@ -237,19 +250,31 @@ header.dashboard-header h1 {
   list-style: none;
   cursor: pointer;
   display: inline-flex;
-  align-items: baseline;
+  /* center (not baseline) so the rotated chevron in ::after vertically
+     lines up with the title text — same as the other summaries. */
+  align-items: center;
   gap: 0.5rem;
 }
 .chart-title-details > summary::-webkit-details-marker { display: none; }
 .chart-title-details > summary::after {
-  content: "▾";
-  font-weight: 700;
-  font-size: 1.6rem;
-  line-height: 0.6;
+  content: "";
+  display: inline-block;
+  width: 0.55em;
+  height: 0.55em;
+  /* Borders use currentColor so the hover rule below tints the chevron
+     in sync with the title text. Defaults to black to match .chart-title. */
   color: #000;
-  transition: transform 0.15s;
+  border-right: 0.25em solid currentColor;
+  border-bottom: 0.25em solid currentColor;
+  transform: rotate(45deg);
+  vertical-align: middle;
+  /* Visual centre of the rotated-corner chevron sits below its box centre
+     (the V is in the bottom half of the original square); nudge it up. */
+  position: relative;
+  top: -0.3em;
+  transition: transform 0.15s, color 0.15s;
 }
-.chart-title-details[open] > summary::after { transform: rotate(180deg); }
+.chart-title-details[open] > summary::after { transform: rotate(225deg); }
 
 .chart-title {
   font-family: var(--font-serif);
@@ -293,13 +318,24 @@ header.dashboard-header h1 {
 }
 .controls-bar + .controls-bar { margin-top: 0.0rem; margin-bottom: 1.0rem; }
 .controls-bar:last-of-type { margin-bottom: 100.1rem; }
+/* Subtle drop shadow under the bottom controls-bar so the controls module
+   visually separates from the chart below. We can't use `:last-of-type`
+   here — it filters by tag (div), and #chart is also a div, so
+   `.controls-bar:last-of-type` matches nothing. `:has(+ #chart)` picks
+   the controls-bar immediately preceding the chart. */
+.controls-bar:has(+ #chart) {
+  box-shadow:
+    0 8px 12px -8px rgba(15, 23, 42, 0.2);
+  padding-bottom: 1.0rem;
+  margin-bottom: 1.0rem;
+}
 
 .control-group { display: flex; align-items: center; gap: 0.5rem; }
 .control-group label { font-weight: 500; font-size: 0.8rem; color: var(--fg-muted); }
 
 /* Task dropdown — the "what to plot" selector. */
 #task-select {
-  padding: 0.3rem 0.5rem; font-family: var(--font-sans); font-size: 0.8rem;
+  padding: 0.3rem 0.2rem; font-family: var(--font-sans); font-size: 0.8rem;
   border: 1px solid var(--border); border-radius: 6px;
   background: var(--surface); color: var(--fg); outline: none;
   field-sizing: content;
@@ -310,7 +346,7 @@ header.dashboard-header h1 {
 /* Shot toggle — segmented 0/1/5-shot button group. */
 .shot-toggle { display: flex; gap: 0; }
 .shot-btn {
-  padding: 0.3rem 0.8rem; border: 1px solid var(--border); background: var(--surface);
+  padding: 0.3rem 0.6rem; border: 1px solid var(--border); background: var(--surface);
   cursor: pointer; font-family: var(--font-sans); font-size: 0.8rem;
   color: var(--fg-muted); transition: all 0.15s;
 }
@@ -322,7 +358,7 @@ header.dashboard-header h1 {
 
 /* Generic small select (prompt aggregation, normalization, metric). */
 .control-select {
-  padding: 0.3rem 0.5rem; font-family: var(--font-sans); font-size: 0.8rem;
+  padding: 0.3rem 0.2rem; font-family: var(--font-sans); font-size: 0.8rem;
   border: 1px solid var(--border); border-radius: 6px; background: var(--surface);
   color: var(--fg); outline: none;
   field-sizing: content;
@@ -344,8 +380,21 @@ header.dashboard-header h1 {
   font-size: 0.8rem; font-weight: 500; color: var(--fg-muted);
 }
 .size-slider-container > label { white-space: nowrap; }
-.size-label { font-weight: 600; color: var(--fg); min-width: 2.5rem; text-align: center; }
-.size-sep { color: var(--fg-muted); }
+/* Tabular-nums keeps digit widths stable (so "9B" → "10B" doesn't wiggle the
+   layout); min-width is just enough for "73B" (the slider's max). */
+.size-label {
+  font-weight: 500; color: var(--fg);
+  min-width: 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+/* Push the min/max numbers toward the en-dash so the "6B – 24B" group reads
+   as one unit. Combined with the smaller min-width above, the interior
+   padding (which was the bulk of the slider→6B whitespace) shrinks. */
+#size-min-label { text-align: right; }
+#size-max-label { text-align: left; }
+/* Cancel most of the .size-slider-container's 0.6rem flex gap around the
+   en-dash, leaving a natural ~0.2rem space on each side. */
+.size-sep { color: var(--fg-muted); margin: 0 -0.4rem; }
 .range-slider {
   position: relative; flex: 1; height: 22px; min-width: 160px; max-width: 240px;
   user-select: none; touch-action: none;
@@ -432,6 +481,18 @@ header.dashboard-header h1 {
   transition: transform 140ms ease-out;
   transform-box: fill-box;
   transform-origin: 50% 100%;
+}
+/* Companion to the bar scale on hover: chart.js adds .bar-hover-bold to the
+   matching score annotation and x-axis tick group, and we bump their text
+   weight here. Mona Sans is a variable font so the transition smoothly
+   interpolates between weights. */
+#chart .annotation text,
+#chart .xtick text {
+  transition: font-weight 140ms ease-out;
+}
+#chart .annotation.bar-hover-bold text,
+#chart .xtick.bar-hover-bold text {
+  font-weight: 700 !important;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -520,14 +581,19 @@ header.dashboard-header h1 {
 }
 .checkbox-category details.task-item > summary::-webkit-details-marker { display: none; }
 .checkbox-category details.task-item > summary::after {
-  content: "▾";
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
   margin-left: auto;
-  font-size: 1.15rem;
-  line-height: 0.6;
+  border-right: 0.1em solid currentColor;
+  border-bottom: 0.1em solid currentColor;
+  transform: rotate(45deg);
+  vertical-align: middle;
   color: var(--fg-muted);
   transition: transform 0.15s;
 }
-.checkbox-category details.task-item[open] > summary::after { transform: rotate(180deg); }
+.checkbox-category details.task-item[open] > summary::after { transform: rotate(225deg); }
 .checkbox-category details.task-item > summary:hover { background: rgba(99, 102, 241, 0.08); }
 .checkbox-category details.task-item > summary:hover::after { color: var(--accent); }
 .checkbox-category .task-name { flex: 1; min-width: 0; }
@@ -584,14 +650,19 @@ header.dashboard-header h1 {
 }
 .model-checkbox-grid details.model-item > summary::-webkit-details-marker { display: none; }
 .model-checkbox-grid details.model-item > summary::after {
-  content: "▾";
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
   margin-left: auto;
-  font-size: 1.15rem;
-  line-height: 0.6;
+  border-right: 0.1em solid currentColor;
+  border-bottom: 0.1em solid currentColor;
+  transform: rotate(45deg);
+  vertical-align: middle;
   color: var(--fg-muted);
   transition: transform 0.15s;
 }
-.model-checkbox-grid details.model-item[open] > summary::after { transform: rotate(180deg); }
+.model-checkbox-grid details.model-item[open] > summary::after { transform: rotate(225deg); }
 .model-checkbox-grid details.model-item > summary:hover { background: rgba(99, 102, 241, 0.08); }
 .model-checkbox-grid details.model-item > summary:hover::after { color: var(--accent); }
 .model-checkbox-grid .model-name { flex: 1; min-width: 0; }

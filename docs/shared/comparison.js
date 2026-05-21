@@ -959,7 +959,7 @@ function renderAggregateBarChart() {
       x: xPositions[i], y: scores[i] + (wantSE ? (aggStderrs[i] || 0) : 0),
       text: scores[i].toFixed(fmt), showarrow: false, yshift: 10,
       xanchor: "center",
-      font: { size: computeAnnotationFontSize(labels.length) },
+      font: { size: computeAnnotationFontSize(labels.length), color: "#000", weight: 500 },
     })),
   });
   layout._annAnim = labels.map((_, i) => ({
@@ -1053,7 +1053,7 @@ function renderGroupedBarChart(groupName) {
         text: values[catIdx].toFixed(fmt),
         showarrow: false, yshift: 10,
         xanchor: "center",
-        font: { size: computeAnnotationFontSize(labels.length * nBars) },
+        font: { size: computeAnnotationFontSize(labels.length * nBars), color: "#000", weight: 500 },
       });
       annAnim.push({ score: values[catIdx], se: se || 0 });
     });
@@ -1147,7 +1147,7 @@ function renderSingleBenchmarkBarChart(benchmark) {
       text: values[i] != null ? values[i].toFixed(fmt) : "",
       showarrow: false, yshift: 10,
       xanchor: "center",
-      font: { size: computeAnnotationFontSize(labels.length) },
+      font: { size: computeAnnotationFontSize(labels.length), color: "#000", weight: 500 },
     })),
   });
   layout._annAnim = labels.map((_, i) => ({

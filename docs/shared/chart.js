@@ -114,7 +114,9 @@ export function makePlotlyConfig(filenamePrefix, getJsonMetadata) {
 /** Standard Plotly layout with sensible defaults; merge with overrides. */
 export function getPlotlyLayout(overrides) {
   const result = Object.assign({
-    font: { family: "Inter, system-ui, sans-serif", size: 13 },
+    // Mirror the page's --font-sans (see shared/style.css) so chart text
+    // matches the rest of the dashboard.
+    font: { family: "'Mona Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif", size: 13 },
     paper_bgcolor: "rgba(0,0,0,0)",
     plot_bgcolor: "rgba(0,0,0,0)",
     margin: { l: 60, r: 20, t: 50, b: 80 },
@@ -123,7 +125,11 @@ export function getPlotlyLayout(overrides) {
   }, overrides);
   const axisDefaults = { showline: false, zeroline: false, gridcolor: "#d8dce3" };
   result.xaxis = Object.assign({ automargin: true }, axisDefaults, result.xaxis);
-  result.yaxis = Object.assign({}, axisDefaults, result.yaxis);
+  // Y-axis tick labels match .control-group label styling in shared/style.css:
+  // 0.85rem (≈13.6px), weight 500, --fg-muted colour (#64748b).
+  result.yaxis = Object.assign({
+    tickfont: { size: 13.6, color: "#64748b", weight: 500 },
+  }, axisDefaults, result.yaxis);
   return result;
 }
 
@@ -155,8 +161,10 @@ const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 const BAR_HOVER_SCALE = 1.12;
 
 /** Wire plotly_hover/plotly_unhover events to set an inline transform on the
- *  hovered bar's <path>. Plotly's drag overlay swallows native :hover, so we
- *  drive the visual through Plotly's own hit-test events. */
+ *  hovered bar's <path>, and tag the matching score-label annotation and
+ *  x-axis tick so style.css can bump their font-weight. Plotly's drag
+ *  overlay swallows native :hover, so we drive the visual through Plotly's
+ *  own hit-test events. */
 function attachBarHoverHighlight(chartEl) {
   function findBarPath(curveNumber, pointNumber) {
     const allData = chartEl.data || [];
@@ -170,15 +178,45 @@ function attachBarHoverHighlight(chartEl) {
     if (!traceEl) return null;
     return traceEl.querySelectorAll("path")[pointNumber] || null;
   }
+  // Find the score annotation whose horizontal centre is closest to the
+  // hovered bar's centre. Works for single-trace AND grouped charts
+  // (where each sub-bar in a group has its own annotation at a slightly
+  // different x), without needing to know Plotly's internal layout.
+  function findAnnotationFor(barPath) {
+    if (!barPath) return null;
+    const barRect = barPath.getBoundingClientRect();
+    const barX = barRect.left + barRect.width / 2;
+    let closest = null, minDist = Infinity;
+    chartEl.querySelectorAll(".annotation").forEach((ann) => {
+      const r = ann.getBoundingClientRect();
+      const x = r.left + r.width / 2;
+      const dist = Math.abs(x - barX);
+      if (dist < minDist) { minDist = dist; closest = ann; }
+    });
+    return closest;
+  }
+  // X-axis tick at a given point index — one xtick per discrete x value,
+  // so pointNumber maps directly even in grouped charts (sub-bars share
+  // the same model position / tick).
+  function findXtickAt(pointNumber) {
+    return chartEl.querySelectorAll(".xtick")[pointNumber] || null;
+  }
   chartEl.on("plotly_hover", (data) => {
     const pt = data.points && data.points[0];
     if (!pt || !pt.data || pt.data.type !== "bar") return;
     const path = findBarPath(pt.curveNumber, pt.pointNumber);
     if (path) path.style.transform = `scaleX(${BAR_HOVER_SCALE})`;
+    const ann = findAnnotationFor(path);
+    if (ann) ann.classList.add("bar-hover-bold");
+    const xtick = findXtickAt(pt.pointNumber);
+    if (xtick) xtick.classList.add("bar-hover-bold");
   });
   chartEl.on("plotly_unhover", () => {
     chartEl.querySelectorAll(".barlayer path").forEach((el) => {
       if (el.style.transform) el.style.transform = "";
+    });
+    chartEl.querySelectorAll(".bar-hover-bold").forEach((el) => {
+      el.classList.remove("bar-hover-bold");
     });
   });
 }
