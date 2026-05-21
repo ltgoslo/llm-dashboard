@@ -1,14 +1,26 @@
 # Norwegian language models
-norolmo-13b:
+norolmo-13b-stage3:
   display_name: "NorOLMo 13B"
   category: norwegian
   organization: LTG/UiO
   parameters: 13.7
   license: "Apache 2.0"
   fully_open: true
-  description: "Fully-open Norwegian language model continually-trained on OLMo2 (13B stage 2), trained by the Language Technology Group at the University of Oslo."
+  description: "The final stage-3 checkpoint of NorOLMo-13B. NorOLMo is a fully-open Norwegian language model continually-trained on OLMo2, trained by the Language Technology Group at the University of Oslo."
   huggingface_url: https://huggingface.co/HPLT/NorOLMo-13B
   default: true
+  color: "#DD0000"
+
+norolmo-13b-stage2:
+  display_name: "NorOLMo 13B (stage 2)"
+  category: norwegian
+  organization: LTG/UiO
+  parameters: 13.7
+  license: "Apache 2.0"
+  fully_open: true
+  description: "The final stage-2 checkpoint of NorOLMo-13B. NorOLMo is a fully-open Norwegian language model continually-trained on OLMo2, trained by the Language Technology Group at the University of Oslo."
+  huggingface_url: https://huggingface.co/HPLT/NorOLMo-13B
+  default: false
   color: "#DD0000"
 
 norolmo-13b-stage1:
