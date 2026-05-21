@@ -135,12 +135,29 @@ export async function initComparison(config) {
     setupUrlState();
     const hasURL = urlState.load();
 
+    // If `task` was specified in the URL but `tasks` was not, derive checkedTasks
+    // from the task selection (mirrors the dropdown change handler). Without
+    // this, checkedTasks stays at the initial "all tasks" value, which both
+    // shows wrong results and pollutes the URL with an explicit tasks= list on
+    // the next save.
+    if (urlState.has("task") && !urlState.has("tasks")) {
+      const benchmarks = getBenchmarksForSelection(state.currentTaskSelection);
+      if (benchmarks.length > 0) state.checkedTasks = new Set(benchmarks);
+    }
+
     // Sync UI controls
     populateTaskDropdown();
     bindEventListeners();
     buildCheckboxes();
     buildModelCheckboxes();
     bindModuleActionStopPropagation();
+
+    // The `norm` URL field has a dynamic default ("baseline" for aggregate
+    // selections, "none" otherwise). That default is only applied on save —
+    // when `norm` is absent on load, `state.currentNormalization` would
+    // otherwise stay at the static state.js default ("baseline"), giving
+    // wrong values for individual-task URLs. Apply the dynamic default here.
+    if (!urlState.has("norm")) autoSetNormalization();
 
     if (hasURL) {
       document.getElementById("task-select").value = state.currentTaskSelection;
@@ -153,8 +170,6 @@ export async function initComparison(config) {
       updateRangeSliderUI();
       const fo = document.getElementById("fully-open-toggle");
       if (fo) fo.checked = fullyOpenOnly;
-    } else {
-      autoSetNormalization();
     }
 
     renderChart();

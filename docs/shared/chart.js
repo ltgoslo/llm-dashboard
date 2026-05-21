@@ -201,6 +201,22 @@ function attachBarHoverHighlight(chartEl) {
   function findXtickAt(pointNumber) {
     return chartEl.querySelectorAll(".xtick")[pointNumber] || null;
   }
+  // Org-logo image whose horizontal centre is closest to the hovered bar's
+  // centre. Same positional-matching approach as the annotation lookup, so
+  // it works for grouped charts too (and tolerates orgs without logos).
+  function findLogoFor(barPath) {
+    if (!barPath) return null;
+    const barRect = barPath.getBoundingClientRect();
+    const barX = barRect.left + barRect.width / 2;
+    let closest = null, minDist = Infinity;
+    chartEl.querySelectorAll(".imagelayer image").forEach((img) => {
+      const r = img.getBoundingClientRect();
+      const x = r.left + r.width / 2;
+      const dist = Math.abs(x - barX);
+      if (dist < minDist) { minDist = dist; closest = img; }
+    });
+    return closest;
+  }
   chartEl.on("plotly_hover", (data) => {
     const pt = data.points && data.points[0];
     if (!pt || !pt.data || pt.data.type !== "bar") return;
@@ -210,9 +226,14 @@ function attachBarHoverHighlight(chartEl) {
     if (ann) ann.classList.add("bar-hover-bold");
     const xtick = findXtickAt(pt.pointNumber);
     if (xtick) xtick.classList.add("bar-hover-bold");
+    const logo = findLogoFor(path);
+    if (logo) logo.style.transform = "scale(1.2)";
   });
   chartEl.on("plotly_unhover", () => {
     chartEl.querySelectorAll(".barlayer path").forEach((el) => {
+      if (el.style.transform) el.style.transform = "";
+    });
+    chartEl.querySelectorAll(".imagelayer image").forEach((el) => {
       if (el.style.transform) el.style.transform = "";
     });
     chartEl.querySelectorAll(".bar-hover-bold").forEach((el) => {

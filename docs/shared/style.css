@@ -382,32 +382,36 @@ header.dashboard-header h1 {
 .size-slider-container > label { white-space: nowrap; }
 /* Min/max labels sit directly under each thumb (chart.js sets `left`% to
    match the thumb percentage). Tabular-nums keeps digit widths stable so
-   the "9B" → "10B" transition doesn't make the centred label jump. */
+   the "9B" → "10B" transition doesn't make the centred label jump.
+   `top: calc(100% + Npx)` places them BELOW the slider's bounding box,
+   so the row's flex centering sees only the slider proper (track+thumb)
+   and the labels just hang into the row's margin-bottom area. */
 .size-label {
   position: absolute;
-  top: 22px;
+  top: calc(100% - 2px);
+  font-size: 0.7rem;
   transform: translateX(-50%);
   font-weight: 500; color: var(--fg);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   pointer-events: none;
 }
-/* Slider is now taller to house the labels under the track/thumbs.
-   Track at y=11, thumbs centred on track, labels at y=22. */
+/* Slider is back to just the track+thumb area (22px). Labels overflow
+   below via top: calc(100% + …) above. */
 .range-slider {
-  position: relative; flex: 1; height: 38px; min-width: 160px; max-width: 240px;
+  position: relative; flex: 1; height: 22px; min-width: 160px; max-width: 240px;
   user-select: none; touch-action: none;
 }
 .range-track {
-  position: absolute; top: 11px; left: 0; right: 0; height: 4px;
-  background: var(--border); border-radius: 2px;
+  position: absolute; top: 50%; left: 0; right: 0; height: 4px;
+  transform: translateY(-50%); background: var(--border); border-radius: 2px;
 }
 .range-fill {
-  position: absolute; top: 11px; height: 4px;
+  position: absolute; top: 50%; height: 4px; transform: translateY(-50%);
   background: var(--accent); border-radius: 2px; pointer-events: none;
 }
 .range-thumb {
-  position: absolute; top: 13px; width: 16px; height: 16px; border-radius: 50%;
+  position: absolute; top: 50%; width: 16px; height: 16px; border-radius: 50%;
   background: var(--accent); border: 2px solid var(--surface);
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   transform: translate(-50%, -50%); cursor: grab; z-index: 2;
@@ -492,6 +496,14 @@ header.dashboard-header h1 {
 #chart .annotation.bar-hover-bold text,
 #chart .xtick.bar-hover-bold text {
   font-weight: 700 !important;
+}
+/* Same hover treatment for the org logos: chart.js sets an inline
+   `transform: scale(...)` on the matching <image> on hover. Origin is
+   centred so the logo "pops" in place rather than growing from a corner. */
+#chart .imagelayer image {
+  transition: transform 140ms ease-out;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
 }
 
 /* ════════════════════════════════════════════════════════════
