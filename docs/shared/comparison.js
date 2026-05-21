@@ -22,7 +22,7 @@ import {
 import {
   showTooltip, hideTooltip, attachTooltip, populateMetricSelector, hideMetricSelector,
   buildTaskCheckboxes, syncTaskCheckboxStates, bindModuleActionStopPropagation,
-  markAppReady,
+  attachControlTooltips, markAppReady,
 } from "./ui.js";
 import { UrlState } from "./url-state.js";
 
@@ -152,6 +152,7 @@ export async function initComparison(config) {
     buildCheckboxes();
     buildModelCheckboxes();
     bindModuleActionStopPropagation();
+    attachControlTooltips();
 
     // The `norm` URL field has a dynamic default ("baseline" for aggregate
     // selections, "none" otherwise). That default is only applied on save —

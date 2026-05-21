@@ -8,7 +8,7 @@
 import { state } from "../shared/state.js";
 import { MODEL_COLORS, isAggregateSelection } from "../shared/core.js";
 import { makePlotlyConfig } from "../shared/chart.js";
-import { buildTaskCheckboxes, syncTaskCheckboxStates, bindModuleActionStopPropagation, markAppReady } from "../shared/ui.js";
+import { buildTaskCheckboxes, syncTaskCheckboxStates, bindModuleActionStopPropagation, attachControlTooltips, markAppReady } from "../shared/ui.js";
 import { renderProgressChart, updateProgressTitle } from "../shared/progress.js";
 import { UrlState } from "../shared/url-state.js";
 
@@ -367,6 +367,7 @@ async function init() {
       onChange: onTaskCheckboxChange,
     });
     bindModuleActionStopPropagation();
+    attachControlTooltips();
 
     // The `norm` URL field has a dynamic default ("baseline" for aggregate
     // selections, "none" otherwise). That default is only applied on save —

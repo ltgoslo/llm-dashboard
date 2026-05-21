@@ -12,7 +12,7 @@ import {
 import { makePlotlyConfig } from "../shared/chart.js";
 import {
   attachTooltip, buildTaskCheckboxes, syncTaskCheckboxStates,
-  bindModuleActionStopPropagation, markAppReady,
+  bindModuleActionStopPropagation, attachControlTooltips, markAppReady,
 } from "../shared/ui.js";
 import {
   renderProgressChart, updateProgressTitle,
@@ -538,6 +538,7 @@ async function init() {
       onChange: onTaskCheckboxChange,
     });
     bindModuleActionStopPropagation();
+    attachControlTooltips();
 
     if (hasURL) {
       document.getElementById("task-select").value = state.currentTaskSelection;

@@ -31,7 +31,7 @@
   --fg: #1e293b;
   --fg-muted: #64748b;
   --accent: #6366f1;
-  --accent-hover: #4f46e5;
+  --accent-hover: #312e81;
   --accent-light: #eef2ff;
   --border: #d2d9e4;
   --border-light: #eef0f3;
@@ -191,7 +191,7 @@ header.dashboard-header h1 {
   font-size: 0.8rem; color: var(--fg); line-height: 1.65; margin-bottom: 0.4rem;
 }
 .about-section a { color: var(--accent); text-decoration: none; }
-.about-section a:hover { text-decoration: underline; }
+.about-section a:hover { color: var(--accent-hover); }
 .about-formula {
   font-family: "JetBrains Mono", "Menlo", monospace;
   background: var(--surface);
@@ -297,7 +297,7 @@ header.dashboard-header h1 {
   max-width: 760px;
 }
 .chart-description a { color: var(--accent); text-decoration: none; }
-.chart-description a:hover { text-decoration: underline; }
+.chart-description a:hover { color: var(--accent-hover); }
 
 /* ──── Controls bar — two flex rows of inline controls ────
    Layout: each row is a .controls-bar; items inside are
@@ -616,7 +616,7 @@ header.dashboard-header h1 {
   padding: 0.3rem 0.0rem 0.5rem 1.0rem;
 }
 .task-description-inline a { color: var(--accent); text-decoration: none; word-break: break-all; }
-.task-description-inline a:hover { text-decoration: underline; }
+.task-description-inline a:hover { color: var(--accent-hover); }
 
 /* ──── Model panel — used in the "Models" module(s) ────
    One .model-panel per category (e.g. Norwegian / Multilingual).
@@ -691,7 +691,7 @@ header.dashboard-header h1 {
   color: var(--fg-muted);
 }
 .model-description-inline a { color: var(--accent); text-decoration: none; word-break: break-all; }
-.model-description-inline a:hover { text-decoration: underline; }
+.model-description-inline a:hover { color: var(--accent-hover); }
 
 .model-color-dot {
   display: inline-block; width: 10px; height: 10px;
@@ -766,7 +766,7 @@ header.dashboard-header h1 {
   font-size: 1.02rem; color: var(--fg); margin-bottom: 0.2rem; margin-top: 0.5rem;
 }
 .filter-panel-header a { color: var(--accent); text-decoration: none; }
-.filter-panel-header a:hover { text-decoration: underline; }
+.filter-panel-header a:hover { color: var(--accent-hover); }
 #filter-panel-content h3 {
   font-family: var(--font-serif); font-weight: 700;
   font-size: 1.02rem; margin: 0.6rem 0 0.2rem;
@@ -872,7 +872,7 @@ footer.dashboard-footer {
   text-align: left;
 }
 footer.dashboard-footer a { color: var(--accent); text-decoration: none; }
-footer.dashboard-footer a:hover { text-decoration: underline; }
+footer.dashboard-footer a:hover { color: var(--accent-hover); }
 
 /* ────────────────────────────────────────────────────────────
    Responsive — narrow-viewport tweaks (tighten paddings, shrink

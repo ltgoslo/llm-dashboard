@@ -71,6 +71,57 @@ export function attachTooltip(element, contentFn) {
   element.addEventListener("mouseleave", () => hideTooltip());
 }
 
+// ─────────────────────────────────────────────────────────────
+// Control-bar tooltips
+// ─────────────────────────────────────────────────────────────
+
+// Tooltip text shown when the user hovers each control-bar setting.
+// `anchor` is a selector for any element inside the control's wrapper;
+// the tooltip is attached to the nearest enclosing .control-group so
+// hovering the label OR the input both trigger it.
+const CONTROL_TOOLTIPS = [
+  {
+    anchor: ".shot-toggle",
+    title: "Shots",
+    body: "Number of in-context examples shown to the model before each test question. 0-shot gives no examples; 1-shot gives one; 5-shot gives five. Comparing across shot settings probes the model's in-context learning ability.",
+  },
+  {
+    anchor: "#prompt-agg-select",
+    title: "Prompt aggregation",
+    body: "Most tasks are evaluated with 4–6 different prompt formulations. This setting selects how scores across prompt variants are summarised: max (best prompt), mean (average), median (typical), or min (worst prompt).",
+  },
+  {
+    anchor: "#norm-select",
+    title: "Normalization",
+    body: "How task scores are rescaled before averaging. 'Random baseline' maps the chance score to 0 and a perfect score to 100; 'min-max' and 'percentile' rescale relative to the evaluated models; 'z-score' shows standard deviations from the mean. 'None' keeps raw metric values.",
+  },
+  {
+    anchor: "#size-slider-container",
+    title: "Model size",
+    body: "Restrict the chart to models whose parameter count (in billions) falls within this range. Models outside the range are excluded from the chart and from any aggregate scores.",
+  },
+  {
+    anchor: "#fully-open-container",
+    title: "Fully-open models only",
+    body: "Restrict to fully-open models — those whose weights, training data, and training code are all released. Models with only open weights are hidden when this is enabled.",
+  },
+];
+
+/** Attach hover tooltips to the control-bar settings (Shots, Prompt
+ *  aggregation, Normalization, Model size, Fully-open). Skips controls
+ *  that don't exist on the current dashboard, so it's safe to call from
+ *  any init flow. */
+export function attachControlTooltips() {
+  for (const cfg of CONTROL_TOOLTIPS) {
+    const el = document.querySelector(cfg.anchor);
+    if (!el) continue;
+    const target = el.classList.contains("control-group")
+      ? el
+      : el.closest(".control-group") || el;
+    attachTooltip(target, () => ({ title: cfg.title, body: cfg.body }));
+  }
+}
+
 /** Module sections are wrapped in <details>/<summary>. The summary line
  *  contains action buttons like "Select all" / "Select none". Without
  *  intervention, clicking those buttons would also toggle the <details>
