@@ -29,6 +29,60 @@ let CFG = null;            // Dashboard configuration (set in initComparison)
 let plotlyConfig = null;   // Built from CFG.filenamePrefix
 let urlState = null;
 
+// Org → local logo filename (all stored white in docs/shared/logos/).
+// Files in this folder are downloaded copies — no runtime network
+// dependency. All 13 orgs in the dataset are now covered.
+const ORG_LOGO = {
+  "Google": "google.png",
+  "Meta": "meta.png",
+  "Mistral AI": "mistral.png",
+  "Alibaba": "qwen.png",
+  "AI Sweden": "ai_sweden.png",
+  "Allen AI": "allen_ai.png",
+  "DFM": "dfm.png",
+  "EuroLLM": "eurollm.png",
+  "LTG/UiO": "uio.png",
+  "Nasjonalbiblioteket": "nb.png",
+  "NorwAI/NTNU": "ntnu.png",
+  "SILO AI": "silo_ai.png",
+  "Swiss AI": "swiss_ai.png",
+};
+// Optional per-org size multiplier (1.0 = default). Useful for logos with
+// thin/detailed designs (e.g. coats of arms) that read visually smaller
+// than bolder marks at the same Plotly box size.
+const ORG_LOGO_SCALE = {
+  // Wide-and-short text logo — after square-padding it has more vertical
+  // breathing room than the other (roughly square) marks, so bump up a bit.
+  "LTG/UiO": 1.15,
+};
+
+/** Plotly layout.images entries: one white logo per model at the bar's
+ *  bottom, positioned via data-x + paper-y (so the vertical placement
+ *  stays a fixed fraction of the chart height regardless of y-axis range). */
+function buildOrgImages(modelNames, xPositions, xOffset) {
+  return modelNames.map((modelDir, i) => {
+    const org = state.DATA.model_organizations?.[modelDir];
+    const filename = org && ORG_LOGO[org];
+    if (!filename) return null;
+    const scale = (org && ORG_LOGO_SCALE[org]) || 1;
+    return {
+      source: `../shared/logos/${filename}`,
+      xref: "x", yref: "paper",
+      x: xPositions[i] + (xOffset || 0),
+      // yanchor:middle + y:0.05 puts the box's vertical centre at ~5% of
+      // chart height above the axis. With sizing:"contain", the logo
+      // (PNGs now square-padded at 85% fill — matching SVG safe-area)
+      // is centred in the box, so the logo's vertical centre lands at
+      // exactly that point regardless of which dimension constrains it.
+      y: 0.04,
+      sizex: 0.5 * scale, sizey: 0.05 * scale,
+      xanchor: "center", yanchor: "middle",
+      sizing: "contain",
+      layer: "above",
+    };
+  }).filter(Boolean);
+}
+
 // Comparison-specific state (not in shared/state.js). These are overwritten
 // by the dashboard's initComparison() defaults before first render.
 let currentSizeMin = 6;
@@ -537,8 +591,12 @@ function updateRangeSliderUI() {
   thumbMax.style.left = pctMax + "%";
   fill.style.left = pctMin + "%";
   fill.style.right = (100 - pctMax) + "%";
-  document.getElementById("size-min-label").textContent = currentSizeMin + "B";
-  document.getElementById("size-max-label").textContent = currentSizeMax + "B";
+  // Labels are absolutely positioned inside the slider, centred on each
+  // thumb via translateX(-50%) in style.css — set their `left` here.
+  const minLabel = document.getElementById("size-min-label");
+  const maxLabel = document.getElementById("size-max-label");
+  if (minLabel) { minLabel.style.left = pctMin + "%"; minLabel.textContent = currentSizeMin + "B"; }
+  if (maxLabel) { maxLabel.style.left = pctMax + "%"; maxLabel.textContent = currentSizeMax + "B"; }
 }
 
 function initRangeSlider() {
@@ -928,7 +986,7 @@ function renderAggregateBarChart() {
   const trace = {
     x: xPositions, y: scores, type: "bar",
     width: 0.85,
-    marker: { color: colors, line: { width: 0 } },
+    marker: { color: colors, line: { width: 0 }, cornerradius: 6 },
     customdata: taskCounts.map((c, i) => ({ count: c, stderr: aggStderrs[i], modelDir: modelNames[i] })),
     hoverinfo: "none",
   };
@@ -961,6 +1019,7 @@ function renderAggregateBarChart() {
       xanchor: "center",
       font: { size: computeAnnotationFontSize(labels.length), color: "#000", weight: 500 },
     })),
+    images: buildOrgImages(modelNames, xPositions),
   });
   layout._annAnim = labels.map((_, i) => ({
     score: scores[i], se: wantSE ? (aggStderrs[i] || 0) : 0,
@@ -1012,7 +1071,7 @@ function renderGroupedBarChart(groupName) {
     const trace = {
       x: xPositions, y: values, name: group.labels[i], type: "bar",
       width: barWidth, offset,
-      marker: { color: barColors, line: { width: 0 } },
+      marker: { color: barColors, line: { width: 0 }, cornerradius: 6 },
       customdata: modelNames.map((m, j) => ({ stderr: seValues ? seValues[j] : null, modelDir: m })),
       hoverinfo: "none", showlegend: true,
     };
@@ -1072,6 +1131,7 @@ function renderGroupedBarChart(groupName) {
     margin: { l: 105, r: 4, t: 8, b: 100 },
     showlegend: false,
     annotations,
+    images: buildOrgImages(modelNames, xPositions),
   });
   layout._annAnim = annAnim;
   // Populate the HTML legend in the Model-size controls bar.
@@ -1121,7 +1181,7 @@ function renderSingleBenchmarkBarChart(benchmark) {
   const trace = {
     x: xPositions, y: values, type: "bar",
     width: 0.85,
-    marker: { color: colors, line: { width: 0 } },
+    marker: { color: colors, line: { width: 0 }, cornerradius: 6 },
     customdata: modelNames.map((m, i) => ({ stderr: seValues ? seValues[i] : null, modelDir: m })),
     hoverinfo: "none",
   };
@@ -1149,6 +1209,7 @@ function renderSingleBenchmarkBarChart(benchmark) {
       xanchor: "center",
       font: { size: computeAnnotationFontSize(labels.length), color: "#000", weight: 500 },
     })),
+    images: buildOrgImages(modelNames, xPositions),
   });
   layout._annAnim = labels.map((_, i) => ({
     score: values[i] || 0, se: wantSE && seArr ? (seArr[i] || 0) : 0,

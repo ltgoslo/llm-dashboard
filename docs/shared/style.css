@@ -380,35 +380,34 @@ header.dashboard-header h1 {
   font-size: 0.8rem; font-weight: 500; color: var(--fg-muted);
 }
 .size-slider-container > label { white-space: nowrap; }
-/* Tabular-nums keeps digit widths stable (so "9B" → "10B" doesn't wiggle the
-   layout); min-width is just enough for "73B" (the slider's max). */
+/* Min/max labels sit directly under each thumb (chart.js sets `left`% to
+   match the thumb percentage). Tabular-nums keeps digit widths stable so
+   the "9B" → "10B" transition doesn't make the centred label jump. */
 .size-label {
+  position: absolute;
+  top: 22px;
+  transform: translateX(-50%);
   font-weight: 500; color: var(--fg);
-  min-width: 1.5rem;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
 }
-/* Push the min/max numbers toward the en-dash so the "6B – 24B" group reads
-   as one unit. Combined with the smaller min-width above, the interior
-   padding (which was the bulk of the slider→6B whitespace) shrinks. */
-#size-min-label { text-align: right; }
-#size-max-label { text-align: left; }
-/* Cancel most of the .size-slider-container's 0.6rem flex gap around the
-   en-dash, leaving a natural ~0.2rem space on each side. */
-.size-sep { color: var(--fg-muted); margin: 0 -0.4rem; }
+/* Slider is now taller to house the labels under the track/thumbs.
+   Track at y=11, thumbs centred on track, labels at y=22. */
 .range-slider {
-  position: relative; flex: 1; height: 22px; min-width: 160px; max-width: 240px;
+  position: relative; flex: 1; height: 38px; min-width: 160px; max-width: 240px;
   user-select: none; touch-action: none;
 }
 .range-track {
-  position: absolute; top: 50%; left: 0; right: 0; height: 4px;
-  transform: translateY(-50%); background: var(--border); border-radius: 2px;
+  position: absolute; top: 11px; left: 0; right: 0; height: 4px;
+  background: var(--border); border-radius: 2px;
 }
 .range-fill {
-  position: absolute; top: 50%; height: 4px; transform: translateY(-50%);
+  position: absolute; top: 11px; height: 4px;
   background: var(--accent); border-radius: 2px; pointer-events: none;
 }
 .range-thumb {
-  position: absolute; top: 50%; width: 16px; height: 16px; border-radius: 50%;
+  position: absolute; top: 13px; width: 16px; height: 16px; border-radius: 50%;
   background: var(--accent); border: 2px solid var(--surface);
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   transform: translate(-50%, -50%); cursor: grab; z-index: 2;
