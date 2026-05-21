@@ -12,7 +12,7 @@ import {
 import { makePlotlyConfig } from "../shared/chart.js";
 import {
   attachTooltip, buildTaskCheckboxes, syncTaskCheckboxStates,
-  bindModuleActionStopPropagation,
+  bindModuleActionStopPropagation, markAppReady,
 } from "../shared/ui.js";
 import {
   renderProgressChart, updateProgressTitle,
@@ -556,10 +556,12 @@ async function init() {
     }
 
     render();
+    markAppReady();
   } catch (err) {
     console.error("init failed:", err);
     const el = document.getElementById("chart");
     if (el) el.innerHTML = "<pre style='color:red;padding:1rem;'>" + err.stack + "</pre>";
+    markAppReady();
   }
 }
 

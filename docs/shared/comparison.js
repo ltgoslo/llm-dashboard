@@ -22,6 +22,7 @@ import {
 import {
   showTooltip, hideTooltip, attachTooltip, populateMetricSelector, hideMetricSelector,
   buildTaskCheckboxes, syncTaskCheckboxStates, bindModuleActionStopPropagation,
+  markAppReady,
 } from "./ui.js";
 import { UrlState } from "./url-state.js";
 
@@ -173,10 +174,12 @@ export async function initComparison(config) {
     }
 
     renderChart();
+    markAppReady();
   } catch (err) {
     console.error("init failed:", err);
     const el = document.getElementById("chart");
     if (el) el.innerHTML = "<pre style='color:red;padding:1rem;'>" + err.stack + "</pre>";
+    markAppReady();
   }
 }
 

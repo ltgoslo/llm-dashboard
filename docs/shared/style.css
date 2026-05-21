@@ -826,6 +826,43 @@ header.dashboard-header h1 {
 .filter-table tr.fail-row td:first-child { color: #f87171; }
 
 /* ────────────────────────────────────────────────────────────
+   App loading overlay — covers the page until the dashboard's
+   initial render finishes, then fades out while the bands fade
+   in. Avoids the jarring "elements pop in one by one" effect.
+   ──────────────────────────────────────────────────────────── */
+
+.app-loading {
+  position: fixed; inset: 0;
+  background: var(--bg-tint);
+  z-index: 9999;
+  display: flex;
+  align-items: center; justify-content: center;
+  transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+}
+.app-loading-spinner {
+  width: 36px; height: 36px;
+  border: 3px solid rgba(99, 102, 241, 0.18);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: app-spin 0.9s linear infinite;
+}
+@keyframes app-spin { to { transform: rotate(360deg); } }
+
+/* Hide top-level bands until the app is ready, then fade them in
+   together. opacity-only (not visibility) so chart container width
+   is correctly computed for the first Plotly render. */
+body > .band {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+body.app-ready > .band { opacity: 1; }
+body.app-ready .app-loading {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+}
+
+/* ────────────────────────────────────────────────────────────
    Footer (same dark band as modules)
    ──────────────────────────────────────────────────────────── */
 

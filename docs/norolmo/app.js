@@ -8,7 +8,7 @@
 import { state } from "../shared/state.js";
 import { MODEL_COLORS, isAggregateSelection } from "../shared/core.js";
 import { makePlotlyConfig } from "../shared/chart.js";
-import { buildTaskCheckboxes, syncTaskCheckboxStates, bindModuleActionStopPropagation } from "../shared/ui.js";
+import { buildTaskCheckboxes, syncTaskCheckboxStates, bindModuleActionStopPropagation, markAppReady } from "../shared/ui.js";
 import { renderProgressChart, updateProgressTitle } from "../shared/progress.js";
 import { UrlState } from "../shared/url-state.js";
 
@@ -385,10 +385,12 @@ async function init() {
     }
 
     render();
+    markAppReady();
   } catch (err) {
     console.error("init failed:", err);
     const el = document.getElementById("chart");
     if (el) el.innerHTML = "<pre style='color:red;padding:1rem;'>" + err.stack + "</pre>";
+    markAppReady();
   }
 }
 

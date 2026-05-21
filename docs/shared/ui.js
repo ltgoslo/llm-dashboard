@@ -4,6 +4,23 @@ import { state } from "./state.js";
 import { METRIC_DISPLAY, METRIC_SCALES, getBaseMetric } from "./core.js";
 
 // ─────────────────────────────────────────────────────────────
+// App-ready toggle — flips body.app-ready, which the stylesheet
+// uses to fade out the loading overlay and fade in the bands.
+// Deferred via rAF so the first chart paint has a chance to land
+// before the fade begins (without this, Firefox sometimes fades
+// in before the bars are positioned).
+// ─────────────────────────────────────────────────────────────
+
+let appReadyMarked = false;
+export function markAppReady() {
+  if (appReadyMarked) return;
+  appReadyMarked = true;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => document.body.classList.add("app-ready"));
+  });
+}
+
+// ─────────────────────────────────────────────────────────────
 // Custom tooltip
 // ─────────────────────────────────────────────────────────────
 
