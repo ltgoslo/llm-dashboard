@@ -158,7 +158,84 @@ let currentAnim = 0;   // monotonic id; in-flight rAF callbacks abort if outdate
 const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
 // Scale applied to the hovered bar; matched in style.css's transition.
-const BAR_HOVER_SCALE = 1.12;
+const BAR_HOVER_SCALE = 1.5;
+// When a bar scales by S, its left and right edges each move outward by
+// (S-1)/2 of the original bar width. To keep gaps between bars consistent,
+// every other bar shifts by that same amount away from the hovered bar
+// (left-of-hovered ← negative, right-of-hovered → positive).
+const BAR_HOVER_SHIFT_PCT = (BAR_HOVER_SCALE - 1) / 2 * 100;
+// "Drag" — each bar's transition is delayed proportional to its distance
+// (in steps) from the hovered bar, so the ripple propagates outward like
+// a wave rather than all bars moving in lockstep. Capped so far-away bars
+// don't lag arbitrarily long.
+const DRAG_DELAY_PER_STEP = 40;   // ms per step from the hovered position
+const DRAG_DELAY_MAX = 300;       // ms cap on stagger delay
+// "Dampening" — magnitude attenuation with distance, like a spring chain
+// where each link transmits less force to the next. Half-life of N steps
+// means shift magnitude halves every N bars further from the hovered one.
+// d=1 still gets the full shift (so the gap with the hovered bar stays
+// exact); only d≥2 attenuates.
+const DAMPEN_HALFLIFE = 4;
+const dampen = (steps) => Math.pow(0.5, Math.max(0, steps - 1) / DAMPEN_HALFLIFE);
+
+/** Prime an aux element so future CSS transform shifts compose correctly
+ *  with however Plotly is positioning it. Two cases:
+ *    (a) Element has a `transform="translate(x, y) …"` attribute (xticks
+ *        and annotations): we replicate that translate as CSS (with
+ *        transition:none + forced reflow so it doesn't jump), then own
+ *        positioning from CSS.
+ *    (b) Element has no transform attribute (errorbars — positioned via
+ *        the path's `d` data): no priming needed, just leave the path
+ *        alone and add a plain CSS `translateX(dxPx)` later. */
+function primeAuxEl(el) {
+  if (el._auxPrimed) return;
+  el._auxPrimed = true;
+  const attr = el.getAttribute("transform") || "";
+  const m = attr.match(/translate\s*\(\s*([-\d.eE+]+)(?:[,\s]+([-\d.eE+]+))?\s*\)/);
+  if (m) {
+    const x = parseFloat(m[1]);
+    const y = m[2] ? parseFloat(m[2]) : 0;
+    const rest = attr.replace(/translate\s*\([^)]+\)/, "").trim();
+    // SVG rotate(N) → CSS rotate(Ndeg) so the carry-over transforms stay valid.
+    const cssRest = rest.replace(/rotate\s*\(\s*([-\d.eE+]+)\s*\)/g, "rotate($1deg)");
+    el._auxBase = { x, y, cssRest, hasAttrPos: true };
+    el.style.transition = "none";
+    el.style.transform = `translate(${x}px, ${y}px)${cssRest ? " " + cssRest : ""}`;
+    el.offsetWidth;  // force reflow so the snap-set commits with no animation
+    el.style.transition = "";
+  } else {
+    // No transform attribute. CSS translateX(dx) just shifts the element by
+    // dx pixels from wherever it's currently rendered — no conflict.
+    el._auxBase = { x: 0, y: 0, cssRest: "", hasAttrPos: false };
+  }
+}
+
+/** Shift an aux element horizontally by `dxPx` from its primed base, with a
+ *  staggered transition-delay. The transition itself is defined in style.css. */
+function shiftAuxEl(el, dxPx, delayMs) {
+  primeAuxEl(el);
+  const { x, y, cssRest, hasAttrPos } = el._auxBase;
+  el.style.transitionDelay = `${delayMs}ms`;
+  el.style.transform = hasAttrPos
+    ? `translate(${x + dxPx}px, ${y}px)${cssRest ? " " + cssRest : ""}`
+    : `translateX(${dxPx}px)`;
+}
+
+/** Screen-x of an SVG element's anchor point. For elements positioned via a
+ *  `transform="translate(...)"` attribute (xticks, annotations) we use
+ *  getScreenCTM, whose `.e` is the x-translation through the whole ancestor
+ *  chain — unaffected by rotated children. For elements without a transform
+ *  attribute (errorbars) we fall back to bbox centre, which is accurate
+ *  there since the path is what's positioned. */
+function getAuxScreenX(el) {
+  const attr = el.getAttribute("transform") || "";
+  if (attr.indexOf("translate") !== -1) {
+    const ctm = el.getScreenCTM();
+    if (ctm) return ctm.e;
+  }
+  const r = el.getBoundingClientRect();
+  return r.left + r.width / 2;
+}
 
 /** Wire plotly_hover/plotly_unhover events to set an inline transform on the
  *  hovered bar's <path>, and tag the matching score-label annotation and
@@ -217,28 +294,183 @@ function attachBarHoverHighlight(chartEl) {
     });
     return closest;
   }
+  // Remember the last hover state so the unhover wave can stagger outward
+  // from the same point the hover wave originated.
+  let lastHoveredPointNum = null;
+  let lastHoverCenterX = null;
+  const stepDelay = (steps) => Math.min((steps - 1) * DRAG_DELAY_PER_STEP, DRAG_DELAY_MAX);
+
   chartEl.on("plotly_hover", (data) => {
     const pt = data.points && data.points[0];
     if (!pt || !pt.data || pt.data.type !== "bar") return;
-    const path = findBarPath(pt.curveNumber, pt.pointNumber);
-    if (path) path.style.transform = `scaleX(${BAR_HOVER_SCALE})`;
+    const hoveredPointNum = pt.pointNumber;
+    lastHoveredPointNum = hoveredPointNum;
+
+    // Measure the hovered bar BEFORE applying any transforms, so rect.width
+    // is the natural (un-scaled) width. (A translateX from a prior hover
+    // doesn't affect width; a scaleX would, but the bar isn't scaled yet.)
+    // Reading after the scaleX would mean dividing by BAR_HOVER_SCALE to
+    // recover natural width, and browsers disagree on whether
+    // getBoundingClientRect returns the target or the interpolated mid-
+    // transition value — that disagreement caused the residual undershoot.
+    const path = findBarPath(pt.curveNumber, hoveredPointNum);
+    let naturalWidth = 0, centerX = 0, shiftPx = 0, pxPerStep = 0;
+    if (path) {
+      const rect = path.getBoundingClientRect();
+      naturalWidth = rect.width;
+      centerX = rect.left + rect.width / 2;
+      lastHoverCenterX = centerX;
+      shiftPx = naturalWidth * (BAR_HOVER_SHIFT_PCT / 100);
+      pxPerStep = naturalWidth / 0.85;
+    }
+
+    // Transform every bar in every bar trace: the hovered point scales,
+    // all other bars shift away in the direction of their index relative
+    // to the hovered point. transition-delay creates a "drag" ripple
+    // outward — closer bars move first, far bars trail.
+    chartEl.querySelectorAll(".barlayer .trace.bars").forEach((traceEl) => {
+      traceEl.querySelectorAll("path").forEach((bar, i) => {
+        const steps = Math.abs(i - hoveredPointNum);
+        bar.style.transitionDelay = `${stepDelay(steps)}ms`;
+        if (i === hoveredPointNum) {
+          bar.style.transform = `scaleX(${BAR_HOVER_SCALE})`;
+        } else {
+          // Dampen the shift magnitude with distance — closer bars move
+          // close to the full amount, far bars only nudge.
+          const shift = BAR_HOVER_SHIFT_PCT * dampen(steps);
+          const dir = i < hoveredPointNum ? -1 : 1;
+          bar.style.transform = `translateX(${dir * shift}%)`;
+        }
+      });
+    });
+
+    // Logos sit at bar centres, so they need the same horizontal shift
+    // (in screen pixels, since their bbox is 128×128 not the bar's width)
+    // and the same distance-based delay.
+    if (path) {
+      const logos = Array.from(chartEl.querySelectorAll(".imagelayer image"));
+      let hoveredLogo = null, minDist = Infinity;
+      logos.forEach((img) => {
+        const r = img.getBoundingClientRect();
+        const dist = Math.abs((r.left + r.width / 2) - centerX);
+        if (dist < minDist) { minDist = dist; hoveredLogo = img; }
+      });
+      logos.forEach((img) => {
+        const r = img.getBoundingClientRect();
+        const x = r.left + r.width / 2;
+        const steps = Math.round(Math.abs(x - centerX) / pxPerStep);
+        img.style.transitionDelay = `${stepDelay(steps)}ms`;
+        if (img === hoveredLogo) {
+          img.style.transform = "scale(1.5)";
+        } else {
+          const damp = dampen(steps);
+          const dir = x < centerX ? -1 : 1;
+          img.style.transform = `translateX(${dir * shiftPx * damp}px)`;
+        }
+      });
+
+      // xticks, annotations, error bars: same dampened-shift pattern, but
+      // matched by DOM index rather than screen position. Position-based
+      // matching is unreliable here — bounding boxes of rotated tick
+      // labels with text-anchor:end drift away from the actual anchor,
+      // and getScreenCTM behaviour varies by browser when CSS transforms
+      // are applied. DOM index is exact: xticks/annotations/errorbars are
+      // emitted in model-position order.
+      const xticks = chartEl.querySelectorAll(".xtick");
+      const annotations = chartEl.querySelectorAll(".annotation");
+      const errorbars = chartEl.querySelectorAll(".errorbar");
+      const N = xticks.length;
+      if (N > 0) {
+        const applyAtModelIdx = (el, modelIdx) => {
+          const steps = Math.abs(modelIdx - hoveredPointNum);
+          const dir = modelIdx < hoveredPointNum ? -1 : 1;
+          const dx = steps === 0 ? 0 : dir * shiftPx * dampen(steps);
+          shiftAuxEl(el, dx, stepDelay(steps));
+        };
+        // xticks: one per model, in order.
+        xticks.forEach((el, i) => applyAtModelIdx(el, i));
+        // Annotations: comparison.js builds them model-by-model (catIdx
+        // outer, sub-bar inner), so floor(i / B) is the model index where
+        // B = annotations / xticks (1 for aggregate, >1 for grouped).
+        const annPerModel = Math.max(1, Math.round(annotations.length / N));
+        annotations.forEach((el, i) =>
+          applyAtModelIdx(el, Math.min(N - 1, Math.floor(i / annPerModel))));
+        // Errorbars: emitted per-trace, data-point-first. So the i-th
+        // .errorbar in DOM is at model index (i % N).
+        errorbars.forEach((el, i) => applyAtModelIdx(el, i % N));
+      }
+    }
+
+    chartEl.classList.add("hover-active");
     const ann = findAnnotationFor(path);
     if (ann) ann.classList.add("bar-hover-bold");
-    const xtick = findXtickAt(pt.pointNumber);
+    const xtick = findXtickAt(hoveredPointNum);
     if (xtick) xtick.classList.add("bar-hover-bold");
-    const logo = findLogoFor(path);
-    if (logo) logo.style.transform = "scale(1.2)";
   });
   chartEl.on("plotly_unhover", () => {
-    chartEl.querySelectorAll(".barlayer path").forEach((el) => {
-      if (el.style.transform) el.style.transform = "";
+    // Mirror the hover ripple on the way back: same distance-based delay,
+    // measured from the bar that was just unhovered.
+    chartEl.querySelectorAll(".barlayer .trace.bars").forEach((traceEl) => {
+      traceEl.querySelectorAll("path").forEach((bar, i) => {
+        if (lastHoveredPointNum != null) {
+          bar.style.transitionDelay =
+            `${stepDelay(Math.abs(i - lastHoveredPointNum))}ms`;
+        } else {
+          bar.style.transitionDelay = "";
+        }
+        bar.style.transform = "";
+      });
     });
-    chartEl.querySelectorAll(".imagelayer image").forEach((el) => {
-      if (el.style.transform) el.style.transform = "";
-    });
+    // Logos: use the cached lastHoverCenterX + a sample bar's width for
+    // the same pxPerStep conversion as the hover handler.
+    const sample = chartEl.querySelector(".barlayer path");
+    if (lastHoverCenterX != null && sample) {
+      const pxPerStep = sample.getBoundingClientRect().width / 0.85;
+      chartEl.querySelectorAll(".imagelayer image").forEach((img) => {
+        const r = img.getBoundingClientRect();
+        const x = r.left + r.width / 2;
+        const steps = Math.round(Math.abs(x - lastHoverCenterX) / pxPerStep);
+        img.style.transitionDelay = `${stepDelay(steps)}ms`;
+        img.style.transform = "";
+      });
+      // Send xticks, annotations, error bars back to base, using the
+      // same DOM-index-based stagger as the hover handler (so the wave
+      // unwinds in mirror order). Removing .hover-active on #chart
+      // (below) flips the CSS transition rule to the slower hover-off curve.
+      if (lastHoveredPointNum != null) {
+        const xticks = chartEl.querySelectorAll(".xtick");
+        const annotations = chartEl.querySelectorAll(".annotation");
+        const errorbars = chartEl.querySelectorAll(".errorbar");
+        const N = xticks.length;
+        if (N > 0) {
+          const clearAt = (el, modelIdx) =>
+            shiftAuxEl(el, 0, stepDelay(Math.abs(modelIdx - lastHoveredPointNum)));
+          xticks.forEach((el, i) => clearAt(el, i));
+          const annPerModel = Math.max(1, Math.round(annotations.length / N));
+          annotations.forEach((el, i) =>
+            clearAt(el, Math.min(N - 1, Math.floor(i / annPerModel))));
+          errorbars.forEach((el, i) => clearAt(el, i % N));
+        }
+      } else {
+        chartEl.querySelectorAll(".xtick, .annotation, .errorbar").forEach((el) => {
+          shiftAuxEl(el, 0, 0);
+        });
+      }
+    } else {
+      chartEl.querySelectorAll(".imagelayer image").forEach((el) => {
+        el.style.transitionDelay = "";
+        el.style.transform = "";
+      });
+      chartEl.querySelectorAll(".xtick, .annotation, .errorbar").forEach((el) => {
+        shiftAuxEl(el, 0, 0);
+      });
+    }
+    chartEl.classList.remove("hover-active");
     chartEl.querySelectorAll(".bar-hover-bold").forEach((el) => {
       el.classList.remove("bar-hover-bold");
     });
+    lastHoveredPointNum = null;
+    lastHoverCenterX = null;
   });
 }
 

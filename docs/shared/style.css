@@ -480,10 +480,22 @@ header.dashboard-header h1 {
    one via Plotly's plotly_hover event (Plotly's drag overlay swallows the
    native :hover, so CSS-only hover doesn't work). Pure transform so it's
    GPU-accelerated and never triggers a Plotly recompute. */
+/* Shared "back-out" easing — on hover-on the value overshoots the target
+   then settles; on hover-off the reverse direction naturally undershoots
+   past identity then settles, so a single curve gives a bouncy feel both
+   ways without needing separate :hover transitions. */
+/* The transition is read at the destination state. So the *base* rules
+   below define the hover-OFF transition (returning to identity) — slower
+   and bouncier; the *hover-state* rules below override it with a snappier
+   hover-ON transition. JS toggles inline `transform` on bar/logo and the
+   `.bar-hover-bold` class on annotation/xtick. */
 #chart .barlayer path {
   transition: transform 140ms ease-out;
   transform-box: fill-box;
   transform-origin: 50% 100%;
+}
+#chart .barlayer path[style*="transform"] {
+  transition: transform 140ms ease-out;
 }
 /* Companion to the bar scale on hover: chart.js adds .bar-hover-bold to the
    matching score annotation and x-axis tick group, and we bump their text
@@ -495,7 +507,8 @@ header.dashboard-header h1 {
 }
 #chart .annotation.bar-hover-bold text,
 #chart .xtick.bar-hover-bold text {
-  font-weight: 700 !important;
+  font-weight: 800 !important;
+  transition: font-weight 140ms ease-out;
 }
 /* Same hover treatment for the org logos: chart.js sets an inline
    `transform: scale(...)` on the matching <image> on hover. Origin is
@@ -504,6 +517,23 @@ header.dashboard-header h1 {
   transition: transform 140ms ease-out;
   transform-box: fill-box;
   transform-origin: 50% 50%;
+}
+#chart .imagelayer image[style*="transform"] {
+  transition: transform 140ms ease-out;
+}
+/* x-axis ticks, score annotations, and error bars: chart.js primes their
+   CSS transforms from Plotly's SVG attribute on first hover, then shifts
+   them via inline transform. Plain ease-out matches the bars/logos so
+   everything moves with a single coherent feel. */
+#chart .xtick,
+#chart .annotation,
+#chart .errorbar {
+  transition: transform 140ms ease-out;
+}
+#chart.hover-active .xtick,
+#chart.hover-active .annotation,
+#chart.hover-active .errorbar {
+  transition: transform 140ms ease-out;
 }
 
 /* ════════════════════════════════════════════════════════════
