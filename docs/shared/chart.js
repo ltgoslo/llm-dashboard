@@ -237,6 +237,37 @@ function getAuxScreenX(el) {
   return r.left + r.width / 2;
 }
 
+/** SVG z-order is purely DOM order — later siblings render on top. With
+ *  the plot clip-path disabled, bars/logos can now overflow into the
+ *  y-axis label area on hover, but Plotly emits `.yaxislayer-above` AFTER
+ *  `.overplot` (where bars live), so the labels paint on top.
+ *  Lifting `.barlayer` out of `.overplot` is unsafe — `.overplot > .xy`
+ *  carries the subplot's positioning transform that places the bars
+ *  inside the plot rectangle, so moving barlayer out makes bars render
+ *  at the wrong coordinates.
+ *  Instead, do the reverse: move `.yaxislayer-above` to *before*
+ *  `.overplot` in the subplot. That preserves all transforms and just
+ *  reorders the painting so bars/logos paint on top. */
+function liftBarsAndLogos(chartEl) {
+  chartEl.querySelectorAll(".subplot.xy").forEach((subplot) => {
+    const overplot = subplot.querySelector(".overplot");
+    if (!overplot) return;
+    const yaxisLabels = subplot.querySelector(":scope > .yaxislayer-above");
+    if (yaxisLabels) subplot.insertBefore(yaxisLabels, overplot);
+  });
+  // UiO logo: pivot-point fix needs a reliable selector. Plotly inlines
+  // the PNG as a base64 data URL on the DOM element, so we can't match
+  // by `href` or by rendered dimensions (every logo gets the same sizex/
+  // sizey). Instead, look up the original `source` from layout.images by
+  // DOM index — that order is the same as the order images render in.
+  const sources = (chartEl.layout && chartEl.layout.images) || [];
+  chartEl.querySelectorAll(".imagelayer image").forEach((img, i) => {
+    const src = (sources[i] && sources[i].source) || "";
+    if (src.endsWith("uio.png")) img.classList.add("logo-uio");
+    else img.classList.remove("logo-uio");
+  });
+}
+
 /** Wire plotly_hover/plotly_unhover events to set an inline transform on the
  *  hovered bar's <path>, and tag the matching score-label annotation and
  *  x-axis tick so style.css can bump their font-weight. Plotly's drag
@@ -299,12 +330,36 @@ function attachBarHoverHighlight(chartEl) {
   let lastHoveredPointNum = null;
   let lastHoverCenterX = null;
   const stepDelay = (steps) => Math.min((steps - 1) * DRAG_DELAY_PER_STEP, DRAG_DELAY_MAX);
+  // Debounce plotly_unhover: it also fires in the tiny gaps between bars
+  // during a rapid sweep. We don't want to run the exit wave there —
+  // it would briefly clear bar transforms, then the next hover would
+  // re-set them, causing flicker. So defer the actual unhover work; if a
+  // hover fires before the timer expires, it cancels this.
+  let pendingUnhoverTimer = null;
+  const UNHOVER_DEBOUNCE = 100;  // ms
 
   chartEl.on("plotly_hover", (data) => {
     const pt = data.points && data.points[0];
     if (!pt || !pt.data || pt.data.type !== "bar") return;
+    // Cancel any pending unhover — the cursor is back on a bar before the
+    // debounce timer fired, so we stay in hover state and shouldn't run
+    // the exit wave.
+    if (pendingUnhoverTimer) {
+      clearTimeout(pendingUnhoverTimer);
+      pendingUnhoverTimer = null;
+    }
     const hoveredPointNum = pt.pointNumber;
+    // First hover = entering the chart from no-hover state. Stagger applies.
+    const isFirstHover = lastHoveredPointNum === null;
+    const delayFor = (steps) => isFirstHover ? stepDelay(steps) : 0;
     lastHoveredPointNum = hoveredPointNum;
+    // Clear the previous hover's bold class before adding the new one —
+    // because plotly_unhover is debounced, we can't rely on it to do this
+    // for us during a rapid sweep, and otherwise the class accumulates
+    // on every xtick/annotation the cursor passes over.
+    chartEl.querySelectorAll(".bar-hover-bold").forEach((el) => {
+      el.classList.remove("bar-hover-bold");
+    });
 
     // Measure the hovered bar BEFORE applying any transforms, so rect.width
     // is the natural (un-scaled) width. (A translateX from a prior hover
@@ -331,15 +386,20 @@ function attachBarHoverHighlight(chartEl) {
     chartEl.querySelectorAll(".barlayer .trace.bars").forEach((traceEl) => {
       traceEl.querySelectorAll("path").forEach((bar, i) => {
         const steps = Math.abs(i - hoveredPointNum);
-        bar.style.transitionDelay = `${stepDelay(steps)}ms`;
+        bar.style.transitionDelay = `${delayFor(steps)}ms`;
         if (i === hoveredPointNum) {
-          bar.style.transform = `scaleX(${BAR_HOVER_SCALE})`;
+          // Independent scale + translate (CSS Transforms 2): the two
+          // properties animate via separate transitions in style.css, so
+          // there's no scale-meets-translate matrix interpolation ghost.
+          bar.style.scale = `${BAR_HOVER_SCALE} 1`;
+          bar.style.translate = "0";
         } else {
           // Dampen the shift magnitude with distance — closer bars move
           // close to the full amount, far bars only nudge.
           const shift = BAR_HOVER_SHIFT_PCT * dampen(steps);
           const dir = i < hoveredPointNum ? -1 : 1;
-          bar.style.transform = `translateX(${dir * shift}%)`;
+          bar.style.scale = "1";
+          bar.style.translate = `${dir * shift}% 0`;
         }
       });
     });
@@ -359,13 +419,15 @@ function attachBarHoverHighlight(chartEl) {
         const r = img.getBoundingClientRect();
         const x = r.left + r.width / 2;
         const steps = Math.round(Math.abs(x - centerX) / pxPerStep);
-        img.style.transitionDelay = `${stepDelay(steps)}ms`;
+        img.style.transitionDelay = `${delayFor(steps)}ms`;
         if (img === hoveredLogo) {
-          img.style.transform = "scale(1.5)";
+          img.style.scale = "1.5";
+          img.style.translate = "0";
         } else {
           const damp = dampen(steps);
           const dir = x < centerX ? -1 : 1;
-          img.style.transform = `translateX(${dir * shiftPx * damp}px)`;
+          img.style.scale = "1";
+          img.style.translate = `${dir * shiftPx * damp}px`;
         }
       });
 
@@ -385,7 +447,7 @@ function attachBarHoverHighlight(chartEl) {
           const steps = Math.abs(modelIdx - hoveredPointNum);
           const dir = modelIdx < hoveredPointNum ? -1 : 1;
           const dx = steps === 0 ? 0 : dir * shiftPx * dampen(steps);
-          shiftAuxEl(el, dx, stepDelay(steps));
+          shiftAuxEl(el, dx, delayFor(steps));
         };
         // xticks: one per model, in order.
         xticks.forEach((el, i) => applyAtModelIdx(el, i));
@@ -408,8 +470,23 @@ function attachBarHoverHighlight(chartEl) {
     if (xtick) xtick.classList.add("bar-hover-bold");
   });
   chartEl.on("plotly_unhover", () => {
+    // Debounce: plotly_unhover also fires in the tiny gaps between bars
+    // during a rapid sweep. We don't want to run the exit wave there —
+    // it would briefly clear bar transforms, then the next hover would
+    // re-set them, causing a flicker. So defer the actual unhover work
+    // by UNHOVER_DEBOUNCE; if a hover fires before then, it cancels this.
+    if (pendingUnhoverTimer) clearTimeout(pendingUnhoverTimer);
+    pendingUnhoverTimer = setTimeout(() => {
+      pendingUnhoverTimer = null;
+      runFullUnhover();
+    }, UNHOVER_DEBOUNCE);
+  });
+
+  function runFullUnhover() {
     // Mirror the hover ripple on the way back: same distance-based delay,
-    // measured from the bar that was just unhovered.
+    // measured from the bar that was just unhovered. We clear both
+    // scale and translate so they animate back to identity via the
+    // separate transitions defined in style.css.
     chartEl.querySelectorAll(".barlayer .trace.bars").forEach((traceEl) => {
       traceEl.querySelectorAll("path").forEach((bar, i) => {
         if (lastHoveredPointNum != null) {
@@ -418,7 +495,8 @@ function attachBarHoverHighlight(chartEl) {
         } else {
           bar.style.transitionDelay = "";
         }
-        bar.style.transform = "";
+        bar.style.scale = "";
+        bar.style.translate = "";
       });
     });
     // Logos: use the cached lastHoverCenterX + a sample bar's width for
@@ -431,7 +509,8 @@ function attachBarHoverHighlight(chartEl) {
         const x = r.left + r.width / 2;
         const steps = Math.round(Math.abs(x - lastHoverCenterX) / pxPerStep);
         img.style.transitionDelay = `${stepDelay(steps)}ms`;
-        img.style.transform = "";
+        img.style.scale = "";
+        img.style.translate = "";
       });
       // Send xticks, annotations, error bars back to base, using the
       // same DOM-index-based stagger as the hover handler (so the wave
@@ -459,7 +538,8 @@ function attachBarHoverHighlight(chartEl) {
     } else {
       chartEl.querySelectorAll(".imagelayer image").forEach((el) => {
         el.style.transitionDelay = "";
-        el.style.transform = "";
+        el.style.scale = "";
+        el.style.translate = "";
       });
       chartEl.querySelectorAll(".xtick, .annotation, .errorbar").forEach((el) => {
         shiftAuxEl(el, 0, 0);
@@ -471,7 +551,7 @@ function attachBarHoverHighlight(chartEl) {
     });
     lastHoveredPointNum = null;
     lastHoverCenterX = null;
-  });
+  }
 }
 
 /** Plotly.newPlot + register hover handlers. Bar traces animate from y=0
@@ -493,7 +573,9 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
   const chartEl = document.getElementById("chart");
 
   if (!shouldAnimate) {
-    Plotly.newPlot("chart", traces, plotLayout, config);
+    Plotly.newPlot("chart", traces, plotLayout, config).then(
+      () => liftBarsAndLogos(chartEl));
+    liftBarsAndLogos(chartEl);
     if (onHover) chartEl.on("plotly_hover", onHover);
     if (onUnhover) chartEl.on("plotly_unhover", onUnhover);
     if (barIndices.length) attachBarHoverHighlight(chartEl);
@@ -520,7 +602,9 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
       (a) => Object.assign({}, a, { y: 0, opacity: 0 }));
   }
 
-  Plotly.newPlot("chart", startTraces, startLayout, config);
+  Plotly.newPlot("chart", startTraces, startLayout, config).then(
+    () => liftBarsAndLogos(chartEl));
+  liftBarsAndLogos(chartEl);
   if (onHover) chartEl.on("plotly_hover", onHover);
   if (onUnhover) chartEl.on("plotly_unhover", onUnhover);
   attachBarHoverHighlight(chartEl);

@@ -475,6 +475,25 @@ header.dashboard-header h1 {
   height: 500px;
 }
 
+/* Allow the bar/logo hover effects to extend past the plot edges instead of
+   being clipped at the leftmost and rightmost bars. Plotly clips chart
+   content several ways and they all need lifting:
+   - the `<div>` wrappers it inserts between #chart and the SVG (svg-container,
+     plot-container, js-plotly-plot) can carry overflow:hidden,
+   - the root <svg class="main-svg"> defaults to overflow:hidden,
+   - cartesian plots get an SVG `clip-path` attribute bounding the plot
+     rectangle (CSS `clip-path` takes precedence and disables it). */
+#chart,
+#chart .js-plotly-plot,
+#chart .plot-container,
+#chart .svg-container,
+#chart .main-svg {
+  overflow: visible !important;
+}
+#chart [clip-path] {
+  clip-path: none !important;
+}
+
 /* Bar hover: every bar path gets a transform transition + bottom-centre
    origin; chart.js adds an inline `transform: scaleX(...)` on the hovered
    one via Plotly's plotly_hover event (Plotly's drag overlay swallows the
@@ -489,13 +508,17 @@ header.dashboard-header h1 {
    and bouncier; the *hover-state* rules below override it with a snappier
    hover-ON transition. JS toggles inline `transform` on bar/logo and the
    `.bar-hover-bold` class on annotation/xtick. */
+/* Use CSS Transforms 2 separate `scale` and `translate` properties (rather
+   than the legacy combined `transform`) so the two animate independently.
+   When a bar goes from hovered (scale 1.5) back to non-hovered (translate
+   only), the legacy matrix interpolation would briefly produce a half-
+   scaled-half-shifted ghost on every interrupt. Independent transitions
+   with a fast `scale` curve mean the scale converges to 1 quickly and then
+   only the translate keeps animating — no mid-state ghosting. */
 #chart .barlayer path {
-  transition: transform 140ms ease-out;
+  transition: translate 140ms ease-out, scale 140ms ease-out;
   transform-box: fill-box;
   transform-origin: 50% 100%;
-}
-#chart .barlayer path[style*="transform"] {
-  transition: transform 140ms ease-out;
 }
 /* Companion to the bar scale on hover: chart.js adds .bar-hover-bold to the
    matching score annotation and x-axis tick group, and we bump their text
@@ -510,16 +533,23 @@ header.dashboard-header h1 {
   font-weight: 800 !important;
   transition: font-weight 140ms ease-out;
 }
-/* Same hover treatment for the org logos: chart.js sets an inline
-   `transform: scale(...)` on the matching <image> on hover. Origin is
-   centred so the logo "pops" in place rather than growing from a corner. */
+/* Same hover treatment for the org logos. As with bars, we drive these via
+   the separate `scale`/`translate` properties so the two animate
+   independently. */
 #chart .imagelayer image {
-  transition: transform 140ms ease-out;
+  transition: translate 140ms ease-out, scale 140ms ease-out;
   transform-box: fill-box;
-  transform-origin: 50% 50%;
+  /* Anchor logos to the bottom-centre so they grow left, right, and up
+     (never down) — matches the bars, which also pin their bottom edge. */
+  transform-origin: 50% 100%;
 }
-#chart .imagelayer image[style*="transform"] {
-  transition: transform 140ms ease-out;
+/* UiO is a wide piece of "UiO" text rendered into the 128×128 canvas with
+   the glyphs centred vertically — the visible text's bottom sits at
+   ~69% of the canvas height, with ~31% empty space below. Pinning the
+   canvas's own bottom would make the text lift upward when scaled;
+   shifting the origin up to the actual text bottom keeps it in place. */
+#chart .imagelayer image.logo-uio {
+  transform-origin: 50% 69%;
 }
 /* x-axis ticks, score annotations, and error bars: chart.js primes their
    CSS transforms from Plotly's SVG attribute on first hover, then shifts
