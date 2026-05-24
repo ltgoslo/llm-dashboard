@@ -32,7 +32,7 @@ let urlState = null;
 
 // Org → local logo filename (all stored white in docs/shared/logos/).
 // Files in this folder are downloaded copies — no runtime network
-// dependency. All 13 orgs in the dataset are now covered.
+// dependency. All 14 orgs in the dataset are now covered.
 const ORG_LOGO = {
   "Google": "google.png",
   "Meta": "meta.png",
@@ -47,6 +47,7 @@ const ORG_LOGO = {
   "NorwAI/NTNU": "ntnu.png",
   "SILO AI": "silo_ai.png",
   "Swiss AI": "swiss_ai.png",
+  "Z.ai": "zai.png",
 };
 // Optional per-org size multiplier (1.0 = default). Useful for logos with
 // thin/detailed designs (e.g. coats of arms) that read visually smaller

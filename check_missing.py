@@ -133,6 +133,8 @@ def main():
             else:
                 print(f"  {model}: OK ({len(benchmarks)} benchmarks x {len(SHOT_SETTINGS)} shots)")
 
+    exit()
+
     # Check data/norolmo/progress/ (training checkpoints)
     progress_dir = os.path.join(BASE_DIR, "data", "norolmo", "progress")
     if os.path.isdir(progress_dir):
