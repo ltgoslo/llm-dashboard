@@ -13,7 +13,7 @@ import {
   getScore, getCombinedSE, scaleStderr, applyNorm, toDisplayScale,
   getBaseMetric, getNormYLabel, getMetricYLabel,
   aggregateScores, isAggregateSelection, isMacroSelection,
-  getEffectiveMetric, isStderrCompatible,
+  getEffectiveMetric, isStderrCompatible, formatTitleWithShot,
 } from "./core.js";
 import {
   darkenColor, makePlotlyConfig, getPlotlyLayout, plotChart,
@@ -1319,7 +1319,7 @@ function computeSingleYRange(benchmark, metric) {
  *    "Category average across all NorEval tasks (5-shot)"
  *    "Task average across Bokmål tasks (5-shot)"
  *    "MultiBLiMP (5-shot)"
- *    "translation (English↔Bokmål) (5-shot)" */
+ *    "translation (English↔Bokmål; 5-shot)" */
 function getChartTitleText() {
   const sel = state.currentTaskSelection;
   const shot = state.currentShot + "-shot";
@@ -1335,8 +1335,8 @@ function getChartTitleText() {
   if (sel === "__lang__nob") return prefix + " across Bokmål tasks (" + shot + ")";
   if (sel === "__lang__nno") return prefix + " across Nynorsk tasks (" + shot + ")";
   if (sel === "__lang__sme") return prefix + " across Northern Sámi tasks (" + shot + ")";
-  if (sel.startsWith("__group__")) return sel.slice(9) + " (" + shot + ")";
-  if (state.metricsSetup[sel]) return state.metricsSetup[sel].pretty_name + " (" + shot + ")";
+  if (sel.startsWith("__group__")) return formatTitleWithShot(sel.slice(9), shot);
+  if (state.metricsSetup[sel]) return formatTitleWithShot(state.metricsSetup[sel].pretty_name, shot);
   return "";
 }
 

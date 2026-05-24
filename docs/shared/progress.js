@@ -21,7 +21,7 @@ import {
   getScore, getCombinedSE, scaleStderr, applyNorm, toDisplayScale,
   getBaseMetric, getNormYLabel, getMetricYLabel,
   aggregateScores, isAggregateSelection, isMacroSelection,
-  getEffectiveMetric, isStderrCompatible,
+  getEffectiveMetric, isStderrCompatible, formatTitleWithShot,
 } from "./core.js";
 import {
   darkenColor, getPlotlyLayout, plotChart,
@@ -356,9 +356,9 @@ function getChartTitleText(config) {
   if (sel === "__lang__sme") return lead + avg + " across Northern Sámi tasks (" + shot + ")";
   if (config.groupBenchmarks && sel.startsWith("__group__")) {
     const g = config.groupBenchmarks(sel.slice(9));
-    if (g) return lead + g.name + " (" + shot + ")";
+    if (g) return lead + formatTitleWithShot(g.name, shot);
   }
-  if (state.metricsSetup[sel]) return lead + state.metricsSetup[sel].pretty_name + " (" + shot + ")";
+  if (state.metricsSetup[sel]) return lead + formatTitleWithShot(state.metricsSetup[sel].pretty_name, shot);
   return lead.replace(/ — $/, "");
 }
 

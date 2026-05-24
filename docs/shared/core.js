@@ -86,6 +86,36 @@ export const METRIC_DESCRIPTIONS = {
   mcc: "Matthews correlation coefficient for classification.",
 };
 
+// Proper capitalization for dataset/acronym names appearing as the
+// parenthetical part of a pretty_name (only applied in chart titles, where
+// the dataset name reads as a proper noun). Keys are lowercase; missing
+// entries fall back to first-letter capitalization.
+export const TASK_NAME_DISPLAY = {
+  belebele: "Belebele",
+  cola: "CoLA",
+  openbookqa: "OpenBookQA",
+  truthfulqa: "TruthfulQA",
+  multiblimp: "MultiBLiMP",
+  norquad: "NorQuAD",
+  norsumm: "NorSumm",
+  "nrk-quiz": "NRK-quiz",
+};
+
+/** Build a chart-title task label that folds the shot setting into a trailing
+ *  parenthetical, e.g. "reading comprehension (belebele)" + "5-shot" becomes
+ *  "reading comprehension (Belebele; 5-shot)". The parenthetical's contents
+ *  are looked up in TASK_NAME_DISPLAY for proper-noun casing, falling back
+ *  to first-letter capitalization when the name already starts lowercase. */
+export function formatTitleWithShot(name, shot) {
+  if (!name) return "(" + shot + ")";
+  const m = name.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+  if (!m) return name + " (" + shot + ")";
+  const inner = m[2];
+  const display = TASK_NAME_DISPLAY[inner.toLowerCase()]
+    || (/^[a-z]/.test(inner) ? inner.charAt(0).toUpperCase() + inner.slice(1) : inner);
+  return m[1] + " (" + display + "; " + shot + ")";
+}
+
 // ─────────────────────────────────────────────────────────────
 // Metric helpers
 // ─────────────────────────────────────────────────────────────
