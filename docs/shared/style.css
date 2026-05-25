@@ -551,6 +551,12 @@ header.dashboard-header h1 {
 #chart .imagelayer image.logo-uio {
   transform-origin: 50% 69%;
 }
+/* Scatter mode: each (disk + logo) image is the marker itself, anchored at
+   the data point's centre — so scale around centre instead of bottom. */
+#chart.scatter-mode .imagelayer image,
+#chart.scatter-mode .imagelayer image.logo-uio {
+  transform-origin: 50% 50%;
+}
 /* x-axis ticks, score annotations, and error bars: chart.js primes their
    CSS transforms from Plotly's SVG attribute on first hover, then shifts
    them via inline transform. Plain ease-out matches the bars/logos so

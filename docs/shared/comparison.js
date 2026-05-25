@@ -124,9 +124,13 @@ function coloredDiskDataUrl(color) {
  *  Plotly paints layout.images in array order, so interleaving per model
  *  means each model's disk+logo paint as a unit — later models cleanly
  *  cover earlier ones when they overlap, rather than all logos painting
- *  on top of all disks. */
+ *  on top of all disks.
+ *  Returns { images, imageToModel } where imageToModel[i] is the model
+ *  index that image i belongs to — needed at hover time so scaling
+ *  affects only the hovered model's images, not nearby ones. */
 function buildScatterCompositeImages(modelDirs, xs, paperYs, colors) {
   const images = [];
+  const imageToModel = [];
   for (let i = 0; i < modelDirs.length; i++) {
     const x = Math.log10(xs[i]);
     const y = paperYs[i];
@@ -139,6 +143,7 @@ function buildScatterCompositeImages(modelDirs, xs, paperYs, colors) {
       sizing: "contain",
       layer: "above",
     });
+    imageToModel.push(i);
     const org = state.DATA.model_organizations?.[modelDirs[i]];
     const filename = org && ORG_LOGO[org];
     if (filename) {
@@ -152,9 +157,10 @@ function buildScatterCompositeImages(modelDirs, xs, paperYs, colors) {
         sizing: "contain",
         layer: "above",
       });
+      imageToModel.push(i);
     }
   }
-  return images;
+  return { images, imageToModel };
 }
 
 // Comparison-specific state (not in shared/state.js). These are overwritten
@@ -1541,6 +1547,7 @@ function plotScatter(xs, ys, dirs, colors, stderrs, yRange, extras) {
     hoverinfo: "none",
   };
 
+  const composite = buildScatterCompositeImages(dirs, xs, paperYs, colors);
   const layout = getPlotlyLayout({
     yaxis: {
       title: "", range: yRange,
@@ -1550,8 +1557,11 @@ function plotScatter(xs, ys, dirs, colors, stderrs, yRange, extras) {
     xaxis: scatterXAxis(),
     showlegend: false,
     margin: { l: 105, r: 4, t: 8, b: 60 },
-    images: buildScatterCompositeImages(dirs, xs, paperYs, colors),
+    images: composite.images,
   });
+  // Stash the image→model mapping so the scatter hover handler (in chart.js)
+  // can scale only the hovered model's images, not nearby ones.
+  document.getElementById("chart")._scatterImageMap = composite.imageToModel;
 
   plotChart([trace], layout, plotlyConfig, onChartHover, hideTooltip);
 }

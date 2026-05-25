@@ -554,6 +554,64 @@ function attachBarHoverHighlight(chartEl) {
   }
 }
 
+/** Scatter-mode hover: scale up the (disk + logo) the cursor is over.
+ *
+ *  Previously this hooked into Plotly's plotly_hover/unhover, which fire
+ *  off the trace's invisible marker hit-test — a different geometry than
+ *  the visible composite — and don't reliably fire unhover on slow exits.
+ *  The tooltip uses those events fine because it tolerates flicker, but
+ *  the animation needs a guaranteed reset when the cursor leaves a glyph.
+ *
+ *  Instead: pure DOM mousemove on the chart, hit-testing the cursor
+ *  against the layout.image bboxes; topmost (last in paint order) wins.
+ *  mouseleave on the chart container is the safety reset. The tooltip
+ *  stays on plotly_hover/unhover, unchanged. */
+function attachScatterHoverHighlight(chartEl) {
+  const SCATTER_HOVER_SCALE = "1.4 1.4";
+  let activeModel = null;
+  let activeImgs = [];
+
+  function applyModel(targetModel) {
+    if (targetModel === activeModel) return;
+    activeImgs.forEach((img) => { img.style.scale = ""; });
+    activeImgs = [];
+    activeModel = targetModel;
+    if (targetModel == null) return;
+    const map = chartEl._scatterImageMap || [];
+    chartEl.querySelectorAll(".imagelayer image").forEach((img, i) => {
+      if (map[i] === targetModel) {
+        img.style.scale = SCATTER_HOVER_SCALE;
+        activeImgs.push(img);
+      }
+    });
+  }
+
+  function pickModelFromCursor(ev) {
+    const map = chartEl._scatterImageMap;
+    if (!map) return null;
+    const cx = ev.clientX, cy = ev.clientY;
+    const imgs = chartEl.querySelectorAll(".imagelayer image");
+    let pick = null;
+    // Last hit wins → topmost in paint order.
+    for (let i = 0; i < imgs.length; i++) {
+      const r = imgs[i].getBoundingClientRect();
+      if (cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom) {
+        pick = map[i];
+      }
+    }
+    return pick;
+  }
+
+  // Idempotently bind: avoid stacking listeners on every re-render.
+  // (Plotly.newPlot doesn't clear DOM listeners added via addEventListener.)
+  if (chartEl._scatterHoverBound) return;
+  chartEl._scatterHoverBound = true;
+  chartEl.addEventListener("mousemove", (ev) => {
+    applyModel(pickModelFromCursor(ev));
+  });
+  chartEl.addEventListener("mouseleave", () => applyModel(null));
+}
+
 /** Plotly.newPlot + register hover handlers. Bar traces animate from y=0
  *  to their target values on each render (debounced). */
 export function plotChart(traces, layout, config, onHover, onUnhover) {
@@ -571,6 +629,12 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
   delete plotLayout._annAnim;
 
   const chartEl = document.getElementById("chart");
+  // Scatter-mode flag: lets style.css swap the logo transform-origin from
+  // bottom-centre (bar-mode default, where logos sit at the chart floor)
+  // to centre (scatter, where the logo is the data marker itself).
+  const isScatterMode = barIndices.length === 0
+    && traces.some((t) => t.type === "scatter" && t.mode && t.mode.indexOf("markers") !== -1);
+  chartEl.classList.toggle("scatter-mode", isScatterMode);
 
   if (!shouldAnimate) {
     Plotly.newPlot("chart", traces, plotLayout, config).then(
@@ -579,6 +643,7 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
     if (onHover) chartEl.on("plotly_hover", onHover);
     if (onUnhover) chartEl.on("plotly_unhover", onUnhover);
     if (barIndices.length) attachBarHoverHighlight(chartEl);
+    if (isScatterMode) attachScatterHoverHighlight(chartEl);
     return;
   }
 
