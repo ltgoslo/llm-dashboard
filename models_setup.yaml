@@ -174,7 +174,7 @@ nb-llama-3.2-1B:
   parameters: 1.2
   license: "Llama 3.2 Community License"
   fully_open: false
-  description: "Norwegian-focused language model continually-trained from Llama-3.2-1B by the National Library of Norway, using only publicly available data (CulturaX, HPLT, Norwegian Colossal Corpus, Wikipedia) filtered with nb-bert quality classifiers. Full support for Norwegian Bokmål, Nynorsk, and English; partial support for Swedish and Danish."
+  description: "Llama-3.2-1B–based language model from the AI Lab of the National Library of Norway. Trained on publicly available data (CulturaX, HPLT, Norwegian Colossal Corpus, Wikipedia). Full support for Norwegian Bokmål, Nynorsk, and English; partial support for Swedish and Danish."
   huggingface_url: https://huggingface.co/NbAiLab/nb-llama-3.2-1B
   default: true
   color: "#40263f"
@@ -186,8 +186,20 @@ nb-llama-3.2-3B:
   parameters: 3.2
   license: "Llama 3.2 Community License"
   fully_open: false
-  description: "Norwegian-focused language model continually-trained from Llama-3.2-3B by the National Library of Norway, using only publicly available data (CulturaX, HPLT, Norwegian Colossal Corpus, Wikipedia) filtered with nb-bert quality classifiers. Full support for Norwegian Bokmål, Nynorsk, and English; partial support for Swedish and Danish."
-  huggingface_url: https://huggingface.co/NbAiLab/nb-llama-3.2-3B
+  description: "Llama-3.2-3B–based language model from the AI Lab of the National Library of Norway. Trained on publicly available data (CulturaX, HPLT, Norwegian Colossal Corpus, Wikipedia). Full support for Norwegian Bokmål, Nynorsk, and English; partial support for Swedish and Danish. The primary repository is not publicly accessible on HuggingFace; only the `-configtest` variant is openly available."
+  huggingface_url: https://huggingface.co/NbAiLab/nb-llama-3.2-3B-configtest
+  default: true
+  color: "#40263f"
+
+nb-llama-3.1-8B:
+  display_name: "NB-Llama 3.1 8B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 8.0
+  license: "Llama 3.1 Community License"
+  fully_open: false
+  description: "Llama-3.1-8B–based language model from the AI Lab of the National Library of Norway, tagged with Norwegian Bokmål, Nynorsk, Swedish, and Danish among its supported languages. The original full-precision checkpoint is not publicly accessible on HuggingFace; only a quantized Q4_K_M GGUF release is openly available."
+  huggingface_url: https://huggingface.co/NbAiLab/nb-llama-3.1-8B-Q4_K_M-GGUF
   default: true
   color: "#40263f"
 

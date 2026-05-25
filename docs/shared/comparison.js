@@ -85,6 +85,78 @@ function buildOrgImages(modelNames, xPositions, xOffset) {
   }).filter(Boolean);
 }
 
+/** Plotly layout.images entries for scatter mode: one logo per model placed
+ *  at its (size, score) point. xref:"x" on a log axis expects coordinates
+ *  in log10 space (not raw data), so we convert here. yref:"paper" with
+ *  score converted to a paper fraction keeps logos a consistent visual size
+ *  regardless of how tight the y-range is. */
+function buildScatterOrgImages(modelDirs, xs, paperYs) {
+  return modelDirs.map((modelDir, i) => {
+    const org = state.DATA.model_organizations?.[modelDir];
+    const filename = org && ORG_LOGO[org];
+    if (!filename) return null;
+    const scale = (org && ORG_LOGO_SCALE[org]) || 1;
+    return {
+      source: `../shared/logos/${filename}`,
+      xref: "x", yref: "paper",
+      x: Math.log10(xs[i]), y: paperYs[i],
+      // Sized to fit inside the 32px (single/aggregate) / 24px (grouped)
+      // scatter markers. sizex is in log10 units (≈ 0.045 ≈ 2% of plot
+      // width on the 1–150B range); sizey is a paper-height fraction.
+      sizex: 0.045 * scale, sizey: 0.045 * scale,
+      xanchor: "center", yanchor: "middle",
+      sizing: "contain",
+      layer: "above",
+    };
+  }).filter(Boolean);
+}
+
+/** SVG data URL for a colored disk with a white outline — the per-marker
+ *  background that lives alongside each logo in layout.images. */
+function coloredDiskDataUrl(color) {
+  const svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>"
+    + `<circle cx='32' cy='32' r='30' fill='${color}' stroke='white' stroke-width='2'/>`
+    + "</svg>";
+  return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+}
+
+/** Interleaved layout.images: [disk_0, logo_0, disk_1, logo_1, …].
+ *  Plotly paints layout.images in array order, so interleaving per model
+ *  means each model's disk+logo paint as a unit — later models cleanly
+ *  cover earlier ones when they overlap, rather than all logos painting
+ *  on top of all disks. */
+function buildScatterCompositeImages(modelDirs, xs, paperYs, colors) {
+  const images = [];
+  for (let i = 0; i < modelDirs.length; i++) {
+    const x = Math.log10(xs[i]);
+    const y = paperYs[i];
+    images.push({
+      source: coloredDiskDataUrl(colors[i]),
+      xref: "x", yref: "paper",
+      x, y,
+      sizex: 0.07, sizey: 0.065,
+      xanchor: "center", yanchor: "middle",
+      sizing: "contain",
+      layer: "above",
+    });
+    const org = state.DATA.model_organizations?.[modelDirs[i]];
+    const filename = org && ORG_LOGO[org];
+    if (filename) {
+      const scale = (org && ORG_LOGO_SCALE[org]) || 1;
+      images.push({
+        source: `../shared/logos/${filename}`,
+        xref: "x", yref: "paper",
+        x, y,
+        sizex: 0.045 * scale, sizey: 0.045 * scale,
+        xanchor: "center", yanchor: "middle",
+        sizing: "contain",
+        layer: "above",
+      });
+    }
+  }
+  return images;
+}
+
 // Comparison-specific state (not in shared/state.js). These are overwritten
 // by the dashboard's initComparison() defaults before first render.
 let currentSizeMin = 6;
@@ -964,11 +1036,70 @@ function renderChart() {
 
   updateChartTitle();
 
-  if (isAggregateSelection(sel)) renderAggregateBarChart();
-  else if (sel.startsWith("__group__")) renderGroupedBarChart(sel.slice(9));
-  else renderSingleBenchmarkBarChart(sel);
+  // When the user fully opens the size range, the bar chart would squeeze
+  // 70+ models into illegible 1–2 pixel bars; switch to a scatter plot
+  // with model size on a log x-axis so each model becomes a distinct point.
+  const useScatter = isFullSizeRange();
+
+  if (isAggregateSelection(sel)) {
+    if (useScatter) renderAggregateScatter();
+    else renderAggregateBarChart();
+  } else if (sel.startsWith("__group__")) {
+    if (useScatter) renderGroupedScatter(sel.slice(9));
+    else renderGroupedBarChart(sel.slice(9));
+  } else {
+    if (useScatter) renderSingleBenchmarkScatter(sel);
+    else renderSingleBenchmarkBarChart(sel);
+  }
 
   urlState.save();
+}
+
+/** True when the user has fully opened the size-range slider — the cue we
+ *  use to switch from per-model bars to a size-vs-score scatter plot. */
+function isFullSizeRange() {
+  return currentSizeMin <= CFG.sizeRangeMin && currentSizeMax >= CFG.sizeRangeMax;
+}
+
+/** Convert a y-data value to a paper-fraction (for image positioning). */
+function paperFraction(y, yRange) {
+  const [lo, hi] = yRange;
+  if (hi === lo) return 0.5;
+  return (y - lo) / (hi - lo);
+}
+
+/** Shared scatter-plot setup: filter models down to those with a known size
+ *  and a non-null score, return parallel arrays + per-model colors. The
+ *  scoreFn may return any extra fields (e.g. count for aggregate hover);
+ *  they're collected into a parallel `extras` array. */
+function collectScatterPoints(modelNames, scoreFn) {
+  const xs = [], ys = [], dirs = [], colors = [], stderrs = [], extras = [];
+  for (const m of modelNames) {
+    const size = state.DATA.model_parameters?.[m];
+    if (!size) continue;            // can't place models without a known size
+    const res = scoreFn(m);
+    if (res == null || res.score == null) continue;
+    xs.push(size);
+    ys.push(res.score);
+    stderrs.push(res.stderr || 0);
+    dirs.push(m);
+    colors.push(getModelColor(m));
+    const { score, stderr, ...rest } = res;
+    extras.push(rest);
+  }
+  return { xs, ys, dirs, colors, stderrs, extras };
+}
+
+function scatterXAxis() {
+  return {
+    type: "log",
+    range: [Math.log10(CFG.sizeRangeMin), Math.log10(CFG.sizeRangeMax)],
+    automargin: false,
+    title: { text: "Model size (B parameters)", font: { size: 13, color: "#64748b" }, standoff: 12 },
+    showgrid: true, gridcolor: "#d8dce3",
+    tickvals: [1, 3, 10, 30, 100],
+    ticktext: ["1B", "3B", "10B", "30B", "100B"],
+  };
 }
 
 function renderAggregateBarChart() {
@@ -1234,6 +1365,194 @@ function renderSingleBenchmarkBarChart(benchmark) {
   layout._annAnim = labels.map((_, i) => ({
     score: values[i] || 0, se: wantSE && seArr ? (seArr[i] || 0) : 0,
   }));
+  plotChart([trace], layout, plotlyConfig, onChartHover, hideTooltip);
+}
+
+// ─────────────────────────────────────────────────────────────
+// Scatter rendering (used when size-range slider is fully open).
+// Logos overlay invisible markers — the markers handle hover, the logos
+// are the visible glyph.
+// ─────────────────────────────────────────────────────────────
+
+function renderAggregateScatter() {
+  updateChartLegend([]);
+  const modelNames = getModelList();
+  const needAllRaw = ["minmax", "zscore", "percentile"].includes(state.currentNormalization);
+  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
+  const macro = isMacroSelection();
+
+  const { xs, ys, dirs, colors, stderrs, extras } = collectScatterPoints(modelNames, (m) => {
+    const res = aggregateScores(state.checkedTasks, (bench) => {
+      const raw = getScore(state.DATA.models, m, bench, state.currentShot);
+      if (raw === undefined) return undefined;
+      const allRaw = needAllRaw
+        ? modelNames.map((mm) => getScore(state.DATA.models, mm, bench, state.currentShot)).filter((v) => v !== undefined)
+        : null;
+      const score = applyNorm(raw, bench, allRaw);
+      const se = wantSE ? scaleStderr(getCombinedSE(state.DATA.models, m, bench, state.currentShot), bench, undefined, allRaw) : undefined;
+      return { score, stderr: se };
+    }, macro);
+    if (!res) return null;
+    return { score: res.score, stderr: res.stderr, count: res.count };
+  });
+
+  const yRange = computeAggregateYRange(state.checkedTasks);
+  plotScatter(xs, ys, dirs, colors, stderrs, yRange, extras);
+}
+
+function renderSingleBenchmarkScatter(benchmark) {
+  updateChartLegend([]);
+  const info = state.metricsSetup[benchmark];
+  if (!info) return;
+  const metric = getEffectiveMetric(benchmark);
+  const modelNames = getModelList();
+  const allRaw = (state.currentNormalization !== "none")
+    ? modelNames.map((mm) => getScore(state.DATA.models, mm, benchmark, state.currentShot, metric)).filter((v) => v !== undefined)
+    : null;
+  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
+
+  const { xs, ys, dirs, colors, stderrs, extras } = collectScatterPoints(modelNames, (m) => {
+    const raw = getScore(state.DATA.models, m, benchmark, state.currentShot, metric);
+    if (raw == null) return null;
+    const score = state.currentNormalization === "none"
+      ? toDisplayScale(raw, benchmark, metric)
+      : applyNorm(raw, benchmark, allRaw, metric);
+    const se = wantSE
+      ? scaleStderr(getCombinedSE(state.DATA.models, m, benchmark, state.currentShot, metric), benchmark, metric, allRaw)
+      : 0;
+    return { score, stderr: se };
+  });
+
+  const yRange = computeSingleYRange(benchmark, metric);
+  plotScatter(xs, ys, dirs, colors, stderrs, yRange, extras);
+}
+
+function renderGroupedScatter(groupName) {
+  const group = state.DATA.task_groups[groupName];
+  if (!group) return;
+  const metric = getEffectiveMetric(group.benchmarks[0]);
+  const modelNames = getModelList();
+  const useNorm = state.currentNormalization !== "none";
+  const needAllRaw = ["minmax", "zscore", "percentile"].includes(state.currentNormalization);
+  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
+
+  // One trace per sub-benchmark, distinguished by colored dots only (no
+  // logos in grouped scatter — overlapping logos at the same x would be
+  // unreadable). The HTML chart legend tells the viewer which is which.
+  const allLogoDirs = [];
+  const allLogoXs = [];
+  const allLogoYs = [];
+  const traces = group.benchmarks.map((bench, gi) => {
+    const allRaw = needAllRaw
+      ? modelNames.map((mm) => getScore(state.DATA.models, mm, bench, state.currentShot, metric)).filter((v) => v !== undefined)
+      : null;
+    const xs = [], ys = [], dirs = [], colors = [], stderrs = [];
+    for (const m of modelNames) {
+      const size = state.DATA.model_parameters?.[m];
+      if (!size) continue;
+      const raw = getScore(state.DATA.models, m, bench, state.currentShot, metric);
+      if (raw == null) continue;
+      const score = useNorm ? applyNorm(raw, bench, allRaw, metric) : toDisplayScale(raw, bench, metric);
+      const se = wantSE
+        ? scaleStderr(getCombinedSE(state.DATA.models, m, bench, state.currentShot, metric), bench, metric, allRaw)
+        : 0;
+      xs.push(size); ys.push(score); dirs.push(m); stderrs.push(se);
+      const base = getModelColor(m);
+      colors.push(gi === 0 ? base : darkenColor(base, 0.3));
+    }
+    // Only the first sub-benchmark contributes logo positions, placed at
+    // the midpoint of the two sub-scores — keeps the org-mark associated
+    // with the model rather than duplicated above each sub-point.
+    if (gi === 0) {
+      const partnerBench = group.benchmarks[1] || bench;
+      const partnerAllRaw = needAllRaw
+        ? modelNames.map((mm) => getScore(state.DATA.models, mm, partnerBench, state.currentShot, metric)).filter((v) => v !== undefined)
+        : null;
+      dirs.forEach((m, i) => {
+        const rawP = getScore(state.DATA.models, m, partnerBench, state.currentShot, metric);
+        const partnerScore = rawP == null ? ys[i]
+          : (useNorm ? applyNorm(rawP, partnerBench, partnerAllRaw, metric) : toDisplayScale(rawP, partnerBench, metric));
+        allLogoDirs.push(m);
+        allLogoXs.push(xs[i]);
+        allLogoYs.push((ys[i] + partnerScore) / 2);
+      });
+    }
+    const trace = {
+      x: xs, y: ys, type: "scatter", mode: "markers",
+      name: group.labels[gi], showlegend: true,
+      marker: { size: 24, color: colors, line: { width: 1.4, color: "rgba(255,255,255,0.95)" } },
+      customdata: dirs.map((m, i) => ({ modelDir: m, stderr: stderrs[i] })),
+      hoverinfo: "none",
+    };
+    return trace;
+  });
+
+  let yRange;
+  if (useNorm) {
+    const vals = [];
+    for (const shot of ALL_SHOTS) {
+      for (const bench of group.benchmarks) {
+        const raws = modelNames.map((m) => getScore(state.DATA.models, m, bench, shot, metric)).filter((v) => v !== undefined);
+        for (const raw of raws) vals.push(applyNorm(raw, bench, needAllRaw ? raws : null, metric));
+      }
+    }
+    yRange = computeYRange(vals);
+  } else {
+    yRange = [0, computeRawYMax_display(group.benchmarks, metric)];
+  }
+
+  const paperYs = allLogoYs.map((y) => paperFraction(y, yRange));
+  const layout = getPlotlyLayout({
+    yaxis: {
+      title: "", range: yRange,
+      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
+      zeroline: state.currentNormalization === "zscore",
+    },
+    xaxis: scatterXAxis(),
+    showlegend: false,
+    margin: { l: 105, r: 4, t: 8, b: 60 },
+    images: buildScatterOrgImages(allLogoDirs, allLogoXs, paperYs),
+  });
+
+  const repColor = MODEL_COLORS[0];
+  updateChartLegend(group.benchmarks.map((_, i) => ({
+    name: group.labels[i],
+    color: i === 0 ? repColor : darkenColor(repColor, 0.3),
+  })));
+
+  plotChart(traces, layout, plotlyConfig, onChartHover, hideTooltip);
+}
+
+/** Build a single-trace scatter chart: one marker per model, org logos
+ *  overlaid via layout.images. Used by aggregate and single-benchmark
+ *  scatter modes. */
+function plotScatter(xs, ys, dirs, colors, stderrs, yRange, extras) {
+  const paperYs = ys.map((y) => paperFraction(y, yRange));
+  const customdata = dirs.map((m, i) => Object.assign(
+    { modelDir: m, stderr: stderrs[i] },
+    (extras && extras[i]) || {}));
+  // Invisible scatter markers handle hover; the visible glyphs (colored
+  // disk + white logo) live in layout.images, interleaved per model so
+  // overlapping points stack as units instead of all-disks-then-all-logos.
+  const trace = {
+    x: xs, y: ys, type: "scatter", mode: "markers",
+    marker: { size: 32, color: "rgba(0,0,0,0)", line: { width: 0 } },
+    customdata,
+    hoverinfo: "none",
+  };
+
+  const layout = getPlotlyLayout({
+    yaxis: {
+      title: "", range: yRange,
+      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
+      zeroline: state.currentNormalization === "zscore",
+    },
+    xaxis: scatterXAxis(),
+    showlegend: false,
+    margin: { l: 105, r: 4, t: 8, b: 60 },
+    images: buildScatterCompositeImages(dirs, xs, paperYs, colors),
+  });
+
   plotChart([trace], layout, plotlyConfig, onChartHover, hideTooltip);
 }
 
