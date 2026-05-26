@@ -164,33 +164,224 @@ def find_latest_results_json(directory):
     return files[-1]
 
 
-def estimate_stderr(value, n_samples, metric_scale):
-    """Fall back to a binomial SE when the file omits stderr (or has 'N/A')."""
+# Wilson score interval (z=1.96 ⇒ 95%). We store half-width / Z as a
+# 1σ-equivalent SE so the existing quadrature combination (sampling ⊕ prompt)
+# and cross-benchmark propagation in the frontend stay unchanged; the
+# frontend multiplies by Z once at display time to produce the CI half-width.
+WILSON_Z = 1.959963984540054
+WILSON_Z2 = WILSON_Z * WILSON_Z
+
+# Metric names treated as Bernoulli proportions for Wilson CI purposes.
+# Wilson is computed from (p, n) directly, overriding any harness-supplied
+# bootstrap SE (which is essentially Wald and breaks down near p=0 / p=1).
+PROPORTION_METRIC_NAMES = {"acc", "acc_norm", "em_first", "em"}
+
+
+def wilson_se(value, n_samples, metric_scale):
+    """Wilson 95% CI half-width / Z, as a 1σ-equivalent SE for a [0,1] proportion.
+
+    Defined and finite at p=0 and p=1 (Wald collapses there). Returns None
+    when n is unknown or ≤ 1. The output is in the same display scale as
+    `value` (i.e. percent stays percent)."""
     if not (n_samples and n_samples > 1):
         return None
     if metric_scale == "percent":
         p = max(0.0, min(1.0, value / 100.0))
-        if 0 < p < 1:
-            return math.sqrt(p * (1 - p) / n_samples) * 100
+        scale = 100.0
     else:
         p = max(0.0, min(1.0, value))
-        if 0 < p < 1:
-            return math.sqrt(p * (1 - p) / n_samples)
-    return None
+        scale = 1.0
+    half_over_z = (
+        math.sqrt(p * (1 - p) / n_samples + WILSON_Z2 / (4 * n_samples * n_samples))
+        / (1 + WILSON_Z2 / n_samples)
+    )
+    return half_over_z * scale
 
 
-def aggregate_prompt_variants(metric_values):
-    """Reduce per-prompt (value, stderr) pairs to {metric_name: prompt-agg dict}.
+def resolve_se(metric_name, value, harness_se, n_samples, metric_scale):
+    """Choose an SE for a (metric, value, n) triple.
 
-    The output dict has max/mean/median/min/first along with paired *_stderr
-    fields, max_prompt_idx, n_prompts, prompt_sd, prompt_mad.
+    Proportion-like metrics → Wilson, regardless of what the harness supplied.
+    Other metrics → trust the harness bootstrap SE when present.
+    Otherwise → Wilson approximation as a fallback (sloppy for non-proportions
+    like F1 / ERRANT-F0.5, but the only thing we can produce without per-item
+    data; see the dashboard 'About' section)."""
+    base = metric_name.split(": ", 1)[0]  # strip subtask suffix if any
+    if base in PROPORTION_METRIC_NAMES:
+        wse = wilson_se(value, n_samples, metric_scale)
+        if wse is not None:
+            return wse
+    if isinstance(harness_se, (int, float)) and math.isfinite(harness_se):
+        return harness_se
+    return wilson_se(value, n_samples, metric_scale)
+
+
+# ─────────────────────────────────────────────────────────────
+# Confidence intervals for prompt aggregations
+# ─────────────────────────────────────────────────────────────
+#
+# Estimand: θ_k = aggregation_{i ≤ k} μ(p_i) — the chosen statistic over the
+# true performances of the k specific prompts we evaluated. We do NOT try to
+# extrapolate to a population of "all reasonable prompts" (untestable from
+# k = 5 without parametric assumptions).
+#
+# For `max` we use Bonferroni-corrected one-sided bounds:
+#     L = max_i ℓ_i(α/(2k)),    U = max_i u_i(α/2)
+# Per-prompt bounds ℓ_i, u_i use Clopper–Pearson exact binomial for proportion-
+# like metrics and the normal approximation with the harness/Wilson SE
+# otherwise. By union bound, P(L > θ_k) ≤ α/2, and the i*-argument gives
+# P(U < θ_k) ≤ α/2 with no correction on the upper side. CIs are intentionally
+# asymmetric — wider below the point estimate than above.
+#
+# For `min` the structure is mirrored (Bonferroni on upper, plain on lower).
+# For `mean` we use the standard Welch combination of sampling and between-
+# prompt variance — that's the right CI for the mean estimand. For `median`
+# / `first` we use the sampling CI of the selected prompt directly; there is
+# no Bonferroni correction because no selection from k is happening.
+#
+# The independence-across-prompts assumption is conservative: prompts share
+# items, so per-prompt estimates are positively correlated, which would make
+# the true joint distribution tighter than the Bonferroni bound assumes.
+
+from scipy.stats import beta as _beta_dist, norm as _norm_dist
+
+ALPHA = 0.05  # 95% CI
+Z_LO_BONF_K = {}    # cache: k -> z_{1 - α/(2k)}
+Z_HI = _norm_dist.ppf(1 - ALPHA / 2)
+
+
+def _z_lo_bonferroni(k):
+    if k not in Z_LO_BONF_K:
+        Z_LO_BONF_K[k] = _norm_dist.ppf(1 - ALPHA / (2 * k))
+    return Z_LO_BONF_K[k]
+
+
+def _clopper_pearson(c, n, alpha_lo, alpha_hi):
+    """Exact binomial CI for a Bernoulli proportion. c successes out of n."""
+    lo = 0.0 if c == 0 else float(_beta_dist.ppf(alpha_lo, c, n - c + 1))
+    hi = 1.0 if c == n else float(_beta_dist.ppf(1 - alpha_hi, c + 1, n - c))
+    return lo, hi
+
+
+def _per_prompt_ci(value, se, n, scale, is_proportion, alpha_lo, alpha_hi):
+    """Per-prompt (lo, hi) for one prompt's μ̂.
+
+    Uses Clopper–Pearson when (proportion-like + n known), otherwise normal
+    approximation with whatever sampling SE we have. Returns values on the
+    original display scale (so percent stays percent)."""
+    if is_proportion and n and n >= 1:
+        ceil_ = 100.0 if scale == "percent" else 1.0
+        p = max(0.0, min(1.0, value / ceil_))
+        c = round(p * n)
+        lo_unit, hi_unit = _clopper_pearson(c, n, alpha_lo, alpha_hi)
+        return lo_unit * ceil_, hi_unit * ceil_
+    z_lo = _norm_dist.ppf(1 - alpha_lo)
+    z_hi = _norm_dist.ppf(1 - alpha_hi)
+    se_use = se if (isinstance(se, (int, float)) and math.isfinite(se)) else 0.0
+    return value - z_lo * se_use, value + z_hi * se_use
+
+
+def bonferroni_max_ci(triples, scale, is_proportion):
+    """95% CI for max_{i≤k} μ_i via Bonferroni on the lower bound only.
+
+    triples: list of (value, se, n). Returns (lo, hi)."""
+    k = len(triples)
+    if k == 0:
+        return None, None
+    alpha_lo = ALPHA / (2 * k)  # union bound across k prompts
+    alpha_hi = ALPHA / 2         # no correction needed on upper
+    los, his = [], []
+    for v, se, n in triples:
+        lo, hi = _per_prompt_ci(v, se, n, scale, is_proportion, alpha_lo, alpha_hi)
+        los.append(lo); his.append(hi)
+    return max(los), max(his)
+
+
+def bonferroni_min_ci(triples, scale, is_proportion):
+    """95% CI for min_{i≤k} μ_i — mirror of max."""
+    k = len(triples)
+    if k == 0:
+        return None, None
+    alpha_lo = ALPHA / 2
+    alpha_hi = ALPHA / (2 * k)
+    los, his = [], []
+    for v, se, n in triples:
+        lo, hi = _per_prompt_ci(v, se, n, scale, is_proportion, alpha_lo, alpha_hi)
+        los.append(lo); his.append(hi)
+    return min(los), min(his)
+
+
+def sampling_ci(value, se, n, scale, is_proportion):
+    """Plain 95% CI for one prompt's μ̂ (median / first / single-prompt cases).
+
+    No Bonferroni — we're not selecting from k."""
+    return _per_prompt_ci(value, se, n, scale, is_proportion, ALPHA / 2, ALPHA / 2)
+
+
+def welch_mean_ci(triples, scale, is_proportion):
+    """95% CI for the mean over the k prompts, via the Welch–Satterthwaite
+    combination of sampling SE and between-prompt SE. Symmetric — this is the
+    only aggregation where the prompt-template SE is conceptually right."""
+    k = len(triples)
+    if k == 0:
+        return None, None
+    values = [v for v, _, _ in triples]
+    ses = [se if isinstance(se, (int, float)) else 0.0 for _, se, _ in triples]
+    mean_v = sum(values) / k
+    # SE of the mean from per-prompt sampling
+    se_sampling_sq = sum(s * s for s in ses) / (k * k)
+    if k >= 2:
+        sd_prompts = math.sqrt(sum((v - mean_v) ** 2 for v in values) / (k - 1))
+        se_prompt = sd_prompts / math.sqrt(k)
+    else:
+        se_prompt = 0.0
+    Vs = se_sampling_sq
+    Vp = se_prompt * se_prompt
+    df_p = max(k - 1, 1)
+    denom = (Vp * Vp / df_p) if Vp > 0 else 0.0
+    df_eff = (Vs + Vp) ** 2 / denom if denom > 0 else float("inf")
+    # Hill 1970 4-term inverse-t for 0.975 quantile
+    if df_eff >= 30:
+        t = Z_HI
+    else:
+        d = max(df_eff, 2.0)
+        z = Z_HI
+        z3, z5, z7, z9 = z ** 3, z ** 5, z ** 7, z ** 9
+        g1 = (z3 + z) / 4
+        g2 = (5 * z5 + 16 * z3 + 3 * z) / 96
+        g3 = (3 * z7 + 19 * z5 + 17 * z3 - 15 * z) / 384
+        g4 = (79 * z9 + 776 * z7 + 1482 * z5 - 1920 * z3 - 945 * z) / 92160
+        t = z + g1 / d + g2 / d ** 2 + g3 / d ** 3 + g4 / d ** 4
+    half = t * math.sqrt(Vs + Vp)
+    return mean_v - half, mean_v + half
+
+
+def aggregate_prompt_variants(metric_values, metric_scale="unit"):
+    """Reduce per-prompt (value, stderr, n) triples to a prompt-aggregation dict.
+
+    Returns {metric_name: entry} where each entry has:
+      max / mean / median / min / first        ← point estimates
+      <agg>_ci_lo / <agg>_ci_hi                ← 95% asymmetric CIs
+      max_prompt_idx, n_prompts, prompt_sd, prompt_mad
+    Per-prompt raw data is preserved under `prompts: [(v, se, n), …]` so the
+    frontend can recompute CIs at different α if needed.
     """
     if not metric_values:
         return None
     out = {}
-    for metric_name, pairs in metric_values.items():
-        values = [v for v, _ in pairs]
-        stderrs = [se for _, se in pairs]
+    for metric_name, triples in metric_values.items():
+        # Normalize triples: accept legacy (v, se) too, default n = None.
+        norm = []
+        for t in triples:
+            if len(t) == 3:
+                norm.append((t[0], t[1], t[2]))
+            else:
+                norm.append((t[0], t[1], None))
+        triples = norm
+
+        base = metric_name.split(": ", 1)[0]
+        is_proportion = base in PROPORTION_METRIC_NAMES
+        values = [v for v, _, _ in triples]
 
         entry = {
             "max": round(max(values), 6),
@@ -201,22 +392,24 @@ def aggregate_prompt_variants(metric_values):
         }
         max_idx = values.index(max(values))
         entry["max_prompt_idx"] = max_idx
-        if stderrs[max_idx] is not None:
-            entry["max_stderr"] = round(stderrs[max_idx], 6)
-        min_idx = values.index(min(values))
-        if stderrs[min_idx] is not None:
-            entry["min_stderr"] = round(stderrs[min_idx], 6)
-        if stderrs[0] is not None:
-            entry["first_stderr"] = round(stderrs[0], 6)
-        if all(se is not None for se in stderrs):
-            n = len(stderrs)
-            entry["mean_stderr"] = round(
-                math.sqrt(sum(se ** 2 for se in stderrs)) / n, 6
-            )
+
+        # Confidence intervals — see helpers above for the methodology.
+        lo, hi = bonferroni_max_ci(triples, metric_scale, is_proportion)
+        entry["max_ci_lo"], entry["max_ci_hi"] = round(lo, 6), round(hi, 6)
+        lo, hi = bonferroni_min_ci(triples, metric_scale, is_proportion)
+        entry["min_ci_lo"], entry["min_ci_hi"] = round(lo, 6), round(hi, 6)
+        lo, hi = welch_mean_ci(triples, metric_scale, is_proportion)
+        entry["mean_ci_lo"], entry["mean_ci_hi"] = round(lo, 6), round(hi, 6)
+
+        # Median / first: sampling CI of the selected prompt, no Bonferroni.
         med = statistics.median(values)
         closest_idx = min(range(len(values)), key=lambda i: abs(values[i] - med))
-        if stderrs[closest_idx] is not None:
-            entry["median_stderr"] = round(stderrs[closest_idx], 6)
+        v_m, se_m, n_m = triples[closest_idx]
+        lo, hi = sampling_ci(v_m, se_m, n_m, metric_scale, is_proportion)
+        entry["median_ci_lo"], entry["median_ci_hi"] = round(lo, 6), round(hi, 6)
+        v_f, se_f, n_f = triples[0]
+        lo, hi = sampling_ci(v_f, se_f, n_f, metric_scale, is_proportion)
+        entry["first_ci_lo"], entry["first_ci_hi"] = round(lo, 6), round(hi, 6)
 
         entry["n_prompts"] = len(values)
         if len(values) >= 2:
@@ -276,10 +469,9 @@ def noreval_extract(results_json_path, benchmark_name, subtasks, metrics_setup_e
                 if metric_name in bench_exclusions:
                     continue
                 if isinstance(val, (int, float)):
-                    se = task_results.get(f"{metric_name}_stderr,none")
-                    if not isinstance(se, (int, float)):
-                        se = estimate_stderr(val, n_samples, metric_scale)
-                    metric_values.setdefault(metric_name, []).append((val, se))
+                    harness_se = task_results.get(f"{metric_name}_stderr,none")
+                    se = resolve_se(metric_name, val, harness_se, n_samples, metric_scale)
+                    metric_values.setdefault(metric_name, []).append((val, se, n_samples))
 
     if subtasks:
         for subtask_code, subtask_info in subtasks.items():
@@ -297,13 +489,12 @@ def noreval_extract(results_json_path, benchmark_name, subtasks, metrics_setup_e
                 if base_metric in bench_exclusions:
                     continue
                 if isinstance(val, (int, float)):
-                    se = task_results.get(f"{base_metric}_stderr,none")
-                    if not isinstance(se, (int, float)):
-                        se = estimate_stderr(val, n_samples, metric_scale)
+                    harness_se = task_results.get(f"{base_metric}_stderr,none")
+                    se = resolve_se(base_metric, val, harness_se, n_samples, metric_scale)
                     virtual_name = f"{base_metric}: {pretty_name}"
-                    metric_values.setdefault(virtual_name, []).append((val, se))
+                    metric_values.setdefault(virtual_name, []).append((val, se, n_samples))
 
-    return aggregate_prompt_variants(metric_values)
+    return aggregate_prompt_variants(metric_values, metric_scale)
 
 
 def noreval_process_model_dir(model_path, metrics_setup):
@@ -572,10 +763,11 @@ def multisynt_extract(results_json_path, benchmark_name, task_config_entry):
             if metric_name in bench_exclusions:
                 continue
             if isinstance(val, (int, float)) and math.isfinite(val):
-                se = task_results.get(f"{metric_name}_stderr,{metric_suffix}")
-                if not (isinstance(se, (int, float)) and math.isfinite(se)):
-                    se = estimate_stderr(val, n_samples, metric_scale)
-                metrics[metric_name] = (val, se)
+                harness_se = task_results.get(f"{metric_name}_stderr,{metric_suffix}")
+                if not (isinstance(harness_se, (int, float)) and math.isfinite(harness_se)):
+                    harness_se = None
+                se = resolve_se(metric_name, val, harness_se, n_samples, metric_scale)
+                metrics[metric_name] = (val, se, n_samples)
 
     # Group-level results (global_mmlu_*)
     for group_key in data.get("groups", {}):
@@ -591,10 +783,11 @@ def multisynt_extract(results_json_path, benchmark_name, task_config_entry):
             if metric_name in bench_exclusions:
                 continue
             if isinstance(val, (int, float)) and math.isfinite(val):
-                se = gr_results.get(f"{metric_name}_stderr,{metric_suffix}")
-                if not (isinstance(se, (int, float)) and math.isfinite(se)):
-                    se = estimate_stderr(val, n_samples, metric_scale)
-                metrics[metric_name] = (val, se)
+                harness_se = gr_results.get(f"{metric_name}_stderr,{metric_suffix}")
+                if not (isinstance(harness_se, (int, float)) and math.isfinite(harness_se)):
+                    harness_se = None
+                se = resolve_se(metric_name, val, harness_se, n_samples, metric_scale)
+                metrics[metric_name] = (val, se, n_samples)
 
     return metrics if metrics else None
 
@@ -640,8 +833,8 @@ def multisynt_process_multiblimp(bench_path):
     if total_n == 0:
         return None
     micro_acc = total_correct / total_n
-    se = math.sqrt(micro_acc * (1 - micro_acc) / total_n) if 0 < micro_acc < 1 else 0.0
-    return {"acc": (micro_acc, se)}
+    se = wilson_se(micro_acc, total_n, "unit") or 0.0
+    return {"acc": (micro_acc, se, total_n)}
 
 
 def multisynt_process_checkpoint(ckpt_path, task_configs, shot):
@@ -682,14 +875,14 @@ def multisynt_process_checkpoint(ckpt_path, task_configs, shot):
         if not partition_results:
             continue
 
-        # Reduce list-of-{metric: (val, se)} to {metric: prompt-agg dict}
+        # Reduce list-of-{metric: (val, se, n)} to {metric: prompt-agg dict}
         metric_values = {}
         for pmetrics in partition_results:
             if pmetrics is None:
                 continue
-            for metric_name, (val, se) in pmetrics.items():
-                metric_values.setdefault(metric_name, []).append((val, se))
-        agg = aggregate_prompt_variants(metric_values)
+            for metric_name, tup in pmetrics.items():
+                metric_values.setdefault(metric_name, []).append(tup)
+        agg = aggregate_prompt_variants(metric_values, config.get("metric_scale", "unit"))
         if agg is not None:
             scores[benchmark] = {shot: agg}
     return scores

@@ -10,7 +10,7 @@
 import { state } from "./state.js";
 import {
   MODEL_COLORS, METRIC_DISPLAY, METRIC_DESCRIPTIONS,
-  getScore, getCombinedSE, scaleStderr, applyNorm, toDisplayScale,
+  getScore, getCombinedCI, scaleCIDistances, applyNorm, toDisplayScale,
   getBaseMetric, getNormYLabel, getMetricYLabel,
   aggregateScores, isAggregateSelection, isMacroSelection,
   getEffectiveMetric, isStderrCompatible, formatTitleWithShot,
@@ -981,16 +981,12 @@ function onChartHover(data) {
   const sel = state.currentTaskSelection;
   const cd = pt.customdata;
 
-  let seStr = "";
-  if (state.showStderr && cd != null) {
-    if (isAggregateSelection(sel)) {
-      if (cd && typeof cd === "object" && cd.stderr != null) {
-        seStr = " ± " + Number(cd.stderr).toFixed(fmt);
-      }
-    } else if (typeof cd === "number" && cd > 0) {
-      seStr = " ± " + Number(cd).toFixed(fmt);
-    } else if (cd && typeof cd === "object" && cd.stderr != null && cd.stderr > 0) {
-      seStr = " ± " + Number(cd.stderr).toFixed(fmt);
+  let ciStr = "";
+  if (state.showStderr && cd != null && typeof cd === "object" && cd.ci) {
+    const v = Number(pt.y);
+    const lo = v - (cd.ci.loDist ?? 0), hi = v + (cd.ci.hiDist ?? 0);
+    if ((cd.ci.loDist ?? 0) > 0 || (cd.ci.hiDist ?? 0) > 0) {
+      ciStr = ` (95% CI: ${Number(lo).toFixed(fmt)} – ${Number(hi).toFixed(fmt)})`;
     }
   }
 
@@ -998,11 +994,11 @@ function onChartHover(data) {
   if (isAggregateSelection(sel)) {
     const unit = isMacroSelection() ? "categories" : "tasks";
     const countStr = cd && typeof cd === "object" ? cd.count : cd;
-    scoreBody = "Average: " + scoreStr + seStr + (countStr != null ? " (" + countStr + " " + unit + ")" : "");
+    scoreBody = "Average: " + scoreStr + ciStr + (countStr != null ? " (" + countStr + " " + unit + ")" : "");
   } else if (sel.startsWith("__group__") && pt.data.name) {
-    scoreBody = pt.data.name + ": " + scoreStr + seStr;
+    scoreBody = pt.data.name + ": " + scoreStr + ciStr;
   } else {
-    scoreBody = "Score: " + scoreStr + seStr;
+    scoreBody = "Score: " + scoreStr + ciStr;
   }
 
   let title = String(pt.x);
@@ -1079,7 +1075,7 @@ function paperFraction(y, yRange) {
  *  scoreFn may return any extra fields (e.g. count for aggregate hover);
  *  they're collected into a parallel `extras` array. */
 function collectScatterPoints(modelNames, scoreFn) {
-  const xs = [], ys = [], dirs = [], colors = [], stderrs = [], extras = [];
+  const xs = [], ys = [], dirs = [], colors = [], cis = [], extras = [];
   for (const m of modelNames) {
     const size = state.DATA.model_parameters?.[m];
     if (!size) continue;            // can't place models without a known size
@@ -1087,13 +1083,13 @@ function collectScatterPoints(modelNames, scoreFn) {
     if (res == null || res.score == null) continue;
     xs.push(size);
     ys.push(res.score);
-    stderrs.push(res.stderr || 0);
+    cis.push(res.ci || null);
     dirs.push(m);
     colors.push(getModelColor(m));
-    const { score, stderr, ...rest } = res;
+    const { score, ci, ...rest } = res;
     extras.push(rest);
   }
-  return { xs, ys, dirs, colors, stderrs, extras };
+  return { xs, ys, dirs, colors, cis, extras };
 }
 
 function scatterXAxis() {
@@ -1113,7 +1109,7 @@ function renderAggregateBarChart() {
   const modelNames = getModelList();
   const labels = modelNames.map(getModelLabel);
   const colors = modelNames.map(getModelColor);
-  const scores = [], taskCounts = [], aggStderrs = [];
+  const scores = [], taskCounts = [], aggCIs = [];
 
   const needAllRaw = ["minmax", "zscore", "percentile"].includes(state.currentNormalization);
   const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
@@ -1127,12 +1123,12 @@ function renderAggregateBarChart() {
         ? modelNames.map((mm) => getScore(state.DATA.models, mm, bench, state.currentShot)).filter((v) => v !== undefined)
         : null;
       const score = applyNorm(raw, bench, allRaw);
-      const se = wantSE ? scaleStderr(getCombinedSE(state.DATA.models, m, bench, state.currentShot), bench, undefined, allRaw) : undefined;
-      return { score, stderr: se };
+      const ci = wantSE ? scaleCIDistances(getCombinedCI(state.DATA.models, m, bench, state.currentShot), bench, undefined, allRaw) : undefined;
+      return { score, ci };
     }, macro);
     scores.push(result ? result.score : 0);
     taskCounts.push(result ? result.count : 0);
-    aggStderrs.push(result ? result.stderr : 0);
+    aggCIs.push(result ? result.ci : null);
   }
 
   const xPositions = computeOrgXPositions(modelNames);
@@ -1144,12 +1140,15 @@ function renderAggregateBarChart() {
     x: xPositions, y: scores, type: "bar",
     width: 0.85,
     marker: { color: colors, line: { width: 0 }, cornerradius: 6 },
-    customdata: taskCounts.map((c, i) => ({ count: c, stderr: aggStderrs[i], modelDir: modelNames[i] })),
+    customdata: taskCounts.map((c, i) => ({ count: c, ci: aggCIs[i], modelDir: modelNames[i] })),
     hoverinfo: "none",
   };
   if (wantSE) {
     trace.error_y = {
-      type: "data", array: aggStderrs, visible: true,
+      type: "data", symmetric: false,
+      array: aggCIs.map((c) => c?.hiDist ?? 0),
+      arrayminus: aggCIs.map((c) => c?.loDist ?? 0),
+      visible: true,
       color: "rgba(0,0,0,0.5)", thickness: 2.4, width: 5,
     };
   }
@@ -1171,7 +1170,7 @@ function renderAggregateBarChart() {
     showlegend: false,
     margin: { l: 105, r: 4, t: 8, b: 100 },
     annotations: labels.map((label, i) => ({
-      x: xPositions[i], y: scores[i] + (wantSE ? (aggStderrs[i] || 0) : 0),
+      x: xPositions[i], y: scores[i] + (wantSE ? (aggCIs[i]?.hiDist ?? 0) : 0),
       text: scores[i].toFixed(fmt), showarrow: false, yshift: 10,
       xanchor: "center",
       font: { size: computeAnnotationFontSize(labels.length), color: "#000", weight: 500 },
@@ -1179,7 +1178,7 @@ function renderAggregateBarChart() {
     images: buildOrgImages(modelNames, xPositions),
   });
   layout._annAnim = labels.map((_, i) => ({
-    score: scores[i], se: wantSE ? (aggStderrs[i] || 0) : 0,
+    score: scores[i], se: wantSE ? (aggCIs[i]?.hiDist ?? 0) : 0,
   }));
   plotChart([trace], layout, plotlyConfig, onChartHover, hideTooltip);
 }
@@ -1214,30 +1213,33 @@ function renderGroupedBarChart(groupName) {
       if (raw == null) return null;
       return useNorm ? applyNorm(raw, bench, allRaw, metric) : toDisplayScale(raw, bench, metric);
     });
-    const seValues = wantSE ? modelNames.map((m) => {
-      const se = getCombinedSE(state.DATA.models, m, bench, state.currentShot, metric);
-      return scaleStderr(se, bench, metric, allRaw);
+    const ciValues = wantSE ? modelNames.map((m) => {
+      const ci = getCombinedCI(state.DATA.models, m, bench, state.currentShot, metric);
+      return scaleCIDistances(ci, bench, metric, allRaw);
     }) : null;
     const barColors = modelNames.map((m) => {
       const base = getModelColor(m);
       return i === 0 ? base : darkenColor(base, 0.3);
     });
-    const seArr = seValues ? seValues.map((v) => v || 0) : null;
+    const hiArr = ciValues ? ciValues.map((c) => c?.hiDist ?? 0) : null;
+    const loArr = ciValues ? ciValues.map((c) => c?.loDist ?? 0) : null;
     // Bar offset (relative to x): place sub-bars side-by-side, centered on x.
     const offset = -totalGroupWidth / 2 + i * barWidth;
     const trace = {
       x: xPositions, y: values, name: group.labels[i], type: "bar",
       width: barWidth, offset,
       marker: { color: barColors, line: { width: 0 }, cornerradius: 6 },
-      customdata: modelNames.map((m, j) => ({ stderr: seValues ? seValues[j] : null, modelDir: m })),
+      customdata: modelNames.map((m, j) => ({ ci: ciValues ? ciValues[j] : null, modelDir: m })),
       hoverinfo: "none", showlegend: true,
     };
-    if (wantSE && seArr) {
-      trace.error_y = { type: "data", array: seArr, visible: true,
+    if (wantSE && hiArr) {
+      trace.error_y = { type: "data", symmetric: false,
+        array: hiArr, arrayminus: loArr,
+        visible: true,
         color: "rgba(0,0,0,0.5)", thickness: 2.4, width: 5 };
     }
     groupValuesArr.push(values);
-    groupSeArrs.push(seArr);
+    groupSeArrs.push(hiArr);  // used only for annotation y-offset (top of error bar)
     return trace;
   });
 
@@ -1322,15 +1324,16 @@ function renderSingleBenchmarkBarChart(benchmark) {
   });
 
   const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
-  const seValues = wantSE ? modelNames.map((m) => {
-    const se = getCombinedSE(state.DATA.models, m, benchmark, state.currentShot, metric);
-    return scaleStderr(se, benchmark, metric, allRaw);
+  const ciValues = wantSE ? modelNames.map((m) => {
+    const ci = getCombinedCI(state.DATA.models, m, benchmark, state.currentShot, metric);
+    return scaleCIDistances(ci, benchmark, metric, allRaw);
   }) : null;
 
   const yRange = computeSingleYRange(benchmark, metric);
   const yLabel = state.currentNormalization === "none" ? getMetricYLabel(benchmark, metric) : getNormYLabel();
   const fmt = state.currentNormalization === "zscore" ? 2 : 1;
-  const seArr = seValues ? seValues.map((v) => v || 0) : null;
+  const hiArr = ciValues ? ciValues.map((c) => c?.hiDist ?? 0) : null;
+  const loArr = ciValues ? ciValues.map((c) => c?.loDist ?? 0) : null;
   const xPositions = computeOrgXPositions(modelNames);
   const xRange = xPositions.length
     ? [xPositions[0] - 0.6, xPositions[xPositions.length - 1] + 0.5]
@@ -1339,11 +1342,13 @@ function renderSingleBenchmarkBarChart(benchmark) {
     x: xPositions, y: values, type: "bar",
     width: 0.85,
     marker: { color: colors, line: { width: 0 }, cornerradius: 6 },
-    customdata: modelNames.map((m, i) => ({ stderr: seValues ? seValues[i] : null, modelDir: m })),
+    customdata: modelNames.map((m, i) => ({ ci: ciValues ? ciValues[i] : null, modelDir: m })),
     hoverinfo: "none",
   };
-  if (wantSE && seArr) {
-    trace.error_y = { type: "data", array: seArr, visible: true,
+  if (wantSE && hiArr) {
+    trace.error_y = { type: "data", symmetric: false,
+      array: hiArr, arrayminus: loArr,
+      visible: true,
       color: "rgba(0,0,0,0.5)", thickness: 2.4, width: 5 };
   }
   const layout = getPlotlyLayout({
@@ -1360,7 +1365,7 @@ function renderSingleBenchmarkBarChart(benchmark) {
     showlegend: false,
     margin: { l: 105, r: 4, t: 8, b: 100 },
     annotations: labels.map((label, i) => ({
-      x: xPositions[i], y: (values[i] || 0) + (wantSE && seArr ? (seArr[i] || 0) : 0),
+      x: xPositions[i], y: (values[i] || 0) + (wantSE && hiArr ? (hiArr[i] || 0) : 0),
       text: values[i] != null ? values[i].toFixed(fmt) : "",
       showarrow: false, yshift: 10,
       xanchor: "center",
@@ -1369,7 +1374,7 @@ function renderSingleBenchmarkBarChart(benchmark) {
     images: buildOrgImages(modelNames, xPositions),
   });
   layout._annAnim = labels.map((_, i) => ({
-    score: values[i] || 0, se: wantSE && seArr ? (seArr[i] || 0) : 0,
+    score: values[i] || 0, se: wantSE && hiArr ? (hiArr[i] || 0) : 0,
   }));
   plotChart([trace], layout, plotlyConfig, onChartHover, hideTooltip);
 }
@@ -1387,7 +1392,7 @@ function renderAggregateScatter() {
   const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
   const macro = isMacroSelection();
 
-  const { xs, ys, dirs, colors, stderrs, extras } = collectScatterPoints(modelNames, (m) => {
+  const { xs, ys, dirs, colors, cis, extras } = collectScatterPoints(modelNames, (m) => {
     const res = aggregateScores(state.checkedTasks, (bench) => {
       const raw = getScore(state.DATA.models, m, bench, state.currentShot);
       if (raw === undefined) return undefined;
@@ -1395,15 +1400,15 @@ function renderAggregateScatter() {
         ? modelNames.map((mm) => getScore(state.DATA.models, mm, bench, state.currentShot)).filter((v) => v !== undefined)
         : null;
       const score = applyNorm(raw, bench, allRaw);
-      const se = wantSE ? scaleStderr(getCombinedSE(state.DATA.models, m, bench, state.currentShot), bench, undefined, allRaw) : undefined;
-      return { score, stderr: se };
+      const ci = wantSE ? scaleCIDistances(getCombinedCI(state.DATA.models, m, bench, state.currentShot), bench, undefined, allRaw) : undefined;
+      return { score, ci };
     }, macro);
     if (!res) return null;
-    return { score: res.score, stderr: res.stderr, count: res.count };
+    return { score: res.score, ci: res.ci, count: res.count };
   });
 
   const yRange = computeAggregateYRange(state.checkedTasks);
-  plotScatter(xs, ys, dirs, colors, stderrs, yRange, extras);
+  plotScatter(xs, ys, dirs, colors, cis, yRange, extras);
 }
 
 function renderSingleBenchmarkScatter(benchmark) {
@@ -1417,20 +1422,20 @@ function renderSingleBenchmarkScatter(benchmark) {
     : null;
   const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
 
-  const { xs, ys, dirs, colors, stderrs, extras } = collectScatterPoints(modelNames, (m) => {
+  const { xs, ys, dirs, colors, cis, extras } = collectScatterPoints(modelNames, (m) => {
     const raw = getScore(state.DATA.models, m, benchmark, state.currentShot, metric);
     if (raw == null) return null;
     const score = state.currentNormalization === "none"
       ? toDisplayScale(raw, benchmark, metric)
       : applyNorm(raw, benchmark, allRaw, metric);
-    const se = wantSE
-      ? scaleStderr(getCombinedSE(state.DATA.models, m, benchmark, state.currentShot, metric), benchmark, metric, allRaw)
-      : 0;
-    return { score, stderr: se };
+    const ci = wantSE
+      ? scaleCIDistances(getCombinedCI(state.DATA.models, m, benchmark, state.currentShot, metric), benchmark, metric, allRaw)
+      : null;
+    return { score, ci };
   });
 
   const yRange = computeSingleYRange(benchmark, metric);
-  plotScatter(xs, ys, dirs, colors, stderrs, yRange, extras);
+  plotScatter(xs, ys, dirs, colors, cis, yRange, extras);
 }
 
 function renderGroupedScatter(groupName) {
@@ -1452,17 +1457,17 @@ function renderGroupedScatter(groupName) {
     const allRaw = needAllRaw
       ? modelNames.map((mm) => getScore(state.DATA.models, mm, bench, state.currentShot, metric)).filter((v) => v !== undefined)
       : null;
-    const xs = [], ys = [], dirs = [], colors = [], stderrs = [];
+    const xs = [], ys = [], dirs = [], colors = [], cis = [];
     for (const m of modelNames) {
       const size = state.DATA.model_parameters?.[m];
       if (!size) continue;
       const raw = getScore(state.DATA.models, m, bench, state.currentShot, metric);
       if (raw == null) continue;
       const score = useNorm ? applyNorm(raw, bench, allRaw, metric) : toDisplayScale(raw, bench, metric);
-      const se = wantSE
-        ? scaleStderr(getCombinedSE(state.DATA.models, m, bench, state.currentShot, metric), bench, metric, allRaw)
-        : 0;
-      xs.push(size); ys.push(score); dirs.push(m); stderrs.push(se);
+      const ci = wantSE
+        ? scaleCIDistances(getCombinedCI(state.DATA.models, m, bench, state.currentShot, metric), bench, metric, allRaw)
+        : null;
+      xs.push(size); ys.push(score); dirs.push(m); cis.push(ci);
       const base = getModelColor(m);
       colors.push(gi === 0 ? base : darkenColor(base, 0.3));
     }
@@ -1487,7 +1492,7 @@ function renderGroupedScatter(groupName) {
       x: xs, y: ys, type: "scatter", mode: "markers",
       name: group.labels[gi], showlegend: true,
       marker: { size: 24, color: colors, line: { width: 1.4, color: "rgba(255,255,255,0.95)" } },
-      customdata: dirs.map((m, i) => ({ modelDir: m, stderr: stderrs[i] })),
+      customdata: dirs.map((m, i) => ({ modelDir: m, ci: cis[i] })),
       hoverinfo: "none",
     };
     return trace;
@@ -1532,10 +1537,10 @@ function renderGroupedScatter(groupName) {
 /** Build a single-trace scatter chart: one marker per model, org logos
  *  overlaid via layout.images. Used by aggregate and single-benchmark
  *  scatter modes. */
-function plotScatter(xs, ys, dirs, colors, stderrs, yRange, extras) {
+function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
   const paperYs = ys.map((y) => paperFraction(y, yRange));
   const customdata = dirs.map((m, i) => Object.assign(
-    { modelDir: m, stderr: stderrs[i] },
+    { modelDir: m, ci: cis[i] },
     (extras && extras[i]) || {}));
   // Invisible scatter markers handle hover; the visible glyphs (colored
   // disk + white logo) live in layout.images, interleaved per model so
@@ -1587,11 +1592,11 @@ function computeAggregateYRange(benchmarks) {
         ? modelNames.map((mm) => getScore(state.DATA.models, mm, bench, state.currentShot)).filter((v) => v !== undefined)
         : null;
       const score = applyNorm(raw, bench, allRaw);
-      const se = wantSE ? scaleStderr(getCombinedSE(state.DATA.models, entity, bench, state.currentShot), bench, undefined, allRaw) : undefined;
-      return { score, stderr: se };
+      const ci = wantSE ? scaleCIDistances(getCombinedCI(state.DATA.models, entity, bench, state.currentShot), bench, undefined, allRaw) : undefined;
+      return { score, ci };
     }, macro);
-    // Include error-bar top in the range so very large stderrs don't clip.
-    if (result) allAvgs.push(result.score + (result.stderr || 0));
+    // Include error-bar top in the range so very large CIs don't clip.
+    if (result) allAvgs.push(result.score + (result.ci?.hiDist ?? 0));
   }
   return computeYRange(allAvgs);
 }
@@ -1605,10 +1610,10 @@ function computeRawYMax_display(benchmarks, metric) {
       const v = getScore(state.DATA.models, entity, bench, state.currentShot, metric);
       if (v != null) {
         const displayV = toDisplayScale(v, bench, metric);
-        const se = wantSE
-          ? scaleStderr(getCombinedSE(state.DATA.models, entity, bench, state.currentShot, metric), bench, metric)
-          : 0;
-        vals.push(displayV + (se || 0));
+        const ci = wantSE
+          ? scaleCIDistances(getCombinedCI(state.DATA.models, entity, bench, state.currentShot, metric), bench, metric)
+          : null;
+        vals.push(displayV + (ci?.hiDist ?? 0));
       }
     }
   }
@@ -1629,10 +1634,10 @@ function computeSingleYRange(benchmark, metric) {
     const displayV = state.currentNormalization === "none"
       ? toDisplayScale(raw, benchmark, metric)
       : applyNorm(raw, benchmark, raws, metric);
-    const se = wantSE
-      ? scaleStderr(getCombinedSE(state.DATA.models, e, benchmark, state.currentShot, metric), benchmark, metric, raws)
-      : 0;
-    vals.push(displayV + (se || 0));
+    const ci = wantSE
+      ? scaleCIDistances(getCombinedCI(state.DATA.models, e, benchmark, state.currentShot, metric), benchmark, metric, raws)
+      : null;
+    vals.push(displayV + (ci?.hiDist ?? 0));
   }
   return computeYRange(vals);
 }

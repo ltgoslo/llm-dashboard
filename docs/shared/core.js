@@ -149,35 +149,42 @@ export function getScore(dataSource, entity, bench, shot, metric) {
   return obj[state.currentPromptAgg];
 }
 
-/** Pull sampling stderr matching the current prompt-aggregation. */
-export function getStderr(dataSource, entity, bench, shot, metric) {
-  metric = metric || state.metricsSetup[bench]?.main_metric;
-  const obj = dataSource[entity]?.[bench]?.[shot]?.[metric];
-  if (obj === undefined || obj === null) return undefined;
-  if (typeof obj === "number") return undefined;
-  const se = obj[state.currentPromptAgg + "_stderr"];
-  return (se !== undefined && se !== null) ? se : undefined;
-}
-
-/** Prompt-variant SE: SD(prompt_scores) / sqrt(n_prompts). */
-export function getPromptSE(dataSource, entity, bench, shot, metric) {
+/** Pull stored asymmetric 95% CI (loDist, hiDist) for the current prompt
+ *  aggregation, where loDist = point − ci_lo and hiDist = ci_hi − point.
+ *
+ *  The build pipeline precomputes these CIs:
+ *    - max / min:  Bonferroni union bound across the k prompts, using
+ *                  Clopper–Pearson exact binomial for proportion-like
+ *                  metrics and the normal approximation with the harness/
+ *                  Wilson SE otherwise. Intentionally asymmetric.
+ *    - mean:       Welch–Satterthwaite combination of sampling and between-
+ *                  prompt variance.
+ *    - median / first: sampling CI of the selected prompt (no Bonferroni).
+ *
+ *  Estimand: θ_k = aggregation_{i ≤ k} μ(p_i) — over the k specific prompts
+ *  evaluated, not the prompt-population supremum. */
+export function getCIDistances(dataSource, entity, bench, shot, metric) {
   metric = metric || state.metricsSetup[bench]?.main_metric;
   const obj = dataSource[entity]?.[bench]?.[shot]?.[metric];
   if (!obj || typeof obj === "number") return undefined;
-  const sd = obj.prompt_sd;
-  const n = obj.n_prompts;
-  if (sd == null || n == null || n < 2) return undefined;
-  return sd / Math.sqrt(n);
+  const agg = state.currentPromptAgg;
+  if (agg === "stdev") return undefined;
+  const v = obj[agg];
+  const lo = obj[agg + "_ci_lo"];
+  const hi = obj[agg + "_ci_hi"];
+  if (v == null || lo == null || hi == null) return undefined;
+  return { loDist: Math.max(0, v - lo), hiDist: Math.max(0, hi - v) };
 }
 
-/** Combined SE = sqrt(sampling_se^2 + prompt_se^2), respecting toggles.
- *  Returns undefined when the prompt-agg is "stdev" (no error bars for SD bars). */
-export function getCombinedSE(dataSource, entity, bench, shot, metric) {
+/** Toggle-aware CI distances. Returns undefined if CIs are off, or for the
+ *  "stdev" prompt-aggregation (no CI on SD bars). The sampling and prompt-
+ *  template uncertainty are already combined inside the stored CI, so the
+ *  prompt-deviation toggle has no effect here — the multi-prompt structure
+ *  is baked into the Bonferroni / Welch estimator. */
+export function getCombinedCI(dataSource, entity, bench, shot, metric) {
   if (state.currentPromptAgg === "stdev") return undefined;
-  const sampSe = state.showStderr ? getStderr(dataSource, entity, bench, shot, metric) : undefined;
-  const promptSe = state.showPromptDeviation ? getPromptSE(dataSource, entity, bench, shot, metric) : undefined;
-  if (sampSe == null && promptSe == null) return undefined;
-  return Math.sqrt((sampSe || 0) ** 2 + (promptSe || 0) ** 2);
+  if (!state.showStderr) return undefined;
+  return getCIDistances(dataSource, entity, bench, shot, metric);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -218,30 +225,42 @@ export function applyNorm(raw, benchmark, allRaw, metric) {
   return toDisplayScale(raw, benchmark, metric);
 }
 
-/** Scale a stderr value for display using the same linear transform as the score. */
-export function scaleStderr(se, benchmark, metric, allRaw) {
-  if (se === undefined || se === null) return undefined;
-  if (state.currentNormalization === "none") return toDisplayScale(se, benchmark, metric);
+/** Scale a single distance (lo or hi half-width) by the current normalization
+ *  factor. All normalizations except percentile are linear, so we just divide
+ *  by the local "scale" of the normalization. */
+function scaleDistance(dist, benchmark, metric, allRaw) {
+  if (dist === undefined || dist === null) return undefined;
+  if (state.currentNormalization === "none") return toDisplayScale(dist, benchmark, metric);
   if (state.currentNormalization === "baseline") {
     const info = state.metricsSetup[benchmark];
     const range = info.max_performance - info.random_baseline;
-    return range === 0 ? 0 : (se / range) * 100;
+    return range === 0 ? 0 : (dist / range) * 100;
   }
   if (state.currentNormalization === "minmax") {
-    if (!allRaw || allRaw.length < 2) return toDisplayScale(se, benchmark, metric);
+    if (!allRaw || allRaw.length < 2) return toDisplayScale(dist, benchmark, metric);
     const mn = Math.min(...allRaw), mx = Math.max(...allRaw);
-    return mx === mn ? 0 : (se / (mx - mn)) * 100;
+    return mx === mn ? 0 : (dist / (mx - mn)) * 100;
   }
   if (state.currentNormalization === "zscore") {
     if (!allRaw || allRaw.length < 2) return 0;
     const mean = allRaw.reduce((a, b) => a + b, 0) / allRaw.length;
     const std = Math.sqrt(allRaw.reduce((s, v) => s + (v - mean) ** 2, 0) / allRaw.length);
-    return std === 0 ? 0 : se / std;
+    return std === 0 ? 0 : dist / std;
   }
-  return undefined;  // percentile: non-linear, error bars not meaningful
+  return undefined;  // percentile: non-linear, CIs not meaningful
 }
 
-/** Whether the current normalization can display sampling error bars meaningfully. */
+/** Scale a (loDist, hiDist) CI pair using the same linear transform as the
+ *  score. Returns undefined under percentile normalization. */
+export function scaleCIDistances(ci, benchmark, metric, allRaw) {
+  if (!ci) return undefined;
+  const lo = scaleDistance(ci.loDist, benchmark, metric, allRaw);
+  const hi = scaleDistance(ci.hiDist, benchmark, metric, allRaw);
+  if (lo === undefined || hi === undefined) return undefined;
+  return { loDist: lo, hiDist: hi };
+}
+
+/** Whether the current normalization can display CIs meaningfully. */
 export function isStderrCompatible() {
   return state.currentNormalization !== "percentile";
 }
@@ -292,26 +311,31 @@ export function getMacroGroups(benchmarks) {
 /** Compute an aggregate score over `benchmarks` using a per-benchmark scoreFn.
  *  - macro=true: average within categories first, then across categories.
  *  - macro=false: simple micro-average across all benchmarks.
- *  scoreFn(bench) returns { score, stderr } | number | undefined.
- *  Returns { score, count, stderr } | null. */
+ *  scoreFn(bench) returns { score, ci } | number | undefined, where
+ *  ci = { loDist, hiDist } if available.
+ *  Returns { score, count, ci } | null. Lower and upper CI distances are
+ *  propagated independently as √(Σ d²)/N — the same quadrature rule we use
+ *  for SEs, but applied to each side of the asymmetric interval. */
 export function aggregateScores(benchmarks, scoreFn, macro) {
   if (macro) {
     const groups = getMacroGroups(benchmarks);
-    let groupSum = 0, groupCount = 0, groupSe2 = 0;
+    let groupSum = 0, groupCount = 0, groupLo2 = 0, groupHi2 = 0;
     for (const group of groups) {
-      let sum = 0, count = 0, se2 = 0;
+      let sum = 0, count = 0, lo2 = 0, hi2 = 0;
       for (const bench of group) {
         const r = scoreFn(bench);
         if (r === undefined) continue;
         const s = (typeof r === "number") ? r : r.score;
         if (s === undefined) continue;
         sum += s; count++;
-        const se = (typeof r === "object" && r.stderr != null) ? r.stderr : 0;
-        se2 += se * se;
+        const ci = (typeof r === "object" && r.ci) ? r.ci : null;
+        const lo = ci?.loDist ?? 0, hi = ci?.hiDist ?? 0;
+        lo2 += lo * lo; hi2 += hi * hi;
       }
       if (count > 0) {
         groupSum += sum / count;
-        groupSe2 += se2 / (count * count);
+        groupLo2 += lo2 / (count * count);
+        groupHi2 += hi2 / (count * count);
         groupCount++;
       }
     }
@@ -319,21 +343,26 @@ export function aggregateScores(benchmarks, scoreFn, macro) {
     return {
       score: groupSum / groupCount,
       count: groupCount,
-      stderr: Math.sqrt(groupSe2) / groupCount,
+      ci: { loDist: Math.sqrt(groupLo2) / groupCount, hiDist: Math.sqrt(groupHi2) / groupCount },
     };
   } else {
-    let sum = 0, count = 0, se2 = 0;
+    let sum = 0, count = 0, lo2 = 0, hi2 = 0;
     for (const bench of benchmarks) {
       const r = scoreFn(bench);
       if (r === undefined) continue;
       const s = (typeof r === "number") ? r : r.score;
       if (s === undefined) continue;
       sum += s; count++;
-      const se = (typeof r === "object" && r.stderr != null) ? r.stderr : 0;
-      se2 += se * se;
+      const ci = (typeof r === "object" && r.ci) ? r.ci : null;
+      const lo = ci?.loDist ?? 0, hi = ci?.hiDist ?? 0;
+      lo2 += lo * lo; hi2 += hi * hi;
     }
     if (count === 0) return null;
-    return { score: sum / count, count, stderr: Math.sqrt(se2) / count };
+    return {
+      score: sum / count,
+      count,
+      ci: { loDist: Math.sqrt(lo2) / count, hiDist: Math.sqrt(hi2) / count },
+    };
   }
 }
 

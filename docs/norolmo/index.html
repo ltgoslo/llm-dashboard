@@ -10,6 +10,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Hubot+Sans:wght@200..900&family=Mona+Sans:wght@200..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/style.css">
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+            onload="renderMathInElement(document.body, { delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$',  right: '$',  display: false}
+            ]});"></script>
 </head>
 <body>
 
@@ -44,12 +51,11 @@
                             </div>
 
                             <div class="about-section">
-                                <h3>Error bars</h3>
-                                <p>Shaded bands show combined uncertainty from two independent sources, added in quadrature:</p>
-                                <ul>
-                                    <li><strong>Sampling error.</strong> For classification metrics, SE = &radic;(v&middot;(1&minus;v)/n). For corpus-level metrics, estimated via bootstrap resampling.</li>
-                                    <li><strong>Prompt deviation.</strong> SD(scores across prompt variants) / &radic;(k).</li>
-                                </ul>
+                                <h3>Confidence intervals</h3>
+                                <p>Shaded bands are <strong>asymmetric 95% CIs</strong> for the score under the selected prompt aggregation (max by default).</p>
+                                <p><strong>For max.</strong> The lower bound has a <a href="https://en.wikipedia.org/wiki/Bonferroni_correction">Bonferroni</a> correction across the $k$ prompts; the upper bound does not, so bands are wider below the line than above.</p>
+                                <p class="about-formula">$$L = \max_i \ell\!\left(c_i,\, n_i,\, \tfrac{\alpha}{2k}\right), \qquad U = \max_i u\!\left(c_i,\, n_i,\, \tfrac{\alpha}{2}\right)$$</p>
+                                <p>Per-prompt bounds use exact <a href="https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Clopper%E2%80%93Pearson_interval">Clopper&ndash;Pearson</a> quantiles for accuracy / exact-match metrics and a normal approximation with the harness <a href="https://en.wikipedia.org/wiki/Bootstrapping_(statistics)">bootstrap</a> SE otherwise. <strong>For mean:</strong> <a href="https://en.wikipedia.org/wiki/Welch%E2%80%93Satterthwaite_equation">Welch&ndash;Satterthwaite</a> combination of sampling and between-prompt variance. <strong>For median / first:</strong> sampling CI of the selected prompt.</p>
                             </div>
 
                             <div class="about-section">

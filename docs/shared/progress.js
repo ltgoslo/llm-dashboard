@@ -18,7 +18,7 @@
 import { state } from "./state.js";
 import {
   METRIC_DISPLAY, METRIC_DESCRIPTIONS,
-  getScore, getCombinedSE, scaleStderr, applyNorm, toDisplayScale,
+  getScore, getCombinedCI, scaleCIDistances, applyNorm, toDisplayScale,
   getBaseMetric, getNormYLabel, getMetricYLabel,
   aggregateScores, isAggregateSelection, isMacroSelection,
   getEffectiveMetric, isStderrCompatible, formatTitleWithShot,
@@ -76,6 +76,14 @@ function resolveTitlePrefix(config) {
   return prefix || "";
 }
 
+function formatCIStr(value, ci, fmt) {
+  if (!ci || !state.showStderr) return "";
+  const lo = value - (ci.loDist ?? 0);
+  const hi = value + (ci.hiDist ?? 0);
+  if (!(ci.loDist > 0 || ci.hiDist > 0)) return "";
+  return ` (95% CI: ${Number(lo).toFixed(fmt)} – ${Number(hi).toFixed(fmt)})`;
+}
+
 function makeHoverHandler(config) {
   return function onHover(data) {
     if (!data.points || !data.points.length) return;
@@ -84,25 +92,18 @@ function makeHoverHandler(config) {
     const fmt = state.currentNormalization === "zscore" ? 2 : 1;
     const scoreStr = Number(pt.y).toFixed(fmt);
     const cd = pt.customdata;
-
-    let seStr = "";
-    if (state.showStderr && cd != null) {
-      if (cd && typeof cd === "object" && cd.stderr != null && cd.stderr > 0) {
-        seStr = " ± " + Number(cd.stderr).toFixed(fmt);
-      } else if (typeof cd === "number" && cd > 0) {
-        seStr = " ± " + Number(cd).toFixed(fmt);
-      }
-    }
+    const ci = (cd && typeof cd === "object" && cd.ci) ? cd.ci : null;
+    const ciStr = formatCIStr(Number(pt.y), ci, fmt);
 
     let body;
     if (isAggregateSelection(state.currentTaskSelection)) {
       const unit = isMacroSelection() ? "categories" : "tasks";
       const countStr = cd && typeof cd === "object" ? cd.count : null;
-      body = "Average: " + scoreStr + seStr + (countStr != null ? " (" + countStr + " " + unit + ")" : "");
+      body = "Average: " + scoreStr + ciStr + (countStr != null ? " (" + countStr + " " + unit + ")" : "");
     } else if (state.currentTaskSelection.startsWith("__group__") && pt.data.name && config.groupBenchmarks) {
-      body = pt.data.name + ": " + scoreStr + seStr;
+      body = pt.data.name + ": " + scoreStr + ciStr;
     } else {
-      body = "Score: " + scoreStr + seStr;
+      body = "Score: " + scoreStr + ciStr;
     }
 
     const title = config.hoverXFormat
@@ -157,24 +158,24 @@ function renderAggregateProgress(config) {
           ? xEntities.map((s) => getScore(traj.dataSource, s, bench, state.currentShot)).filter((v) => v !== undefined)
           : null;
         const score = applyNorm(raw, bench, allRaw);
-        const se = wantSE
-          ? scaleStderr(getCombinedSE(traj.dataSource, x, bench, state.currentShot), bench, undefined, allRaw)
+        const ci = wantSE
+          ? scaleCIDistances(getCombinedCI(traj.dataSource, x, bench, state.currentShot), bench, undefined, allRaw)
           : undefined;
-        return { score, stderr: se };
+        return { score, ci };
       }, macro);
     });
     const scores = aggResults.map((r) => r ? r.score : null);
-    const seVals = aggResults.map((r) => r ? r.stderr : null);
+    const ciVals = aggResults.map((r) => r ? r.ci : null);
 
     if (wantSE) {
-      const band = makeBandTrace(xs, scores, seVals, traj.color, traj.name);
+      const band = makeBandTrace(xs, scores, ciVals, traj.color, traj.name);
       if (band) traces.push(band);
     }
     traces.push({
       x: xs, y: scores, mode: "lines+markers", name: traj.name,
       legendgroup: traj.name,
       line: { color: traj.color, width: 2.5 }, marker: { size: 5 },
-      customdata: aggResults.map((r) => r ? { count: r.count, stderr: r.stderr } : null),
+      customdata: aggResults.map((r) => r ? { count: r.count, ci: r.ci } : null),
       hoverinfo: "none",
     });
   }
@@ -230,14 +231,14 @@ function renderGroupedProgress(config, group) {
         if (raw == null) return null;
         return useNorm ? applyNorm(raw, bench, allRaw, metric) : toDisplayScale(raw, bench, metric);
       });
-      const ses = wantSE ? xValues.map((x) => {
-        const se = getCombinedSE(traj.dataSource, x, bench, state.currentShot, metric);
-        return scaleStderr(se, bench, metric, allRaw);
+      const cis = wantSE ? xValues.map((x) => {
+        const ci = getCombinedCI(traj.dataSource, x, bench, state.currentShot, metric);
+        return scaleCIDistances(ci, bench, metric, allRaw);
       }) : null;
       const lineColor = i === 0 ? traj.color : darkenColor(traj.color, 0.3);
       const traceName = (trajectories.length > 1 ? traj.name + " — " : "") + group.labels[i];
-      if (wantSE && ses) {
-        const band = makeBandTrace(xs, ys, ses, lineColor, traceName);
+      if (wantSE && cis) {
+        const band = makeBandTrace(xs, ys, cis, lineColor, traceName);
         if (band) traces.push(band);
       }
       traces.push({
@@ -245,7 +246,7 @@ function renderGroupedProgress(config, group) {
         name: traceName,
         legendgroup: traceName,
         line: { color: lineColor, width: 2.5 }, marker: { size: 5 },
-        customdata: ses || ys.map(() => null),
+        customdata: (cis || ys.map(() => null)).map((c) => c ? { ci: c } : null),
         hoverinfo: "none",
       });
     });
@@ -298,19 +299,19 @@ function renderSingleProgress(config, benchmark) {
       if (raw == null) return null;
       return useNorm ? applyNorm(raw, benchmark, null, metric) : toDisplayScale(raw, benchmark, metric);
     });
-    const ses = wantSE ? xValues.map((x) => {
-      const se = getCombinedSE(traj.dataSource, x, benchmark, state.currentShot, metric);
-      return scaleStderr(se, benchmark, metric);
+    const cis = wantSE ? xValues.map((x) => {
+      const ci = getCombinedCI(traj.dataSource, x, benchmark, state.currentShot, metric);
+      return scaleCIDistances(ci, benchmark, metric);
     }) : null;
-    if (wantSE && ses) {
-      const band = makeBandTrace(xs, ys, ses, traj.color, traj.name);
+    if (wantSE && cis) {
+      const band = makeBandTrace(xs, ys, cis, traj.color, traj.name);
       if (band) traces.push(band);
     }
     traces.push({
       x: xs, y: ys, mode: "lines+markers", name: traj.name,
       legendgroup: traj.name,
       line: { color: traj.color, width: 2.5 }, marker: { size: 5 },
-      customdata: ses || ys.map(() => null),
+      customdata: (cis || ys.map(() => null)).map((c) => c ? { ci: c } : null),
       hoverinfo: "none",
     });
   }

@@ -10,6 +10,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Hubot+Sans:wght@200..900&family=Mona+Sans:wght@200..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/style.css">
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+            onload="renderMathInElement(document.body, { delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$',  right: '$',  display: false}
+            ]});"></script>
 </head>
 <body>
 
@@ -37,13 +44,13 @@
                             </div>
 
                             <div class="about-section">
-                                <h3>Error bars</h3>
-                                <p>Error bars on this dashboard show combined uncertainty from two independent sources, added in quadrature:</p>
-                                <ul>
-                                    <li><strong>Sampling error (&plusmn;1 SE).</strong> For classification metrics, SE = &radic;(v&middot;(1&minus;v)/n). For corpus-level metrics, estimated via bootstrap resampling.</li>
-                                    <li><strong>Prompt deviation.</strong> SD(scores across prompt variants) / &radic;(k).</li>
-                                </ul>
-                                <p>The two components are combined as &radic;(SE&sup2; + prompt_SE&sup2;).</p>
+                                <h3>Confidence intervals</h3>
+                                <p>Error bars are <strong>asymmetric 95% CIs</strong> for the score under the selected prompt aggregation (max by default).</p>
+                                <p><strong>For max.</strong> Combines per-prompt sampling noise with the uncertainty over which prompt is best. The lower bound has a <a href="https://en.wikipedia.org/wiki/Bonferroni_correction">Bonferroni</a> correction across the $k$ prompts; the upper bound does not.</p>
+                                <p class="about-formula">$$L = \max_i \ell\!\left(c_i,\, n_i,\, \tfrac{\alpha}{2k}\right), \qquad U = \max_i u\!\left(c_i,\, n_i,\, \tfrac{\alpha}{2}\right)$$</p>
+                                <p>Per-prompt bounds use exact <a href="https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Clopper%E2%80%93Pearson_interval">Clopper&ndash;Pearson</a> quantiles for accuracy / exact-match metrics and a normal approximation with the harness <a href="https://en.wikipedia.org/wiki/Bootstrapping_(statistics)">bootstrap</a> SE for corpus-level metrics (BLEU, ROUGE, chrF, token-F1).</p>
+                                <p><strong>For mean.</strong> Symmetric CI from the <a href="https://en.wikipedia.org/wiki/Welch%E2%80%93Satterthwaite_equation">Welch&ndash;Satterthwaite</a> combination of sampling SE and SD across prompts. <strong>For median and first:</strong> sampling CI of the selected prompt.</p>
+                                <p>Three benchmarks (<em>norec_document</em>, <em>norec_sentence</em>, <em>ask_gec</em>) have no harness SE, so we apply the binomial bounds as a coarse placeholder.</p>
                             </div>
 
                             <div class="about-section">

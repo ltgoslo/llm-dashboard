@@ -800,16 +800,17 @@ export function computeAnnotationFontSize(totalPositions) {
 // Line-chart helpers (progress views)
 // ─────────────────────────────────────────────────────────────
 
-/** Create a shaded band trace around a line for ±SE visualization.
- *  Pass the matching line trace's `name` as `legendGroup` so legend clicks
- *  toggle the band along with its line. */
-export function makeBandTrace(xValues, yValues, seValues, color, legendGroup) {
+/** Create a shaded band trace around a line for asymmetric CI visualization.
+ *  `ciValues` is an array of {loDist, hiDist} | null per x — distances below
+ *  and above the line respectively. Pass the matching line trace's `name` as
+ *  `legendGroup` so legend clicks toggle the band along with its line. */
+export function makeBandTrace(xValues, yValues, ciValues, color, legendGroup) {
   const upper = [], lower = [], xs = [];
   for (let i = 0; i < xValues.length; i++) {
-    if (yValues[i] != null && seValues[i] != null) {
+    if (yValues[i] != null && ciValues[i] != null) {
       xs.push(xValues[i]);
-      upper.push(yValues[i] + seValues[i]);
-      lower.push(yValues[i] - seValues[i]);
+      upper.push(yValues[i] + (ciValues[i].hiDist ?? 0));
+      lower.push(yValues[i] - (ciValues[i].loDist ?? 0));
     }
   }
   if (xs.length === 0) return null;

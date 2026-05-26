@@ -10,6 +10,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Hubot+Sans:wght@200..900&family=Mona+Sans:wght@200..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/style.css">
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+            onload="renderMathInElement(document.body, { delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$',  right: '$',  display: false}
+            ]});"></script>
 </head>
 <body>
 
@@ -44,13 +51,18 @@
                             </div>
 
                             <div class="about-section">
-                                <h3>Error bars</h3>
-                                <p>Error bars on this dashboard show combined uncertainty from two independent sources, added in quadrature:</p>
-                                <ul>
-                                    <li><strong>Sampling error (&plusmn;1 SE).</strong> For classification metrics (accuracy, F1, exact match), SE = &radic;(v&middot;(1&minus;v)/n), where v is the score and n is the number of samples. For corpus-level metrics (BLEU, chrF, ROUGE), SE is estimated via bootstrap resampling (100 iterations).</li>
-                                    <li><strong>Prompt deviation.</strong> Computed as SD(scores across prompt variants) / &radic;(k), where k is the number of prompt variants. This captures uncertainty due to prompt formulation. Has no effect on single-prompt benchmarks.</li>
-                                </ul>
-                                <p>The two components are combined as &radic;(SE&sup2; + prompt_SE&sup2;). In aggregate views, SE is propagated as &radic;(&Sigma; SE&sup2;) / N across the N benchmarks being averaged.</p>
+                                <h3>Confidence intervals</h3>
+                                <p>Error bars are <strong>asymmetric 95% CIs</strong> for the score under the selected prompt aggregation (max by default).</p>
+
+                                <p><strong>For max.</strong> The interval combines per-prompt sampling noise with the uncertainty over <em>which</em> prompt is best. The lower bound has a <a href="https://en.wikipedia.org/wiki/Bonferroni_correction">Bonferroni</a> correction across the $k$ prompts; the upper bound does not. CIs are therefore wider below the bar than above.</p>
+                                <p class="about-formula">$$L = \max_i \ell\!\left(c_i,\, n_i,\, \tfrac{\alpha}{2k}\right), \qquad U = \max_i u\!\left(c_i,\, n_i,\, \tfrac{\alpha}{2}\right)$$</p>
+                                <p>Per-prompt bounds $\ell$ and $u$ are exact <a href="https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Clopper%E2%80%93Pearson_interval">Clopper&ndash;Pearson</a> binomial quantiles for accuracy and exact-match metrics; for corpus-level metrics (BLEU, ROUGE, chrF, token-F1) we use the normal approximation with the harness <a href="https://en.wikipedia.org/wiki/Bootstrapping_(statistics)">bootstrap</a> SE.</p>
+
+                                <p><strong>For mean.</strong> Symmetric CI from the <a href="https://en.wikipedia.org/wiki/Welch%E2%80%93Satterthwaite_equation">Welch&ndash;Satterthwaite</a> combination of sampling SE and the SD across prompts.</p>
+
+                                <p><strong>For median and first.</strong> Sampling CI of the prompt that achieved that statistic.</p>
+
+                                <p><strong>Caveats.</strong> Three benchmarks (<em>norec_document</em>, <em>norec_sentence</em>, <em>ask_gec</em>) have no harness-supplied SE, so we apply the binomial bounds as a coarse placeholder &mdash; F1 and ERRANT-F<sub>0.5</sub> aren't proper Bernoulli proportions, so their CIs are indicative rather than exact. When averaging across benchmarks, lower and upper distances are propagated independently as $\sqrt{\sum d_i^2}/N$.</p>
                             </div>
 
                             <div class="about-section">
