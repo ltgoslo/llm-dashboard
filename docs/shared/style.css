@@ -494,27 +494,16 @@ header.dashboard-header h1 {
   clip-path: none !important;
 }
 
-/* Bar hover: every bar path gets a transform transition + bottom-centre
-   origin; chart.js adds an inline `transform: scaleX(...)` on the hovered
-   one via Plotly's plotly_hover event (Plotly's drag overlay swallows the
-   native :hover, so CSS-only hover doesn't work). Pure transform so it's
-   GPU-accelerated and never triggers a Plotly recompute. */
-/* Shared "back-out" easing — on hover-on the value overshoots the target
-   then settles; on hover-off the reverse direction naturally undershoots
-   past identity then settles, so a single curve gives a bouncy feel both
-   ways without needing separate :hover transitions. */
-/* The transition is read at the destination state. So the *base* rules
-   below define the hover-OFF transition (returning to identity) — slower
-   and bouncier; the *hover-state* rules below override it with a snappier
-   hover-ON transition. JS toggles inline `transform` on bar/logo and the
-   `.bar-hover-bold` class on annotation/xtick. */
+/* Bar hover: chart.js sets inline `scale` and `translate` on each bar path
+   as a continuous function of the cursor's distance to the bar's rect.
+   Plotly's drag overlay swallows native :hover, so we hit-test against
+   bar rects ourselves on mousemove. Pure transform so it's GPU-accelerated
+   and never triggers a Plotly recompute. The transition below just smooths
+   between mousemove samples — the cursor's own motion is the input clock. */
 /* Use CSS Transforms 2 separate `scale` and `translate` properties (rather
    than the legacy combined `transform`) so the two animate independently.
-   When a bar goes from hovered (scale 1.5) back to non-hovered (translate
-   only), the legacy matrix interpolation would briefly produce a half-
-   scaled-half-shifted ghost on every interrupt. Independent transitions
-   with a fast `scale` curve mean the scale converges to 1 quickly and then
-   only the translate keeps animating — no mid-state ghosting. */
+   With matrix interpolation, a rapid scale change while a translate is
+   mid-flight would briefly produce a half-scaled-half-shifted ghost. */
 #chart .barlayer path {
   transition: translate 140ms ease-out, scale 140ms ease-out;
   transform-box: fill-box;
@@ -557,19 +546,17 @@ header.dashboard-header h1 {
 #chart.scatter-mode .imagelayer image.logo-uio {
   transform-origin: 50% 50%;
 }
-/* x-axis ticks, score annotations, and error bars: chart.js primes their
-   CSS transforms from Plotly's SVG attribute on first hover, then shifts
-   them via inline transform. Plain ease-out matches the bars/logos so
-   everything moves with a single coherent feel. */
+/* x-axis ticks, score labels, and error bars ride the same dock-spread as
+   the bars: chart.js sets an inline `translate` that is a pure function of
+   each element's horizontal centre, so a bar and its tick / score / error
+   bar move by the identical amount. (The `translate` CSS property composes
+   with Plotly's own `transform` attribute, so the elements keep their
+   layout position and just gain the shift.) Same transition as the
+   bars/logos so the whole column moves with one coherent feel. */
 #chart .xtick,
 #chart .annotation,
 #chart .errorbar {
-  transition: transform 140ms ease-out;
-}
-#chart.hover-active .xtick,
-#chart.hover-active .annotation,
-#chart.hover-active .errorbar {
-  transition: transform 140ms ease-out;
+  transition: translate 140ms ease-out;
 }
 
 /* ════════════════════════════════════════════════════════════
