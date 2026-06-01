@@ -159,12 +159,48 @@ const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
 // Peak scale applied to a bar when the cursor is directly on it; matched
 // in style.css's transition.
-const BAR_HOVER_SCALE = 1.5;
+const BAR_HOVER_SCALE = 1.75;
 // Attention kernel: 1 when the cursor is on (or inside) a bar's rect,
 // decaying smoothly with distance to that rect. Lorentzian: 1/(1+(d/σ)²)
 // over distance in bar-width units.
 const HOVER_KERNEL_SIGMA = 0.25;
 const hoverKernel = (d) => 1 / (1 + (d / HOVER_KERNEL_SIGMA) ** 2);
+// Dock-motion damping. ONLY the horizontal SHIFT is damped — the scale (the
+// magnification itself) tracks the cursor directly, exactly like the dock.
+// The shift is eased with an exponential smoother parameterised by a HALF-LIFE
+// (ms to close half the remaining gap) and driven by the real frame
+// delta-time, so the feel is identical at 60 / 120 / 144 Hz instead of running
+// N× faster on a faster display. The per-frame factor is
+//   alpha = 1 − 2^(−dt / halfLife).
+// The half-life grades with the column's distance to the cursor: a bar under
+// the cursor tracks it almost rigidly, distant bars trail — the soft "drag"
+// the macOS dock has. On exit everything glides back at one rate.
+const EMA_HALFLIFE_NEAR = 10;      // ms — column at the cursor (near-instant)
+const EMA_HALFLIFE_FAR = 500;    // ms — column far from the cursor (trails)
+const EMA_HALFLIFE_RETURN = 55;   // ms — easing back to rest after exit
+// dt is clamped to this (ms) so a stutter or a backgrounded tab can't make the
+// smoother jump in one giant step.
+const EMA_MAX_DT = 64;
+// Stop the loop once every column's shift is within this many px of target.
+const EMA_SETTLE = 0.3;
+const emaAlpha = (dt, halfLife) => 1 - Math.pow(2, -dt / halfLife);
+// Falloff (in bar-width units) that grades the damping half-life with distance.
+// This is DELIBERATELY MUCH BROADER than HOVER_KERNEL_SIGMA: that kernel is
+// razor-sharp so only the hovered bar magnifies, but as a speed gradient it's
+// near-binary — every non-hovered bar would collapse to the same FAR half-life
+// and they'd all move at one speed. A wide falloff makes the trail-speed vary
+// smoothly across many columns. Bigger ⇒ the slowness reaches further out.
+const DAMP_SIGMA = 12;
+const dampWeight = (d) => 1 / (1 + (d / DAMP_SIGMA) ** 2);
+// Let the dock spread RELAX with distance so far bars don't carry the full
+// push: their gaps compress slightly to absorb it. The gap-preserving shift is
+// multiplied by a factor that fades from 1 (at the cursor — keep the magnified
+// bar cleanly separated) toward SPREAD_FLOOR far away. SPREAD_RANGE (bar-width
+// units) sets how quickly it relaxes. FLOOR = 1 ⇒ rigid, no compression (old
+// behaviour); FLOOR = 0 ⇒ gaps absorb everything and far bars stay put.
+const SPREAD_RANGE = 4;
+const SPREAD_FLOOR = 0.5;
+const spreadAtten = (d) => SPREAD_FLOOR + (1 - SPREAD_FLOOR) / (1 + (d / SPREAD_RANGE) ** 2);
 // Shortest distance from a point to a rectangle's interior; 0 if inside.
 function distPointToRect(x, y, rect) {
   const dx = Math.max(rect.left - x, 0, x - rect.right);
@@ -178,23 +214,14 @@ function distPointToRect(x, y, rect) {
 // separately so they ride along as their own group rather than being
 // mistaken for extra bars.
 const BAR_RECT_SELECTOR = ".barlayer .trace.bars .points path";
-// Aux elements that follow the bars horizontally (translate only, no scale).
-// Each is centred on the same x as its bar, so a shift that's a pure function
-// of centre-x moves the whole column by an identical amount.
+// Aux elements that ride along with the bars (per model column, by index).
+// Used to clear their inline transforms on settle; the hover loop addresses
+// them directly when painting.
 const AUX_SELECTORS = [
   ".barlayer .trace.bars .errorbar",   // error-bar I-beams (the <g>)
   ".imagelayer image",                 // org logos
   ".xtick",                            // x-axis tick labels
   ".annotation",                       // score labels
-];
-// Subset of AUX_SELECTORS that is genuinely centred on its column (upright,
-// text-anchor middle), so each element's own bbox centre-x is the column x
-// and a pure shiftAt(cx) is exact. x-tick labels are EXCLUDED: they may be
-// angled (see computeTickAngle), which displaces their bbox centre away from
-// the column, so they're shifted by their model column's value instead.
-const CX_AUX_SELECTORS = [
-  ".barlayer .trace.bars .errorbar",
-  ".annotation",
 ];
 
 // Cache one element's natural (pre-CSS-transform) screen rect + centre-x.
@@ -234,9 +261,9 @@ function capRect(el) {
 // partial-height rect if seeded mid-grow-up). Instead this runs at known
 // clean points (after a fresh layout / after the grow-up completes).
 function captureNaturalRects(chartEl) {
+  // Only bars need a cached rect — they're what the cursor is hit-tested
+  // against. Aux elements are positioned by model-column index, not measured.
   chartEl.querySelectorAll(BAR_RECT_SELECTOR).forEach(capRect);
-  AUX_SELECTORS.forEach((sel) =>
-    chartEl.querySelectorAll(sel).forEach(capRect));
 }
 
 // Hover handlers ask this. Returns the captured natural rect or null. If
@@ -277,36 +304,46 @@ function liftBarsAndLogos(chartEl) {
   });
 }
 
-/** Minimal continuous bar-hover: SCALE ONLY. No shifts, no aux movement.
+/** Continuous dock-style bar hover with EMA damping.
  *
- *  Two passes per rAF-throttled mousemove tick:
- *    1. For every bar, derive { scale } from cursor's 2-D distance to the
- *       bar's NATURAL rect (cached, set once per layout in captureNaturalRects).
- *    2. Apply each bar's scale. Nothing else moves.
+ *  A self-sustaining rAF loop (NOT one frame per mousemove) eases every model
+ *  column's {scale, horizontal shift} toward the target the cursor implies.
+ *  Each column's EMA rate falls off with its distance to the cursor, so a bar
+ *  under the cursor tracks it tightly while distant bars trail — the soft drag
+ *  the macOS dock has. The loop keeps running after the cursor stops (to
+ *  finish settling) and after it leaves (to glide back to rest), then stops
+ *  itself so it isn't burning frames while idle; mousemove restarts it.
  *
- *  Boldness is the only side effect on aux elements — same as today:
- *  bold the xtick + annotation of the bar the cursor is inside. */
+ *  Everything is addressed per MODEL column (index 0..N-1): a bar and its
+ *  logo / tick / score label / error bar all read the same column state, so
+ *  they stay locked together and the damping is applied once per column.
+ *  CSS transitions on these transforms are disabled (see style.css) so the
+ *  JS EMA is the only smoothing. */
 function attachBarHoverHighlight(chartEl) {
   if (chartEl._barHoverBound) return;
   chartEl._barHoverBound = true;
 
+  const pointer = { x: 0, y: 0, active: false };
   let rafId = null;
-  let lastEv = null;
+  let lastT = null;   // timestamp of the previous frame, for delta-time
   let currentBoldBar = null;
+  // Displayed (eased) state, persisted across frames; rebuilt when the model
+  // count changes. Sits at rest (scale 1, shift 0) between interactions.
+  let curScale = null, curShift = null, stateN = 0;
 
-  function schedule(ev) {
-    lastEv = ev;
-    if (rafId !== null) return;
-    rafId = requestAnimationFrame(() => {
-      rafId = null;
-      apply(lastEv.clientX, lastEv.clientY);
-    });
+  function ensureState(N) {
+    if (stateN !== N || !curScale) {
+      curScale = new Array(N).fill(1);
+      curShift = new Array(N).fill(0);
+      stateN = N;
+    }
   }
 
-  function apply(cursorX, cursorY) {
-    // ── Pass 1 — scale per bar from the cursor's distance to it ──
+  // Collect the bar paths with their cached natural rects. null until the
+  // first captureNaturalRects has run for this layout.
+  function gatherBars() {
     const traces = chartEl.querySelectorAll(".barlayer .trace.bars");
-    if (!traces.length) return;
+    if (!traces.length) return null;
     const bars = [];
     let N = 0;
     traces.forEach((tr, traceIdx) => {
@@ -314,141 +351,201 @@ function attachBarHoverHighlight(chartEl) {
       if (N === 0) N = paths.length;
       paths.forEach((bar, modelIdx) => {
         const rect = getBarNatRect(bar);
-        if (!rect) return;
-        bars.push({ el: bar, traceIdx, modelIdx, rect });
+        if (rect) bars.push({ el: bar, traceIdx, modelIdx, rect });
       });
     });
-    if (!bars.length || N === 0) return;
-    const refWidth = bars[0].rect.width;
-    bars.forEach((b) => {
-      b.dist = distPointToRect(cursorX, cursorY, b.rect);
-      b.weight = hoverKernel(b.dist / refWidth);
-      b.scale = 1 + (BAR_HOVER_SCALE - 1) * b.weight;
-    });
+    if (!bars.length || N === 0) return null;
+    return { bars, N, refWidth: bars[0].rect.width };
+  }
 
-    // ── Pass 1b — dock spread: shift everything so the gaps stay constant ──
-    // A bar at scale s grows by e = (s−1)·width, half to each side. To keep
-    // the resting gap between two neighbours, the relative shift between
-    // adjacent columns must equal the average of their growths — i.e. a
-    // cumulative sum of growths along x. We then sample that sum at the cursor
-    // and subtract it, making the cursor the pivot: columns to its left slide
-    // left, columns to its right slide right (the macOS dock). Because the
-    // shift is a pure function of horizontal centre, a bar and its logo /
-    // tick / score label / error bar — all centred on the same x — move by
-    // the exact same amount.
-    const colMap = new Map();
+  // Per-model targets the current cursor implies: peak scale, dock shift,
+  // distance (drives the EMA rate), and the bar the cursor sits inside (bold).
+  //
+  // The dock shift is the cumulative sum of column growths, sampled at the
+  // cursor and subtracted so the cursor is the pivot — same maths as before,
+  // but accumulated over MODEL columns so the result is indexed by model.
+  function computeTargets(bars, N, refWidth, cx, cy) {
+    const sumCx = new Array(N).fill(0);
+    const cnt = new Array(N).fill(0);
+    const scale = new Array(N).fill(1);
+    const dist = new Array(N).fill(Infinity);
+    let insideBar = null;
     bars.forEach((b) => {
-      const key = Math.round(b.rect.cx);
-      let c = colMap.get(key);
-      if (!c) colMap.set(key, (c = { cx: b.rect.cx, exp: 0 }));
-      c.exp = Math.max(c.exp, (b.scale - 1) * b.rect.width);
+      const d = distPointToRect(cx, cy, b.rect);
+      const s = 1 + (BAR_HOVER_SCALE - 1) * hoverKernel(d / refWidth);
+      const i = b.modelIdx;
+      sumCx[i] += b.rect.cx; cnt[i] += 1;
+      if (s > scale[i]) scale[i] = s;
+      if (d < dist[i]) dist[i] = d;
+      if (d === 0 && !insideBar) insideBar = b;
     });
-    const cols = [...colMap.values()].sort((p, q) => p.cx - q.cx);
+    const order = [];
+    for (let i = 0; i < N; i++) if (cnt[i]) order.push(i);
+    order.sort((a, b) => sumCx[a] / cnt[a] - sumCx[b] / cnt[b]);
+    const mcx = order.map((i) => sumCx[i] / cnt[i]);
+    const exp = order.map((i) => (scale[i] - 1) * refWidth);
     const cum = [0];
-    for (let k = 1; k < cols.length; k++) {
-      cum[k] = cum[k - 1] + (cols[k - 1].exp + cols[k].exp) / 2;
-    }
-    // Cumulative offset at any x: linear between column centres, flat beyond
-    // the ends (no growth past the last bar, so no extra spreading).
+    for (let k = 1; k < order.length; k++) cum[k] = cum[k - 1] + (exp[k - 1] + exp[k]) / 2;
     const offsetAt = (x) => {
-      if (x <= cols[0].cx) return cum[0];
-      if (x >= cols[cols.length - 1].cx) return cum[cols.length - 1];
+      if (!order.length) return 0;
+      if (x <= mcx[0]) return cum[0];
+      if (x >= mcx[mcx.length - 1]) return cum[cum.length - 1];
       let k = 1;
-      while (k < cols.length && cols[k].cx < x) k++;
-      const f = (x - cols[k - 1].cx) / (cols[k].cx - cols[k - 1].cx);
+      while (k < mcx.length && mcx[k] < x) k++;
+      const f = (x - mcx[k - 1]) / (mcx[k] - mcx[k - 1]);
       return cum[k - 1] + f * (cum[k] - cum[k - 1]);
     };
-    const anchor = offsetAt(cursorX);
-    const shiftAt = (x) => offsetAt(x) - anchor;
-
-    // ── Pass 2 — scale (bars only) + translate (bars AND every aux group) ──
-    // Per-model column shift + scale, accumulated from the bars so that
-    // index-matched aux (the angled x-tick labels, and the logos which also
-    // magnify) can borrow their column's exact values rather than re-deriving
-    // them from their own geometry.
-    const modelShiftSum = new Array(N).fill(0);
-    const modelShiftCnt = new Array(N).fill(0);
-    const modelScale = new Array(N).fill(1);
-    bars.forEach((b) => {
-      const shift = shiftAt(b.rect.cx);
-      b.el.style.scale = `${b.scale} 1`;
-      b.el.style.translate = `${shift}px 0`;
-      modelShiftSum[b.modelIdx] += shift;
-      modelShiftCnt[b.modelIdx] += 1;
-      if (b.scale > modelScale[b.modelIdx]) modelScale[b.modelIdx] = b.scale;
+    const anchor = offsetAt(cx);
+    const shift = new Array(N).fill(0);
+    // Gap-preserving shift, then relaxed by distance so far columns travel less
+    // (their gaps take up the slack). The fade is gentle enough that the shift
+    // stays monotonic in x — bars compress, never cross.
+    order.forEach((i, k) => {
+      shift[i] = (offsetAt(mcx[k]) - anchor) * spreadAtten(Math.abs(mcx[k] - cx) / refWidth);
     });
-    // Upright aux (score labels, error bars) are centred on their bar, so
-    // their own centre-x gives the exact same shift as the bar.
-    CX_AUX_SELECTORS.forEach((sel) => {
-      chartEl.querySelectorAll(sel).forEach((el) => {
-        const r = el._natRect;
-        if (r) el.style.translate = `${shiftAt(r.cx)}px 0`;
+    return { scale, shift, dist, insideBar };
+  }
+
+  // Write the current (eased) per-column state onto every element of each
+  // column. Bars scale in x only (height encodes the score); logos scale
+  // uniformly like a dock icon. Aux elements are matched by index.
+  function paint(bars, N) {
+    bars.forEach((b) => {
+      const i = b.modelIdx;
+      b.el.style.scale = `${curScale[i]} 1`;
+      b.el.style.translate = `${curShift[i]}px 0`;
+    });
+    chartEl.querySelectorAll(".imagelayer image").forEach((el, i) => {
+      if (i < N) {
+        el.style.scale = `${curScale[i]} ${curScale[i]}`;
+        el.style.translate = `${curShift[i]}px 0`;
+      }
+    });
+    chartEl.querySelectorAll(".xtick").forEach((el, i) => {
+      if (i < N) el.style.translate = `${curShift[i]}px 0`;
+    });
+    chartEl.querySelectorAll(".barlayer .trace.bars").forEach((tr) => {
+      tr.querySelectorAll(".errorbar").forEach((el, i) => {
+        if (i < N) el.style.translate = `${curShift[i]}px 0`;
       });
     });
-    // Logos: shift AND magnify with their bar (matched by index). Scale is
-    // uniform so the logo grows like a dock icon rather than stretching;
-    // style.css anchors it bottom-centre so it grows up off the bar top.
-    chartEl.querySelectorAll(".imagelayer image").forEach((el, i) => {
-      if (i < N && modelShiftCnt[i]) {
-        el.style.translate = `${modelShiftSum[i] / modelShiftCnt[i]}px 0`;
-        el.style.scale = `${modelScale[i]} ${modelScale[i]}`;
-      }
-    });
-    // x-tick labels: shift by the model column's value (matched by index to
-    // the bar), since an angled label's bbox centre is offset from the column.
-    chartEl.querySelectorAll(".xtick").forEach((el, i) => {
-      if (i < N && modelShiftCnt[i]) {
-        el.style.translate = `${modelShiftSum[i] / modelShiftCnt[i]}px 0`;
-      }
-    });
-
-    // Boldness — bold the xtick + annotation of the bar the cursor is inside.
-    chartEl.classList.add("hover-active");
-    let inside = null;
-    for (const b of bars) if (b.dist === 0) { inside = b; break; }
-    if ((inside && inside.el) !== currentBoldBar) {
-      chartEl.querySelectorAll(".bar-hover-bold").forEach((el) =>
-        el.classList.remove("bar-hover-bold"));
-      if (inside) {
-        const xticks = chartEl.querySelectorAll(".xtick");
-        const xt = xticks[inside.modelIdx];
-        if (xt) xt.classList.add("bar-hover-bold");
-        const annotations = chartEl.querySelectorAll(".annotation");
-        const annPerModel = annotations.length
-          ? Math.max(1, Math.round(annotations.length / N)) : 0;
-        if (annPerModel > 0) {
-          const annIdx = annPerModel === 1
-            ? inside.modelIdx
-            : inside.modelIdx * annPerModel
-              + Math.min(inside.traceIdx, annPerModel - 1);
-          const an = annotations[annIdx];
-          if (an) an.classList.add("bar-hover-bold");
-        }
-      }
-      currentBoldBar = inside ? inside.el : null;
+    const anns = chartEl.querySelectorAll(".annotation");
+    const annPerModel = anns.length ? Math.max(1, Math.round(anns.length / N)) : 0;
+    if (annPerModel > 0) {
+      anns.forEach((el, j) => {
+        const m = Math.floor(j / annPerModel);
+        if (m < N) el.style.translate = `${curShift[m]}px 0`;
+      });
     }
   }
 
-  function reset() {
-    if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
-    chartEl.querySelectorAll(BAR_RECT_SELECTOR).forEach((bar) => {
-      bar.style.scale = "";
-      bar.style.translate = "";
+  // Bold the xtick + score label of the column the cursor sits inside.
+  function updateBold(insideBar, N) {
+    if ((insideBar && insideBar.el) === currentBoldBar) return;
+    chartEl.querySelectorAll(".bar-hover-bold").forEach((el) =>
+      el.classList.remove("bar-hover-bold"));
+    if (insideBar) {
+      const xt = chartEl.querySelectorAll(".xtick")[insideBar.modelIdx];
+      if (xt) xt.classList.add("bar-hover-bold");
+      const anns = chartEl.querySelectorAll(".annotation");
+      const annPerModel = anns.length ? Math.max(1, Math.round(anns.length / N)) : 0;
+      if (annPerModel > 0) {
+        const annIdx = annPerModel === 1
+          ? insideBar.modelIdx
+          : insideBar.modelIdx * annPerModel + Math.min(insideBar.traceIdx, annPerModel - 1);
+        const an = anns[annIdx];
+        if (an) an.classList.add("bar-hover-bold");
+      }
+    }
+    currentBoldBar = insideBar ? insideBar.el : null;
+  }
+
+  // Drop all inline transforms so elements return to their natural geometry.
+  function clearInline(bars) {
+    bars.forEach((b) => { b.el.style.scale = ""; b.el.style.translate = ""; });
+    chartEl.querySelectorAll(".imagelayer image").forEach((el) => {
+      el.style.scale = ""; el.style.translate = "";
     });
     AUX_SELECTORS.forEach((sel) =>
       chartEl.querySelectorAll(sel).forEach((el) => { el.style.translate = ""; }));
-    // Logos also magnify on hover, so drop their scale too.
-    chartEl.querySelectorAll(".imagelayer image").forEach((el) => {
-      el.style.scale = "";
-    });
-    chartEl.querySelectorAll(".bar-hover-bold").forEach((el) =>
-      el.classList.remove("bar-hover-bold"));
-    chartEl.classList.remove("hover-active");
-    currentBoldBar = null;
   }
 
-  chartEl.addEventListener("mousemove", schedule);
-  chartEl.addEventListener("mouseleave", reset);
+  function frame(now) {
+    rafId = null;
+    // Real delta-time since the last frame, clamped to (0, EMA_MAX_DT]. null on
+    // the first frame of a run (loop was idle) — use a nominal 16 ms. The lower
+    // bound keeps emaAlpha well-defined even if a half-life is 0.
+    const dt = lastT === null ? 16 : Math.max(1, Math.min(EMA_MAX_DT, now - lastT));
+    lastT = now;
+
+    const got = gatherBars();
+    if (!got) {
+      // Natural rects not captured yet; keep waiting while the cursor's on us.
+      if (pointer.active) rafId = requestAnimationFrame(frame);
+      else lastT = null;
+      return;
+    }
+    const { bars, N, refWidth } = got;
+    ensureState(N);
+
+    const targets = pointer.active
+      ? computeTargets(bars, N, refWidth, pointer.x, pointer.y)
+      : { scale: new Array(N).fill(1), shift: new Array(N).fill(0), dist: null, insideBar: null };
+
+    // Pre-compute the exit alpha once; per-column alpha (active) interpolates
+    // the half-life by the cursor-distance weight, then converts with dt.
+    const returnAlpha = emaAlpha(dt, EMA_HALFLIFE_RETURN);
+
+    // SCALE follows the target directly (no damping) — the magnification is a
+    // direct function of cursor proximity, like the dock. Only the SHIFT is
+    // eased, with a distance-graded half-life. Track the largest shift residual
+    // so we know when the row has settled.
+    let maxRes = 0;
+    for (let i = 0; i < N; i++) {
+      curScale[i] = targets.scale[i];
+      const a = pointer.active
+        ? emaAlpha(dt, EMA_HALFLIFE_FAR
+            + (EMA_HALFLIFE_NEAR - EMA_HALFLIFE_FAR) * dampWeight(targets.dist[i] / refWidth))
+        : returnAlpha;
+      curShift[i] += a * (targets.shift[i] - curShift[i]);
+      maxRes = Math.max(maxRes, Math.abs(targets.shift[i] - curShift[i]));
+    }
+    paint(bars, N);
+
+    if (pointer.active) {
+      chartEl.classList.add("hover-active");
+      updateBold(targets.insideBar, N);
+    }
+
+    if (maxRes < EMA_SETTLE) {
+      // Snap exactly onto target to kill sub-pixel drift, then stop the loop.
+      // lastT is reset so the next run (restarted by mousemove) starts fresh.
+      for (let i = 0; i < N; i++) { curScale[i] = targets.scale[i]; curShift[i] = targets.shift[i]; }
+      lastT = null;
+      if (pointer.active) {
+        paint(bars, N);   // rest at the hover pose; idle until the next move
+      } else {
+        clearInline(bars);
+        chartEl.querySelectorAll(".bar-hover-bold").forEach((el) =>
+          el.classList.remove("bar-hover-bold"));
+        chartEl.classList.remove("hover-active");
+        currentBoldBar = null;
+      }
+      return;
+    }
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function ensureLoop() { if (rafId === null) rafId = requestAnimationFrame(frame); }
+
+  chartEl.addEventListener("mousemove", (ev) => {
+    pointer.x = ev.clientX; pointer.y = ev.clientY; pointer.active = true;
+    ensureLoop();
+  });
+  chartEl.addEventListener("mouseleave", () => {
+    pointer.active = false;
+    ensureLoop();
+  });
 }
 
 /** Scatter-mode hover: scale up the (disk + logo) the cursor is over.

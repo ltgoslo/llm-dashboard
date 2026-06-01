@@ -498,14 +498,13 @@ header.dashboard-header h1 {
    as a continuous function of the cursor's distance to the bar's rect.
    Plotly's drag overlay swallows native :hover, so we hit-test against
    bar rects ourselves on mousemove. Pure transform so it's GPU-accelerated
-   and never triggers a Plotly recompute. The transition below just smooths
-   between mousemove samples — the cursor's own motion is the input clock. */
-/* Use CSS Transforms 2 separate `scale` and `translate` properties (rather
-   than the legacy combined `transform`) so the two animate independently.
-   With matrix interpolation, a rapid scale change while a translate is
-   mid-flight would briefly produce a half-scaled-half-shifted ghost. */
+   and never triggers a Plotly recompute.
+   NO CSS transition: the motion is smoothed by chart.js's per-frame EMA loop
+   (distance-dependent damping); a CSS transition on top would double-smooth.
+   We still use the separate `scale`/`translate` properties (not the legacy
+   combined `transform`) so the two compose without matrix-interpolation
+   ghosting. */
 #chart .barlayer path {
-  transition: translate 140ms ease-out, scale 140ms ease-out;
   transform-box: fill-box;
   transform-origin: 50% 100%;
 }
@@ -522,15 +521,21 @@ header.dashboard-header h1 {
   font-weight: 800 !important;
   transition: font-weight 140ms ease-out;
 }
-/* Same hover treatment for the org logos. As with bars, we drive these via
-   the separate `scale`/`translate` properties so the two animate
-   independently. */
+/* Same hover treatment for the org logos. We keep the separate
+   `scale`/`translate` properties. The transition here is for SCATTER mode,
+   where the logo is the data marker and is smoothed purely by CSS; in bar
+   mode the EMA loop drives logos and the transition is suppressed (below). */
 #chart .imagelayer image {
   transition: translate 140ms ease-out, scale 140ms ease-out;
   transform-box: fill-box;
   /* Anchor logos to the bottom-centre so they grow left, right, and up
      (never down) — matches the bars, which also pin their bottom edge. */
   transform-origin: 50% 100%;
+}
+/* Bar mode: the EMA loop drives logos frame-by-frame, so no CSS transition
+   (it would double-smooth). Scatter mode keeps the transition above. */
+#chart:not(.scatter-mode) .imagelayer image {
+  transition: none;
 }
 /* UiO is a wide piece of "UiO" text rendered into the 128×128 canvas with
    the glyphs centred vertically — the visible text's bottom sits at
@@ -547,16 +552,14 @@ header.dashboard-header h1 {
   transform-origin: 50% 50%;
 }
 /* x-axis ticks, score labels, and error bars ride the same dock-spread as
-   the bars: chart.js sets an inline `translate` that is a pure function of
-   each element's horizontal centre, so a bar and its tick / score / error
-   bar move by the identical amount. (The `translate` CSS property composes
-   with Plotly's own `transform` attribute, so the elements keep their
-   layout position and just gain the shift.) Same transition as the
-   bars/logos so the whole column moves with one coherent feel. */
+   the bars: chart.js sets an inline `translate` (the `translate` CSS property
+   composes with Plotly's own `transform` attribute, so they keep their layout
+   position and just gain the shift). No CSS transition — the shift is smoothed
+   by chart.js's EMA loop, in lockstep with the bars. */
 #chart .xtick,
 #chart .annotation,
 #chart .errorbar {
-  transition: translate 140ms ease-out;
+  transition: none;
 }
 
 /* ════════════════════════════════════════════════════════════
