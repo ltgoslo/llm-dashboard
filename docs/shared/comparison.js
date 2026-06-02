@@ -32,7 +32,7 @@ let urlState = null;
 
 // Org → local logo filename (all stored white in docs/shared/logos/).
 // Files in this folder are downloaded copies — no runtime network
-// dependency. All 14 orgs in the dataset are now covered.
+// dependency. All 18 orgs in the dataset are now covered.
 const ORG_LOGO = {
   "Google": "google.png",
   "Meta": "meta.png",
@@ -40,11 +40,15 @@ const ORG_LOGO = {
   "Alibaba": "qwen.png",
   "AI Sweden": "ai_sweden.png",
   "Allen AI": "allen_ai.png",
+  "SpeakLeash": "bielik.png",
+  "Cohere Labs": "cohere.png",
   "DFM": "dfm.png",
+  "DeepSeek AI": "deepseek.png",
   "EuroLLM": "eurollm.png",
   "LTG/UiO": "uio.png",
   "Nasjonalbiblioteket": "nb.png",
   "NorwAI/NTNU": "ntnu.png",
+  "NVIDIA": "nvidia.png",
   "SILO AI": "silo_ai.png",
   "Swiss AI": "swiss_ai.png",
   "Z.ai": "zai.png",

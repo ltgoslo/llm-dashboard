@@ -11,5 +11,5 @@ initComparison({
   defaultSizeMin: 6,
   defaultSizeMax: 24,
   sizeRangeMin: 1,
-  sizeRangeMax: 150,
+  sizeRangeMax: 700,
 });
