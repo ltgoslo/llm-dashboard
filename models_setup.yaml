@@ -931,7 +931,7 @@ Bielik-1.5B-v3:
   parameters: 1.6
   license: "Apache 2.0"
   fully_open: false
-  description: "Polish-focused base language model from SpeakLeash and ACK Cyfronet AGH, continually-trained from Qwen2.5-1.5B on 292B tokens (1.2 epochs) of Polish text filtered with an XGBoost quality classifier. Trained on the Helios supercomputer using the ALLaMo framework."
+  description: "Polish-focused base language model from SpeakLeash and ACK Cyfronet AGH, continually-trained from Qwen2.5-1.5B on 300B tokens of Polish text."
   huggingface_url: https://huggingface.co/speakleash/Bielik-1.5B-v3
   default: true
   color: "#f66953"
@@ -943,7 +943,7 @@ Bielik-4.5B-v3:
   parameters: 4.8
   license: "Apache 2.0"
   fully_open: false
-  description: "Polish-focused base language model from SpeakLeash and ACK Cyfronet AGH, continually-trained from Qwen2.5-3B (with depth/width expansion) on 292B tokens (1.2 epochs) of Polish text filtered with an XGBoost quality classifier. Trained on 256 NVIDIA GH200 cards on the Helios supercomputer."
+  description: "Polish-focused base language model from SpeakLeash and ACK Cyfronet AGH, continually-trained from Qwen2.5-3B (with depth/width expansion) on 300B tokens of Polish text."
   huggingface_url: https://huggingface.co/speakleash/Bielik-4.5B-v3
   default: true
   color: "#f66953"
@@ -955,7 +955,7 @@ Bielik-11B-v3-Base-20250730:
   parameters: 11.2
   license: "Apache 2.0"
   fully_open: false
-  description: "Polish-focused base language model from SpeakLeash and ACK Cyfronet AGH, continually-trained from Mistral-7B-v0.2 (with depth expansion). Trained on the Helios supercomputer; covers 32 European languages with optimization for Polish."
+  description: "Polish-focused base language model from SpeakLeash and ACK Cyfronet AGH, continually-trained from Mistral-7B-v0.2 (with depth expansion). Covers 32 European languages with preference for Polish."
   huggingface_url: https://huggingface.co/speakleash/Bielik-11B-v3-Base-20250730
   default: true
   color: "#f66953"
@@ -967,7 +967,7 @@ tiny-aya-base:
   parameters: 3.3
   license: "CC-BY-NC"
   fully_open: false
-  description: "Pretrained foundation model from Cohere Labs, trained from scratch for efficient multilingual representation across 70+ languages. Uses a hybrid attention pattern of three sliding-window layers (window 4096) for every global-attention layer without positional embeddings, plus RoPE. 8k context window."
+  description: "Pretrained base model from Cohere Labs, trained from scratch for efficient multilingual representation across 70+ languages. Uses a hybrid attention pattern of three sliding-window layers (window 4096) for every global-attention layer."
   huggingface_url: https://huggingface.co/CohereLabs/tiny-aya-base
   default: true
   color: "#3d5b51"
@@ -991,7 +991,7 @@ NVIDIA-Nemotron-Nano-12B-v2-Base:
   parameters: 12.3
   license: "NVIDIA Open Model License"
   fully_open: false
-  description: "Dense hybrid Mamba-2 / Transformer base language model from NVIDIA with 62 layers (28 Mamba-2, 28 MLP, 6 GQA attention layers). Pretrained on 20T tokens across 16 languages and code, with a 128k context window. Trained with NeMo / Megatron-LM."
+  description: "Dense hybrid Mamba-2 / Transformer base language model from NVIDIA with 62 layers (28 Mamba-2, 28 MLP, 6 GQA attention layers). Pretrained on 20T tokens across 16 languages and code, with a 128k context window."
   huggingface_url: https://huggingface.co/nvidia/NVIDIA-Nemotron-Nano-12B-v2-Base
   default: true
   color: "#76b900"
@@ -1003,7 +1003,7 @@ NVIDIA-Nemotron-3-Nano-30B-A3B-Base-BF16:
   parameters: 31.6
   license: "NVIDIA Open Model License"
   fully_open: false
-  description: "Mixture-of-Experts hybrid Mamba-2 / Transformer base model from NVIDIA with 30B total and 3B active parameters. Pretrained on 10.6T tokens (33% synthetic) across 20 languages. Supports up to 1M context (256k default), trained with NeMo / Megatron-LM."
+  description: "Mixture-of-Experts hybrid Mamba-2 / Transformer base model from NVIDIA with 30B total and 3B active parameters. Pretrained on 10.6T tokens (33% synthetic) across 20 languages. Supports up to 1M context (256k default)."
   huggingface_url: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-Base-BF16
   default: true
   color: "#76b900"
