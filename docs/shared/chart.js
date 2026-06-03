@@ -562,16 +562,46 @@ function attachBarHoverHighlight(chartEl) {
  *  unchanged); mouseleave is the safety reset. */
 function attachScatterHoverHighlight(chartEl) {
   const SCATTER_PEAK_SCALE = 2;   // peak magnification at the cursor
-  const SCATTER_SIGMA = 0.75;        // proximity falloff, in marker-radius units
-  let rafId = null;
-  let lastEv = null;
-  let currentTop = null;          // model currently lifted frontmost
+  const SCATTER_SIGMA = 0.75;     // magnify falloff, in marker-radius units
+  // Repulsion declutter — a per-frame force RELAXATION (not a static vector).
+  // Each frame we recompute overlaps from the markers' CURRENT positions, so a
+  // marker pushed into a new neighbour is in turn pushed by it: collisions
+  // cascade and resolve. A spring pulls every marker back to rest, and the
+  // cursor's proximity gates how much push it feels — so a cluster eases apart
+  // as the cursor nears and relaxes back as it leaves.
+  const SPREAD_SIGMA = 2.5;       // proximity gate for the push, in radii
+  const SPREAD_PAD = 1.0;         // separate until gap = (rᵢ+rⱼ)·PAD
+  const REPULSE = 0.1;           // push accel per px of overlap (per 60 fps frame)
+  const SPRING = 0.1;            // pull back to rest (per 60 fps frame)
+  const MOBILITY = 1.0;           // integration gain (per 60 fps frame)
+  const SPREAD_MAX = 4;         // cap a marker's displacement at × its radius
+  // Hit radius as a fraction of the measured bbox half-extent: only the SOLID
+  // coloured interior counts, not the white border ring. The disk SVG (see
+  // comparison.js coloredDiskDataUrl) is circle r=30 + stroke-width 2 in a
+  // 64-unit viewBox (half = 32), so the colour fills r<29 → 29/32. Scale-
+  // invariant, since both bbox and border scale together.
+  const SCATTER_HIT_FRAC = 29 / 32;
+  const SCATTER_SETTLE = 0.15;    // px/frame; stop the loop below this motion
+  const HALO_SCALE = 1.6;         // focus halo reaches this multiple of the
+                                  // marker radius (white starts AT the edge,
+                                  // fades to transparent at HALO_SCALE×).
+  // Visible disk edge as a fraction of the measured bbox half-extent: the disk
+  // SVG is r=30 + stroke 2 in a 64-unit viewBox, "contain"-fit, so the outer
+  // edge sits at 31/32. Used so the halo starts exactly at the marker's rim.
+  const DISK_EDGE_FRAC = 31 / 32;
+
+  const pointer = { x: 0, y: 0, active: false };
+  let rafId = null, lastT = null, currentTop = null;
+  let snap = null;                // { list:[{model,cx,cy,r}], idx:Map(model→i) }
+  let dispX = null, dispY = null; // per-marker displacement from rest (px)
+  let scaleState = null;          // last frame's magnify scale (for edge calc)
 
   // Tag each image with its model the first time we see a fresh (untagged) set
   // — right after a render, when DOM order still matches the positional
   // _scatterImageMap. Keying off the tag (not the live index) lets our z-order
   // reshuffling persist without desyncing the lookup; only a fresh Plotly
-  // redraw (new, untagged nodes) re-tags. Returns the image list, or null.
+  // redraw (new, untagged nodes) re-tags, which also re-snapshots rest geometry
+  // and zeroes the displacement. Returns the image list, or null.
   function taggedImages() {
     const map = chartEl._scatterImageMap;
     if (!map) return null;
@@ -579,38 +609,56 @@ function attachScatterHoverHighlight(chartEl) {
     if (!imgs.length) return null;
     if (imgs.some((img) => !img._scatterTagged)) {
       imgs.forEach((img, i) => { img._scatterTagged = true; img._scatterModel = map[i]; });
-      currentTop = null;   // fresh layout → nothing lifted yet
+      currentTop = null;
+      snapshotRest(imgs);
     }
     return imgs;
   }
 
-  // Group images by model and, in the SAME pass, find the hit model: the
-  // topmost (last-painted) marker whose disk is under the cursor. We iterate in
-  // DOM order and overwrite, so the frontmost match wins — meaning a marker we
-  // lifted keeps the hit while the cursor stays on it (no flip-flop), and the
-  // decision honours the live paint order rather than a fixed data order.
-  function readModels(imgs, cursorX, cursorY) {
-    const models = new Map();
-    let hitModel = null;
+  // Snapshot each model's RESTING centre + radius (measured at a clean moment:
+  // fresh, untransformed nodes). The simulation springs toward these rest
+  // positions; the forces themselves are recomputed live from rest + disp.
+  function snapshotRest(imgs) {
+    const g = new Map();
     imgs.forEach((img) => {
       const model = img._scatterModel;
       if (model == null) return;
       const r = img.getBoundingClientRect();
       if (!(r.width > 0)) return;
-      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-      const rad = Math.min(r.width, r.height) / 2;   // disk radius
-      if (Math.hypot(cursorX - cx, cursorY - cy) <= rad) hitModel = model;
-      let g = models.get(model);
-      if (!g) models.set(model, (g = { model, imgs: [], cx: 0, cy: 0, r: 0, n: 0 }));
-      g.imgs.push(img);
-      g.cx += cx; g.cy += cy;
-      g.r = Math.max(g.r, rad);
-      g.n += 1;
+      let m = g.get(model);
+      if (!m) g.set(model, (m = { model, cx: 0, cy: 0, r: 0, n: 0 }));
+      m.cx += r.left + r.width / 2;
+      m.cy += r.top + r.height / 2;
+      m.r = Math.max(m.r, Math.min(r.width, r.height) / 2);
+      m.n += 1;
     });
-    if (!models.size) return null;
-    const out = [];
-    models.forEach((g) => { g.cx /= g.n; g.cy /= g.n; out.push(g); });
-    return { models: out, hitModel };
+    const list = [], idx = new Map();
+    g.forEach((m) => {
+      idx.set(m.model, list.length);
+      list.push({ model: m.model, cx: m.cx / m.n, cy: m.cy / m.n, r: m.r });
+    });
+    snap = { list, idx };
+    dispX = new Float64Array(list.length);
+    dispY = new Float64Array(list.length);
+    scaleState = new Float64Array(list.length).fill(1);
+  }
+
+  // Hit model: the topmost (last-painted) marker whose CURRENT disk is under
+  // the cursor. Iterating DOM order and overwriting means the frontmost match
+  // wins — a lifted marker keeps the hit while the cursor's on it (no flicker),
+  // and it honours the live paint order, not a fixed data order. Uses the
+  // current (possibly moved/scaled) bbox so the hit follows what's on screen.
+  function hitTest(imgs, cursorX, cursorY) {
+    let hitModel = null;
+    imgs.forEach((img) => {
+      const r = img.getBoundingClientRect();
+      if (!(r.width > 0)) return;
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      if (Math.hypot(cursorX - cx, cursorY - cy) <= Math.min(r.width, r.height) / 2 * SCATTER_HIT_FRAC) {
+        hitModel = img._scatterModel;
+      }
+    });
+    return hitModel;
   }
 
   // Lift a model's images to the front (end of the layer; SVG paints the last
@@ -622,6 +670,59 @@ function attachScatterHoverHighlight(chartEl) {
     chartEl.querySelectorAll(".imagelayer image").forEach((img) => {
       if (img._scatterModel === model && img.parentNode) img.parentNode.appendChild(img);
     });
+  }
+
+  // A single overlay div holding a white radial-gradient ring, parked over the
+  // focused marker (transparent centre → the marker shows through; white ring
+  // fades outward, reading as a light moat against overlapping neighbours).
+  // SVG <image> can't carry a CSS gradient, so a positioned overlay is the
+  // simplest way to get one. Fixed-position in viewport coords (matches
+  // getBoundingClientRect); pointer-events none so it never blocks hovering.
+  function halo() {
+    let h = chartEl._scatterHalo;
+    if (!h) {
+      h = document.createElement("div");
+      h.className = "scatter-focus-halo";
+      // The white starts at the marker edge — which sits at 1/HALO_SCALE of the
+      // div radius (the div spans HALO_SCALE× the marker radius) — and fades to
+      // transparent at the edge. `closest-side` makes 100% land on the div's
+      // own edge (not its corner), so border-radius can't hard-cut a non-zero
+      // alpha → a smooth fade. Set here so it stays in sync with HALO_SCALE.
+      const edge = (100 / HALO_SCALE).toFixed(2);
+      h.style.background = `radial-gradient(circle closest-side, `
+        + `rgba(255,255,255,0) ${edge}%, `
+        + `rgba(255,255,255,0.5) ${edge}%, `
+        + `rgba(255,255,255,0) 100%)`;
+      document.body.appendChild(h);
+      chartEl._scatterHalo = h;
+    }
+    return h;
+  }
+
+  // Park the halo over the focused model's DISK (the data-URL image, not the
+  // logo), sized so the white ring begins exactly at the disk's rim. Hidden
+  // when nothing is focused.
+  function placeHalo(model, imgs) {
+    const h = halo();
+    if (model == null) { h.style.opacity = "0"; return; }
+    let disk = null;
+    for (const img of imgs) {
+      if (img._scatterModel !== model) continue;
+      const href = img.getAttribute("href") || img.getAttribute("xlink:href") || "";
+      if (href.startsWith("data:")) { disk = img; break; }   // the coloured disk
+      if (!disk) disk = img;                                  // fallback: first
+    }
+    const r = disk && disk.getBoundingClientRect();
+    if (!r || !(r.width > 0)) { h.style.opacity = "0"; return; }
+    // Visible marker radius, then the halo radius = HALO_SCALE× that, so the
+    // edge lands at 1/HALO_SCALE of the div (matching the gradient stop).
+    const markerR = Math.min(r.width, r.height) / 2 * DISK_EDGE_FRAC;
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const d = markerR * HALO_SCALE;
+    h.style.left = `${cx - d}px`;
+    h.style.top = `${cy - d}px`;
+    h.style.width = h.style.height = `${2 * d}px`;
+    h.style.opacity = "1";
   }
 
   // Drive the shared tooltip from the SAME hit as the magnify + lift, reusing
@@ -645,51 +746,121 @@ function attachScatterHoverHighlight(chartEl) {
     if (onUnhover) onUnhover();
   }
 
-  function apply(cursorX, cursorY) {
+  function frame(now) {
+    rafId = null;
+    const dt = lastT === null ? 16 : Math.max(1, Math.min(EMA_MAX_DT, now - lastT));
+    lastT = now;
+    const dtN = dt / 16;   // frames elapsed (normalised to 60 fps)
+
     const imgs = taggedImages();
-    if (!imgs) return;
-    const read = readModels(imgs, cursorX, cursorY);
-    if (!read) return;
-    const { models, hitModel } = read;
-    // Rest radius = smallest measured (any magnified marker is inflated).
-    let refR = Infinity;
-    for (const m of models) refR = Math.min(refR, m.r);
-    if (!isFinite(refR) || refR <= 0) refR = 16;
-    const denom = SCATTER_SIGMA * refR;
-    for (const m of models) {
-      // Distance from the marker's EDGE (the disk of radius refR), not its
-      // centre: 0 whenever the cursor is anywhere on the marker — so it sits at
-      // full peak across the whole disk and only fades once the cursor leaves
-      // it (mirrors the bars' point-to-rect distance).
-      const d = Math.max(0, Math.hypot(cursorX - m.cx, cursorY - m.cy) - refR);
-      const w = 1 / (1 + (d / denom) ** 2);
-      const s = 1 + (SCATTER_PEAK_SCALE - 1) * w;
-      const v = s > 1.005 ? `${s} ${s}` : "";   // leave distant markers at rest
-      m.imgs.forEach((img) => { img.style.scale = v; });
+    if (!imgs || !snap) {
+      if (pointer.active) rafId = requestAnimationFrame(frame);
+      else lastT = null;
+      return;
     }
+    const list = snap.list, N = list.length;
+    let refR = Infinity;
+    for (const m of list) refR = Math.min(refR, m.r);
+    if (!isFinite(refR) || refR <= 0) refR = 16;
+    const magDenom = SCATTER_SIGMA * refR, sprDenom = SPREAD_SIGMA * refR;
+
+    // Per-marker cursor proximity (gates the push), magnify scale, and the
+    // resulting CURRENT (scaled) radius used for the overlap test.
+    //
+    // The spread gate W keys off the REST centre (stable input to the sim). The
+    // magnify S keys off the CURRENT edge: distance from the cursor to the
+    // marker as it actually is right now — current centre (rest + displacement)
+    // minus current radius (rest × last frame's scale). Reusing the previous
+    // scale relaxes the self-reference across frames; it converges and is
+    // bounded by SCATTER_PEAK_SCALE, giving a slightly "magnetic" grow.
+    const W = new Float64Array(N), S = new Float64Array(N), R = new Float64Array(N);
+    for (let i = 0; i < N; i++) {
+      const m = list[i];
+      if (pointer.active) {
+        const dcRest = Math.hypot(pointer.x - m.cx, pointer.y - m.cy);
+        W[i] = 1 / (1 + (dcRest / sprDenom) ** 2);
+        const dcCur = Math.hypot(pointer.x - (m.cx + dispX[i]), pointer.y - (m.cy + dispY[i]));
+        const edge = Math.max(0, dcCur - m.r * scaleState[i]);
+        const wm = 1 / (1 + (edge / magDenom) ** 2);
+        S[i] = 1 + (SCATTER_PEAK_SCALE - 1) * wm;
+      } else { W[i] = 0; S[i] = 1; }
+      scaleState[i] = S[i];
+      R[i] = m.r * S[i];
+    }
+
+    // Forces: spring to rest + pairwise repulsion from CURRENT overlaps.
+    // Recomputing from current positions each frame is what lets a displaced
+    // marker collide with a NEW neighbour and be pushed back — the cascade
+    // resolves over successive frames instead of in one blind shove.
+    const Fx = new Float64Array(N), Fy = new Float64Array(N);
+    for (let i = 0; i < N; i++) { Fx[i] = -SPRING * dispX[i]; Fy[i] = -SPRING * dispY[i]; }
+    for (let i = 0; i < N; i++) {
+      for (let j = i + 1; j < N; j++) {
+        const ax = list[i].cx + dispX[i], ay = list[i].cy + dispY[i];
+        const bx = list[j].cx + dispX[j], by = list[j].cy + dispY[j];
+        const dx = ax - bx, dy = ay - by;
+        const d = Math.hypot(dx, dy);
+        const overlap = (R[i] + R[j]) * SPREAD_PAD - d;   // current (scaled) radii
+        if (overlap <= 0) continue;              // disjoint → no force
+        let ux, uy;
+        if (d < 1e-3) { const a = list[i].model * 2.39996; ux = Math.cos(a); uy = Math.sin(a); }
+        else { ux = dx / d; uy = dy / d; }
+        const f = REPULSE * overlap;
+        Fx[i] += ux * f * W[i]; Fy[i] += uy * f * W[i];   // gated by proximity
+        Fx[j] -= ux * f * W[j]; Fy[j] -= uy * f * W[j];
+      }
+    }
+
+    // Integrate (overdamped — no inertia, so it can't oscillate) and clamp.
+    let maxStep = 0;
+    for (let i = 0; i < N; i++) {
+      const sx = Fx[i] * MOBILITY * dtN, sy = Fy[i] * MOBILITY * dtN;
+      dispX[i] += sx; dispY[i] += sy;
+      const mag = Math.hypot(dispX[i], dispY[i]), cap = SPREAD_MAX * list[i].r;
+      if (mag > cap && mag > 0) { const k = cap / mag; dispX[i] *= k; dispY[i] *= k; }
+      maxStep = Math.max(maxStep, Math.hypot(sx, sy));
+    }
+
+    // Read (hit-test) before writing styles, to avoid layout read/write churn.
+    const hitModel = pointer.active ? hitTest(imgs, pointer.x, pointer.y) : null;
+    imgs.forEach((img) => {
+      const i = snap.idx.get(img._scatterModel);
+      if (i == null) return;
+      const s = S[i];
+      img.style.scale = s > 1.005 ? `${s} ${s}` : "";
+      const tx = dispX[i], ty = dispY[i];
+      img.style.translate = (Math.abs(tx) > 0.05 || Math.abs(ty) > 0.05) ? `${tx}px ${ty}px` : "";
+    });
     bringToFront(hitModel);
-    driveTooltip(hitModel, cursorX, cursorY);
+    placeHalo(hitModel, imgs);
+    driveTooltip(hitModel, pointer.x, pointer.y);
+
+    if (maxStep < SCATTER_SETTLE) {
+      lastT = null;
+      if (!pointer.active) {
+        // Fully relaxed back to rest: clear residual inline transforms.
+        for (let i = 0; i < N; i++) { dispX[i] = 0; dispY[i] = 0; }
+        imgs.forEach((img) => { img.style.scale = ""; img.style.translate = ""; });
+      }
+      return;   // idle until the next mousemove / mouseleave
+    }
+    rafId = requestAnimationFrame(frame);
   }
 
-  function schedule(ev) {
-    lastEv = ev;
-    if (rafId !== null) return;
-    rafId = requestAnimationFrame(() => { rafId = null; apply(lastEv.clientX, lastEv.clientY); });
-  }
-
-  function reset() {
-    if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
-    chartEl.querySelectorAll(".imagelayer image").forEach((img) => { img.style.scale = ""; });
-    if (chartEl._scatterOnUnhover) chartEl._scatterOnUnhover();
-    // Paint order is intentionally NOT reset — lifts persist across hovers.
-  }
+  function ensureLoop() { if (rafId === null) rafId = requestAnimationFrame(frame); }
 
   // Idempotently bind: avoid stacking listeners on every re-render.
   // (Plotly.newPlot doesn't clear DOM listeners added via addEventListener.)
   if (chartEl._scatterHoverBound) return;
   chartEl._scatterHoverBound = true;
-  chartEl.addEventListener("mousemove", schedule);
-  chartEl.addEventListener("mouseleave", reset);
+  chartEl.addEventListener("mousemove", (ev) => {
+    pointer.x = ev.clientX; pointer.y = ev.clientY; pointer.active = true;
+    ensureLoop();
+  });
+  chartEl.addEventListener("mouseleave", () => {
+    pointer.active = false;   // springs relax everything back to rest
+    ensureLoop();
+  });
 }
 
 /** Plotly.newPlot + register hover handlers. Bar traces animate from y=0
@@ -715,6 +886,9 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
   const isScatterMode = barIndices.length === 0
     && traces.some((t) => t.type === "scatter" && t.mode && t.mode.indexOf("markers") !== -1);
   chartEl.classList.toggle("scatter-mode", isScatterMode);
+  // Each render rebuilds the chart, so hide any leftover focus halo (e.g. when
+  // switching scatter → bars without a mouseleave). It reappears on next hover.
+  if (chartEl._scatterHalo) chartEl._scatterHalo.style.opacity = "0";
 
   if (!shouldAnimate) {
     Plotly.newPlot("chart", traces, plotLayout, config).then(() => {

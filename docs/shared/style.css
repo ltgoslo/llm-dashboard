@@ -546,10 +546,27 @@ header.dashboard-header h1 {
   transform-origin: 50% 69%;
 }
 /* Scatter mode: each (disk + logo) image is the marker itself, anchored at
-   the data point's centre — so scale around centre instead of bottom. */
+   the data point's centre — so scale around centre instead of bottom. The
+   `translate` is driven frame-by-frame by chart.js's repulsion simulation, so
+   only `scale` gets a CSS transition here (a translate transition would
+   double-smooth and lag the sim). */
 #chart.scatter-mode .imagelayer image,
 #chart.scatter-mode .imagelayer image.logo-uio {
   transform-origin: 50% 50%;
+  transition: scale 140ms ease-out;
+}
+/* Focused (hovered) marker halo: a white radial glow on the OUTSIDE of the
+   marker. chart.js parks this overlay over the focused disk and sets its
+   `background` gradient (kept in sync with HALO_SCALE) — white starting at the
+   marker's rim, fading outward to transparent; the centre stays transparent so
+   the marker shows through with no inner lightening. */
+.scatter-focus-halo {
+  position: fixed;
+  z-index: 100;            /* above the chart, below the tooltip (1000) */
+  pointer-events: none;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 140ms ease-out;
 }
 /* x-axis ticks, score labels, and error bars ride the same dock-spread as
    the bars: chart.js sets an inline `translate` (the `translate` CSS property
