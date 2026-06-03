@@ -1099,12 +1099,12 @@ function collectScatterPoints(modelNames, scoreFn) {
 function scatterXAxis() {
   return {
     type: "log",
-    range: [Math.log10(CFG.sizeRangeMin), Math.log10(CFG.sizeRangeMax)],
+    range: [Math.log10(0.6), Math.log10(1050)],
     automargin: false,
     title: { text: "Model size (B parameters)", font: { size: 13, color: "#64748b" }, standoff: 12 },
     showgrid: true, gridcolor: "#d8dce3",
-    tickvals: [1, 3, 10, 30, 100],
-    ticktext: ["1B", "3B", "10B", "30B", "100B"],
+    tickvals: [1, 3, 10, 30, 100, 300, 1000],
+    ticktext: ["1B", "3B", "10B", "30B", "100B", "300B", "1T"],
   };
 }
 
@@ -1525,7 +1525,7 @@ function renderGroupedScatter(groupName) {
     },
     xaxis: scatterXAxis(),
     showlegend: false,
-    margin: { l: 105, r: 4, t: 8, b: 60 },
+    margin: { l: 105, r: 20, t: 8, b: 60 },
     images: buildScatterOrgImages(allLogoDirs, allLogoXs, paperYs),
   });
 
@@ -1535,6 +1535,9 @@ function renderGroupedScatter(groupName) {
     color: i === 0 ? repColor : darkenColor(repColor, 0.3),
   })));
 
+  // Grouped scatter uses Plotly dots (no composite images): clear any stale
+  // map from a prior single-trace scatter so chart.js keeps Plotly's hover.
+  document.getElementById("chart")._scatterImageMap = null;
   plotChart(traces, layout, plotlyConfig, onChartHover, hideTooltip);
 }
 
@@ -1565,7 +1568,7 @@ function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
     },
     xaxis: scatterXAxis(),
     showlegend: false,
-    margin: { l: 105, r: 4, t: 8, b: 60 },
+    margin: { l: 105, r: 20, t: 8, b: 60 },
     images: composite.images,
   });
   // Stash the image→model mapping so the scatter hover handler (in chart.js)

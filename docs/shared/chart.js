@@ -548,62 +548,148 @@ function attachBarHoverHighlight(chartEl) {
   });
 }
 
-/** Scatter-mode hover: scale up the (disk + logo) the cursor is over.
+/** Scatter-mode hover: smoothly MAGNIFY each marker by the cursor's proximity
+ *  to it — a soft magnifier like the bars' dock scaling, but markers only grow,
+ *  they don't move. Scale is a continuous function of distance (peaks under the
+ *  cursor, falls off with a Lorentzian over a few marker-radii); the CSS `scale`
+ *  transition (kept in scatter mode) smooths it between mousemove samples.
  *
- *  Previously this hooked into Plotly's plotly_hover/unhover, which fire
- *  off the trace's invisible marker hit-test — a different geometry than
- *  the visible composite — and don't reliably fire unhover on slow exits.
- *  The tooltip uses those events fine because it tolerates flicker, but
- *  the animation needs a guaranteed reset when the cursor leaves a glyph.
+ *  Marker centres are invariant under the centred scale, so we can measure them
+ *  live even while a marker is mid-magnify; a magnified marker's measured radius
+ *  is inflated, so the rest radius is taken as the min across models.
  *
- *  Instead: pure DOM mousemove on the chart, hit-testing the cursor
- *  against the layout.image bboxes; topmost (last in paint order) wins.
- *  mouseleave on the chart container is the safety reset. The tooltip
- *  stays on plotly_hover/unhover, unchanged. */
+ *  Pure DOM mousemove (the tooltip still rides Plotly's plotly_hover/unhover,
+ *  unchanged); mouseleave is the safety reset. */
 function attachScatterHoverHighlight(chartEl) {
-  const SCATTER_HOVER_SCALE = "1.4 1.4";
-  let activeModel = null;
-  let activeImgs = [];
+  const SCATTER_PEAK_SCALE = 2;   // peak magnification at the cursor
+  const SCATTER_SIGMA = 0.75;        // proximity falloff, in marker-radius units
+  let rafId = null;
+  let lastEv = null;
+  let currentTop = null;          // model currently lifted frontmost
 
-  function applyModel(targetModel) {
-    if (targetModel === activeModel) return;
-    activeImgs.forEach((img) => { img.style.scale = ""; });
-    activeImgs = [];
-    activeModel = targetModel;
-    if (targetModel == null) return;
-    const map = chartEl._scatterImageMap || [];
-    chartEl.querySelectorAll(".imagelayer image").forEach((img, i) => {
-      if (map[i] === targetModel) {
-        img.style.scale = SCATTER_HOVER_SCALE;
-        activeImgs.push(img);
-      }
+  // Tag each image with its model the first time we see a fresh (untagged) set
+  // — right after a render, when DOM order still matches the positional
+  // _scatterImageMap. Keying off the tag (not the live index) lets our z-order
+  // reshuffling persist without desyncing the lookup; only a fresh Plotly
+  // redraw (new, untagged nodes) re-tags. Returns the image list, or null.
+  function taggedImages() {
+    const map = chartEl._scatterImageMap;
+    if (!map) return null;
+    const imgs = [...chartEl.querySelectorAll(".imagelayer image")];
+    if (!imgs.length) return null;
+    if (imgs.some((img) => !img._scatterTagged)) {
+      imgs.forEach((img, i) => { img._scatterTagged = true; img._scatterModel = map[i]; });
+      currentTop = null;   // fresh layout → nothing lifted yet
+    }
+    return imgs;
+  }
+
+  // Group images by model and, in the SAME pass, find the hit model: the
+  // topmost (last-painted) marker whose disk is under the cursor. We iterate in
+  // DOM order and overwrite, so the frontmost match wins — meaning a marker we
+  // lifted keeps the hit while the cursor stays on it (no flip-flop), and the
+  // decision honours the live paint order rather than a fixed data order.
+  function readModels(imgs, cursorX, cursorY) {
+    const models = new Map();
+    let hitModel = null;
+    imgs.forEach((img) => {
+      const model = img._scatterModel;
+      if (model == null) return;
+      const r = img.getBoundingClientRect();
+      if (!(r.width > 0)) return;
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const rad = Math.min(r.width, r.height) / 2;   // disk radius
+      if (Math.hypot(cursorX - cx, cursorY - cy) <= rad) hitModel = model;
+      let g = models.get(model);
+      if (!g) models.set(model, (g = { model, imgs: [], cx: 0, cy: 0, r: 0, n: 0 }));
+      g.imgs.push(img);
+      g.cx += cx; g.cy += cy;
+      g.r = Math.max(g.r, rad);
+      g.n += 1;
+    });
+    if (!models.size) return null;
+    const out = [];
+    models.forEach((g) => { g.cx /= g.n; g.cy /= g.n; out.push(g); });
+    return { models: out, hitModel };
+  }
+
+  // Lift a model's images to the front (end of the layer; SVG paints the last
+  // sibling on top) and LEAVE them there — every other marker keeps its current
+  // order, so lifts accumulate and persist after the cursor leaves.
+  function bringToFront(model) {
+    if (model == null || model === currentTop) return;
+    currentTop = model;
+    chartEl.querySelectorAll(".imagelayer image").forEach((img) => {
+      if (img._scatterModel === model && img.parentNode) img.parentNode.appendChild(img);
     });
   }
 
-  function pickModelFromCursor(ev) {
-    const map = chartEl._scatterImageMap;
-    if (!map) return null;
-    const cx = ev.clientX, cy = ev.clientY;
-    const imgs = chartEl.querySelectorAll(".imagelayer image");
-    let pick = null;
-    // Last hit wins → topmost in paint order.
-    for (let i = 0; i < imgs.length; i++) {
-      const r = imgs[i].getBoundingClientRect();
-      if (cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom) {
-        pick = map[i];
+  // Drive the shared tooltip from the SAME hit as the magnify + lift, reusing
+  // the chart's own hover callback so the content matches exactly. This keeps
+  // tooltip, magnify, and z-order in lockstep — all on the live paint order.
+  function driveTooltip(hitModel, cursorX, cursorY) {
+    const onHover = chartEl._scatterOnHover, onUnhover = chartEl._scatterOnUnhover;
+    if (hitModel != null && onHover) {
+      const tr = chartEl.data && chartEl.data[0];
+      if (tr) {
+        onHover({
+          points: [{
+            x: tr.x[hitModel], y: tr.y[hitModel],
+            customdata: tr.customdata && tr.customdata[hitModel], data: tr,
+          }],
+          event: { clientX: cursorX, clientY: cursorY },
+        });
+        return;
       }
     }
-    return pick;
+    if (onUnhover) onUnhover();
+  }
+
+  function apply(cursorX, cursorY) {
+    const imgs = taggedImages();
+    if (!imgs) return;
+    const read = readModels(imgs, cursorX, cursorY);
+    if (!read) return;
+    const { models, hitModel } = read;
+    // Rest radius = smallest measured (any magnified marker is inflated).
+    let refR = Infinity;
+    for (const m of models) refR = Math.min(refR, m.r);
+    if (!isFinite(refR) || refR <= 0) refR = 16;
+    const denom = SCATTER_SIGMA * refR;
+    for (const m of models) {
+      // Distance from the marker's EDGE (the disk of radius refR), not its
+      // centre: 0 whenever the cursor is anywhere on the marker — so it sits at
+      // full peak across the whole disk and only fades once the cursor leaves
+      // it (mirrors the bars' point-to-rect distance).
+      const d = Math.max(0, Math.hypot(cursorX - m.cx, cursorY - m.cy) - refR);
+      const w = 1 / (1 + (d / denom) ** 2);
+      const s = 1 + (SCATTER_PEAK_SCALE - 1) * w;
+      const v = s > 1.005 ? `${s} ${s}` : "";   // leave distant markers at rest
+      m.imgs.forEach((img) => { img.style.scale = v; });
+    }
+    bringToFront(hitModel);
+    driveTooltip(hitModel, cursorX, cursorY);
+  }
+
+  function schedule(ev) {
+    lastEv = ev;
+    if (rafId !== null) return;
+    rafId = requestAnimationFrame(() => { rafId = null; apply(lastEv.clientX, lastEv.clientY); });
+  }
+
+  function reset() {
+    if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+    chartEl.querySelectorAll(".imagelayer image").forEach((img) => { img.style.scale = ""; });
+    if (chartEl._scatterOnUnhover) chartEl._scatterOnUnhover();
+    // Paint order is intentionally NOT reset — lifts persist across hovers.
   }
 
   // Idempotently bind: avoid stacking listeners on every re-render.
   // (Plotly.newPlot doesn't clear DOM listeners added via addEventListener.)
   if (chartEl._scatterHoverBound) return;
   chartEl._scatterHoverBound = true;
-  chartEl.addEventListener("mousemove", (ev) => {
-    applyModel(pickModelFromCursor(ev));
-  });
-  chartEl.addEventListener("mouseleave", () => applyModel(null));
+  chartEl.addEventListener("mousemove", schedule);
+  chartEl.addEventListener("mouseleave", reset);
 }
 
 /** Plotly.newPlot + register hover handlers. Bar traces animate from y=0
@@ -639,8 +725,18 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
       if (barIndices.length) captureNaturalRects(chartEl);
     });
     liftBarsAndLogos(chartEl);
-    if (onHover) chartEl.on("plotly_hover", onHover);
-    if (onUnhover) chartEl.on("plotly_unhover", onUnhover);
+    // Composite scatter (single trace + _scatterImageMap) drives its tooltip
+    // from chart.js's own paint-order hit-test, so the tooltip, magnify, and
+    // bring-to-front all agree and honour the live z-order. Every other mode
+    // (bars, grouped scatter) uses Plotly's hover as before.
+    const compositeScatter = isScatterMode && !!chartEl._scatterImageMap;
+    if (compositeScatter) {
+      chartEl._scatterOnHover = onHover || null;
+      chartEl._scatterOnUnhover = onUnhover || null;
+    } else {
+      if (onHover) chartEl.on("plotly_hover", onHover);
+      if (onUnhover) chartEl.on("plotly_unhover", onUnhover);
+    }
     if (barIndices.length) attachBarHoverHighlight(chartEl);
     if (isScatterMode) attachScatterHoverHighlight(chartEl);
     return;
