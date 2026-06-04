@@ -571,9 +571,9 @@ function attachScatterHoverHighlight(chartEl) {
   // as the cursor nears and relaxes back as it leaves.
   const SPREAD_SIGMA = 2.5;       // proximity gate for the push, in radii
   const SPREAD_PAD = 1.0;         // separate until gap = (rᵢ+rⱼ)·PAD
-  const REPULSE = 0.1;           // push accel per px of overlap (per 60 fps frame)
-  const SPRING = 0.1;            // pull back to rest (per 60 fps frame)
-  const MOBILITY = 1.0;           // integration gain (per 60 fps frame)
+  const REPULSE = 0.3;           // push accel per px of overlap (per 60 fps frame)
+  const SPRING = 0.3;            // pull back to rest (per 60 fps frame)
+  const MOBILITY = 0.5;           // integration gain (per 60 fps frame)
   const SPREAD_MAX = 4;         // cap a marker's displacement at × its radius
   // Hit radius as a fraction of the measured bbox half-extent: only the SOLID
   // coloured interior counts, not the white border ring. The disk SVG (see

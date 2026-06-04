@@ -984,6 +984,18 @@ DeepSeek-V3-Base:
   default: true
   color: "#4d6bfe"
 
+DeepSeek-V4-Flash-Base:
+  display_name: "DeepSeek V4 Flash 284B (13B active)"
+  category: multilingual
+  organization: DeepSeek AI
+  parameters: 284.0
+  license: "MIT"
+  fully_open: false
+  description: "Efficiency-focused Mixture-of-Experts base language model from DeepSeek AI with 284B total and 13B active parameters across 256 routed experts (6 active per token) plus 1 shared expert. Pretrained on 32T+ tokens in FP8 with a hybrid attention mechanism combining Compressed Sparse Attention (4× compression) and Heavily Compressed Attention (128× compression), reducing inference FLOPs to ~10% and KV-cache memory to ~7% of DeepSeek-V3.2. Native 64k context extended to 1M tokens via YaRN scaling."
+  huggingface_url: https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-Base
+  default: true
+  color: "#4d6bfe"
+
 NVIDIA-Nemotron-Nano-12B-v2-Base:
   display_name: "Nemotron Nano 12B v2"
   category: multilingual
