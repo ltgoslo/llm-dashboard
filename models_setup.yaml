@@ -1031,3 +1031,15 @@ NVIDIA-Nemotron-3-Super-120B-A12B-Base-BF16:
   huggingface_url: https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-Base-BF16
   default: true
   color: "#76b900"
+
+Nemotron-4-340B-Base-hf-FP8:
+  display_name: "Nemotron 4 340B"
+  category: multilingual
+  organization: NVIDIA
+  parameters: 340.0
+  license: "NVIDIA Open Model License"
+  fully_open: false
+  description: "Dense transformer-decoder base model from NVIDIA with 340B parameters, using Grouped-Query Attention and Rotary Position Embeddings. Pretrained on 9T tokens (8T initial + 1T continual) covering 50+ natural and 40+ coding languages. Featured here as the FP8-quantized HF-format conversion of the original v1.2 .nemo checkpoint. 4k context window."
+  huggingface_url: https://huggingface.co/mgoin/Nemotron-4-340B-Base-hf-FP8
+  default: true
+  color: "#76b900"
