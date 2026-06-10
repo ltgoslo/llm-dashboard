@@ -32,10 +32,6 @@ function getMainCheckpoints() {
   return Object.keys(state.DATA.progress).map(Number).sort((a, b) => a - b);
 }
 
-function getAblationCheckpoints(ablName) {
-  return Object.keys(state.DATA.ablations[ablName] || {}).map(Number).sort((a, b) => a - b);
-}
-
 function getAblationDisplayName(ablName) {
   return state.DATA.ablation_display_names?.[ablName] || ablName;
 }
@@ -50,19 +46,53 @@ function getAblationColor(ablName) {
   return ABLATION_COLORS_FALLBACK[names.indexOf(ablName) % ABLATION_COLORS_FALLBACK.length];
 }
 
+// Each ablation forked off a parent run; prepending the parent's checkpoint
+// at the fork connects the lines visually instead of leaving a gap.
+// Stage 2 ablations forked from the main run at step 24,000 (201.3B tokens);
+// the older stage 3 ablations continue the last "stage 1 data, full decay"
+// checkpoint, and stage3-mainline continues "stage 2 data, ½ decay".
+const STAGE2_FORK_STEP = 24000;
+
+function lastStep(data) {
+  return Math.max(...Object.keys(data || {}).map(Number));
+}
+
+function getForkPoint(ablName) {
+  const abl = state.DATA.ablations || {};
+  if (ablName.startsWith("stage2")) {
+    return { data: state.DATA.progress, step: STAGE2_FORK_STEP };
+  }
+  const parentName = ablName === "stage3-mainline"
+    ? "stage2-no-len-ext-stage2-data-half-decay"
+    : "stage2-ablation-no-len-ext-stage1-data";
+  const parent = abl[parentName];
+  return parent ? { data: parent, step: lastStep(parent) } : null;
+}
+
 function getTrajectories() {
   const trajectories = [{
     name: "NorOLMo",
     color: MODEL_COLORS[0],
     dataSource: state.DATA.progress,
     checkpoints: getMainCheckpoints,
+    legendColumn: 2,   // "Original run"
   }];
   for (const ablName of Object.keys(state.DATA.ablations || {})) {
+    let data = state.DATA.ablations[ablName];
+    const fork = getForkPoint(ablName);
+    if (fork && fork.data[fork.step]) {
+      data = { [fork.step]: fork.data[fork.step], ...data };
+    }
+    const steps = Object.keys(data).map(Number).sort((a, b) => a - b);
     trajectories.push({
       name: getAblationDisplayName(ablName),
       color: getAblationColor(ablName),
-      dataSource: state.DATA.ablations[ablName],
-      checkpoints: () => getAblationCheckpoints(ablName),
+      dataSource: data,
+      checkpoints: () => steps,
+      legendColumn: ablName.startsWith("stage3") ? 1 : 0,
+      // The current mainline continuation paints above the other runs
+      // (without affecting legend order).
+      ...(ablName === "stage3-mainline" && { zorder: 1 }),
     });
   }
   return trajectories;
@@ -77,7 +107,12 @@ const chartConfig = {
   xToTokens: (step) => step * TOKENS_PER_STEP,
   xAxisLabel: "tokens",
   allShots: ALL_SHOTS,
-  legendPosition: "bottom-right",
+  yRangeSkipFirst: true,
+  legendColumns: [
+    { title: "Stage 2 tests", x: 0.05 },
+    { title: "Stage 3 tests", x: 0.225 },
+    { title: "Original run", x: 0.45 },
+  ],
   plotlyConfig,
   groupBenchmarks: (name) => {
     const g = state.DATA.task_groups?.[name];

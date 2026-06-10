@@ -41,12 +41,91 @@ const TOP_LEFT_LEGEND = {
   bgcolor: "rgba(255,255,255,0.8)", bordercolor: "#e2e8f0", borderwidth: 1,
 };
 
+// Line/marker sizing — base values used when building traces, hover values
+// applied to the whole hovered run via setTraceEmphasis().
+const LINE_WIDTH = 2.5, LINE_WIDTH_HOVER = 4.5;
+const MARKER_SIZE = 5, MARKER_SIZE_HOVER = 8;
+
+/** Emphasize the hovered run: thicken its line and enlarge its markers.
+ *  Pass null to clear. One Plotly.restyle call swaps the previous and new
+ *  emphasis together; a same-trace no-op guard keeps mousemoves along a
+ *  line from re-restyling. Bands are hoverinfo:"skip", so curve numbers
+ *  here always refer to line traces. */
+function setTraceEmphasis(curve) {
+  const chartEl = document.getElementById("chart");
+  if (!chartEl || !chartEl.data) return;
+  const prev = chartEl._emphasizedTrace ?? null;
+  if (prev === curve) return;
+  chartEl._emphasizedTrace = curve;
+  const indices = [], widths = [], sizes = [];
+  if (prev != null && prev < chartEl.data.length) {
+    indices.push(prev); widths.push(LINE_WIDTH); sizes.push(MARKER_SIZE);
+  }
+  if (curve != null && curve < chartEl.data.length) {
+    indices.push(curve); widths.push(LINE_WIDTH_HOVER); sizes.push(MARKER_SIZE_HOVER);
+  }
+  if (indices.length) {
+    Plotly.restyle(chartEl, { "line.width": widths, "marker.size": sizes }, indices);
+  }
+}
+
+/** Map a legend entry's <g class="traces"> element to its trace index in
+ *  chartEl.data. Primary: the d3-bound datum (legend items carry their full
+ *  trace, whose .index is the position in gd.data). Fallback: match the
+ *  legend label against line-trace names (bands carry no name). */
+function legendItemTraceIndex(chartEl, item) {
+  const d = item.__data__;
+  const tr = d && d[0] && d[0].trace;
+  if (tr && typeof tr.index === "number") return tr.index;
+  const label = item.querySelector(".legendtext")?.textContent;
+  if (!label) return null;
+  const idx = (chartEl.data || []).findIndex((t) => t.name === label && t.fill !== "toself");
+  return idx >= 0 ? idx : null;
+}
+
+/** Hovering a legend entry emphasizes its line just like hovering the line
+ *  itself. Delegated on the chart container (bound once — the container
+ *  div and its listeners survive Plotly re-renders), so it keeps working
+ *  after every redraw. Tracks legend-driven emphasis separately so it
+ *  never clears an emphasis set by plotly_hover on the lines. */
+function attachLegendHoverEmphasis(chartEl) {
+  if (chartEl._legendHoverBound) return;
+  chartEl._legendHoverBound = true;
+  chartEl.addEventListener("mouseover", (ev) => {
+    const item = ev.target.closest(".infolayer .traces");
+    if (item) {
+      const idx = legendItemTraceIndex(chartEl, item);
+      if (idx != null) {
+        chartEl._legendEmphasis = idx;
+        setTraceEmphasis(idx);
+      }
+    } else if (chartEl._legendEmphasis != null) {
+      chartEl._legendEmphasis = null;
+      setTraceEmphasis(null);
+    }
+  });
+  chartEl.addEventListener("mouseleave", () => {
+    if (chartEl._legendEmphasis != null) {
+      chartEl._legendEmphasis = null;
+      setTraceEmphasis(null);
+    }
+  });
+}
+
 /** Render a progress chart for the current task selection.
  *  config = { getTrajectories, xToTokens, xAxisLabel, hoverXFormat, titlePrefix,
  *             groupBenchmarks (optional, for grouped/paired views),
  *             plotlyConfig, legendPosition: "bottom-right"|"top-left",
  *             onTooltipExtra: optional callback for additional tooltip enrichment } */
 export function renderProgressChart(config) {
+  // Re-renders rebuild all traces at base width/size; drop any stale
+  // emphasis index so it can't restyle the wrong trace later.
+  const chartEl = document.getElementById("chart");
+  if (chartEl) {
+    chartEl._emphasizedTrace = null;
+    chartEl._legendEmphasis = null;
+    attachLegendHoverEmphasis(chartEl);
+  }
   const sel = state.currentTaskSelection;
 
   if (isAggregateSelection(sel)) {
@@ -68,6 +147,34 @@ function legendFor(config) {
   return config.legendPosition === "top-left" ? TOP_LEFT_LEGEND : PROGRESS_LEGEND;
 }
 
+/** Layout fragment for the legend(s). With config.legendColumns
+ *  ([{title, x, y?}, …]) the chart gets one titled Plotly legend per
+ *  column ("legend", "legend2", …), anchored top-left side by side;
+ *  trajectories opt into a column via their `legendColumn` index.
+ *  Without it, the single positional legend is used. */
+function legendLayout(config) {
+  if (!config.legendColumns) return { legend: legendFor(config) };
+  const out = {};
+  config.legendColumns.forEach((col, i) => {
+    out[i === 0 ? "legend" : "legend" + (i + 1)] = {
+      x: col.x ?? 0.01, y: col.y ?? 0.99, xanchor: "left", yanchor: "top",
+      bgcolor: "rgba(255,255,255,0.7)", borderwidth: 0,
+      // Title-to-entries spacing is handled in style.css (the legend
+      // `.groups` translateY rule) -- Plotly has no padding option, and
+      // a <br> in the title adds a full line-height, which is too much.
+      title: { text: "<b>" + col.title + "</b>" },
+    };
+  });
+  return out;
+}
+
+/** Plotly legend reference ("legend", "legend2", …) for a trajectory's
+ *  legendColumn, or undefined when multi-column legends aren't configured. */
+function legendRefFor(config, traj) {
+  if (!config.legendColumns || traj.legendColumn == null) return undefined;
+  return traj.legendColumn === 0 ? "legend" : "legend" + (traj.legendColumn + 1);
+}
+
 /** Resolve titlePrefix (string or function-returning-string). Returns "X – " or "". */
 function resolveTitlePrefix(config) {
   const prefix = typeof config.titlePrefix === "function"
@@ -84,11 +191,17 @@ function formatCIStr(value, ci, fmt) {
   return ` (95% CI: ${Number(lo).toFixed(fmt)} – ${Number(hi).toFixed(fmt)})`;
 }
 
+function onProgressUnhover() {
+  setTraceEmphasis(null);
+  hideTooltip();
+}
+
 function makeHoverHandler(config) {
   return function onHover(data) {
     if (!data.points || !data.points.length) return;
     const pt = data.points[0];
     if (pt.y == null) return;
+    setTraceEmphasis(pt.curveNumber);
     const fmt = state.currentNormalization === "zscore" ? 2 : 1;
     const scoreStr = Number(pt.y).toFixed(fmt);
     const cd = pt.customdata;
@@ -126,11 +239,18 @@ function renderAggregateProgress(config) {
   const traces = [];
   const allYValues = [];
 
-  // Compute y-range across all shots for stable axes.
-  for (const shot of config.allShots) {
+  // Compute y-range. Default: across all shots, for stable axes when
+  // switching shots. With yRangeSkipFirst the range instead tracks only
+  // the displayed shot, and each trajectory's first checkpoint is excluded
+  // (still plotted — early-training outliers just shouldn't compress the
+  // rest of the chart; the plot-area clip handles the spill).
+  const rangeShots = config.yRangeSkipFirst ? [state.currentShot] : config.allShots;
+  for (const shot of rangeShots) {
     for (const traj of trajectories) {
-      for (const x of traj.checkpoints()) {
-        const xEntities = traj.checkpoints().map(String);
+      const checkpoints = traj.checkpoints();
+      const xEntities = checkpoints.map(String);
+      const rangeXs = config.yRangeSkipFirst ? checkpoints.slice(1) : checkpoints;
+      for (const x of rangeXs) {
         const result = aggregateScores(state.checkedTasks, (bench) => {
           const raw = getScore(traj.dataSource, x, bench, shot);
           if (raw === undefined) return undefined;
@@ -143,8 +263,11 @@ function renderAggregateProgress(config) {
       }
     }
   }
-  const yRange = computeYRange(allYValues);
+  const yRange = computeYRange(allYValues, !!config.yRangeSkipFirst);
 
+  // Build bands and lines in separate passes so every band paints below
+  // every line — otherwise traj-N's band would occlude traj-(N-1)'s line.
+  const lineTraces = [];
   for (const traj of trajectories) {
     const xValues = traj.checkpoints();
     if (!xValues.length) continue;
@@ -166,19 +289,26 @@ function renderAggregateProgress(config) {
     });
     const scores = aggResults.map((r) => r ? r.score : null);
     const ciVals = aggResults.map((r) => r ? r.ci : null);
+    const lref = legendRefFor(config, traj);
 
     if (wantSE) {
       const band = makeBandTrace(xs, scores, ciVals, traj.color, traj.name);
-      if (band) traces.push(band);
+      if (band) {
+        if (lref) band.legend = lref;
+        traces.push(band);
+      }
     }
-    traces.push({
+    lineTraces.push({
       x: xs, y: scores, mode: "lines+markers", name: traj.name,
       legendgroup: traj.name,
-      line: { color: traj.color, width: 2.5 }, marker: { size: 5 },
+      ...(lref && { legend: lref }),
+      ...(traj.zorder != null && { zorder: traj.zorder }),
+      line: { color: traj.color, width: LINE_WIDTH }, marker: { size: MARKER_SIZE },
       customdata: aggResults.map((r) => r ? { count: r.count, ci: r.ci } : null),
       hoverinfo: "none",
     });
   }
+  traces.push(...lineTraces);
 
   const layout = getPlotlyLayout({
     margin: { l: 105, r: 4, t: 8, b: 50 },
@@ -189,9 +319,9 @@ function renderAggregateProgress(config) {
       zeroline: state.currentNormalization === "zscore",
     },
     showlegend: trajectories.length > 1,
-    legend: legendFor(config),
+    ...legendLayout(config),
   });
-  plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), hideTooltip);
+  plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), onProgressUnhover);
 }
 
 function renderGroupedProgress(config, group) {
@@ -203,13 +333,20 @@ function renderGroupedProgress(config, group) {
   const traces = [];
   const allYVals = [];
 
-  // Collect y-range across all shots.
-  for (const shot of config.allShots) {
+  // Collect y-range (see renderAggregateProgress for the yRangeSkipFirst
+  // semantics: displayed shot only, first checkpoint excluded; the
+  // normalization basis `raws` keeps all checkpoints to match the
+  // plotting loop below).
+  const rangeShots = config.yRangeSkipFirst ? [state.currentShot] : config.allShots;
+  for (const shot of rangeShots) {
     for (const traj of trajectories) {
       for (const bench of group.benchmarks) {
         const xs = traj.checkpoints();
+        const rangeXs = config.yRangeSkipFirst ? xs.slice(1) : xs;
         const raws = xs.map((x) => getScore(traj.dataSource, x, bench, shot, metric)).filter((v) => v !== undefined);
-        for (const raw of raws) {
+        for (const x of rangeXs) {
+          const raw = getScore(traj.dataSource, x, bench, shot, metric);
+          if (raw === undefined) continue;
           allYVals.push(useNorm
             ? applyNorm(raw, bench, needAllRaw ? raws : null, metric)
             : toDisplayScale(raw, bench, metric));
@@ -217,8 +354,10 @@ function renderGroupedProgress(config, group) {
       }
     }
   }
-  const yRange = computeYRange(allYVals);
+  const yRange = computeYRange(allYVals, !!config.yRangeSkipFirst);
 
+  // Bands and lines in separate passes so every band paints below every line.
+  const lineTraces = [];
   for (const traj of trajectories) {
     const xValues = traj.checkpoints();
     const xs = xValues.map(config.xToTokens);
@@ -237,20 +376,27 @@ function renderGroupedProgress(config, group) {
       }) : null;
       const lineColor = i === 0 ? traj.color : darkenColor(traj.color, 0.3);
       const traceName = (trajectories.length > 1 ? traj.name + " — " : "") + group.labels[i];
+      const lref = legendRefFor(config, traj);
       if (wantSE && cis) {
         const band = makeBandTrace(xs, ys, cis, lineColor, traceName);
-        if (band) traces.push(band);
+        if (band) {
+          if (lref) band.legend = lref;
+          traces.push(band);
+        }
       }
-      traces.push({
+      lineTraces.push({
         x: xs, y: ys, mode: "lines+markers",
         name: traceName,
         legendgroup: traceName,
-        line: { color: lineColor, width: 2.5 }, marker: { size: 5 },
+        ...(lref && { legend: lref }),
+        ...(traj.zorder != null && { zorder: traj.zorder }),
+        line: { color: lineColor, width: LINE_WIDTH }, marker: { size: MARKER_SIZE },
         customdata: (cis || ys.map(() => null)).map((c) => c ? { ci: c } : null),
         hoverinfo: "none",
       });
     });
   }
+  traces.push(...lineTraces);
 
   const yLabel = useNorm ? getNormYLabel() : getMetricYLabel(group.benchmarks[0], metric);
   const layout = getPlotlyLayout({
@@ -261,9 +407,9 @@ function renderGroupedProgress(config, group) {
       showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
       zeroline: state.currentNormalization === "zscore",
     },
-    legend: legendFor(config),
+    ...legendLayout(config),
   });
-  plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), hideTooltip);
+  plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), onProgressUnhover);
 }
 
 function renderSingleProgress(config, benchmark) {
@@ -276,9 +422,14 @@ function renderSingleProgress(config, benchmark) {
   const traces = [];
   const allYVals = [];
 
-  for (const shot of config.allShots) {
+  // With yRangeSkipFirst, the y-range tracks only the displayed shot and
+  // each trajectory's first checkpoint is excluded (still plotted).
+  const rangeShots = config.yRangeSkipFirst ? [state.currentShot] : config.allShots;
+  for (const shot of rangeShots) {
     for (const traj of trajectories) {
-      for (const x of traj.checkpoints()) {
+      const checkpoints = traj.checkpoints();
+      const rangeXs = config.yRangeSkipFirst ? checkpoints.slice(1) : checkpoints;
+      for (const x of rangeXs) {
         const raw = getScore(traj.dataSource, x, benchmark, shot, metric);
         if (raw != null) {
           allYVals.push(useNorm
@@ -288,8 +439,13 @@ function renderSingleProgress(config, benchmark) {
       }
     }
   }
-  const yRange = useNorm ? computeYRange(allYVals) : [0, computeYMax(allYVals)];
+  const tight = !!config.yRangeSkipFirst;
+  const yRange = (useNorm || tight)
+    ? computeYRange(allYVals, tight)
+    : [0, computeYMax(allYVals)];
 
+  // Bands and lines in separate passes so every band paints below every line.
+  const lineTraces = [];
   for (const traj of trajectories) {
     const xValues = traj.checkpoints();
     if (!xValues.length) continue;
@@ -303,18 +459,25 @@ function renderSingleProgress(config, benchmark) {
       const ci = getCombinedCI(traj.dataSource, x, benchmark, state.currentShot, metric);
       return scaleCIDistances(ci, benchmark, metric);
     }) : null;
+    const lref = legendRefFor(config, traj);
     if (wantSE && cis) {
       const band = makeBandTrace(xs, ys, cis, traj.color, traj.name);
-      if (band) traces.push(band);
+      if (band) {
+        if (lref) band.legend = lref;
+        traces.push(band);
+      }
     }
-    traces.push({
+    lineTraces.push({
       x: xs, y: ys, mode: "lines+markers", name: traj.name,
       legendgroup: traj.name,
-      line: { color: traj.color, width: 2.5 }, marker: { size: 5 },
+      ...(lref && { legend: lref }),
+      ...(traj.zorder != null && { zorder: traj.zorder }),
+      line: { color: traj.color, width: LINE_WIDTH }, marker: { size: MARKER_SIZE },
       customdata: (cis || ys.map(() => null)).map((c) => c ? { ci: c } : null),
       hoverinfo: "none",
     });
   }
+  traces.push(...lineTraces);
 
   const yLabel = state.currentPromptAgg === "stdev"
     ? getNormYLabel()
@@ -328,9 +491,9 @@ function renderSingleProgress(config, benchmark) {
       zeroline: state.currentNormalization === "zscore",
     },
     showlegend: trajectories.length > 1,
-    legend: legendFor(config),
+    ...legendLayout(config),
   });
-  plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), hideTooltip);
+  plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), onProgressUnhover);
 }
 
 // ─────────────────────────────────────────────────────────────

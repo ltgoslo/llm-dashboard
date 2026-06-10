@@ -304,6 +304,56 @@ function liftBarsAndLogos(chartEl) {
   });
 }
 
+/** Extra vertical gap (px) between a legend's bold title and its first
+ *  entry. Plotly has no layout option for this, and CSS transforms can't
+ *  express it either (a CSS transform on the entry groups would *replace*
+ *  their positioning `transform` attribute, collapsing the entries onto
+ *  each other), so applyLegendTitleGap() rewrites the attribute instead. */
+const LEGEND_TITLE_GAP = 8;
+
+/** Push every titled legend's entry groups down by LEGEND_TITLE_GAP px.
+ *  Applies to all legends ("legend", "legend2", …) that carry a title.
+ *  Idempotent per draw: Plotly recomputes the transforms on each redraw,
+ *  so we re-run on plotly_afterplot and detect whether the gap is already
+ *  baked in by remembering the y we last wrote. */
+function applyLegendTitleGap(chartEl) {
+  chartEl.querySelectorAll(".infolayer > [class^='legend']").forEach((leg) => {
+    // The title's class is namespaced by legend id: "legendtitletext",
+    // "legend2titletext", … — match the common suffix.
+    if (!leg.querySelector("[class$='titletext']")) return;
+    leg.querySelectorAll(".scrollbox .groups").forEach((g) => {
+      const t = g.getAttribute("transform") || "";
+      const m = t.match(/translate\(\s*([-\d.eE+]+)[ ,]\s*([-\d.eE+]+)\s*\)/);
+      const x = m ? parseFloat(m[1]) : 0;
+      const y = m ? parseFloat(m[2]) : 0;
+      if (g._gapY === y) return;              // gap already applied this draw
+      g._gapY = y + LEGEND_TITLE_GAP;
+      g.setAttribute("transform", `translate(${x}, ${g._gapY})`);
+    });
+  });
+}
+
+/** Line-mode clipping: keep Plotly's plot-area clip vertically (so traces
+ *  never spill above/under a fixed y-range) but open it horizontally (so
+ *  markers at the first/last x-position aren't half-clipped at the plot
+ *  edges). CSS can't express this on SVG <g> elements — `clip-path: inset()`
+ *  resolves against the content bbox, not the plot rect — so widen the
+ *  actual <clipPath> rect that the trace layer references. Re-run after
+ *  every render: Plotly.newPlot rebuilds the defs. */
+function widenLineModeClip(chartEl) {
+  chartEl.querySelectorAll(".subplot.xy .plot").forEach((plot) => {
+    const ref = plot.getAttribute("clip-path");
+    const m = ref && ref.match(/url\(["']?#([^"')]+)/);
+    if (!m) return;
+    const rect = chartEl.querySelector(`#${CSS.escape(m[1])} rect`);
+    if (rect && !rect._widened) {
+      rect._widened = true;
+      rect.setAttribute("x", "-9999");
+      rect.setAttribute("width", "99999");
+    }
+  });
+}
+
 /** Continuous dock-style bar hover with EMA damping.
  *
  *  A self-sustaining rAF loop (NOT one frame per mousemove) eases every model
@@ -886,6 +936,16 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
   const isScatterMode = barIndices.length === 0
     && traces.some((t) => t.type === "scatter" && t.mode && t.mode.indexOf("markers") !== -1);
   chartEl.classList.toggle("scatter-mode", isScatterMode);
+  // Line-mode flag: progress dashboards (no bars, no org-logo images) want
+  // Plotly's natural plot-area clipping back so data points outside the
+  // fixed y-range don't spill above/under the chart. The bar/scatter modes
+  // still need `clip-path: none` for hover-scale overflow. Note: progress
+  // traces omit `type` (Plotly defaults it to "scatter"), so accept
+  // undefined as scatter here.
+  const hasImages = !!(plotLayout.images && plotLayout.images.length);
+  const isLineMode = !barIndices.length && !hasImages
+    && traces.some((t) => t.type === "scatter" || t.type === undefined);
+  chartEl.classList.toggle("line-mode", isLineMode);
   // Each render rebuilds the chart, so hide any leftover focus halo (e.g. when
   // switching scatter → bars without a mouseleave). It reappears on next hover.
   if (chartEl._scatterHalo) chartEl._scatterHalo.style.opacity = "0";
@@ -893,12 +953,26 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
   if (!shouldAnimate) {
     Plotly.newPlot("chart", traces, plotLayout, config).then(() => {
       liftBarsAndLogos(chartEl);
+      if (isLineMode) widenLineModeClip(chartEl);
+      applyLegendTitleGap(chartEl);
       // Bars are at full height immediately (no grow-up). Capture their
       // natural geometry now so the hover handler has a stable cache from
       // the first mousemove.
       if (barIndices.length) captureNaturalRects(chartEl);
     });
     liftBarsAndLogos(chartEl);
+    applyLegendTitleGap(chartEl);
+    if (isLineMode) {
+      widenLineModeClip(chartEl);
+      // Responsive resizes rebuild the clip rect (and legend transforms) at
+      // new dimensions — the afterplot event fires on every redraw, so
+      // re-apply there. newPlot purges previous listeners, so this doesn't
+      // stack across renders.
+      chartEl.on("plotly_afterplot", () => {
+        widenLineModeClip(chartEl);
+        applyLegendTitleGap(chartEl);
+      });
+    }
     // Composite scatter (single trace + _scatterImageMap) drives its tooltip
     // from chart.js's own paint-order hit-test, so the tooltip, magnify, and
     // bring-to-front all agree and honour the live z-order. Every other mode
@@ -1109,14 +1183,21 @@ export function makeBandTrace(xValues, yValues, ciValues, color, legendGroup) {
 // Y-range computations
 // ─────────────────────────────────────────────────────────────
 
-/** Compute [yMin, yMax] padding for non-negative or zscore data. */
-export function computeYRange(values) {
+/** Compute [yMin, yMax] padding for non-negative or zscore data.
+ *  With `tight`, the lower bound hugs the data min (padded) instead of
+ *  being pinned at 0 — used by progress charts whose y-range is computed
+ *  from a trimmed checkpoint set and clipped at the plot edges. */
+export function computeYRange(values, tight = false) {
   if (!values.length) return state.currentNormalization === "zscore" ? [-2, 2] : [0, 100];
   const mx = Math.max(...values);
   const mn = Math.min(...values);
   if (state.currentNormalization === "zscore") {
     const pad = Math.max((mx - mn) * 0.15, 0.3);
     return [mn - pad, mx + pad];
+  }
+  if (tight) {
+    const pad = Math.max((mx - mn) * 0.15, 1);
+    return [Math.max(0, mn - pad), Math.min(mx + pad, 115)];
   }
   return [0, Math.min(mx + Math.max(mx * 0.15, 2), 115)];
 }

@@ -490,7 +490,13 @@ header.dashboard-header h1 {
 #chart .main-svg {
   overflow: visible !important;
 }
-#chart [clip-path] {
+/* Line-mode (progress dashboards) keeps Plotly's natural plot-area clip
+   so traces don't leak above/below the fixed y-range. Bar/scatter modes
+   still strip the clip so hover-scaled bars/logos can extend past the
+   plot edges. CSS `clip-path: inset()` doesn't work on SVG <g> elements
+   (it's keyed off the content bbox, not the plot rect), so we just leave
+   Plotly's `clip-path="url(#…)"` attribute intact in line-mode. */
+#chart:not(.line-mode) [clip-path] {
   clip-path: none !important;
 }
 

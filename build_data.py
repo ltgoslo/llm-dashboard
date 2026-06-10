@@ -68,18 +68,20 @@ NOROLMO_TOKENS_PER_STEP = 8192 * 1024
 
 # NorOLMo ablation display names and colors.
 ABLATION_NAME_MAP = {
-    "stage2-ablation-no-len-ext-stage1-data": "Stage 2 (stage 1 data, full decay)",
-    "stage2-no-len-ext-stage1-data-half-decay": "Stage 2 (stage 1 data, ½ decay)",
-    "stage2-no-len-ext-stage2-data-half-decay": "Stage 2 (stage 2 data, ½ decay)",
-    "stage3-no-rope-scaling": "Stage 3 (no RoPE scaling)",
-    "stage3-rope-scaling": "Stage 3 (RoPE scaling)",
+    "stage2-ablation-no-len-ext-stage1-data": "stage 1 data, full decay",
+    "stage2-no-len-ext-stage1-data-half-decay": "stage 1 data, ½ decay",
+    "stage2-no-len-ext-stage2-data-half-decay": "stage 2 data, ½ decay",
+    "stage3-no-rope-scaling": "stage 1 data, no RoPE scaling",
+    "stage3-rope-scaling": "stage 1 data, RoPE scaling",
+    "stage3-mainline": "stage 2 data, RoPE scaling",
 }
 ABLATION_COLOR_MAP = {
     "stage2-ablation-no-len-ext-stage1-data": "#e63946",        # red
-    "stage2-no-len-ext-stage1-data-half-decay": "#ff7f0e",      # orange
+    "stage2-no-len-ext-stage1-data-half-decay": "#c70eff",      # orange
     "stage2-no-len-ext-stage2-data-half-decay": "#2ca02c",      # green
-    "stage3-no-rope-scaling": "#9467bd",                        # purple
-    "stage3-rope-scaling": "#17becf",                           # cyan
+    "stage3-no-rope-scaling": "#ff7f0e",                        # purple
+    "stage3-rope-scaling": "#d62728",                           # cyan
+    "stage3-mainline": "#5acc2d",                               # red
 }
 
 # NorEval cross-benchmark task groups (paired bar charts).

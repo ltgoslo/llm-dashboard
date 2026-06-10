@@ -31,7 +31,7 @@
                             <div class="about-section">
                                 <h2>About NorOLMo</h2>
                                 <p>
-                                    NorOLMo is a fully-open Norwegian language model continually-trained on OLMo2 (13B stage 2) by the
+                                    NorOLMo is a fully-open Norwegian language model continually-trained on OLMo2 (13B stage 1) by the
                                     <a href="https://www.mn.uio.no/ifi/english/research/groups/ltg/">Language Technology Group</a>
                                     at the University of Oslo. This view tracks NorOLMo's performance across 33 training checkpoints
                                     (steps 1k–33k) plus several late-stage ablation runs, evaluated on the NorEval benchmark
@@ -44,10 +44,9 @@
                                 <p>The dashboard includes several ablations of NorOLMo's late training stages:</p>
                                 <ul>
                                     <li><strong>Stage 2 (stage 1 data, full decay).</strong> No length extension; stage-2 schedule continues training on stage-1 data with full LR decay.</li>
-                                    <li><strong>Stage 2 (stage 1/2 data, ½ decay).</strong> Variants that halve the LR decay rate during stage 2.</li>
+                                    <li><strong>Stage 2 (stage 1/2 data, ½ decay).</strong> Variants that halve the LR decay rate during stage 2 (so that stage 3 can then smoothly continue the decay).</li>
                                     <li><strong>Stage 3 (RoPE scaling / no RoPE scaling).</strong> Length-extension experiments at stage 3.</li>
                                 </ul>
-                                <p>Ablation lines start at different training steps, reflecting where each experiment diverges from the main run.</p>
                             </div>
 
                             <div class="about-section">
