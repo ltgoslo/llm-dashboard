@@ -175,6 +175,25 @@ function legendRefFor(config, traj) {
   return traj.legendColumn === 0 ? "legend" : "legend" + (traj.legendColumn + 1);
 }
 
+/** With config.xRangeTight, pin the x-axis to the exact first/last
+ *  checkpoint (token units) across all trajectories, removing Plotly's
+ *  autorange padding so the data spans the full plot width. Line-mode's
+ *  horizontally-open clip lets the edge markers overflow the plot sides
+ *  instead of being half-clipped. Returns undefined when disabled or
+ *  degenerate (single x value). */
+function tightXRange(config, trajectories) {
+  if (!config.xRangeTight) return undefined;
+  let min = Infinity, max = -Infinity;
+  for (const traj of trajectories) {
+    for (const x of traj.checkpoints()) {
+      const t = config.xToTokens(x);
+      if (t < min) min = t;
+      if (t > max) max = t;
+    }
+  }
+  return min < max ? [min, max] : undefined;
+}
+
 /** Resolve titlePrefix (string or function-returning-string). Returns "X – " or "". */
 function resolveTitlePrefix(config) {
   const prefix = typeof config.titlePrefix === "function"
@@ -310,9 +329,10 @@ function renderAggregateProgress(config) {
   }
   traces.push(...lineTraces);
 
+  const xRange = tightXRange(config, trajectories);
   const layout = getPlotlyLayout({
     margin: { l: 105, r: 4, t: 8, b: 50 },
-    xaxis: { automargin: false, title: config.xAxisLabel },
+    xaxis: { automargin: false, title: config.xAxisLabel, ...(xRange && { range: xRange }) },
     yaxis: {
       title: "", range: yRange,
       showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
@@ -399,9 +419,10 @@ function renderGroupedProgress(config, group) {
   traces.push(...lineTraces);
 
   const yLabel = useNorm ? getNormYLabel() : getMetricYLabel(group.benchmarks[0], metric);
+  const xRange = tightXRange(config, trajectories);
   const layout = getPlotlyLayout({
     margin: { l: 105, r: 4, t: 8, b: 50 },
-    xaxis: { automargin: false, title: config.xAxisLabel },
+    xaxis: { automargin: false, title: config.xAxisLabel, ...(xRange && { range: xRange }) },
     yaxis: {
       title: "", range: yRange,
       showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
@@ -482,9 +503,10 @@ function renderSingleProgress(config, benchmark) {
   const yLabel = state.currentPromptAgg === "stdev"
     ? getNormYLabel()
     : (useNorm ? getNormYLabel() : getMetricYLabel(benchmark, metric));
+  const xRange = tightXRange(config, trajectories);
   const layout = getPlotlyLayout({
     margin: { l: 105, r: 4, t: 8, b: 50 },
-    xaxis: { automargin: false, title: config.xAxisLabel },
+    xaxis: { automargin: false, title: config.xAxisLabel, ...(xRange && { range: xRange }) },
     yaxis: {
       title: "", range: yRange,
       showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,

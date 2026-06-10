@@ -108,10 +108,11 @@ const chartConfig = {
   xAxisLabel: "tokens",
   allShots: ALL_SHOTS,
   yRangeSkipFirst: true,
+  xRangeTight: true,
   legendColumns: [
     { title: "Stage 2 tests", x: 0.05 },
     { title: "Stage 3 tests", x: 0.225 },
-    { title: "Original run", x: 0.45 },
+    { title: "Original run", x: 0.44 },
   ],
   plotlyConfig,
   groupBenchmarks: (name) => {
