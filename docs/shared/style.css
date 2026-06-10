@@ -111,7 +111,7 @@ body {
    ──────────────────────────────────────────────────────────── */
 
 header.dashboard-header {
-  padding: 1rem 0 1.5rem;
+  padding: 0.75rem 0 0.75rem;
   display: flex;
   align-items: flex-start;
   gap: 1.5rem;
@@ -136,6 +136,38 @@ header.dashboard-header h1 {
   border-radius: 2px;
   overflow: hidden;
   margin: 0.5rem 0 0;
+}
+
+/* Circular institution seal variant of the header icon */
+.header-icon-seal {
+  width: 44px;
+  border-radius: 0;
+  margin: 0.2rem 0 0;
+}
+
+/* SAS-style "line flag" closing the header band: a 3px red rule whose
+   left end carries the 1-D cross-section of the Norwegian flag
+   (red : white : blue : white : red = 6 : 1 : 2 : 1 : rest, 16px per
+   unit). The flag starts exactly at the left edge of the centered
+   content column (same geometry as .band-inner); the page margin to
+   its left just continues the red line. */
+.flag-line {
+  height: 3px;
+  background: #dadada;
+}
+.flag-line::before {
+  content: "";
+  display: block;
+  height: 100%;
+  width: min(1152px, 100% - 3rem); /* .band-inner inner width */
+  margin: 0 auto;
+  background: linear-gradient(to right,
+    #BA0C2F 0 48px,
+    #FFFFFF 48px 56px,
+    #00205B 56px 72px,
+    #FFFFFF 72px 80px,
+    #BA0C2F 80px 128px,
+    #dadada 128px);
 }
 
 /* ──── About panel — collapsible <details> under the header title ──── */
@@ -328,6 +360,17 @@ header.dashboard-header h1 {
     0 8px 12px -8px rgba(15, 23, 42, 0.2);
   padding-bottom: 1.0rem;
   margin-bottom: 1.0rem;
+  /* Bleed the shadow-casting box 1.5rem past the column on both sides
+     so the shadow's soft ends fall in the page margins instead of
+     visibly stopping at the column edges. The padding compensates the
+     negative margins, keeping the controls aligned with the column. */
+  margin-left: -1.5rem;
+  margin-right: -1.5rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  /* Trim the blur's sideways spill flush with the box edges; the
+     negative bottom inset leaves room for the shadow below. */
+  clip-path: inset(0 0 -2rem 0);
 }
 
 .control-group { display: flex; align-items: center; gap: 0.5rem; }
