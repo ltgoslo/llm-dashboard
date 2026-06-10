@@ -72,6 +72,7 @@ function getForkPoint(ablName) {
 function getTrajectories() {
   const trajectories = [{
     name: "NorOLMo",
+    key: "main",
     color: MODEL_COLORS[0],
     dataSource: state.DATA.progress,
     checkpoints: getMainCheckpoints,
@@ -86,6 +87,9 @@ function getTrajectories() {
     const steps = Object.keys(data).map(Number).sort((a, b) => a - b);
     trajectories.push({
       name: getAblationDisplayName(ablName),
+      // Stable unique id for Plotly legendgroups — display names may
+      // repeat across runs (e.g. mainline vs the rope-scaling ablation).
+      key: ablName,
       color: getAblationColor(ablName),
       dataSource: data,
       checkpoints: () => steps,
@@ -110,9 +114,9 @@ const chartConfig = {
   yRangeSkipFirst: true,
   xRangeTight: true,
   legendColumns: [
-    { title: "Stage 2 tests", x: 0.05 },
+    { title: "Stage 2 tests", x: 0.025 },
     { title: "Stage 3 tests", x: 0.225 },
-    { title: "Original run", x: 0.44 },
+    { title: "Original run", x: 0.5 },
   ],
   plotlyConfig,
   groupBenchmarks: (name) => {

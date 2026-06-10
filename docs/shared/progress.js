@@ -44,7 +44,7 @@ const TOP_LEFT_LEGEND = {
 // Line/marker sizing — base values used when building traces, hover values
 // applied to the whole hovered run via setTraceEmphasis().
 const LINE_WIDTH = 2.5, LINE_WIDTH_HOVER = 4.5;
-const MARKER_SIZE = 5, MARKER_SIZE_HOVER = 8;
+const MARKER_SIZE = 6.5, MARKER_SIZE_HOVER = 9.5;
 
 /** Emphasize the hovered run: thicken its line and enlarge its markers.
  *  Pass null to clear. One Plotly.restyle call swaps the previous and new
@@ -309,9 +309,13 @@ function renderAggregateProgress(config) {
     const scores = aggResults.map((r) => r ? r.score : null);
     const ciVals = aggResults.map((r) => r ? r.ci : null);
     const lref = legendRefFor(config, traj);
+    // Group by stable key, not display name — names can repeat across
+    // trajectories, and Plotly merges same-group entries (killing the
+    // tracegroupgap between them and tying their legend toggles).
+    const lgroup = traj.key || traj.name;
 
     if (wantSE) {
-      const band = makeBandTrace(xs, scores, ciVals, traj.color, traj.name);
+      const band = makeBandTrace(xs, scores, ciVals, traj.color, lgroup);
       if (band) {
         if (lref) band.legend = lref;
         traces.push(band);
@@ -319,7 +323,7 @@ function renderAggregateProgress(config) {
     }
     lineTraces.push({
       x: xs, y: scores, mode: "lines+markers", name: traj.name,
-      legendgroup: traj.name,
+      legendgroup: lgroup,
       ...(lref && { legend: lref }),
       ...(traj.zorder != null && { zorder: traj.zorder }),
       line: { color: traj.color, width: LINE_WIDTH }, marker: { size: MARKER_SIZE },
@@ -397,8 +401,9 @@ function renderGroupedProgress(config, group) {
       const lineColor = i === 0 ? traj.color : darkenColor(traj.color, 0.3);
       const traceName = (trajectories.length > 1 ? traj.name + " — " : "") + group.labels[i];
       const lref = legendRefFor(config, traj);
+      const lgroup = (traj.key || traj.name) + " — " + group.labels[i];
       if (wantSE && cis) {
-        const band = makeBandTrace(xs, ys, cis, lineColor, traceName);
+        const band = makeBandTrace(xs, ys, cis, lineColor, lgroup);
         if (band) {
           if (lref) band.legend = lref;
           traces.push(band);
@@ -407,7 +412,7 @@ function renderGroupedProgress(config, group) {
       lineTraces.push({
         x: xs, y: ys, mode: "lines+markers",
         name: traceName,
-        legendgroup: traceName,
+        legendgroup: lgroup,
         ...(lref && { legend: lref }),
         ...(traj.zorder != null && { zorder: traj.zorder }),
         line: { color: lineColor, width: LINE_WIDTH }, marker: { size: MARKER_SIZE },
@@ -481,8 +486,9 @@ function renderSingleProgress(config, benchmark) {
       return scaleCIDistances(ci, benchmark, metric);
     }) : null;
     const lref = legendRefFor(config, traj);
+    const lgroup = traj.key || traj.name;
     if (wantSE && cis) {
-      const band = makeBandTrace(xs, ys, cis, traj.color, traj.name);
+      const band = makeBandTrace(xs, ys, cis, traj.color, lgroup);
       if (band) {
         if (lref) band.legend = lref;
         traces.push(band);
@@ -490,7 +496,7 @@ function renderSingleProgress(config, benchmark) {
     }
     lineTraces.push({
       x: xs, y: ys, mode: "lines+markers", name: traj.name,
-      legendgroup: traj.name,
+      legendgroup: lgroup,
       ...(lref && { legend: lref }),
       ...(traj.zorder != null && { zorder: traj.zorder }),
       line: { color: traj.color, width: LINE_WIDTH }, marker: { size: MARKER_SIZE },
