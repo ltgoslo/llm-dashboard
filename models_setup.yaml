@@ -984,6 +984,42 @@ DeepSeek-V3-Base:
   default: true
   color: "#4d6bfe"
 
+TildeOpen-30b:
+  display_name: "TildeOpen 30B"
+  category: multilingual
+  organization: Tilde.ai
+  parameters: 30.7
+  license: "CC-BY-4.0"
+  fully_open: true
+  description: "Open multilingual base language model from Tilde.ai, trained from scratch on 2T tokens with a curriculum learning approach. Focused on 19 underrepresented European languages (including Baltic, Slavic, Nordic, and Finno-Ugric languages). Trained on the LUMI supercomputer with funding from the European Commission via EuroHPC JU."
+  huggingface_url: https://huggingface.co/TildeAI/TildeOpen-30b
+  default: true
+  color: "#861628"
+
+Trinity-Mini-Base:
+  display_name: "Trinity Mini 26B (3B active)"
+  category: multilingual
+  organization: Arcee AI
+  parameters: 26.1
+  license: "OpenMDW-1.1"
+  fully_open: false
+  description: "Mixture-of-Experts base language model from Arcee AI with 26B total and 3B active parameters (128 experts, 8 active + 1 shared per token). Pretrained on 10T tokens curated with Datology, building on the AFM-4.5B dataset with additional math and code data. 128k context window."
+  huggingface_url: https://huggingface.co/arcee-ai/Trinity-Mini-Base
+  default: true
+  color: "#008c8c"
+
+Trinity-Nano-Base:
+  display_name: "Trinity Nano 6B (1B active)"
+  category: multilingual
+  organization: Arcee AI
+  parameters: 6.1
+  license: "OpenMDW-1.1"
+  fully_open: false
+  description: "Mixture-of-Experts base language model from Arcee AI with 6B total and 1B active parameters (128 experts, 8 active + 1 shared per token). Pretrained on 10T tokens curated with Datology, building on the AFM-4.5B dataset with additional math and code data. 128k context window."
+  huggingface_url: https://huggingface.co/arcee-ai/Trinity-Nano-Base
+  default: true
+  color: "#008c8c"
+
 DeepSeek-V4-Flash-Base:
   display_name: "DeepSeek V4 Flash 284B (13B active)"
   category: multilingual
