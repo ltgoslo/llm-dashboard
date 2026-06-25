@@ -6,7 +6,7 @@
 // URL state, and the construction of the "trajectories" list (main + ablations).
 
 import { state } from "../shared/state.js";
-import { MODEL_COLORS, isAggregateSelection } from "../shared/core.js";
+import { isAggregateSelection } from "../shared/core.js";
 import { makePlotlyConfig } from "../shared/chart.js";
 import { buildTaskCheckboxes, syncTaskCheckboxStates, bindModuleActionStopPropagation, attachControlTooltips, markAppReady } from "../shared/ui.js";
 import { renderProgressChart, updateProgressTitle } from "../shared/progress.js";
@@ -36,14 +36,24 @@ function getAblationDisplayName(ablName) {
   return state.DATA.ablation_display_names?.[ablName] || ablName;
 }
 
-const ABLATION_COLORS_FALLBACK = [
-  "#e63946", "#ff7f0e", "#2ca02c", "#9467bd", "#17becf", "#d62728", "#8c564b",
-];
+// Run colors. The three final-model runs share one blue; the original run's
+// stage-2/stage-3 continuation is brown; the remaining ablations get distinct
+// orange/red shades. Keyed by run id (main segments + ablation names).
+const FINAL_COLOR = "#2563eb";   // blue
+const RUN_COLOR = {
+  "main-stage1": FINAL_COLOR,
+  "stage2-no-len-ext-stage2-data-half-decay": FINAL_COLOR,
+  "stage3-mainline": FINAL_COLOR,
+  "main-stage2": "#7c2d12",                                // original run (brown)
+  "main-stage3": "#7c2d12",                                // original run (brown)
+  "stage2-ablation-no-len-ext-stage1-data": "#f97316",     // orange
+  "stage2-no-len-ext-stage1-data-half-decay": "#dc2626",   // red
+  "stage3-no-rope-scaling": "#fb923c",                     // light orange
+  "stage3-rope-scaling": "#b45309",                        // amber
+};
 
-function getAblationColor(ablName) {
-  if (state.DATA.ablation_colors?.[ablName]) return state.DATA.ablation_colors[ablName];
-  const names = Object.keys(state.DATA.ablations || {});
-  return ABLATION_COLORS_FALLBACK[names.indexOf(ablName) % ABLATION_COLORS_FALLBACK.length];
+function colorFor(key) {
+  return RUN_COLOR[key] || "#999999";
 }
 
 // Each ablation forked off a parent run; prepending the parent's checkpoint
@@ -69,15 +79,53 @@ function getForkPoint(ablName) {
   return parent ? { data: parent, step: lastStep(parent) } : null;
 }
 
+// The three runs that compose the released NorOLMo model — one per stage.
+// They're marked with star markers, drawn thicker, colored blue, ordered
+// first in their column, and painted on top. The stage-1 segment of the
+// original run IS the final model's pretraining; stage 2 and stage 3 are
+// two specific ablations.
+const FINAL_MODEL_RUNS = new Set([
+  "main-stage1",                                // stage 1 (pretraining)
+  "stage2-no-len-ext-stage2-data-half-decay",   // stage 2 (midtraining, 1→½)
+  "stage3-mainline",                            // stage 3 (RoPE scaling, ½→0)
+]);
+
+// Last step a stage-2 run reached (= the step the stage-3 runs fork from).
+function stage3ForkStep() {
+  const abl = state.DATA.ablations || {};
+  const stage2 = Object.keys(abl).filter((k) => k.startsWith("stage2"));
+  return stage2.length ? Math.max(...stage2.map((k) => lastStep(abl[k]))) : STAGE2_FORK_STEP;
+}
+
 function getTrajectories() {
-  const trajectories = [{
-    name: "NorOLMo",
-    key: "main",
-    color: MODEL_COLORS[0],
-    dataSource: state.DATA.progress,
-    checkpoints: getMainCheckpoints,
-    legendColumn: 2,   // "Original run"
-  }];
+  const progress = state.DATA.progress;
+  const mainSteps = getMainCheckpoints();
+  const s1End = STAGE2_FORK_STEP;     // stage 1 → 2 boundary (24k / 201.3B)
+  const s2End = stage3ForkStep();     // stage 2 → 3 boundary (30k)
+
+  // The original NorOLMo run, split into its three stage segments so each
+  // sits in its own legend column. Segments overlap by one checkpoint at the
+  // stage boundaries so the line stays visually continuous across columns.
+  const mainSegments = [
+    { name: "pretraining data, 1→1 decay",
+      key: "main-stage1", legendColumn: 0,
+      steps: mainSteps.filter((s) => s <= s1End) },
+    { name: "midtraining data, RoPE scaling, 1→0 decay",
+      key: "main-stage2", legendColumn: 1,
+      steps: mainSteps.filter((s) => s >= s1End && s <= s2End) },
+    { name: "midtraining data, RoPE scaling, 1→0 decay",
+      key: "main-stage3", legendColumn: 2,
+      steps: mainSteps.filter((s) => s >= s2End) },
+  ];
+  const trajectories = mainSegments.map((seg) => ({
+    name: seg.name,
+    key: seg.key,
+    color: colorFor(seg.key),
+    dataSource: progress,
+    checkpoints: () => seg.steps,
+    legendColumn: seg.legendColumn,
+  }));
+
   for (const ablName of Object.keys(state.DATA.ablations || {})) {
     let data = state.DATA.ablations[ablName];
     const fork = getForkPoint(ablName);
@@ -90,15 +138,26 @@ function getTrajectories() {
       // Stable unique id for Plotly legendgroups — display names may
       // repeat across runs (e.g. mainline vs the rope-scaling ablation).
       key: ablName,
-      color: getAblationColor(ablName),
+      color: colorFor(ablName),
       dataSource: data,
       checkpoints: () => steps,
-      legendColumn: ablName.startsWith("stage3") ? 1 : 0,
-      // The current mainline continuation paints above the other runs
-      // (without affecting legend order).
-      ...(ablName === "stage3-mainline" && { zorder: 1 }),
+      legendColumn: ablName.startsWith("stage3") ? 2 : 1,
     });
   }
+
+  // Flag the three final-model runs: thicker line, star markers, painted on
+  // top via zorder (color + "first in column" ordering handled elsewhere).
+  for (const traj of trajectories) {
+    if (FINAL_MODEL_RUNS.has(traj.key)) {
+      traj.emphasized = true;
+      traj.zorder = 1;
+    }
+  }
+  // Within each legend column, list the final-model run first. Stable sort
+  // keeps the column grouping and the relative order of the rest.
+  trajectories.sort((a, b) =>
+    (a.legendColumn - b.legendColumn)
+    || ((b.emphasized ? 1 : 0) - (a.emphasized ? 1 : 0)));
   return trajectories;
 }
 
@@ -112,11 +171,12 @@ const chartConfig = {
   xAxisLabel: "tokens",
   allShots: ALL_SHOTS,
   yRangeSkipFirst: true,
+  yMaxHeadroom: 0.25,   // extra top space (× data span) so the legend fits
   xRangeTight: true,
   legendColumns: [
-    { title: "Stage 2 tests", x: 0.025 },
-    { title: "Stage 3 tests", x: 0.225 },
-    { title: "Original run", x: 0.5 },
+    { title: "Stage 1", x: 0.01 },
+    { title: "Stage 2", x: 0.22 },
+    { title: "Stage 3", x: 0.5 },
   ],
   plotlyConfig,
   groupBenchmarks: (name) => {

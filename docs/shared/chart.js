@@ -333,23 +333,31 @@ function applyLegendTitleGap(chartEl) {
   });
 }
 
+const LINE_CLIP_WIDTH = "99999";   // sentinel marking an already-widened rect
+
 /** Line-mode clipping: keep Plotly's plot-area clip vertically (so traces
  *  never spill above/under a fixed y-range) but open it horizontally (so
  *  markers at the first/last x-position aren't half-clipped at the plot
- *  edges). CSS can't express this on SVG <g> elements — `clip-path: inset()`
- *  resolves against the content bbox, not the plot rect — so widen the
- *  actual <clipPath> rect that the trace layer references. Re-run after
- *  every render: Plotly.newPlot rebuilds the defs. */
+ *  edges, nor at the page margin). CSS can't express this on SVG <g>
+ *  elements — `clip-path: inset()` resolves against the content bbox, not
+ *  the plot rect — so widen the actual <clipPath> rect that the trace layer
+ *  references. Plotly REUSES this rect node across redraws/resizes and
+ *  resets its x/width back to the tight plot bounds, so we must re-widen on
+ *  every plotly_afterplot. Guard on the live width attribute (not a one-shot
+ *  flag on the node, which goes stale once Plotly resets the geometry). */
 function widenLineModeClip(chartEl) {
-  chartEl.querySelectorAll(".subplot.xy .plot").forEach((plot) => {
-    const ref = plot.getAttribute("clip-path");
-    const m = ref && ref.match(/url\(["']?#([^"')]+)/);
-    if (!m) return;
-    const rect = chartEl.querySelector(`#${CSS.escape(m[1])} rect`);
-    if (rect && !rect._widened) {
-      rect._widened = true;
+  // Plotly's plot-area clipPath carries class "plotclip" and an id ending in
+  // "plot" (e.g. "clip1a2b3xyplot"); its rect's width/height = the plot box.
+  // Target it directly — the older "walk .plot's clip-path url to the rect"
+  // chain was fragile and silently matched nothing. Axis/tick clips end in
+  // x/y/xy, so the id-suffix selector won't touch them.
+  const rects = chartEl.querySelectorAll(
+    'clipPath.plotclip > rect, clipPath[id$="plot"] > rect'
+  );
+  rects.forEach((rect) => {
+    if (rect.getAttribute("width") !== LINE_CLIP_WIDTH) {
       rect.setAttribute("x", "-9999");
-      rect.setAttribute("width", "99999");
+      rect.setAttribute("width", LINE_CLIP_WIDTH);
     }
   });
 }
@@ -1186,20 +1194,23 @@ export function makeBandTrace(xValues, yValues, ciValues, color, legendGroup) {
 /** Compute [yMin, yMax] padding for non-negative or zscore data.
  *  With `tight`, the lower bound hugs the data min (padded) instead of
  *  being pinned at 0 — used by progress charts whose y-range is computed
- *  from a trimmed checkpoint set and clipped at the plot edges. */
-export function computeYRange(values, tight = false) {
+ *  from a trimmed checkpoint set and clipped at the plot edges.
+ *  `topHeadroom` adds extra space above the max (as a fraction of the data
+ *  span), e.g. to clear a top-anchored legend. */
+export function computeYRange(values, tight = false, topHeadroom = 0) {
   if (!values.length) return state.currentNormalization === "zscore" ? [-2, 2] : [0, 100];
   const mx = Math.max(...values);
   const mn = Math.min(...values);
+  const extra = (mx - mn) * topHeadroom;
   if (state.currentNormalization === "zscore") {
     const pad = Math.max((mx - mn) * 0.15, 0.3);
-    return [mn - pad, mx + pad];
+    return [mn - pad, mx + pad + extra];
   }
   if (tight) {
     const pad = Math.max((mx - mn) * 0.15, 1);
-    return [Math.max(0, mn - pad), Math.min(mx + pad, 115)];
+    return [Math.max(0, mn - pad), Math.min(mx + pad + extra, 115)];
   }
-  return [0, Math.min(mx + Math.max(mx * 0.15, 2), 115)];
+  return [0, Math.min(mx + Math.max(mx * 0.15, 2) + extra, 115)];
 }
 
 /** Compute a single yMax for raw, non-normalized data. */

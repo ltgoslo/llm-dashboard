@@ -68,12 +68,12 @@ NOROLMO_TOKENS_PER_STEP = 8192 * 1024
 
 # NorOLMo ablation display names and colors.
 ABLATION_NAME_MAP = {
-    "stage2-ablation-no-len-ext-stage1-data": "stage 1 data, 1→0 decay",
-    "stage2-no-len-ext-stage1-data-half-decay": "stage 1 data, 1→½ decay",
-    "stage2-no-len-ext-stage2-data-half-decay": "stage 2 data, 1→½ decay",
-    "stage3-no-rope-scaling": "stage 2 data, no RoPE scaling, 1→0 decay",
-    "stage3-rope-scaling": "stage 2 data, RoPE scaling, 1→0 decay",
-    "stage3-mainline": "stage 2 data, RoPE scaling, ½→0 decay",
+    "stage2-ablation-no-len-ext-stage1-data": "pretraining data, 1→0 decay",
+    "stage2-no-len-ext-stage1-data-half-decay": "pretraining data, 1→½ decay",
+    "stage2-no-len-ext-stage2-data-half-decay": "midtraining data, 1→½ decay",
+    "stage3-no-rope-scaling": "midtraining data, 1→0 decay",
+    "stage3-rope-scaling": "midtraining data, RoPE scaling, 1→0 decay",
+    "stage3-mainline": "midtraining data, RoPE scaling, ½→0 decay",
 }
 ABLATION_COLOR_MAP = {
     "stage2-ablation-no-len-ext-stage1-data": "#e63946",        # red

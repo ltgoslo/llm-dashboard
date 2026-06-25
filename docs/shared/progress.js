@@ -37,7 +37,7 @@ const PROGRESS_LEGEND = {
   bgcolor: "rgba(255,255,255,0.7)", borderwidth: 0,
 };
 const TOP_LEFT_LEGEND = {
-  x: 0.01, y: 0.99, xanchor: "left", yanchor: "top",
+  x: 0.0, y: 0.99, xanchor: "left", yanchor: "top",
   bgcolor: "rgba(255,255,255,0.8)", bordercolor: "#e2e8f0", borderwidth: 1,
 };
 
@@ -45,6 +45,20 @@ const TOP_LEFT_LEGEND = {
 // applied to the whole hovered run via setTraceEmphasis().
 const LINE_WIDTH = 2.5, LINE_WIDTH_HOVER = 4.5;
 const MARKER_SIZE = 6.5, MARKER_SIZE_HOVER = 9.5;
+// Emphasized ("final model") runs: thicker at rest, thicker still on hover.
+const LINE_WIDTH_FINAL = 4, LINE_WIDTH_FINAL_HOVER = 6;
+const MARKER_SIZE_FINAL = 12.5, MARKER_SIZE_FINAL_HOVER = 15;
+
+/** Base/hover line-width and marker-size for a trajectory, depending on
+ *  whether it's flagged `emphasized` (a final-model run). Stored on each
+ *  line trace as `_emph` so setTraceEmphasis can restore the right base. */
+function emphasisFor(traj) {
+  return traj && traj.emphasized
+    ? { baseW: LINE_WIDTH_FINAL, baseS: MARKER_SIZE_FINAL,
+        hoverW: LINE_WIDTH_FINAL_HOVER, hoverS: MARKER_SIZE_FINAL_HOVER, symbol: "star" }
+    : { baseW: LINE_WIDTH, baseS: MARKER_SIZE,
+        hoverW: LINE_WIDTH_HOVER, hoverS: MARKER_SIZE_HOVER, symbol: "circle" };
+}
 
 /** Emphasize the hovered run: thicken its line and enlarge its markers.
  *  Pass null to clear. One Plotly.restyle call swaps the previous and new
@@ -59,10 +73,14 @@ function setTraceEmphasis(curve) {
   chartEl._emphasizedTrace = curve;
   const indices = [], widths = [], sizes = [];
   if (prev != null && prev < chartEl.data.length) {
-    indices.push(prev); widths.push(LINE_WIDTH); sizes.push(MARKER_SIZE);
+    const e = chartEl.data[prev]._emph;
+    indices.push(prev);
+    widths.push(e ? e.baseW : LINE_WIDTH); sizes.push(e ? e.baseS : MARKER_SIZE);
   }
   if (curve != null && curve < chartEl.data.length) {
-    indices.push(curve); widths.push(LINE_WIDTH_HOVER); sizes.push(MARKER_SIZE_HOVER);
+    const e = chartEl.data[curve]._emph;
+    indices.push(curve);
+    widths.push(e ? e.hoverW : LINE_WIDTH_HOVER); sizes.push(e ? e.hoverS : MARKER_SIZE_HOVER);
   }
   if (indices.length) {
     Plotly.restyle(chartEl, { "line.width": widths, "marker.size": sizes }, indices);
@@ -158,7 +176,7 @@ function legendLayout(config) {
   config.legendColumns.forEach((col, i) => {
     out[i === 0 ? "legend" : "legend" + (i + 1)] = {
       x: col.x ?? 0.01, y: col.y ?? 0.99, xanchor: "left", yanchor: "top",
-      bgcolor: "rgba(255,255,255,0.7)", borderwidth: 0,
+      bgcolor: "rgba(0,0,0,0)", borderwidth: 0,
       // Title-to-entries spacing is handled in style.css (the legend
       // `.groups` translateY rule) -- Plotly has no padding option, and
       // a <br> in the title adds a full line-height, which is too much.
@@ -282,7 +300,7 @@ function renderAggregateProgress(config) {
       }
     }
   }
-  const yRange = computeYRange(allYValues, !!config.yRangeSkipFirst);
+  const yRange = computeYRange(allYValues, !!config.yRangeSkipFirst, config.yMaxHeadroom || 0);
 
   // Build bands and lines in separate passes so every band paints below
   // every line — otherwise traj-N's band would occlude traj-(N-1)'s line.
@@ -313,6 +331,7 @@ function renderAggregateProgress(config) {
     // trajectories, and Plotly merges same-group entries (killing the
     // tracegroupgap between them and tying their legend toggles).
     const lgroup = traj.key || traj.name;
+    const emph = emphasisFor(traj);
 
     if (wantSE) {
       const band = makeBandTrace(xs, scores, ciVals, traj.color, lgroup);
@@ -326,7 +345,8 @@ function renderAggregateProgress(config) {
       legendgroup: lgroup,
       ...(lref && { legend: lref }),
       ...(traj.zorder != null && { zorder: traj.zorder }),
-      line: { color: traj.color, width: LINE_WIDTH }, marker: { size: MARKER_SIZE },
+      line: { color: traj.color, width: emph.baseW }, marker: { size: emph.baseS, symbol: emph.symbol },
+      _emph: emph,
       customdata: aggResults.map((r) => r ? { count: r.count, ci: r.ci } : null),
       hoverinfo: "none",
     });
@@ -378,7 +398,7 @@ function renderGroupedProgress(config, group) {
       }
     }
   }
-  const yRange = computeYRange(allYVals, !!config.yRangeSkipFirst);
+  const yRange = computeYRange(allYVals, !!config.yRangeSkipFirst, config.yMaxHeadroom || 0);
 
   // Bands and lines in separate passes so every band paints below every line.
   const lineTraces = [];
@@ -402,6 +422,7 @@ function renderGroupedProgress(config, group) {
       const traceName = (trajectories.length > 1 ? traj.name + " — " : "") + group.labels[i];
       const lref = legendRefFor(config, traj);
       const lgroup = (traj.key || traj.name) + " — " + group.labels[i];
+      const emph = emphasisFor(traj);
       if (wantSE && cis) {
         const band = makeBandTrace(xs, ys, cis, lineColor, lgroup);
         if (band) {
@@ -415,7 +436,8 @@ function renderGroupedProgress(config, group) {
         legendgroup: lgroup,
         ...(lref && { legend: lref }),
         ...(traj.zorder != null && { zorder: traj.zorder }),
-        line: { color: lineColor, width: LINE_WIDTH }, marker: { size: MARKER_SIZE },
+        line: { color: lineColor, width: emph.baseW }, marker: { size: emph.baseS, symbol: emph.symbol },
+        _emph: emph,
         customdata: (cis || ys.map(() => null)).map((c) => c ? { ci: c } : null),
         hoverinfo: "none",
       });
@@ -467,7 +489,7 @@ function renderSingleProgress(config, benchmark) {
   }
   const tight = !!config.yRangeSkipFirst;
   const yRange = (useNorm || tight)
-    ? computeYRange(allYVals, tight)
+    ? computeYRange(allYVals, tight, config.yMaxHeadroom || 0)
     : [0, computeYMax(allYVals)];
 
   // Bands and lines in separate passes so every band paints below every line.
@@ -487,6 +509,7 @@ function renderSingleProgress(config, benchmark) {
     }) : null;
     const lref = legendRefFor(config, traj);
     const lgroup = traj.key || traj.name;
+    const emph = emphasisFor(traj);
     if (wantSE && cis) {
       const band = makeBandTrace(xs, ys, cis, traj.color, lgroup);
       if (band) {
@@ -499,7 +522,8 @@ function renderSingleProgress(config, benchmark) {
       legendgroup: lgroup,
       ...(lref && { legend: lref }),
       ...(traj.zorder != null && { zorder: traj.zorder }),
-      line: { color: traj.color, width: LINE_WIDTH }, marker: { size: MARKER_SIZE },
+      line: { color: traj.color, width: emph.baseW }, marker: { size: emph.baseS, symbol: emph.symbol },
+      _emph: emph,
       customdata: (cis || ys.map(() => null)).map((c) => c ? { ci: c } : null),
       hoverinfo: "none",
     });
