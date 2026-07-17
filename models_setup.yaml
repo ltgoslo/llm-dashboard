@@ -996,6 +996,18 @@ TildeOpen-30b:
   default: true
   color: "#861628"
 
+TildeOpen-30b-64k:
+  display_name: "TildeOpen 30B 64k"
+  category: multilingual
+  organization: Tilde.ai
+  parameters: 30.7
+  license: "CC-BY-4.0"
+  fully_open: false
+  description: "Long-context version of TildeOpen 30B with the context window extended from 8k to 64k tokens using YaRN. Continually-trained on a mix of the original base data, FinePDF, and synthetic long-context data generated with the KNOT method. Supports 34 European language variants."
+  huggingface_url: https://huggingface.co/TildeAI/TildeOpen-30b-64k
+  default: true
+  color: "#861628"
+
 Trinity-Mini-Base:
   display_name: "Trinity Mini 26B (3B active)"
   category: multilingual
