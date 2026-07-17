@@ -3,27 +3,32 @@
     "ask_gec_p0": {
       "alias": "ask_gec_p0",
       "exact_match,none": 0.0,
-      "exact_match_stderr,none": 0.0
+      "exact_match_stderr,none": 0.0,
+      "errant_f05,none": 0.48
     },
     "ask_gec_p1": {
       "alias": "ask_gec_p1",
       "exact_match,none": 0.0,
-      "exact_match_stderr,none": 0.0
+      "exact_match_stderr,none": 0.0,
+      "errant_f05,none": 0.499
     },
     "ask_gec_p2": {
       "alias": "ask_gec_p2",
       "exact_match,none": 0.0,
-      "exact_match_stderr,none": 0.0
+      "exact_match_stderr,none": 0.0,
+      "errant_f05,none": 0.4976
     },
     "ask_gec_p3": {
       "alias": "ask_gec_p3",
       "exact_match,none": 0.0,
-      "exact_match_stderr,none": 0.0
+      "exact_match_stderr,none": 0.0,
+      "errant_f05,none": 0.4787
     },
     "ask_gec_p4": {
       "alias": "ask_gec_p4",
       "exact_match,none": 0.0,
-      "exact_match_stderr,none": 0.0
+      "exact_match_stderr,none": 0.0,
+      "errant_f05,none": 0.5013
     }
   },
   "group_subtasks": {
@@ -139,7 +144,7 @@
       "training_split": "train",
       "validation_split": "validation",
       "test_split": "test",
-      "doc_to_text": "Skriv om følgende tekst slik at den blir grammatisk korrekt: {{source}}\nKorreksjon:",
+      "doc_to_text": "Skriv om f\u00f8lgende tekst slik at den blir grammatisk korrekt: {{source}}\nKorreksjon:",
       "doc_to_target": "correction",
       "unsafe_code": false,
       "description": "",
@@ -151,7 +156,7 @@
         "process_docs": null,
         "fewshot_indices": null,
         "samples": null,
-        "doc_to_text": "Skriv om følgende tekst slik at den blir grammatisk korrekt: {{source}}\nKorreksjon:",
+        "doc_to_text": "Skriv om f\u00f8lgende tekst slik at den blir grammatisk korrekt: {{source}}\nKorreksjon:",
         "doc_to_choice": null,
         "doc_to_target": "correction",
         "gen_prefix": null,
@@ -296,19 +301,24 @@
   },
   "higher_is_better": {
     "ask_gec_p0": {
-      "exact_match": true
+      "exact_match": true,
+      "errant_f05": true
     },
     "ask_gec_p1": {
-      "exact_match": true
+      "exact_match": true,
+      "errant_f05": true
     },
     "ask_gec_p2": {
-      "exact_match": true
+      "exact_match": true,
+      "errant_f05": true
     },
     "ask_gec_p3": {
-      "exact_match": true
+      "exact_match": true,
+      "errant_f05": true
     },
     "ask_gec_p4": {
-      "exact_match": true
+      "exact_match": true,
+      "errant_f05": true
     }
   },
   "n-samples": {
