@@ -39,6 +39,19 @@ export const JSON_DOWNLOAD_ICON = {
   path: "M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z",
 };
 
+/** Trigger a client-side download of `data` as a pretty-printed JSON file. */
+export function downloadJSON(data, filename) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 /** Export the current chart's data as JSON.
  *  `metadata` provides dashboard-specific fields to include in the export. */
 export function exportChartDataAsJSON(gd, metadata, filename) {
@@ -61,15 +74,7 @@ export function exportChartDataAsJSON(gd, metadata, filename) {
     if (trace.error_y?.array) series.error = Array.from(trace.error_y.array);
     exportData.series.push(series);
   }
-  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename || "chart-data.json";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  downloadJSON(exportData, filename || "chart-data.json");
 }
 
 /** Build a Plotly config with the standard PNG/SVG/JSON download buttons.
@@ -131,6 +136,29 @@ export function getPlotlyLayout(overrides) {
     tickfont: { size: 13.6, color: "#64748b", weight: 500 },
   }, axisDefaults, result.yaxis);
   return result;
+}
+
+/** The y-axis fragment shared by every dashboard chart: fixed range, grid
+ *  lines only (no ticks), zeroline only under z-score normalization. */
+export function makeYAxis(range) {
+  return {
+    title: "", range,
+    showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
+    zeroline: state.currentNormalization === "zscore",
+  };
+}
+
+/** Plotly error_y fragment from an array of {loDist, hiDist}|null CI values;
+ *  undefined when `ciValues` is null (CIs off). */
+export function makeErrorY(ciValues) {
+  if (!ciValues) return undefined;
+  return {
+    type: "data", symmetric: false,
+    array: ciValues.map((c) => c?.hiDist ?? 0),
+    arrayminus: ciValues.map((c) => c?.loDist ?? 0),
+    visible: true,
+    color: "rgba(0,0,0,0.5)", thickness: 2.4, width: 5,
+  };
 }
 
 // Bar "grow-up" animation. Debounced so rapid renders (e.g. dragging the size

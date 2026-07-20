@@ -9,21 +9,27 @@
 
 import { state } from "./state.js";
 import {
-  MODEL_COLORS, METRIC_DISPLAY, METRIC_DESCRIPTIONS,
+  MODEL_COLORS,
   getScore, getCombinedCI, scaleCIDistances, applyNorm, toDisplayScale,
-  getBaseMetric, getNormYLabel, getMetricYLabel,
-  aggregateScores, isAggregateSelection, isMacroSelection,
-  getEffectiveMetric, isStderrCompatible, formatTitleWithShot,
+  getBaseMetric, aggregateScores, isAggregateSelection, isMacroSelection,
+  getEffectiveMetric, formatTitleWithShot, capitalize, taskTitleDescription,
+  wantCI, normNeedsAllValues, scoreDecimals,
 } from "./core.js";
 import {
   darkenColor, makePlotlyConfig, getPlotlyLayout, plotChart,
-  computeTickAngle, computeAnnotationFontSize, computeYRange,
+  computeTickAngle, computeAnnotationFontSize, computeYRange, computeYMax,
+  makeYAxis, makeErrorY,
 } from "./chart.js";
 import {
-  showTooltip, hideTooltip, attachTooltip, populateMetricSelector, hideMetricSelector,
-  buildTaskCheckboxes, syncTaskCheckboxStates, bindModuleActionStopPropagation,
-  attachControlTooltips, markAppReady,
+  showTooltip, hideTooltip, populateMetricSelector, hideMetricSelector,
+  buildTaskCheckboxes, bindModuleActionStopPropagation,
+  attachControlTooltips, markAppReady, setChartHeader,
 } from "./ui.js";
+import {
+  setsEqual, getBenchmarksForSelection, autoSetNormalization,
+  populateTaskDropdown, onTaskCheckboxChange, bindTaskControls,
+  restoreCheckedTasksFromSelection, syncTaskControlsFromState,
+} from "./selection.js";
 import { UrlState } from "./url-state.js";
 
 let CFG = null;            // Dashboard configuration (set in initComparison)
@@ -67,7 +73,7 @@ const ORG_LOGO_SCALE = {
 /** Plotly layout.images entries: one white logo per model at the bar's
  *  bottom, positioned via data-x + paper-y (so the vertical placement
  *  stays a fixed fraction of the chart height regardless of y-axis range). */
-function buildOrgImages(modelNames, xPositions, xOffset) {
+function buildOrgImages(modelNames, xPositions) {
   return modelNames.map((modelDir, i) => {
     const org = state.DATA.model_organizations?.[modelDir];
     const filename = org && ORG_LOGO[org];
@@ -76,7 +82,7 @@ function buildOrgImages(modelNames, xPositions, xOffset) {
     return {
       source: `../shared/logos/${filename}`,
       xref: "x", yref: "paper",
-      x: xPositions[i] + (xOffset || 0),
+      x: xPositions[i],
       // yanchor:middle + y:0.05 puts the box's vertical centre at ~5% of
       // chart height above the axis. With sizing:"contain", the logo
       // (PNGs now square-padded at 85% fill — matching SVG safe-area)
@@ -185,16 +191,12 @@ export const checkedModels = new Set();
 /** Entry point. Loads data.json, initializes state, wires DOM, renders. */
 export async function initComparison(config) {
   CFG = Object.assign({
-    title: "Model Comparison",
     defaultShot: "5",
     defaultSizeMin: 6,
     defaultSizeMax: 24,
     sizeRangeMin: 1,
     sizeRangeMax: 73,
     filenamePrefix: "comparison-chart",
-    enableLanguageGroups: true,
-    enableEvalTypes: true,
-    enableTaskGroups: true,
   }, config);
   plotlyConfig = makePlotlyConfig(CFG.filenamePrefix, () => ({
     shot: state.currentShot + "-shot",
@@ -220,21 +222,15 @@ export async function initComparison(config) {
 
     setupUrlState();
     const hasURL = urlState.load();
-
-    // If `task` was specified in the URL but `tasks` was not, derive checkedTasks
-    // from the task selection (mirrors the dropdown change handler). Without
-    // this, checkedTasks stays at the initial "all tasks" value, which both
-    // shows wrong results and pollutes the URL with an explicit tasks= list on
-    // the next save.
-    if (urlState.has("task") && !urlState.has("tasks")) {
-      const benchmarks = getBenchmarksForSelection(state.currentTaskSelection);
-      if (benchmarks.length > 0) state.checkedTasks = new Set(benchmarks);
-    }
+    restoreCheckedTasksFromSelection(urlState);
 
     // Sync UI controls
     populateTaskDropdown();
     bindEventListeners();
-    buildCheckboxes();
+    buildTaskCheckboxes({
+      filterSourceFn: () => state.checkedTasks,
+      onChange: () => onTaskCheckboxChange(renderChart),
+    });
     buildModelCheckboxes();
     bindModuleActionStopPropagation();
     attachControlTooltips();
@@ -247,12 +243,7 @@ export async function initComparison(config) {
     if (!urlState.has("norm")) autoSetNormalization();
 
     if (hasURL) {
-      document.getElementById("task-select").value = state.currentTaskSelection;
-      document.getElementById("prompt-agg-select").value = state.currentPromptAgg;
-      document.getElementById("norm-select").value = state.currentNormalization;
-      document.querySelectorAll(".shot-btn").forEach((b) =>
-        b.classList.toggle("active", b.dataset.shot === state.currentShot));
-      syncTaskCheckboxStates(() => state.checkedTasks);
+      syncTaskControlsFromState();
       syncModelCheckboxStates();
       updateRangeSliderUI();
       const fo = document.getElementById("fully-open-toggle");
@@ -333,8 +324,6 @@ function setupUrlState() {
       get: () => taskAlias._toAlias[state.currentTaskSelection] || state.currentTaskSelection,
       set: (v) => { state.currentTaskSelection = taskAlias._toSel[v] || v; },
       default: "__all_macro__",
-      encode: (v) => v,
-      decode: (v) => v,
     },
     { key: "prompt", get: () => state.currentPromptAgg, set: (v) => state.currentPromptAgg = v, default: "max" },
     {
@@ -410,161 +399,12 @@ function setupUrlState() {
   ]);
 }
 
-function setsEqual(a, b) {
-  if (a.size !== b.size) return false;
-  for (const item of a) if (!b.has(item)) return false;
-  return true;
-}
-
 // ─────────────────────────────────────────────────────────────
-// Selection helpers
-// ─────────────────────────────────────────────────────────────
-
-function getBenchmarksForSelection(sel) {
-  if (sel === "__all__" || sel === "__all_macro__" || sel === "__filtered__") return Object.keys(state.metricsSetup);
-  if (sel === "__custom__") return [];
-  if (sel.startsWith("__cat__")) {
-    const c = sel.slice(7);
-    return Object.keys(state.metricsSetup).filter((b) => state.metricsSetup[b].category === c);
-  }
-  if (sel.startsWith("__eval__")) {
-    const e = sel.slice(8);
-    return Object.keys(state.metricsSetup).filter((b) => state.metricsSetup[b].evaluation_type === e);
-  }
-  if (sel === "__lang__nno") {
-    const nno = new Set(state.DATA.nno_benchmarks || []);
-    for (const b of (state.DATA.nob_nno_translation_benchmarks || [])) nno.add(b);
-    for (const b of (state.DATA.shared_language_benchmarks || [])) nno.add(b);
-    return [...nno];
-  }
-  if (sel === "__lang__nob") {
-    const nnoOnly = new Set(state.DATA.nno_benchmarks || []);
-    const smeOnly = new Set(state.DATA.sme_benchmarks || []);
-    const nobNno = new Set(state.DATA.nob_nno_translation_benchmarks || []);
-    const shared = new Set(state.DATA.shared_language_benchmarks || []);
-    return Object.keys(state.metricsSetup).filter((b) =>
-      (!nnoOnly.has(b) && !smeOnly.has(b)) || nobNno.has(b) || shared.has(b));
-  }
-  if (sel === "__lang__sme") return state.DATA.sme_benchmarks || [];
-  if (sel.startsWith("__group__")) {
-    const g = state.DATA.task_groups[sel.slice(9)];
-    return g ? g.benchmarks : [];
-  }
-  if (state.metricsSetup[sel]) return [sel];
-  return [];
-}
-
-function findDropdownValueForBench(bench) {
-  for (const [gn, g] of Object.entries(state.DATA.task_groups || {})) {
-    if (g.benchmarks.includes(bench)) return "__group__" + gn;
-  }
-  if (state.DATA.standalone_benchmarks && state.DATA.standalone_benchmarks.includes(bench)) return bench;
-  return null;
-}
-
-function autoSetNormalization() {
-  state.currentNormalization = isAggregateSelection(state.currentTaskSelection) ? "baseline" : "none";
-  document.getElementById("norm-select").value = state.currentNormalization;
-}
-
-// ─────────────────────────────────────────────────────────────
-// Dropdown
-// ─────────────────────────────────────────────────────────────
-
-function populateTaskDropdown() {
-  const select = document.getElementById("task-select");
-
-  if (CFG.enableTaskGroups) {
-    const categories = {};
-    for (const [bench, info] of Object.entries(state.metricsSetup)) {
-      (categories[info.category] = categories[info.category] || []).push(bench);
-    }
-    const catGroup = document.createElement("optgroup");
-    catGroup.label = "Aggregate by category";
-    for (const catName of Object.keys(categories).sort()) {
-      const opt = document.createElement("option");
-      opt.value = "__cat__" + catName;
-      opt.textContent = capitalize(catName);
-      catGroup.appendChild(opt);
-    }
-    select.appendChild(catGroup);
-  }
-
-  if (CFG.enableEvalTypes) {
-    const evalTypes = {};
-    for (const [bench, info] of Object.entries(state.metricsSetup)) {
-      const et = info.evaluation_type;
-      if (et) (evalTypes[et] = evalTypes[et] || []).push(bench);
-    }
-    if (Object.keys(evalTypes).length > 0) {
-      const evalGroup = document.createElement("optgroup");
-      evalGroup.label = "Aggregate by evaluation type";
-      for (const etName of Object.keys(evalTypes).sort()) {
-        const opt = document.createElement("option");
-        opt.value = "__eval__" + etName;
-        opt.textContent = capitalize(etName);
-        evalGroup.appendChild(opt);
-      }
-      select.appendChild(evalGroup);
-    }
-  }
-
-  if (CFG.enableLanguageGroups) {
-    const langGroup = document.createElement("optgroup");
-    langGroup.label = "Aggregate by language";
-    for (const [val, label] of [["__lang__nob", "Bokmål"], ["__lang__nno", "Nynorsk"], ["__lang__sme", "Northern Sámi"]]) {
-      const opt = document.createElement("option");
-      opt.value = val; opt.textContent = label;
-      langGroup.appendChild(opt);
-    }
-    select.appendChild(langGroup);
-  }
-
-  const taskGroup = document.createElement("optgroup");
-  taskGroup.label = "Individual tasks";
-  const entries = [];
-  if (CFG.enableTaskGroups && state.DATA.task_groups) {
-    for (const groupName of Object.keys(state.DATA.task_groups)) {
-      entries.push({ value: "__group__" + groupName, label: capitalize(groupName) });
-    }
-  }
-  const standalones = state.DATA.standalone_benchmarks || Object.keys(state.metricsSetup);
-  for (const bench of standalones) {
-    const info = state.metricsSetup[bench];
-    if (info) entries.push({ value: bench, label: capitalize(info.pretty_name) });
-  }
-  entries.sort((a, b) => a.label.localeCompare(b.label));
-  for (const entry of entries) {
-    const opt = document.createElement("option");
-    opt.value = entry.value; opt.textContent = entry.label;
-    taskGroup.appendChild(opt);
-  }
-  select.appendChild(taskGroup);
-}
-
-// ─────────────────────────────────────────────────────────────
-// Event listeners
+// Event listeners (dashboard-specific; shared ones live in selection.js)
 // ─────────────────────────────────────────────────────────────
 
 function bindEventListeners() {
-  document.querySelectorAll(".shot-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document.querySelector(".shot-btn.active")?.classList.remove("active");
-      btn.classList.add("active");
-      state.currentShot = btn.dataset.shot;
-      renderChart();
-    });
-  });
-
-  document.getElementById("prompt-agg-select").addEventListener("change", (e) => {
-    state.currentPromptAgg = e.target.value;
-    renderChart();
-  });
-
-  document.getElementById("norm-select").addEventListener("change", (e) => {
-    state.currentNormalization = e.target.value;
-    renderChart();
-  });
+  bindTaskControls(renderChart);
 
   const foToggle = document.getElementById("fully-open-toggle");
   if (foToggle) {
@@ -573,34 +413,6 @@ function bindEventListeners() {
       renderChart();
     });
   }
-
-  document.getElementById("metric-select").addEventListener("change", (e) => {
-    state.currentMetric = e.target.value;
-    renderChart();
-  });
-
-  document.getElementById("task-select").addEventListener("change", (e) => {
-    state.currentTaskSelection = e.target.value;
-    const benchmarks = getBenchmarksForSelection(state.currentTaskSelection);
-    if (benchmarks.length > 0) state.checkedTasks = new Set(benchmarks);
-    syncTaskCheckboxStates(() => state.checkedTasks);
-    autoSetNormalization();
-    renderChart();
-  });
-
-  document.getElementById("select-all-btn").addEventListener("click", () => {
-    state.checkedTasks = new Set(Object.keys(state.metricsSetup));
-    state.currentTaskSelection = "__all__";
-    document.getElementById("task-select").value = "__all__";
-    syncTaskCheckboxStates(() => state.checkedTasks);
-    autoSetNormalization();
-    renderChart();
-  });
-  document.getElementById("select-none-btn").addEventListener("click", () => {
-    state.checkedTasks.clear();
-    syncTaskCheckboxStates(() => state.checkedTasks);
-    renderChart();
-  });
 
   document.querySelectorAll(".model-select-all").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -624,45 +436,6 @@ function bindEventListeners() {
   });
 
   initRangeSlider();
-}
-
-// ─────────────────────────────────────────────────────────────
-// Task checkboxes
-// ─────────────────────────────────────────────────────────────
-
-function buildCheckboxes() {
-  buildTaskCheckboxes({
-    filterSourceFn: () => state.checkedTasks,
-    onChange: onTaskCheckboxChange,
-  });
-}
-
-function onTaskCheckboxChange() {
-  if (state.checkedTasks.size === 1) {
-    const bench = [...state.checkedTasks][0];
-    state.currentTaskSelection = bench;
-    const ddVal = findDropdownValueForBench(bench);
-    if (ddVal) document.getElementById("task-select").value = ddVal;
-    autoSetNormalization();
-    renderChart();
-    return;
-  }
-  if (CFG.enableTaskGroups && state.checkedTasks.size === 2 && state.DATA.task_groups) {
-    const arr = [...state.checkedTasks];
-    for (const [gn, g] of Object.entries(state.DATA.task_groups)) {
-      if (g.benchmarks.length === 2 && g.benchmarks.includes(arr[0]) && g.benchmarks.includes(arr[1])) {
-        state.currentTaskSelection = "__group__" + gn;
-        document.getElementById("task-select").value = state.currentTaskSelection;
-        autoSetNormalization();
-        renderChart();
-        return;
-      }
-    }
-  }
-  state.currentTaskSelection = "__custom__";
-  document.getElementById("task-select").value = "__custom__";
-  autoSetNormalization();
-  renderChart();
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -783,6 +556,54 @@ function getModelColor(modelDir) {
 
 function getModelOpenLabel(modelDir) {
   return state.DATA.model_fully_open?.[modelDir] ? "fully-open" : "open weights";
+}
+
+/** "7B parameters  ·  License: X  ·  fully-open" meta line for a model. */
+function modelMetaLine(modelDir) {
+  const params = state.DATA.model_parameters?.[modelDir];
+  const paramsPart = params
+    ? (params < 1 ? `${Math.round(params * 1000)}M parameters` : `${params}B parameters`)
+    : "";
+  const license = state.DATA.model_info?.[modelDir]?.license;
+  const licensePart = license ? `License: ${license}` : "";
+  return [paramsPart, licensePart, getModelOpenLabel(modelDir)].filter(Boolean).join("  ·  ");
+}
+
+/** Raw scores of every listed model on one benchmark (the reference set for
+ *  min-max / z-score / percentile normalization). */
+function allRawScores(modelNames, bench, metric) {
+  return modelNames
+    .map((m) => getScore(state.DATA.models, m, bench, state.currentShot, metric))
+    .filter((v) => v !== undefined);
+}
+
+/** Normalized display score + scaled CI for one model on one benchmark, or
+ *  null when the model has no score. CI is null when CIs are off. */
+function modelScoreCI(m, bench, metric, allRaw) {
+  const raw = getScore(state.DATA.models, m, bench, state.currentShot, metric);
+  if (raw == null) return null;
+  const score = applyNorm(raw, bench, allRaw, metric);
+  const ci = wantCI()
+    ? scaleCIDistances(getCombinedCI(state.DATA.models, m, bench, state.currentShot, metric), bench, metric, allRaw)
+    : null;
+  return { score, ci };
+}
+
+/** Aggregate {score, count, ci} for one model across state.checkedTasks,
+ *  under the current macro/micro mode and normalization. */
+function aggregateModelResult(m, modelNames) {
+  const needAll = normNeedsAllValues();
+  const useCI = wantCI();
+  return aggregateScores(state.checkedTasks, (bench) => {
+    const raw = getScore(state.DATA.models, m, bench, state.currentShot);
+    if (raw === undefined) return undefined;
+    const allRaw = needAll ? allRawScores(modelNames, bench) : null;
+    const score = applyNorm(raw, bench, allRaw);
+    const ci = useCI
+      ? scaleCIDistances(getCombinedCI(state.DATA.models, m, bench, state.currentShot), bench, undefined, allRaw)
+      : undefined;
+    return { score, ci };
+  }, isMacroSelection());
 }
 
 function isModelInSizeRange(modelDir) {
@@ -925,12 +746,7 @@ function buildModelCheckboxes() {
         const desc = document.createElement("div");
         desc.className = "model-description-inline";
         if (info) {
-          const params = state.DATA.model_parameters?.[modelDir];
-          const paramsPart = params
-            ? (params < 1 ? `${Math.round(params * 1000)}M parameters` : `${params}B parameters`)
-            : "";
-          const licensePart = info.license ? `License: ${info.license}` : "";
-          const meta = [paramsPart, licensePart, getModelOpenLabel(modelDir)].filter(Boolean).join("  ·  ");
+          const meta = modelMetaLine(modelDir);
           if (meta) {
             const metaEl = document.createElement("span");
             metaEl.className = "meta";
@@ -982,13 +798,13 @@ function onChartHover(data) {
   if (!data.points || !data.points.length) return;
   const pt = data.points[0];
   if (pt.y == null) return;
-  const fmt = state.currentNormalization === "zscore" ? 2 : 1;
+  const fmt = scoreDecimals();
   const scoreStr = Number(pt.y).toFixed(fmt);
   const sel = state.currentTaskSelection;
   const cd = pt.customdata;
 
   let ciStr = "";
-  if (state.showStderr && cd != null && typeof cd === "object" && cd.ci) {
+  if (cd != null && typeof cd === "object" && cd.ci) {
     const v = Number(pt.y);
     const lo = v - (cd.ci.loDist ?? 0), hi = v + (cd.ci.hiDist ?? 0);
     if ((cd.ci.loDist ?? 0) > 0 || (cd.ci.hiDist ?? 0) > 0) {
@@ -1007,22 +823,15 @@ function onChartHover(data) {
     scoreBody = "Score: " + scoreStr + ciStr;
   }
 
-  let title = String(pt.x);
-  let meta = "", body = scoreBody, footer = "";
+  // With a known model whose info carries a description, the tooltip becomes
+  // a model card (name, meta line, description) with the score as footer.
   const modelDir = cd && typeof cd === "object" ? cd.modelDir : null;
-  if (modelDir) {
-    const info = state.DATA.model_info?.[modelDir];
-    if (info && info.description) {
-      const params = state.DATA.model_parameters?.[modelDir];
-      const paramsPart = params ? (params < 1 ? `${Math.round(params * 1000)}M parameters` : `${params}B parameters`) : "";
-      const licensePart = info.license ? `License: ${info.license}` : "";
-      title = getModelLabel(modelDir);
-      meta = [paramsPart, licensePart, getModelOpenLabel(modelDir)].filter(Boolean).join("  ·  ");
-      body = info.description;
-      footer = scoreBody;
-    }
+  const info = modelDir ? state.DATA.model_info?.[modelDir] : null;
+  if (info?.description) {
+    showTooltip(data.event, getModelLabel(modelDir), info.description, scoreBody, modelMetaLine(modelDir));
+  } else {
+    showTooltip(data.event, String(pt.x), scoreBody, "", "");
   }
-  showTooltip(data.event, title, body, footer, meta);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1110,83 +919,91 @@ function scatterXAxis() {
   };
 }
 
-function renderAggregateBarChart() {
+/** Render the standard one-bar-per-model chart used by the aggregate and
+ *  single-benchmark views. `values` / `ciValues` / `customdata` are parallel
+ *  to `modelNames`; `ciValues` is null when CIs are off. */
+function renderModelBars(modelNames, { values, ciValues, customdata, yRange }) {
   updateChartLegend([]);
-  const modelNames = getModelList();
   const labels = modelNames.map(getModelLabel);
-  const colors = modelNames.map(getModelColor);
-  const scores = [], taskCounts = [], aggCIs = [];
-
-  const needAllRaw = ["minmax", "zscore", "percentile"].includes(state.currentNormalization);
-  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
-  const macro = isMacroSelection();
-
-  for (const m of modelNames) {
-    const result = aggregateScores(state.checkedTasks, (bench) => {
-      const raw = getScore(state.DATA.models, m, bench, state.currentShot);
-      if (raw === undefined) return undefined;
-      const allRaw = needAllRaw
-        ? modelNames.map((mm) => getScore(state.DATA.models, mm, bench, state.currentShot)).filter((v) => v !== undefined)
-        : null;
-      const score = applyNorm(raw, bench, allRaw);
-      const ci = wantSE ? scaleCIDistances(getCombinedCI(state.DATA.models, m, bench, state.currentShot), bench, undefined, allRaw) : undefined;
-      return { score, ci };
-    }, macro);
-    scores.push(result ? result.score : 0);
-    taskCounts.push(result ? result.count : 0);
-    aggCIs.push(result ? result.ci : null);
-  }
-
   const xPositions = computeOrgXPositions(modelNames);
   const xRange = xPositions.length
     ? [xPositions[0] - 0.6, xPositions[xPositions.length - 1] + 0.5]
     : null;
-  const fmt = state.currentNormalization === "zscore" ? 2 : 1;
+  const fmt = scoreDecimals();
+  const hiArr = ciValues ? ciValues.map((c) => c?.hiDist ?? 0) : null;
   const trace = {
-    x: xPositions, y: scores, type: "bar",
+    x: xPositions, y: values, type: "bar",
     width: 0.85,
-    marker: { color: colors, line: { width: 0 }, cornerradius: 6 },
-    customdata: taskCounts.map((c, i) => ({ count: c, ci: aggCIs[i], modelDir: modelNames[i] })),
+    marker: { color: modelNames.map(getModelColor), line: { width: 0 }, cornerradius: 6 },
+    customdata,
     hoverinfo: "none",
+    ...(ciValues && { error_y: makeErrorY(ciValues) }),
   };
-  if (wantSE) {
-    trace.error_y = {
-      type: "data", symmetric: false,
-      array: aggCIs.map((c) => c?.hiDist ?? 0),
-      arrayminus: aggCIs.map((c) => c?.loDist ?? 0),
-      visible: true,
-      color: "rgba(0,0,0,0.5)", thickness: 2.4, width: 5,
-    };
-  }
-
-  const yRange = computeAggregateYRange(state.checkedTasks);
   const layout = getPlotlyLayout({
-    yaxis: {
-      title: "", range: yRange,
-      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
-      zeroline: state.currentNormalization === "zscore",
-    },
+    yaxis: makeYAxis(yRange),
     xaxis: { automargin: false,
-      title: "",
       range: xRange,
       tickvals: xPositions, ticktext: labels,
-      tickangle: computeTickAngle(labels),
-      showgrid: false,
+      tickangle: computeTickAngle(labels), showgrid: false,
     },
     showlegend: false,
     margin: { l: 105, r: 4, t: 8, b: 100 },
     annotations: labels.map((label, i) => ({
-      x: xPositions[i], y: scores[i] + (wantSE ? (aggCIs[i]?.hiDist ?? 0) : 0),
-      text: scores[i].toFixed(fmt), showarrow: false, yshift: 10,
+      x: xPositions[i], y: (values[i] || 0) + (hiArr ? (hiArr[i] || 0) : 0),
+      text: values[i] != null ? values[i].toFixed(fmt) : "",
+      showarrow: false, yshift: 10,
       xanchor: "center",
       font: { size: computeAnnotationFontSize(labels.length), color: "#000", weight: 500 },
     })),
     images: buildOrgImages(modelNames, xPositions),
   });
   layout._annAnim = labels.map((_, i) => ({
-    score: scores[i], se: wantSE ? (aggCIs[i]?.hiDist ?? 0) : 0,
+    score: values[i] || 0, se: hiArr ? (hiArr[i] || 0) : 0,
   }));
   plotChart([trace], layout, plotlyConfig, onChartHover, hideTooltip);
+}
+
+function renderAggregateBarChart() {
+  const modelNames = getModelList();
+  const results = modelNames.map((m) => aggregateModelResult(m, modelNames));
+  renderModelBars(modelNames, {
+    values: results.map((r) => r ? r.score : 0),
+    ciValues: wantCI() ? results.map((r) => r ? r.ci : null) : null,
+    customdata: results.map((r, i) => ({
+      count: r ? r.count : 0, ci: r ? r.ci : null, modelDir: modelNames[i],
+    })),
+    yRange: computeAggregateYRange(),
+  });
+}
+
+/** Y-range for a paired-benchmark (group) view. Normalized: computed across
+ *  all shot settings so the axis stays stable when switching shots; raw:
+ *  0 … padded max. Shared by the grouped bar and grouped scatter views. */
+function computeGroupYRange(group, metric) {
+  if (state.currentNormalization === "none") {
+    return [0, computeRawYMax(group.benchmarks, metric)];
+  }
+  const modelNames = getModelList();
+  const needAll = normNeedsAllValues();
+  const vals = [];
+  for (const shot of ALL_SHOTS) {
+    for (const bench of group.benchmarks) {
+      const raws = modelNames.map((m) => getScore(state.DATA.models, m, bench, shot, metric)).filter((v) => v !== undefined);
+      for (const raw of raws) vals.push(applyNorm(raw, bench, needAll ? raws : null, metric));
+    }
+  }
+  return computeYRange(vals);
+}
+
+/** Populate the HTML chart legend with a representative light/dark shade per
+ *  sub-benchmark (per-model bar colors vary; the legend only needs to show
+ *  WHICH sub-bar shade is which label). */
+function updateGroupLegend(group) {
+  const repColor = MODEL_COLORS[0];
+  updateChartLegend(group.labels.map((name, i) => ({
+    name,
+    color: i === 0 ? repColor : darkenColor(repColor, 0.3),
+  })));
 }
 
 function renderGroupedBarChart(groupName) {
@@ -1195,11 +1012,9 @@ function renderGroupedBarChart(groupName) {
   const metric = getEffectiveMetric(group.benchmarks[0]);
   const modelNames = getModelList();
   const labels = modelNames.map(getModelLabel);
-  const bench0 = group.benchmarks[0];
-  const useNorm = state.currentNormalization !== "none";
-  const needAllRaw = ["minmax", "zscore", "percentile"].includes(state.currentNormalization);
-  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
-  const fmt = state.currentNormalization === "zscore" ? 2 : 1;
+  const needAll = normNeedsAllValues();
+  const useCI = wantCI();
+  const fmt = scoreDecimals();
   const groupValuesArr = [], groupSeArrs = [];
 
   const xPositions = computeOrgXPositions(modelNames);
@@ -1211,24 +1026,15 @@ function renderGroupedBarChart(groupName) {
   const barWidth = totalGroupWidth / nBars;
 
   const dataTraces = group.benchmarks.map((bench, i) => {
-    const allRaw = needAllRaw
-      ? modelNames.map((mm) => getScore(state.DATA.models, mm, bench, state.currentShot, metric)).filter((v) => v !== undefined)
-      : null;
-    const values = modelNames.map((m) => {
-      const raw = getScore(state.DATA.models, m, bench, state.currentShot, metric);
-      if (raw == null) return null;
-      return useNorm ? applyNorm(raw, bench, allRaw, metric) : toDisplayScale(raw, bench, metric);
-    });
-    const ciValues = wantSE ? modelNames.map((m) => {
-      const ci = getCombinedCI(state.DATA.models, m, bench, state.currentShot, metric);
-      return scaleCIDistances(ci, bench, metric, allRaw);
-    }) : null;
+    const allRaw = needAll ? allRawScores(modelNames, bench, metric) : null;
+    const points = modelNames.map((m) => modelScoreCI(m, bench, metric, allRaw));
+    const values = points.map((p) => p ? p.score : null);
+    const ciValues = useCI ? points.map((p) => p ? p.ci : null) : null;
     const barColors = modelNames.map((m) => {
       const base = getModelColor(m);
       return i === 0 ? base : darkenColor(base, 0.3);
     });
     const hiArr = ciValues ? ciValues.map((c) => c?.hiDist ?? 0) : null;
-    const loArr = ciValues ? ciValues.map((c) => c?.loDist ?? 0) : null;
     // Bar offset (relative to x): place sub-bars side-by-side, centered on x.
     const offset = -totalGroupWidth / 2 + i * barWidth;
     const trace = {
@@ -1237,38 +1043,19 @@ function renderGroupedBarChart(groupName) {
       marker: { color: barColors, line: { width: 0 }, cornerradius: 6 },
       customdata: modelNames.map((m, j) => ({ ci: ciValues ? ciValues[j] : null, modelDir: m })),
       hoverinfo: "none", showlegend: true,
+      ...(ciValues && { error_y: makeErrorY(ciValues) }),
     };
-    if (wantSE && hiArr) {
-      trace.error_y = { type: "data", symmetric: false,
-        array: hiArr, arrayminus: loArr,
-        visible: true,
-        color: "rgba(0,0,0,0.5)", thickness: 2.4, width: 5 };
-    }
     groupValuesArr.push(values);
     groupSeArrs.push(hiArr);  // used only for annotation y-offset (top of error bar)
     return trace;
   });
 
-  const yLabel = useNorm ? getNormYLabel() : getMetricYLabel(bench0, metric);
-  let yRange;
-  if (useNorm) {
-    const vals = [];
-    for (const shot of ALL_SHOTS) {
-      for (const bench of group.benchmarks) {
-        const raws = modelNames.map((m) => getScore(state.DATA.models, m, bench, shot, metric)).filter((v) => v !== undefined);
-        for (const raw of raws) vals.push(applyNorm(raw, bench, needAllRaw ? raws : null, metric));
-      }
-    }
-    yRange = computeYRange(vals);
-  } else {
-    yRange = [0, computeRawYMax_display(group.benchmarks, metric)];
-  }
   const annotations = [];
   const annAnim = [];
   labels.forEach((_, catIdx) => {
     groupValuesArr.forEach((values, gi) => {
       if (values[catIdx] == null) return;
-      const se = (wantSE && groupSeArrs[gi]) ? groupSeArrs[gi][catIdx] : 0;
+      const se = groupSeArrs[gi] ? (groupSeArrs[gi][catIdx] || 0) : 0;
       // Centre of the i-th sub-bar in [-totalGroupWidth/2 … +totalGroupWidth/2]
       const subBarCentre = -totalGroupWidth / 2 + (gi + 0.5) * barWidth;
       annotations.push({
@@ -1279,15 +1066,11 @@ function renderGroupedBarChart(groupName) {
         xanchor: "center",
         font: { size: computeAnnotationFontSize(labels.length * nBars), color: "#000", weight: 500 },
       });
-      annAnim.push({ score: values[catIdx], se: se || 0 });
+      annAnim.push({ score: values[catIdx], se });
     });
   });
   const layout = getPlotlyLayout({
-    yaxis: {
-      title: "", range: yRange,
-      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
-      zeroline: state.currentNormalization === "zscore",
-    },
+    yaxis: makeYAxis(computeGroupYRange(group, metric)),
     xaxis: { automargin: false,
       range: xRange,
       tickvals: xPositions, ticktext: labels,
@@ -1299,90 +1082,25 @@ function renderGroupedBarChart(groupName) {
     images: buildOrgImages(modelNames, xPositions),
   });
   layout._annAnim = annAnim;
-  // Populate the HTML legend in the Model-size controls bar.
-  // Per-model bar colors vary; the legend uses a representative shade so the
-  // viewer can see WHICH sub-bar (light vs darkened) is which label.
-  const repColor = MODEL_COLORS[0];
-  updateChartLegend(group.benchmarks.map((_, i) => ({
-    name: group.labels[i],
-    color: i === 0 ? repColor : darkenColor(repColor, 0.3),
-  })));
+  updateGroupLegend(group);
   plotChart(dataTraces, layout, plotlyConfig, onChartHover, hideTooltip);
 }
 
 function renderSingleBenchmarkBarChart(benchmark) {
   updateChartLegend([]);
-  const info = state.metricsSetup[benchmark];
-  if (!info) return;
+  if (!state.metricsSetup[benchmark]) return;
   const metric = getEffectiveMetric(benchmark);
   const modelNames = getModelList();
-  const labels = modelNames.map(getModelLabel);
-  const colors = modelNames.map(getModelColor);
   const allRaw = (state.currentNormalization !== "none")
-    ? modelNames.map((mm) => getScore(state.DATA.models, mm, benchmark, state.currentShot, metric)).filter((v) => v !== undefined)
+    ? allRawScores(modelNames, benchmark, metric)
     : null;
-  const values = modelNames.map((m) => {
-    const raw = getScore(state.DATA.models, m, benchmark, state.currentShot, metric);
-    if (raw == null) return null;
-    return state.currentNormalization === "none"
-      ? toDisplayScale(raw, benchmark, metric)
-      : applyNorm(raw, benchmark, allRaw, metric);
+  const points = modelNames.map((m) => modelScoreCI(m, benchmark, metric, allRaw));
+  renderModelBars(modelNames, {
+    values: points.map((p) => p ? p.score : null),
+    ciValues: wantCI() ? points.map((p) => p ? p.ci : null) : null,
+    customdata: modelNames.map((m, i) => ({ ci: points[i]?.ci ?? null, modelDir: m })),
+    yRange: computeSingleYRange(benchmark, metric),
   });
-
-  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
-  const ciValues = wantSE ? modelNames.map((m) => {
-    const ci = getCombinedCI(state.DATA.models, m, benchmark, state.currentShot, metric);
-    return scaleCIDistances(ci, benchmark, metric, allRaw);
-  }) : null;
-
-  const yRange = computeSingleYRange(benchmark, metric);
-  const yLabel = state.currentNormalization === "none" ? getMetricYLabel(benchmark, metric) : getNormYLabel();
-  const fmt = state.currentNormalization === "zscore" ? 2 : 1;
-  const hiArr = ciValues ? ciValues.map((c) => c?.hiDist ?? 0) : null;
-  const loArr = ciValues ? ciValues.map((c) => c?.loDist ?? 0) : null;
-  const xPositions = computeOrgXPositions(modelNames);
-  const xRange = xPositions.length
-    ? [xPositions[0] - 0.6, xPositions[xPositions.length - 1] + 0.5]
-    : null;
-  const trace = {
-    x: xPositions, y: values, type: "bar",
-    width: 0.85,
-    marker: { color: colors, line: { width: 0 }, cornerradius: 6 },
-    customdata: modelNames.map((m, i) => ({ ci: ciValues ? ciValues[i] : null, modelDir: m })),
-    hoverinfo: "none",
-  };
-  if (wantSE && hiArr) {
-    trace.error_y = { type: "data", symmetric: false,
-      array: hiArr, arrayminus: loArr,
-      visible: true,
-      color: "rgba(0,0,0,0.5)", thickness: 2.4, width: 5 };
-  }
-  const layout = getPlotlyLayout({
-    yaxis: {
-      title: "", range: yRange,
-      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
-      zeroline: state.currentNormalization === "zscore",
-    },
-    xaxis: { automargin: false,
-      range: xRange,
-      tickvals: xPositions, ticktext: labels,
-      tickangle: computeTickAngle(labels), showgrid: false,
-    },
-    showlegend: false,
-    margin: { l: 105, r: 4, t: 8, b: 100 },
-    annotations: labels.map((label, i) => ({
-      x: xPositions[i], y: (values[i] || 0) + (wantSE && hiArr ? (hiArr[i] || 0) : 0),
-      text: values[i] != null ? values[i].toFixed(fmt) : "",
-      showarrow: false, yshift: 10,
-      xanchor: "center",
-      font: { size: computeAnnotationFontSize(labels.length), color: "#000", weight: 500 },
-    })),
-    images: buildOrgImages(modelNames, xPositions),
-  });
-  layout._annAnim = labels.map((_, i) => ({
-    score: values[i] || 0, se: wantSE && hiArr ? (hiArr[i] || 0) : 0,
-  }));
-  plotChart([trace], layout, plotlyConfig, onChartHover, hideTooltip);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1394,54 +1112,24 @@ function renderSingleBenchmarkBarChart(benchmark) {
 function renderAggregateScatter() {
   updateChartLegend([]);
   const modelNames = getModelList();
-  const needAllRaw = ["minmax", "zscore", "percentile"].includes(state.currentNormalization);
-  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
-  const macro = isMacroSelection();
-
   const { xs, ys, dirs, colors, cis, extras } = collectScatterPoints(modelNames, (m) => {
-    const res = aggregateScores(state.checkedTasks, (bench) => {
-      const raw = getScore(state.DATA.models, m, bench, state.currentShot);
-      if (raw === undefined) return undefined;
-      const allRaw = needAllRaw
-        ? modelNames.map((mm) => getScore(state.DATA.models, mm, bench, state.currentShot)).filter((v) => v !== undefined)
-        : null;
-      const score = applyNorm(raw, bench, allRaw);
-      const ci = wantSE ? scaleCIDistances(getCombinedCI(state.DATA.models, m, bench, state.currentShot), bench, undefined, allRaw) : undefined;
-      return { score, ci };
-    }, macro);
-    if (!res) return null;
-    return { score: res.score, ci: res.ci, count: res.count };
+    const res = aggregateModelResult(m, modelNames);
+    return res ? { score: res.score, ci: res.ci, count: res.count } : null;
   });
-
-  const yRange = computeAggregateYRange(state.checkedTasks);
-  plotScatter(xs, ys, dirs, colors, cis, yRange, extras);
+  plotScatter(xs, ys, dirs, colors, cis, computeAggregateYRange(), extras);
 }
 
 function renderSingleBenchmarkScatter(benchmark) {
   updateChartLegend([]);
-  const info = state.metricsSetup[benchmark];
-  if (!info) return;
+  if (!state.metricsSetup[benchmark]) return;
   const metric = getEffectiveMetric(benchmark);
   const modelNames = getModelList();
   const allRaw = (state.currentNormalization !== "none")
-    ? modelNames.map((mm) => getScore(state.DATA.models, mm, benchmark, state.currentShot, metric)).filter((v) => v !== undefined)
+    ? allRawScores(modelNames, benchmark, metric)
     : null;
-  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
-
-  const { xs, ys, dirs, colors, cis, extras } = collectScatterPoints(modelNames, (m) => {
-    const raw = getScore(state.DATA.models, m, benchmark, state.currentShot, metric);
-    if (raw == null) return null;
-    const score = state.currentNormalization === "none"
-      ? toDisplayScale(raw, benchmark, metric)
-      : applyNorm(raw, benchmark, allRaw, metric);
-    const ci = wantSE
-      ? scaleCIDistances(getCombinedCI(state.DATA.models, m, benchmark, state.currentShot, metric), benchmark, metric, allRaw)
-      : null;
-    return { score, ci };
-  });
-
-  const yRange = computeSingleYRange(benchmark, metric);
-  plotScatter(xs, ys, dirs, colors, cis, yRange, extras);
+  const { xs, ys, dirs, colors, cis, extras } = collectScatterPoints(
+    modelNames, (m) => modelScoreCI(m, benchmark, metric, allRaw));
+  plotScatter(xs, ys, dirs, colors, cis, computeSingleYRange(benchmark, metric), extras);
 }
 
 function renderGroupedScatter(groupName) {
@@ -1449,9 +1137,7 @@ function renderGroupedScatter(groupName) {
   if (!group) return;
   const metric = getEffectiveMetric(group.benchmarks[0]);
   const modelNames = getModelList();
-  const useNorm = state.currentNormalization !== "none";
-  const needAllRaw = ["minmax", "zscore", "percentile"].includes(state.currentNormalization);
-  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
+  const needAll = normNeedsAllValues();
 
   // One trace per sub-benchmark, distinguished by colored dots only (no
   // logos in grouped scatter — overlapping logos at the same x would be
@@ -1460,20 +1146,14 @@ function renderGroupedScatter(groupName) {
   const allLogoXs = [];
   const allLogoYs = [];
   const traces = group.benchmarks.map((bench, gi) => {
-    const allRaw = needAllRaw
-      ? modelNames.map((mm) => getScore(state.DATA.models, mm, bench, state.currentShot, metric)).filter((v) => v !== undefined)
-      : null;
+    const allRaw = needAll ? allRawScores(modelNames, bench, metric) : null;
     const xs = [], ys = [], dirs = [], colors = [], cis = [];
     for (const m of modelNames) {
       const size = state.DATA.model_parameters?.[m];
       if (!size) continue;
-      const raw = getScore(state.DATA.models, m, bench, state.currentShot, metric);
-      if (raw == null) continue;
-      const score = useNorm ? applyNorm(raw, bench, allRaw, metric) : toDisplayScale(raw, bench, metric);
-      const ci = wantSE
-        ? scaleCIDistances(getCombinedCI(state.DATA.models, m, bench, state.currentShot, metric), bench, metric, allRaw)
-        : null;
-      xs.push(size); ys.push(score); dirs.push(m); cis.push(ci);
+      const p = modelScoreCI(m, bench, metric, allRaw);
+      if (!p) continue;
+      xs.push(size); ys.push(p.score); dirs.push(m); cis.push(p.ci);
       const base = getModelColor(m);
       colors.push(gi === 0 ? base : darkenColor(base, 0.3));
     }
@@ -1482,60 +1162,34 @@ function renderGroupedScatter(groupName) {
     // with the model rather than duplicated above each sub-point.
     if (gi === 0) {
       const partnerBench = group.benchmarks[1] || bench;
-      const partnerAllRaw = needAllRaw
-        ? modelNames.map((mm) => getScore(state.DATA.models, mm, partnerBench, state.currentShot, metric)).filter((v) => v !== undefined)
-        : null;
+      const partnerAllRaw = needAll ? allRawScores(modelNames, partnerBench, metric) : null;
       dirs.forEach((m, i) => {
-        const rawP = getScore(state.DATA.models, m, partnerBench, state.currentShot, metric);
-        const partnerScore = rawP == null ? ys[i]
-          : (useNorm ? applyNorm(rawP, partnerBench, partnerAllRaw, metric) : toDisplayScale(rawP, partnerBench, metric));
+        const partner = modelScoreCI(m, partnerBench, metric, partnerAllRaw);
         allLogoDirs.push(m);
         allLogoXs.push(xs[i]);
-        allLogoYs.push((ys[i] + partnerScore) / 2);
+        allLogoYs.push((ys[i] + (partner ? partner.score : ys[i])) / 2);
       });
     }
-    const trace = {
+    return {
       x: xs, y: ys, type: "scatter", mode: "markers",
       name: group.labels[gi], showlegend: true,
       marker: { size: 24, color: colors, line: { width: 1.4, color: "rgba(255,255,255,0.95)" } },
       customdata: dirs.map((m, i) => ({ modelDir: m, ci: cis[i] })),
       hoverinfo: "none",
     };
-    return trace;
   });
 
-  let yRange;
-  if (useNorm) {
-    const vals = [];
-    for (const shot of ALL_SHOTS) {
-      for (const bench of group.benchmarks) {
-        const raws = modelNames.map((m) => getScore(state.DATA.models, m, bench, shot, metric)).filter((v) => v !== undefined);
-        for (const raw of raws) vals.push(applyNorm(raw, bench, needAllRaw ? raws : null, metric));
-      }
-    }
-    yRange = computeYRange(vals);
-  } else {
-    yRange = [0, computeRawYMax_display(group.benchmarks, metric)];
-  }
-
+  const yRange = computeGroupYRange(group, metric);
   const paperYs = allLogoYs.map((y) => paperFraction(y, yRange));
   const layout = getPlotlyLayout({
-    yaxis: {
-      title: "", range: yRange,
-      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
-      zeroline: state.currentNormalization === "zscore",
-    },
+    yaxis: makeYAxis(yRange),
     xaxis: scatterXAxis(),
     showlegend: false,
     margin: { l: 105, r: 20, t: 8, b: 60 },
     images: buildScatterOrgImages(allLogoDirs, allLogoXs, paperYs),
   });
 
-  const repColor = MODEL_COLORS[0];
-  updateChartLegend(group.benchmarks.map((_, i) => ({
-    name: group.labels[i],
-    color: i === 0 ? repColor : darkenColor(repColor, 0.3),
-  })));
+  updateGroupLegend(group);
 
   // Grouped scatter uses Plotly dots (no composite images): clear any stale
   // map from a prior single-trace scatter so chart.js keeps Plotly's hover.
@@ -1563,11 +1217,7 @@ function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
 
   const composite = buildScatterCompositeImages(dirs, xs, paperYs, colors);
   const layout = getPlotlyLayout({
-    yaxis: {
-      title: "", range: yRange,
-      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
-      zeroline: state.currentNormalization === "zscore",
-    },
+    yaxis: makeYAxis(yRange),
     xaxis: scatterXAxis(),
     showlegend: false,
     margin: { l: 105, r: 20, t: 8, b: 60 },
@@ -1586,67 +1236,42 @@ function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
 
 const ALL_SHOTS = ["0", "1", "5"];
 
-function computeAggregateYRange(benchmarks) {
+function computeAggregateYRange() {
+  const modelNames = getModelList();
   const allAvgs = [];
-  const needAllRaw = ["minmax", "zscore", "percentile"].includes(state.currentNormalization);
-  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
-  const macro = isMacroSelection();
-  const modelNames = Object.keys(state.DATA.models).filter((e) => checkedModels.has(e) && isModelInSizeRange(e));
-  for (const entity of Object.keys(state.DATA.models)) {
-    if (!checkedModels.has(entity) || !isModelInSizeRange(entity)) continue;
-    const result = aggregateScores(benchmarks, (bench) => {
-      const raw = getScore(state.DATA.models, entity, bench, state.currentShot);
-      if (raw === undefined) return undefined;
-      const allRaw = needAllRaw
-        ? modelNames.map((mm) => getScore(state.DATA.models, mm, bench, state.currentShot)).filter((v) => v !== undefined)
-        : null;
-      const score = applyNorm(raw, bench, allRaw);
-      const ci = wantSE ? scaleCIDistances(getCombinedCI(state.DATA.models, entity, bench, state.currentShot), bench, undefined, allRaw) : undefined;
-      return { score, ci };
-    }, macro);
+  for (const m of modelNames) {
+    const result = aggregateModelResult(m, modelNames);
     // Include error-bar top in the range so very large CIs don't clip.
     if (result) allAvgs.push(result.score + (result.ci?.hiDist ?? 0));
   }
   return computeYRange(allAvgs);
 }
 
-function computeRawYMax_display(benchmarks, metric) {
+/** Padded maximum of the raw display-scale scores (plus error-bar tops)
+ *  across the listed models and `benchmarks`. */
+function computeRawYMax(benchmarks, metric) {
+  const useCI = wantCI();
   const vals = [];
-  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
-  for (const entity of Object.keys(state.DATA.models)) {
-    if (!checkedModels.has(entity) || !isModelInSizeRange(entity)) continue;
+  for (const m of getModelList()) {
     for (const bench of benchmarks) {
-      const v = getScore(state.DATA.models, entity, bench, state.currentShot, metric);
-      if (v != null) {
-        const displayV = toDisplayScale(v, bench, metric);
-        const ci = wantSE
-          ? scaleCIDistances(getCombinedCI(state.DATA.models, entity, bench, state.currentShot, metric), bench, metric)
-          : null;
-        vals.push(displayV + (ci?.hiDist ?? 0));
-      }
+      const raw = getScore(state.DATA.models, m, bench, state.currentShot, metric);
+      if (raw == null) continue;
+      const ci = useCI
+        ? scaleCIDistances(getCombinedCI(state.DATA.models, m, bench, state.currentShot, metric), bench, metric)
+        : null;
+      vals.push(toDisplayScale(raw, bench, metric) + (ci?.hiDist ?? 0));
     }
   }
-  if (!vals.length) return 100;
-  const mx = Math.max(...vals);
-  return Math.min(mx + Math.max(mx * 0.15, 2), 115);
+  return computeYMax(vals);
 }
 
 function computeSingleYRange(benchmark, metric) {
+  const modelNames = getModelList();
+  const raws = allRawScores(modelNames, benchmark, metric);
   const vals = [];
-  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
-  const entities = Object.keys(state.DATA.models).filter((e) => checkedModels.has(e) && isModelInSizeRange(e));
-  const raws = entities.map((e) => getScore(state.DATA.models, e, benchmark, state.currentShot, metric))
-    .filter((v) => v !== undefined);
-  for (const e of entities) {
-    const raw = getScore(state.DATA.models, e, benchmark, state.currentShot, metric);
-    if (raw === undefined) continue;
-    const displayV = state.currentNormalization === "none"
-      ? toDisplayScale(raw, benchmark, metric)
-      : applyNorm(raw, benchmark, raws, metric);
-    const ci = wantSE
-      ? scaleCIDistances(getCombinedCI(state.DATA.models, e, benchmark, state.currentShot, metric), benchmark, metric, raws)
-      : null;
-    vals.push(displayV + (ci?.hiDist ?? 0));
+  for (const m of modelNames) {
+    const p = modelScoreCI(m, benchmark, metric, raws);
+    if (p) vals.push(p.score + (p.ci?.hiDist ?? 0));
   }
   return computeYRange(vals);
 }
@@ -1702,62 +1327,19 @@ function getChartTitleDescription() {
   if (isAggregateSelection(sel)) {
     return { body: getAggregateDescription(), footer: "" };
   }
-  let body = "", url = "";
   if (sel.startsWith("__group__")) {
     const g = state.DATA.task_groups[sel.slice(9)];
-    if (g) {
-      const info = state.metricsSetup[g.benchmarks[0]];
-      if (info) {
-        body = info.description || "";
-        url = info.url || "";
-        const metric = getEffectiveMetric(g.benchmarks[0]);
-        const metricName = METRIC_DISPLAY[metric] || metric;
-        const baseMetric = getBaseMetric(metric);
-        const subtaskDesc = getSubtaskDescription(g.benchmarks[0], metric);
-        const metricDesc = subtaskDesc || METRIC_DESCRIPTIONS[baseMetric] || METRIC_DESCRIPTIONS[metric] || "";
-        body = (body ? body + " " : "") + "Metric: " + metricName + ". " + metricDesc;
-      }
-    }
+    if (g) return taskTitleDescription(g.benchmarks[0], getSubtaskDescription);
   } else if (state.metricsSetup[sel]) {
-    body = state.metricsSetup[sel].description || "";
-    url = state.metricsSetup[sel].url || "";
-    const metric = getEffectiveMetric(sel);
-    const metricName = METRIC_DISPLAY[metric] || metric;
-    const baseMetric = getBaseMetric(metric);
-    const subtaskDesc = getSubtaskDescription(sel, metric);
-    const metricDesc = subtaskDesc || METRIC_DESCRIPTIONS[baseMetric] || METRIC_DESCRIPTIONS[metric] || "";
-    body = (body ? body + " " : "") + "Metric: " + metricName + ". " + metricDesc;
+    return taskTitleDescription(sel, getSubtaskDescription);
   }
-  const footer = url ? url.replace("https://huggingface.co/", "https://hf.co/") : "";
-  return { body, footer };
-}
-
-/** Capitalize the first letter (used so titles like "multiple-choice QA …"
- *  or "grammar correction (5-shot)" lead with a capital). */
-function capitalize(s) {
-  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+  return { body: "", footer: "" };
 }
 
 /** Update the chart title text and the inline description (shown when the user
  *  expands the <details> that wraps the title). */
 function updateChartTitle() {
-  const titleEl = document.getElementById("chart-title");
-  if (titleEl) titleEl.textContent = capitalize(getChartTitleText());
-
-  const descEl = document.getElementById("chart-description");
-  if (!descEl) return;
-  const { body, footer } = getChartTitleDescription();
-  descEl.innerHTML = "";
-  if (body) descEl.appendChild(document.createTextNode(body));
-  if (footer) {
-    if (body) descEl.appendChild(document.createElement("br"));
-    const a = document.createElement("a");
-    a.href = footer.startsWith("hf.co/") ? "https://" + footer : footer;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    a.textContent = footer;
-    descEl.appendChild(a);
-  }
+  setChartHeader(capitalize(getChartTitleText()), getChartTitleDescription());
 }
 
 function getAggregateDescription() {

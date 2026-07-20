@@ -7,11 +7,11 @@
 
 import { state } from "../shared/state.js";
 import {
-  MODEL_COLORS, isAggregateSelection,
+  MODEL_COLORS, isAggregateSelection, capitalize,
 } from "../shared/core.js";
-import { makePlotlyConfig } from "../shared/chart.js";
+import { makePlotlyConfig, downloadJSON } from "../shared/chart.js";
 import {
-  attachTooltip, buildTaskCheckboxes, syncTaskCheckboxStates,
+  buildTaskCheckboxes, syncTaskCheckboxStates,
   bindModuleActionStopPropagation, attachControlTooltips, markAppReady,
 } from "../shared/ui.js";
 import {
@@ -195,13 +195,13 @@ function autoSetNormalization() {
 function buildLangTabs(languages) {
   const nav = document.getElementById("tab-nav");
   nav.innerHTML = "";
-  languages.forEach((lang, i) => {
+  for (const lang of languages) {
     const btn = document.createElement("button");
     btn.className = "tab-btn" + (lang === currentLang ? " active" : "");
     btn.dataset.lang = lang;
     btn.textContent = lang;
     nav.appendChild(btn);
-  });
+  }
 }
 
 function populateTaskDropdown() {
@@ -213,14 +213,13 @@ function populateTaskDropdown() {
   for (const [bench, info] of Object.entries(ms)) {
     (categories[info.category] = categories[info.category] || []).push(bench);
   }
-  const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
   if (Object.keys(categories).length > 1) {
     const catGroup = document.createElement("optgroup");
     catGroup.label = "Aggregate by category";
     for (const catName of Object.keys(categories).sort()) {
       const opt = document.createElement("option");
       opt.value = "__cat__" + catName;
-      opt.textContent = cap(catName);
+      opt.textContent = capitalize(catName);
       catGroup.appendChild(opt);
     }
     select.appendChild(catGroup);
@@ -228,7 +227,7 @@ function populateTaskDropdown() {
 
   const taskGroup = document.createElement("optgroup");
   taskGroup.label = "Individual tasks";
-  const entries = Object.entries(ms).map(([bench, info]) => ({ value: bench, label: cap(info.pretty_name) }));
+  const entries = Object.entries(ms).map(([bench, info]) => ({ value: bench, label: capitalize(info.pretty_name) }));
   entries.sort((a, b) => a.label.localeCompare(b.label));
   for (const entry of entries) {
     const opt = document.createElement("option");
@@ -273,23 +272,6 @@ function bindEventListeners() {
     state.currentMetric = e.target.value;
     render();
   });
-  document.getElementById("prompt-dev-toggle").addEventListener("change", (e) => {
-    state.showPromptDeviation = e.target.checked;
-    render();
-  });
-
-  const promptDevLabel = document.getElementById("prompt-dev-label");
-  if (promptDevLabel) {
-    promptDevLabel.style.cursor = "help";
-    promptDevLabel.style.textDecoration = "underline";
-    promptDevLabel.style.textDecorationStyle = "dotted";
-    promptDevLabel.style.textUnderlineOffset = "3px";
-    attachTooltip(promptDevLabel, () => ({
-      title: "Prompt uncertainty",
-      body: "Include prompt-template uncertainty in the error band. Computed as the standard deviation across prompt variants divided by √n, combined in quadrature with the sampling standard error.",
-      footer: "",
-    }));
-  }
 
   document.getElementById("task-select").addEventListener("change", (e) => {
     state.currentTaskSelection = e.target.value;
@@ -376,14 +358,8 @@ function bindFilterIO() {
   const dlBtn = document.getElementById("filter-download-btn");
   if (dlBtn) {
     dlBtn.onclick = () => {
-      const data = serializeCriteria();
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "filter-criteria-" + (currentLang || "default").toLowerCase() + ".json";
-      document.body.appendChild(a); a.click();
-      document.body.removeChild(a); URL.revokeObjectURL(url);
+      downloadJSON(serializeCriteria(),
+        "filter-criteria-" + (currentLang || "default").toLowerCase() + ".json");
     };
   }
   const ulBtn = document.getElementById("filter-upload-btn");
@@ -466,12 +442,6 @@ function setupUrlState() {
     { key: "norm", get: () => state.currentNormalization, set: (v) => state.currentNormalization = v, default: "baseline" },
     { key: "metric", get: () => state.currentMetric || "", set: (v) => state.currentMetric = v, default: "" },
     {
-      key: "pdev",
-      get: () => state.showPromptDeviation ? "1" : "0",
-      set: (v) => state.showPromptDeviation = v === "1",
-      default: "1",
-    },
-    {
       key: "fc",
       get: () => {
         // Encode criteria compactly: name=enabled,min,max,thresh
@@ -544,7 +514,6 @@ async function init() {
       document.getElementById("task-select").value = state.currentTaskSelection;
       document.getElementById("prompt-agg-select").value = state.currentPromptAgg;
       document.getElementById("norm-select").value = state.currentNormalization;
-      document.getElementById("prompt-dev-toggle").checked = state.showPromptDeviation;
       document.querySelectorAll(".shot-btn").forEach((b) =>
         b.classList.toggle("active", b.dataset.shot === state.currentShot));
       document.querySelectorAll(".tab-btn").forEach((b) =>

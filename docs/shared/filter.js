@@ -10,7 +10,7 @@
 // identity for percent metrics) rather than on baseline-normalized scores.
 
 import { state } from "./state.js";
-import { attachTooltip } from "./ui.js";
+import { attachHelpTooltip } from "./ui.js";
 
 // Module-level filter state. `initFilter()` resets criteria and uiConfig.
 export const filter = {
@@ -69,10 +69,12 @@ function computeKendallTau(x, y) {
   return pairs === 0 ? 0 : (concordant - discordant) / pairs;
 }
 
-function evaluateThreshold(name, value, threshold) {
+/** Pass/fail for a criterion value against its configured threshold. The
+ *  comparison direction comes from the criterion's own `direction` field
+ *  ("<=" = lower is better). */
+function evaluateThreshold(cfg, value) {
   if (value === null || value === undefined) return null;
-  const lowerIsBetter = { cv: true, mad: true, promptSwitch: true };
-  return lowerIsBetter[name] ? value <= threshold : value >= threshold;
+  return cfg.direction === "<=" ? value <= cfg.threshold : value >= cfg.threshold;
 }
 
 function medianOf(arr) {
@@ -165,7 +167,7 @@ function computeFilterCriteriaForBench(bench, shot, models) {
         taus.push(t != null ? t : 0);
       }
       const value = taus.reduce((a, b) => a + b, 0) / taus.length;
-      results[name] = { value, pass: evaluateThreshold(name, value, cfg.threshold) };
+      results[name] = { value, pass: evaluateThreshold(cfg, value) };
       continue;
     }
 
@@ -212,11 +214,7 @@ function computeFilterCriteriaForBench(bench, shot, models) {
         }
         case "mad": {
           const mads = pairs.map((p) => p.obj.prompt_mad).filter((v) => v != null);
-          if (mads.length === 0) break;
-          const scaled = mads.map((v) => v * noiseFactor).sort((a, b) => a - b);
-          value = scaled.length % 2 === 0
-            ? (scaled[scaled.length / 2 - 1] + scaled[scaled.length / 2]) / 2
-            : scaled[Math.floor(scaled.length / 2)];
+          value = medianOf(mads.map((v) => v * noiseFactor));
           break;
         }
         case "promptSwitch": {
@@ -238,7 +236,7 @@ function computeFilterCriteriaForBench(bench, shot, models) {
     }
 
     const medianValue = medianOf(perModelValues);
-    results[name] = { value: medianValue, pass: evaluateThreshold(name, medianValue, cfg.threshold) };
+    results[name] = { value: medianValue, pass: evaluateThreshold(cfg, medianValue) };
   }
   return results;
 }
@@ -291,11 +289,7 @@ function renderFilterPanel() {
     label.className = "criterion-label"; label.htmlFor = cb.id;
     label.textContent = cfg.label;
     if (cfg.tooltip) {
-      label.style.cursor = "help";
-      label.style.textDecoration = "underline";
-      label.style.textDecorationStyle = "dotted";
-      label.style.textUnderlineOffset = "3px";
-      attachTooltip(label, () => ({ title: cfg.label, body: cfg.tooltip, footer: "" }));
+      attachHelpTooltip(label, () => ({ title: cfg.label, body: cfg.tooltip, footer: "" }));
     }
     const desc = document.createElement("span");
     desc.className = "criterion-desc"; desc.textContent = cfg.description;
@@ -358,11 +352,7 @@ function renderFilterTable() {
     th.textContent = criterionHeaders[i] || cfg.label;
     if (!cfg.enabled) th.style.opacity = "0.4";
     if (cfg.tooltip) {
-      th.style.cursor = "help";
-      th.style.textDecoration = "underline";
-      th.style.textDecorationStyle = "dotted";
-      th.style.textUnderlineOffset = "3px";
-      attachTooltip(th, () => ({ title: cfg.label + " (median across models)", body: cfg.tooltip, footer: "" }));
+      attachHelpTooltip(th, () => ({ title: cfg.label + " (median across models)", body: cfg.tooltip, footer: "" }));
     }
     headerRow.appendChild(th);
   }

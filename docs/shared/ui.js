@@ -71,6 +71,35 @@ export function attachTooltip(element, contentFn) {
   element.addEventListener("mouseleave", () => hideTooltip());
 }
 
+/** Style an element as a help anchor (dotted underline, help cursor — the
+ *  .tooltip-anchor class in style.css) and attach a hover tooltip to it. */
+export function attachHelpTooltip(element, contentFn) {
+  element.classList.add("tooltip-anchor");
+  attachTooltip(element, contentFn);
+}
+
+/** Update the chart title and the inline description below it (shown when
+ *  the user expands the <details> wrapping the title). `desc` is
+ *  {body, footer}; a non-empty footer renders as a link on its own line. */
+export function setChartHeader(titleText, desc) {
+  const titleEl = document.getElementById("chart-title");
+  if (titleEl) titleEl.textContent = titleText;
+  const descEl = document.getElementById("chart-description");
+  if (!descEl) return;
+  const { body, footer } = desc;
+  descEl.innerHTML = "";
+  if (body) descEl.appendChild(document.createTextNode(body));
+  if (footer) {
+    if (body) descEl.appendChild(document.createElement("br"));
+    const a = document.createElement("a");
+    a.href = footer.startsWith("hf.co/") ? "https://" + footer : footer;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.textContent = footer;
+    descEl.appendChild(a);
+  }
+}
+
 // ─────────────────────────────────────────────────────────────
 // Control-bar tooltips
 // ─────────────────────────────────────────────────────────────
@@ -122,12 +151,9 @@ export function attachControlTooltips() {
   }
 }
 
-/** Module sections are wrapped in <details>/<summary>. The summary line
- *  contains action buttons like "Select all" / "Select none". Without
- *  intervention, clicking those buttons would also toggle the <details>
- *  open/closed because the click event bubbles to the summary. This
- *  installs a single document-level listener (capture phase) that stops
- *  propagation of clicks originating inside .module-actions. */
+/** Module headers contain action buttons like "Select all" / "Select none".
+ *  Stop click propagation inside .module-actions so those clicks never
+ *  bubble up to any enclosing summary/header click handlers. */
 let moduleActionsBound = false;
 export function bindModuleActionStopPropagation() {
   if (moduleActionsBound) return;
@@ -138,9 +164,6 @@ export function bindModuleActionStopPropagation() {
     });
   });
 }
-
-// (attachTaskTooltip was removed when task items became expandable <details>
-//  that show the description inline below the task name instead of on hover.)
 
 // ─────────────────────────────────────────────────────────────
 // Task checkboxes

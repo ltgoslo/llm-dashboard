@@ -3,19 +3,19 @@
    Used by every dashboard (noreval, noreval-gen, norolmo, multisynt).
 
    Page layout, top → bottom:
-     • Header (white band)        — title + flag icon + collapsible About
+     • Header (white band)        — title + flag line + collapsible About
      • Multisynt language tabs    — only on the multisynt dashboard
      • Chart section (white band) — title, description, two rows of
                                     controls, the Plotly canvas, the
                                     chart legend pinned to the right
-     • Modules section (dark band)— task checkbox grid, model panels
+     • Modules section (tint band)— task checkbox grid, model panels
                                     grouped by organization, HPLT-E
                                     filter panel (multisynt only)
-     • Footer (dark band)
+     • Footer (tint band)
 
    Other concerns scattered through the file:
-     • CSS variables / palette          (:root, .band-black re-scope)
-     • Bands & responsive shadow band   (.band, .band-white, .band-black)
+     • CSS variables / palette          (:root)
+     • Bands                            (.band, .band-white, .band-tint)
      • Hover tooltip                    (.custom-tooltip — fixed overlay)
      • Plotly modebar overrides         (.modebar-container, .modebar-btn)
      • Bar hover scale animation        (driven by chart.js, see #chart
@@ -26,8 +26,7 @@
 :root {
   /* Palette */
   --surface: #ffffff;          /* the white plot band */
-  --bg-tint: #eef0f4;           /* (currently unused outside the dark theme) */
-  --black: #0f1115;             /* the dark band */
+  --bg-tint: #eef0f4;          /* page background + tinted modules band */
   --fg: #1e293b;
   --fg-muted: #64748b;
   --accent: #6366f1;
@@ -62,10 +61,8 @@ body {
 
 /* ────────────────────────────────────────────────────────────
    Bands — full-width sections with a centered inner column.
-   .band-white = white background (only the plot section).
-   .band-black = inverted dark background. CSS variables are
-   re-scoped inside .band-black so all child text/borders flip
-   automatically without needing per-element overrides.
+   .band-white = white background (header + plot sections).
+   .band-tint = page-tint background (modules + footer).
    ──────────────────────────────────────────────────────────── */
 
 .band { width: 100%; }
@@ -73,32 +70,7 @@ body {
 .band-white {
   background: var(--surface);
   position: relative;
-  /* Soft drop shadow on the top and bottom edges of the white plot band.
-     Two layers: a tight near-shadow + a moderately diffuse one. */
-  /* box-shadow:
-    0 0px 2px 0px rgba(0, 0, 0, 0.2),
-    0 2px 4px -2px rgba(15, 23, 42, 0.05),
-    0 -2px 4px -2px rgba(15, 23, 42, 0.03),
-    0 12px 24px -12px rgba(15, 23, 42, 0.08),
-    0 -12px 24px -12px rgba(15, 23, 42, 0.05); */
 }
-.band-black {
-  background: var(--black);
-  --surface: #1a1c22;            /* light-card → muted dark surface */
-  /* Body text is intentionally a slightly muted off-white; only headings get
-     pure-ish white (via --fg-strong) so the page doesn't feel glaring. */
-  --fg: #c8cdd6;
-  --fg-strong: #f1f5f9;
-  --fg-muted: #8a93a3;
-  --border: #2a2f3a;
-  --border-light: #1f2229;
-  --accent-light: rgba(99, 102, 241, 0.22);
-}
-/* Bright shade for headings inside the dark band */
-.band-black h1,
-.band-black h2,
-.band-black h3,
-.band-black h4 { color: var(--fg-strong); }
 
 .band-inner {
   max-width: 1200px;
@@ -127,22 +99,6 @@ header.dashboard-header h1 {
   letter-spacing: -0.00em;
   color: #000;
   margin: 0;
-}
-
-.header-icon {
-  flex-shrink: 0;
-  width: 29px;
-  height: auto;
-  border-radius: 2px;
-  overflow: hidden;
-  margin: 0.5rem 0 0;
-}
-
-/* Circular institution seal variant of the header icon */
-.header-icon-seal {
-  width: 44px;
-  border-radius: 0;
-  margin: 0.2rem 0 0;
 }
 
 /* SAS-style "line flag" closing the header band: a 3px red rule whose
@@ -349,7 +305,6 @@ header.dashboard-header h1 {
   padding: 0.2rem 0;
 }
 .controls-bar + .controls-bar { margin-top: 0.0rem; margin-bottom: 1.0rem; }
-.controls-bar:last-of-type { margin-bottom: 100.1rem; }
 /* Subtle drop shadow under the bottom controls-bar so the controls module
    visually separates from the chart below. We can't use `:last-of-type`
    here — it filters by tag (div), and #chart is also a div, so
@@ -408,12 +363,16 @@ header.dashboard-header h1 {
 }
 .control-select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
 
-/* Small checkbox + label combo (e.g. "Show std err"). */
-.toggle-label {
-  display: flex; align-items: center; gap: 0.35rem; cursor: pointer;
-  user-select: none; font-size: 0.9rem; font-weight: 500; color: var(--fg-muted);
+/* Help anchor — dotted underline + help cursor on elements that carry a
+   hover tooltip (applied by attachHelpTooltip in shared/ui.js). The cursor
+   needs !important to beat more specific cursor rules on anchored elements
+   (e.g. .filter-criterion-header .criterion-label's pointer). */
+.tooltip-anchor {
+  cursor: help !important;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
 }
-.toggle-label input[type="checkbox"] { accent-color: var(--accent); cursor: pointer; }
 
 /* ──── Size slider — custom two-thumb range for model-parameter
    filtering. The track is .range-track, the highlighted span between
@@ -1005,7 +964,6 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
 @media (max-width: 768px) {
   header.dashboard-header { padding: 2rem 0 1.25rem; gap: 0.75rem; }
   header.dashboard-header h1 { font-size: 1.7rem; }
-  .header-icon { width: 36px; }
   .chart-title { font-size: 1.2rem; }
   .controls-bar { gap: 0.75rem; padding: 0.5rem 0.6rem; }
   .checkbox-grid { grid-template-columns: 1fr; }

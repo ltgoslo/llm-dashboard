@@ -13,6 +13,4 @@ export const state = {
   currentNormalization: "baseline",
   currentMetric: null,        // null = use the benchmark's main_metric
   checkedTasks: new Set(),
-  showStderr: true,
-  showPromptDeviation: true,
 };

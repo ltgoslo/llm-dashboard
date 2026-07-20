@@ -27,6 +27,7 @@ import statistics
 from pathlib import Path
 
 import yaml
+from scipy.stats import beta as _beta_dist, norm as _norm_dist
 
 BASE_DIR = Path(__file__).parent
 
@@ -75,13 +76,15 @@ ABLATION_NAME_MAP = {
     "stage3-rope-scaling": "midtraining data, RoPE scaling, 1→0 decay",
     "stage3-mainline": "midtraining data, RoPE scaling, ½→0 decay",
 }
+# Note: the norolmo frontend currently uses its own RUN_COLOR map
+# (docs/norolmo/app.js) and ignores these colors.
 ABLATION_COLOR_MAP = {
     "stage2-ablation-no-len-ext-stage1-data": "#e63946",        # red
-    "stage2-no-len-ext-stage1-data-half-decay": "#c70eff",      # orange
+    "stage2-no-len-ext-stage1-data-half-decay": "#c70eff",      # magenta
     "stage2-no-len-ext-stage2-data-half-decay": "#2ca02c",      # green
-    "stage3-no-rope-scaling": "#ff7f0e",                        # purple
-    "stage3-rope-scaling": "#d62728",                           # cyan
-    "stage3-mainline": "#5acc2d",                               # red
+    "stage3-no-rope-scaling": "#ff7f0e",                        # orange
+    "stage3-rope-scaling": "#d62728",                           # dark red
+    "stage3-mainline": "#5acc2d",                               # light green
 }
 
 # NorEval cross-benchmark task groups (paired bar charts).
@@ -245,8 +248,6 @@ def resolve_se(metric_name, value, harness_se, n_samples, metric_scale):
 # items, so per-prompt estimates are positively correlated, which would make
 # the true joint distribution tighter than the Bonferroni bound assumes.
 
-from scipy.stats import beta as _beta_dist, norm as _norm_dist
-
 ALPHA = 0.05  # 95% CI
 Z_LO_BONF_K = {}    # cache: k -> z_{1 - α/(2k)}
 Z_HI = _norm_dist.ppf(1 - ALPHA / 2)
@@ -365,8 +366,6 @@ def aggregate_prompt_variants(metric_values, metric_scale="unit"):
       max / mean / median / min / first        ← point estimates
       <agg>_ci_lo / <agg>_ci_hi                ← 95% asymmetric CIs
       max_prompt_idx, n_prompts, prompt_sd, prompt_mad
-    Per-prompt raw data is preserved under `prompts: [(v, se, n), …]` so the
-    frontend can recompute CIs at different α if needed.
     """
     if not metric_values:
         return None
@@ -432,6 +431,29 @@ def aggregate_prompt_variants(metric_values, metric_scale="unit"):
 # ─────────────────────────────────────────────────────────────
 
 
+def get_n_samples(n_samples_dict, task_key):
+    ns_entry = n_samples_dict.get(task_key, {})
+    return ns_entry.get("effective") or ns_entry.get("original")
+
+
+def collect_prompt_metrics(task_results, n_samples, exclusions, metric_scale,
+                           metric_values, rename=None):
+    """Append a (value, se, n) triple to `metric_values` for every
+    `<metric>,none` entry in one task's results. `rename` optionally maps the
+    metric name (used to build "metric: subtask" virtual names)."""
+    for key, val in task_results.items():
+        if not key.endswith(",none") or "_stderr,none" in key:
+            continue
+        metric_name = key[: -len(",none")]
+        if metric_name in exclusions:
+            continue
+        if isinstance(val, (int, float)):
+            harness_se = task_results.get(f"{metric_name}_stderr,none")
+            se = resolve_se(metric_name, val, harness_se, n_samples, metric_scale)
+            name = rename(metric_name) if rename else metric_name
+            metric_values.setdefault(name, []).append((val, se, n_samples))
+
+
 def noreval_extract(results_json_path, benchmark_name, subtasks, metrics_setup_entry):
     """Read a NorEval result JSON and aggregate metrics across prompt variants.
 
@@ -459,42 +481,25 @@ def noreval_extract(results_json_path, benchmark_name, subtasks, metrics_setup_e
         if metrics_setup_entry else "unit"
     )
 
-    metric_values = {}  # metric_name -> [(value, stderr_or_None), ...]
+    metric_values = {}  # metric_name -> [(value, stderr_or_None, n), ...]
     for task_key, task_results in results.items():
         if task_key == benchmark_name or task_key.startswith(f"{benchmark_name}_p"):
-            ns_entry = n_samples_dict.get(task_key, {})
-            n_samples = ns_entry.get("effective") or ns_entry.get("original")
-            for key, val in task_results.items():
-                if not key.endswith(",none") or "_stderr,none" in key:
-                    continue
-                metric_name = key[: -len(",none")]
-                if metric_name in bench_exclusions:
-                    continue
-                if isinstance(val, (int, float)):
-                    harness_se = task_results.get(f"{metric_name}_stderr,none")
-                    se = resolve_se(metric_name, val, harness_se, n_samples, metric_scale)
-                    metric_values.setdefault(metric_name, []).append((val, se, n_samples))
+            collect_prompt_metrics(
+                task_results, get_n_samples(n_samples_dict, task_key),
+                bench_exclusions, metric_scale, metric_values,
+            )
 
-    if subtasks:
-        for subtask_code, subtask_info in subtasks.items():
-            subtask_key = f"{benchmark_name}_{subtask_code}"
-            task_results = results.get(subtask_key)
-            if not task_results:
-                continue
-            pretty_name = subtask_info["pretty_name"]
-            ns_entry = n_samples_dict.get(subtask_key, {})
-            n_samples = ns_entry.get("effective") or ns_entry.get("original")
-            for key, val in task_results.items():
-                if not key.endswith(",none") or "_stderr,none" in key:
-                    continue
-                base_metric = key[: -len(",none")]
-                if base_metric in bench_exclusions:
-                    continue
-                if isinstance(val, (int, float)):
-                    harness_se = task_results.get(f"{base_metric}_stderr,none")
-                    se = resolve_se(base_metric, val, harness_se, n_samples, metric_scale)
-                    virtual_name = f"{base_metric}: {pretty_name}"
-                    metric_values.setdefault(virtual_name, []).append((val, se, n_samples))
+    for subtask_code, subtask_info in (subtasks or {}).items():
+        subtask_key = f"{benchmark_name}_{subtask_code}"
+        task_results = results.get(subtask_key)
+        if not task_results:
+            continue
+        pretty_name = subtask_info["pretty_name"]
+        collect_prompt_metrics(
+            task_results, get_n_samples(n_samples_dict, subtask_key),
+            bench_exclusions, metric_scale, metric_values,
+            rename=lambda m, p=pretty_name: f"{m}: {p}",
+        )
 
     return aggregate_prompt_variants(metric_values, metric_scale)
 
@@ -569,33 +574,41 @@ def build_noreval_metrics_info(metrics_setup, discovered_metrics):
 
 
 def load_models_yaml(path):
-    """Load a NorEval models YAML into the per-field dicts the dashboards expect."""
+    """Load a NorEval models YAML into the model-metadata section of data.json.
+
+    Returns a dict whose keys are exactly the model_* / default_models fields
+    the comparison dashboards read, so callers can splat it into the output.
+    """
+    meta = {
+        "model_display_names": {},
+        "model_categories": {},
+        "model_organizations": {},
+        "model_parameters": {},
+        "model_colors": {},
+        "model_fully_open": {},
+        "model_info": {},
+        "default_models": [],
+    }
     if not path.exists():
-        return ({}, {}, {}, {}, [], {}, {}, {})
-    raw = load_yaml(path)
-    display_names, categories, organizations, parameters = {}, {}, {}, {}
-    default_models, color_map, model_info, fully_open = [], {}, {}, {}
-    for model_dir, cfg in raw.items():
-        display_names[model_dir] = cfg.get("display_name", model_dir)
-        categories[model_dir] = cfg.get("category", "multilingual")
-        organizations[model_dir] = cfg.get("organization", "")
-        parameters[model_dir] = cfg.get("parameters", 0)
-        fully_open[model_dir] = bool(cfg.get("fully_open", False))
+        return meta
+    for model_dir, cfg in load_yaml(path).items():
+        meta["model_display_names"][model_dir] = cfg.get("display_name", model_dir)
+        meta["model_categories"][model_dir] = cfg.get("category", "multilingual")
+        meta["model_organizations"][model_dir] = cfg.get("organization", "")
+        meta["model_parameters"][model_dir] = cfg.get("parameters", 0)
+        meta["model_fully_open"][model_dir] = bool(cfg.get("fully_open", False))
         if cfg.get("default"):
-            default_models.append(model_dir)
+            meta["default_models"].append(model_dir)
         if cfg.get("color"):
-            color_map[model_dir] = cfg["color"]
-        desc = cfg.get("description", "")
-        url = cfg.get("huggingface_url", "")
-        license_ = cfg.get("license", "")
-        if desc or url or license_:
-            model_info[model_dir] = {
-                "description": desc,
-                "huggingface_url": url,
-                "license": license_,
-            }
-    return (display_names, categories, organizations, parameters,
-            default_models, color_map, model_info, fully_open)
+            meta["model_colors"][model_dir] = cfg["color"]
+        info = {
+            "description": cfg.get("description", ""),
+            "huggingface_url": cfg.get("huggingface_url", ""),
+            "license": cfg.get("license", ""),
+        }
+        if any(info.values()):
+            meta["model_info"][model_dir] = info
+    return meta
 
 
 def build_noreval_lang_lists(metrics_setup):
@@ -619,9 +632,6 @@ def build_noreval_lang_lists(metrics_setup):
 
 def build_comparison_data(results_dir, models_yaml, metrics_setup):
     """Build a complete data.json for a comparison dashboard."""
-    (display_names, categories, organizations, parameters,
-     default_models, color_map, model_info, fully_open) = load_models_yaml(models_yaml)
-
     models = {}
     discovered = {}
     if results_dir.is_dir():
@@ -645,14 +655,7 @@ def build_comparison_data(results_dir, models_yaml, metrics_setup):
         "sme_benchmarks": sme,
         "nob_nno_translation_benchmarks": nob_nno,
         "shared_language_benchmarks": shared,
-        "model_display_names": display_names,
-        "model_categories": categories,
-        "model_organizations": organizations,
-        "model_parameters": parameters,
-        "model_colors": color_map,
-        "model_fully_open": fully_open,
-        "model_info": model_info,
-        "default_models": default_models,
+        **load_models_yaml(models_yaml),
         "models": models,
     }
 
@@ -671,34 +674,26 @@ def build_norolmo_data(metrics_setup):
     if NOROLMO_PROGRESS.is_dir():
         for ckpt_dir in sorted(os.listdir(NOROLMO_PROGRESS)):
             ckpt_path = NOROLMO_PROGRESS / ckpt_dir
-            if not ckpt_path.is_dir():
-                continue
-            # Regular main-line checkpoints: NorOLMo-step-{N}
-            if ckpt_dir.startswith("NorOLMo-step-"):
-                step_str = ckpt_dir.rsplit("-", 1)[-1]
-                if not step_str.isdigit():
-                    continue
-                step = int(step_str)
-                print(f"  Checkpoint: step {step}")
-                scores, disc = noreval_process_model_dir(str(ckpt_path), metrics_setup)
-                progress[step] = scores
-                for b, mset in disc.items():
-                    discovered.setdefault(b, set()).update(mset)
-                continue
-            # Ablation: NorOLMo-<ablation_name>-step-{N}
-            if not ckpt_dir.startswith("NorOLMo-"):
+            if not ckpt_path.is_dir() or not ckpt_dir.startswith("NorOLMo-"):
                 continue
             step_str = ckpt_dir.rsplit("-", 1)[-1]
             if not step_str.isdigit():
                 continue
             step = int(step_str)
-            suffix = ckpt_dir[len("NorOLMo-"):]
-            ablation_name = suffix[: suffix.rfind("-step-")]
-            if not ablation_name:
-                continue
-            print(f"  Ablation {ablation_name}: step {step}")
+            if ckpt_dir.startswith("NorOLMo-step-"):
+                # Main-line checkpoint: NorOLMo-step-{N}
+                print(f"  Checkpoint: step {step}")
+                target = progress
+            else:
+                # Ablation checkpoint: NorOLMo-<ablation_name>-step-{N}
+                suffix = ckpt_dir[len("NorOLMo-"):]
+                ablation_name = suffix[: suffix.rfind("-step-")]
+                if not ablation_name:
+                    continue
+                print(f"  Ablation {ablation_name}: step {step}")
+                target = ablations.setdefault(ablation_name, {})
             scores, disc = noreval_process_model_dir(str(ckpt_path), metrics_setup)
-            ablations.setdefault(ablation_name, {})[step] = scores
+            target[step] = scores
             for b, mset in disc.items():
                 discovered.setdefault(b, set()).update(mset)
 
@@ -734,8 +729,10 @@ def multisynt_extract(results_json_path, benchmark_name, task_config_entry):
     """Read one MultiSynt partition's results JSON.
 
     MultiSynt scores use suffixes other than `,none` (e.g. `,remove_whitespace`),
-    so we accept any `,<suffix>` form. Group-level entries (e.g. global_mmlu)
-    are picked up from `groups`. Returns {metric: (value, stderr)} or None.
+    so we accept any `,<suffix>` form. Only the benchmark's own (or per-
+    partition `_p<N>`) entries are read — subtask entries like
+    `global_mmlu_french_business_p0` are skipped, since lm-eval also reports
+    the group aggregate under `results`. Returns {metric: (value, se, n)} or None.
     """
     with open(results_json_path) as f:
         data = json.load(f)
@@ -751,13 +748,8 @@ def multisynt_extract(results_json_path, benchmark_name, task_config_entry):
     metrics = {}
     for task_key, task_results in results.items():
         if not (task_key == benchmark_name or task_key.startswith(f"{benchmark_name}_p")):
-            if not task_key.startswith(f"{benchmark_name}_"):
-                continue
-            # Subtask result (e.g. global_mmlu_french_business_p0) — skip;
-            # only the group aggregate matters.
             continue
-        ns_entry = n_samples_dict.get(task_key, {})
-        n_samples = ns_entry.get("effective") or ns_entry.get("original")
+        n_samples = get_n_samples(n_samples_dict, task_key)
         for key, val in task_results.items():
             if key == "alias" or "," not in key or "_stderr," in key:
                 continue
@@ -766,26 +758,6 @@ def multisynt_extract(results_json_path, benchmark_name, task_config_entry):
                 continue
             if isinstance(val, (int, float)) and math.isfinite(val):
                 harness_se = task_results.get(f"{metric_name}_stderr,{metric_suffix}")
-                if not (isinstance(harness_se, (int, float)) and math.isfinite(harness_se)):
-                    harness_se = None
-                se = resolve_se(metric_name, val, harness_se, n_samples, metric_scale)
-                metrics[metric_name] = (val, se, n_samples)
-
-    # Group-level results (global_mmlu_*)
-    for group_key in data.get("groups", {}):
-        if not (group_key == benchmark_name or group_key.startswith(f"{benchmark_name}_p")):
-            continue
-        gr_results = results.get(group_key, {})
-        ns_entry = n_samples_dict.get(group_key, {})
-        n_samples = ns_entry.get("effective") or ns_entry.get("original")
-        for key, val in gr_results.items():
-            if key == "alias" or "," not in key or "_stderr," in key:
-                continue
-            metric_name, metric_suffix = key.rsplit(",", 1)
-            if metric_name in bench_exclusions:
-                continue
-            if isinstance(val, (int, float)) and math.isfinite(val):
-                harness_se = gr_results.get(f"{metric_name}_stderr,{metric_suffix}")
                 if not (isinstance(harness_se, (int, float)) and math.isfinite(harness_se)):
                     harness_se = None
                 se = resolve_se(metric_name, val, harness_se, n_samples, metric_scale)
@@ -854,25 +826,21 @@ def multisynt_process_checkpoint(ckpt_path, task_configs, shot):
             if agg_metrics:
                 partition_results.append(agg_metrics)
         else:
+            # One p<N> subdir per prompt/partition; a bare directory means a
+            # single un-partitioned run.
             partitions = sorted(
                 d for d in os.listdir(bench_path)
                 if os.path.isdir(os.path.join(bench_path, d))
                 and d.startswith("p") and d[1:].isdigit()
             )
-            if partitions:
-                for part in partitions:
-                    part_path = os.path.join(bench_path, part)
-                    results_file = find_latest_results_json(part_path)
-                    if results_file is None:
-                        continue
-                    metrics = multisynt_extract(results_file, benchmark, config)
+            search_dirs = [os.path.join(bench_path, p) for p in partitions] or [bench_path]
+            for path in search_dirs:
+                results_file = find_latest_results_json(path)
+                if results_file is None:
+                    continue
+                metrics = multisynt_extract(results_file, benchmark, config)
+                if metrics:
                     partition_results.append(metrics)
-            else:
-                results_file = find_latest_results_json(bench_path)
-                if results_file is not None:
-                    metrics = multisynt_extract(results_file, benchmark, config)
-                    if metrics:
-                        partition_results.append(metrics)
 
         if not partition_results:
             continue
@@ -880,8 +848,6 @@ def multisynt_process_checkpoint(ckpt_path, task_configs, shot):
         # Reduce list-of-{metric: (val, se, n)} to {metric: prompt-agg dict}
         metric_values = {}
         for pmetrics in partition_results:
-            if pmetrics is None:
-                continue
             for metric_name, tup in pmetrics.items():
                 metric_values.setdefault(metric_name, []).append(tup)
         agg = aggregate_prompt_variants(metric_values, config.get("metric_scale", "unit"))
@@ -1003,7 +969,7 @@ def build_multisynt_data():
                         bucket = progress.setdefault(tokens_b, {})
                         for bench, shot_data in scores.items():
                             bucket.setdefault(bench, {}).update(shot_data)
-                            for s, metric_data in shot_data.items():
+                            for metric_data in shot_data.values():
                                 discovered.setdefault(bench, set()).update(metric_data.keys())
 
             models_out[base_model] = {
@@ -1016,7 +982,7 @@ def build_multisynt_data():
         max_tokens = 0
         for md in models_out.values():
             for tk in md["progress"]:
-                if isinstance(tk, (int, float)) and tk != "main":
+                if isinstance(tk, (int, float)):
                     max_tokens = max(max_tokens, tk)
         for md in models_out.values():
             if "main" in md["progress"] and max_tokens > 0:

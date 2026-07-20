@@ -45,6 +45,7 @@ llm-dashboard/
     │   ├── core.js               ← score access, normalization, aggregation
     │   ├── chart.js              ← Plotly config, colors, layout helpers
     │   ├── ui.js                 ← tooltip, checkboxes, metric selector
+    │   ├── selection.js          ← task-selection logic + shared control listeners
     │   ├── filter.js             ← HPLT-E quality filter (multisynt only)
     │   ├── url-state.js          ← URL hash/search save/restore
     │   ├── comparison.js         ← bar-chart logic shared by noreval + noreval-gen
@@ -58,7 +59,7 @@ llm-dashboard/
 ## Building locally
 
 ```bash
-pip install pyyaml
+pip install pyyaml scipy
 python3 build_data.py             # regenerates all four data.json files
 python3 -m http.server 8000 -d docs   # serves at http://localhost:8000/noreval/
 ```

@@ -101,6 +101,11 @@ export const TASK_NAME_DISPLAY = {
   "nrk-quiz": "NRK-quiz",
 };
 
+/** Capitalize the first letter (so lowercase pretty_names lead with a capital). */
+export function capitalize(s) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+}
+
 /** Build a chart-title task label that folds the shot setting into a trailing
  *  parenthetical, e.g. "reading comprehension (belebele)" + "5-shot" becomes
  *  "reading comprehension (Belebele; 5-shot)". The parenthetical's contents
@@ -176,14 +181,12 @@ export function getCIDistances(dataSource, entity, bench, shot, metric) {
   return { loDist: Math.max(0, v - lo), hiDist: Math.max(0, hi - v) };
 }
 
-/** Toggle-aware CI distances. Returns undefined if CIs are off, or for the
- *  "stdev" prompt-aggregation (no CI on SD bars). The sampling and prompt-
- *  template uncertainty are already combined inside the stored CI, so the
- *  prompt-deviation toggle has no effect here — the multi-prompt structure
- *  is baked into the Bonferroni / Welch estimator. */
+/** CI distances for display. Returns undefined for the "stdev" prompt-
+ *  aggregation (no CI on SD bars). The sampling and prompt-template
+ *  uncertainty are already combined inside the stored CI — the multi-prompt
+ *  structure is baked into the Bonferroni / Welch estimator. */
 export function getCombinedCI(dataSource, entity, bench, shot, metric) {
   if (state.currentPromptAgg === "stdev") return undefined;
-  if (!state.showStderr) return undefined;
   return getCIDistances(dataSource, entity, bench, shot, metric);
 }
 
@@ -260,9 +263,22 @@ export function scaleCIDistances(ci, benchmark, metric, allRaw) {
   return { loDist: lo, hiDist: hi };
 }
 
-/** Whether the current normalization can display CIs meaningfully. */
-export function isStderrCompatible() {
+/** Whether error bars / CI bands should be rendered for the current view.
+ *  CIs are shown under every normalization except percentile — a non-linear
+ *  rank transform with no meaningful interval. */
+export function wantCI() {
   return state.currentNormalization !== "percentile";
+}
+
+/** Whether the current normalization needs the raw scores of all compared
+ *  entities as its reference set (min-max / z-score / percentile). */
+export function normNeedsAllValues() {
+  return ["minmax", "zscore", "percentile"].includes(state.currentNormalization);
+}
+
+/** Decimal places for displayed scores (z-scores get an extra digit). */
+export function scoreDecimals() {
+  return state.currentNormalization === "zscore" ? 2 : 1;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -308,6 +324,22 @@ export function getMacroGroups(benchmarks) {
   return Object.values(categoryGroups);
 }
 
+/** Sum scores and squared CI distances over one benchmark set. */
+function accumulateScores(benchmarks, scoreFn) {
+  let sum = 0, count = 0, lo2 = 0, hi2 = 0;
+  for (const bench of benchmarks) {
+    const r = scoreFn(bench);
+    if (r === undefined) continue;
+    const s = (typeof r === "number") ? r : r.score;
+    if (s === undefined) continue;
+    sum += s; count++;
+    const ci = (typeof r === "object" && r.ci) ? r.ci : null;
+    const lo = ci?.loDist ?? 0, hi = ci?.hiDist ?? 0;
+    lo2 += lo * lo; hi2 += hi * hi;
+  }
+  return { sum, count, lo2, hi2 };
+}
+
 /** Compute an aggregate score over `benchmarks` using a per-benchmark scoreFn.
  *  - macro=true: average within categories first, then across categories.
  *  - macro=false: simple micro-average across all benchmarks.
@@ -318,20 +350,9 @@ export function getMacroGroups(benchmarks) {
  *  for SEs, but applied to each side of the asymmetric interval. */
 export function aggregateScores(benchmarks, scoreFn, macro) {
   if (macro) {
-    const groups = getMacroGroups(benchmarks);
     let groupSum = 0, groupCount = 0, groupLo2 = 0, groupHi2 = 0;
-    for (const group of groups) {
-      let sum = 0, count = 0, lo2 = 0, hi2 = 0;
-      for (const bench of group) {
-        const r = scoreFn(bench);
-        if (r === undefined) continue;
-        const s = (typeof r === "number") ? r : r.score;
-        if (s === undefined) continue;
-        sum += s; count++;
-        const ci = (typeof r === "object" && r.ci) ? r.ci : null;
-        const lo = ci?.loDist ?? 0, hi = ci?.hiDist ?? 0;
-        lo2 += lo * lo; hi2 += hi * hi;
-      }
+    for (const group of getMacroGroups(benchmarks)) {
+      const { sum, count, lo2, hi2 } = accumulateScores(group, scoreFn);
       if (count > 0) {
         groupSum += sum / count;
         groupLo2 += lo2 / (count * count);
@@ -345,25 +366,14 @@ export function aggregateScores(benchmarks, scoreFn, macro) {
       count: groupCount,
       ci: { loDist: Math.sqrt(groupLo2) / groupCount, hiDist: Math.sqrt(groupHi2) / groupCount },
     };
-  } else {
-    let sum = 0, count = 0, lo2 = 0, hi2 = 0;
-    for (const bench of benchmarks) {
-      const r = scoreFn(bench);
-      if (r === undefined) continue;
-      const s = (typeof r === "number") ? r : r.score;
-      if (s === undefined) continue;
-      sum += s; count++;
-      const ci = (typeof r === "object" && r.ci) ? r.ci : null;
-      const lo = ci?.loDist ?? 0, hi = ci?.hiDist ?? 0;
-      lo2 += lo * lo; hi2 += hi * hi;
-    }
-    if (count === 0) return null;
-    return {
-      score: sum / count,
-      count,
-      ci: { loDist: Math.sqrt(lo2) / count, hiDist: Math.sqrt(hi2) / count },
-    };
   }
+  const { sum, count, lo2, hi2 } = accumulateScores(benchmarks, scoreFn);
+  if (count === 0) return null;
+  return {
+    score: sum / count,
+    count,
+    ci: { loDist: Math.sqrt(lo2) / count, hiDist: Math.sqrt(hi2) / count },
+  };
 }
 
 /** True for any aggregating task selection (all / category / language / eval-type / custom / filtered). */
@@ -376,4 +386,22 @@ export function isAggregateSelection(sel) {
 /** Effective metric for an individual/group view (currentMetric override, else main_metric). */
 export function getEffectiveMetric(benchmark) {
   return state.currentMetric || state.metricsSetup[benchmark]?.main_metric;
+}
+
+/** Chart-title description for a single benchmark: the task description plus
+ *  "Metric: <name>. <metric description>", and the task URL (as footer).
+ *  `subtaskDescFn(bench, metric)` may supply a per-subtask description that
+ *  overrides the base metric's. Returns { body, footer }. */
+export function taskTitleDescription(benchmark, subtaskDescFn) {
+  const info = state.metricsSetup[benchmark];
+  if (!info) return { body: "", footer: "" };
+  const metric = getEffectiveMetric(benchmark);
+  const metricName = METRIC_DISPLAY[metric] || metric;
+  const baseMetric = getBaseMetric(metric);
+  const subtaskDesc = subtaskDescFn ? subtaskDescFn(benchmark, metric) : null;
+  const metricDesc = subtaskDesc || METRIC_DESCRIPTIONS[baseMetric] || METRIC_DESCRIPTIONS[metric] || "";
+  const body = (info.description ? info.description + " " : "")
+    + "Metric: " + metricName + ". " + metricDesc;
+  const url = info.url || "";
+  return { body, footer: url ? url.replace("https://huggingface.co/", "https://hf.co/") : "" };
 }

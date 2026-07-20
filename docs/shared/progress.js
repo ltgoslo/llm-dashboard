@@ -17,19 +17,18 @@
 
 import { state } from "./state.js";
 import {
-  METRIC_DISPLAY, METRIC_DESCRIPTIONS,
-  getScore, getCombinedCI, scaleCIDistances, applyNorm, toDisplayScale,
-  getBaseMetric, getNormYLabel, getMetricYLabel,
+  getScore, getCombinedCI, scaleCIDistances, applyNorm,
   aggregateScores, isAggregateSelection, isMacroSelection,
-  getEffectiveMetric, isStderrCompatible, formatTitleWithShot,
+  getEffectiveMetric, formatTitleWithShot, capitalize, taskTitleDescription,
+  wantCI, normNeedsAllValues, scoreDecimals,
 } from "./core.js";
 import {
   darkenColor, getPlotlyLayout, plotChart,
-  makeBandTrace, computeYRange, computeYMax,
+  makeBandTrace, computeYRange, computeYMax, makeYAxis,
 } from "./chart.js";
 import {
-  showTooltip, hideTooltip, attachTooltip,
-  populateMetricSelector, hideMetricSelector,
+  showTooltip, hideTooltip,
+  populateMetricSelector, hideMetricSelector, setChartHeader,
 } from "./ui.js";
 
 const PROGRESS_LEGEND = {
@@ -220,8 +219,64 @@ function resolveTitlePrefix(config) {
   return prefix || "";
 }
 
+/** Iterate the (shot, trajectory) combinations whose scores define the
+ *  y-range. Default: every shot in config.allShots and every checkpoint, for
+ *  stable axes when switching shots. With config.yRangeSkipFirst the range
+ *  instead tracks only the displayed shot, and each trajectory's first
+ *  checkpoint is excluded (still plotted — early-training outliers just
+ *  shouldn't compress the rest of the chart; the plot-area clip handles the
+ *  spill). `fn(traj, shot, checkpoints, rangeXs)` receives both the full
+ *  checkpoint list (e.g. as a normalization basis) and the included subset. */
+function forEachRangeSlice(config, trajectories, fn) {
+  const rangeShots = config.yRangeSkipFirst ? [state.currentShot] : config.allShots;
+  for (const shot of rangeShots) {
+    for (const traj of trajectories) {
+      const checkpoints = traj.checkpoints();
+      const rangeXs = config.yRangeSkipFirst ? checkpoints.slice(1) : checkpoints;
+      fn(traj, shot, checkpoints, rangeXs);
+    }
+  }
+}
+
+/** Append one plotted run to the trace lists: its CI band (into `traces`,
+ *  which paints below all lines) when `cis` is non-null, and its line trace
+ *  (into `lineTraces`). */
+function pushRunTraces(traces, lineTraces, config, traj, { xs, ys, cis, name, color, lgroup, customdata }) {
+  const lref = legendRefFor(config, traj);
+  const emph = emphasisFor(traj);
+  if (cis) {
+    const band = makeBandTrace(xs, ys, cis, color, lgroup);
+    if (band) {
+      if (lref) band.legend = lref;
+      traces.push(band);
+    }
+  }
+  lineTraces.push({
+    x: xs, y: ys, mode: "lines+markers", name,
+    legendgroup: lgroup,
+    ...(lref && { legend: lref }),
+    ...(traj.zorder != null && { zorder: traj.zorder }),
+    line: { color, width: emph.baseW }, marker: { size: emph.baseS, symbol: emph.symbol },
+    _emph: emph,
+    customdata,
+    hoverinfo: "none",
+  });
+}
+
+/** Shared layout for the progress charts. */
+function progressLayout(config, trajectories, yRange, showlegend) {
+  const xRange = tightXRange(config, trajectories);
+  return getPlotlyLayout({
+    margin: { l: 105, r: 4, t: 8, b: 50 },
+    xaxis: { automargin: false, title: config.xAxisLabel, ...(xRange && { range: xRange }) },
+    yaxis: makeYAxis(yRange),
+    ...(showlegend !== undefined && { showlegend }),
+    ...legendLayout(config),
+  });
+}
+
 function formatCIStr(value, ci, fmt) {
-  if (!ci || !state.showStderr) return "";
+  if (!ci) return "";
   const lo = value - (ci.loDist ?? 0);
   const hi = value + (ci.hiDist ?? 0);
   if (!(ci.loDist > 0 || ci.hiDist > 0)) return "";
@@ -239,7 +294,7 @@ function makeHoverHandler(config) {
     const pt = data.points[0];
     if (pt.y == null) return;
     setTraceEmphasis(pt.curveNumber);
-    const fmt = state.currentNormalization === "zscore" ? 2 : 1;
+    const fmt = scoreDecimals();
     const scoreStr = Number(pt.y).toFixed(fmt);
     const cd = pt.customdata;
     const ci = (cd && typeof cd === "object" && cd.ci) ? cd.ci : null;
@@ -271,280 +326,160 @@ function makeHoverHandler(config) {
 function renderAggregateProgress(config) {
   const trajectories = config.getTrajectories();
   const macro = isMacroSelection();
-  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
-  const needAllRaw = ["minmax", "zscore", "percentile"].includes(state.currentNormalization);
-  const traces = [];
-  const allYValues = [];
+  const useCI = wantCI();
+  const needAll = normNeedsAllValues();
 
-  // Compute y-range. Default: across all shots, for stable axes when
-  // switching shots. With yRangeSkipFirst the range instead tracks only
-  // the displayed shot, and each trajectory's first checkpoint is excluded
-  // (still plotted — early-training outliers just shouldn't compress the
-  // rest of the chart; the plot-area clip handles the spill).
-  const rangeShots = config.yRangeSkipFirst ? [state.currentShot] : config.allShots;
-  for (const shot of rangeShots) {
-    for (const traj of trajectories) {
-      const checkpoints = traj.checkpoints();
-      const xEntities = checkpoints.map(String);
-      const rangeXs = config.yRangeSkipFirst ? checkpoints.slice(1) : checkpoints;
-      for (const x of rangeXs) {
-        const result = aggregateScores(state.checkedTasks, (bench) => {
-          const raw = getScore(traj.dataSource, x, bench, shot);
-          if (raw === undefined) return undefined;
-          const allRaw = needAllRaw
-            ? xEntities.map((s) => getScore(traj.dataSource, s, bench, shot)).filter((v) => v !== undefined)
-            : null;
-          return applyNorm(raw, bench, allRaw);
-        }, macro);
-        if (result) allYValues.push(result.score);
-      }
-    }
+  /** Aggregate {score, count, ci} at one checkpoint of one trajectory. */
+  function aggregateAt(traj, x, xEntities, shot, withCI) {
+    return aggregateScores(state.checkedTasks, (bench) => {
+      const raw = getScore(traj.dataSource, x, bench, shot);
+      if (raw === undefined) return undefined;
+      const allRaw = needAll
+        ? xEntities.map((s) => getScore(traj.dataSource, s, bench, shot)).filter((v) => v !== undefined)
+        : null;
+      const score = applyNorm(raw, bench, allRaw);
+      const ci = withCI
+        ? scaleCIDistances(getCombinedCI(traj.dataSource, x, bench, shot), bench, undefined, allRaw)
+        : undefined;
+      return { score, ci };
+    }, macro);
   }
+
+  const allYValues = [];
+  forEachRangeSlice(config, trajectories, (traj, shot, checkpoints, rangeXs) => {
+    const xEntities = checkpoints.map(String);
+    for (const x of rangeXs) {
+      const result = aggregateAt(traj, x, xEntities, shot, false);
+      if (result) allYValues.push(result.score);
+    }
+  });
   const yRange = computeYRange(allYValues, !!config.yRangeSkipFirst, config.yMaxHeadroom || 0);
 
   // Build bands and lines in separate passes so every band paints below
   // every line — otherwise traj-N's band would occlude traj-(N-1)'s line.
+  const traces = [];
   const lineTraces = [];
   for (const traj of trajectories) {
     const xValues = traj.checkpoints();
     if (!xValues.length) continue;
     const xEntities = xValues.map(String);
-    const xs = xValues.map(config.xToTokens);
-    const aggResults = xValues.map((x) => {
-      return aggregateScores(state.checkedTasks, (bench) => {
-        const raw = getScore(traj.dataSource, x, bench, state.currentShot);
-        if (raw === undefined) return undefined;
-        const allRaw = needAllRaw
-          ? xEntities.map((s) => getScore(traj.dataSource, s, bench, state.currentShot)).filter((v) => v !== undefined)
-          : null;
-        const score = applyNorm(raw, bench, allRaw);
-        const ci = wantSE
-          ? scaleCIDistances(getCombinedCI(traj.dataSource, x, bench, state.currentShot), bench, undefined, allRaw)
-          : undefined;
-        return { score, ci };
-      }, macro);
-    });
-    const scores = aggResults.map((r) => r ? r.score : null);
-    const ciVals = aggResults.map((r) => r ? r.ci : null);
-    const lref = legendRefFor(config, traj);
-    // Group by stable key, not display name — names can repeat across
-    // trajectories, and Plotly merges same-group entries (killing the
-    // tracegroupgap between them and tying their legend toggles).
-    const lgroup = traj.key || traj.name;
-    const emph = emphasisFor(traj);
-
-    if (wantSE) {
-      const band = makeBandTrace(xs, scores, ciVals, traj.color, lgroup);
-      if (band) {
-        if (lref) band.legend = lref;
-        traces.push(band);
-      }
-    }
-    lineTraces.push({
-      x: xs, y: scores, mode: "lines+markers", name: traj.name,
-      legendgroup: lgroup,
-      ...(lref && { legend: lref }),
-      ...(traj.zorder != null && { zorder: traj.zorder }),
-      line: { color: traj.color, width: emph.baseW }, marker: { size: emph.baseS, symbol: emph.symbol },
-      _emph: emph,
+    const aggResults = xValues.map((x) => aggregateAt(traj, x, xEntities, state.currentShot, useCI));
+    pushRunTraces(traces, lineTraces, config, traj, {
+      xs: xValues.map(config.xToTokens),
+      ys: aggResults.map((r) => r ? r.score : null),
+      cis: useCI ? aggResults.map((r) => r ? r.ci : null) : null,
+      name: traj.name,
+      color: traj.color,
+      // Group by stable key, not display name — names can repeat across
+      // trajectories, and Plotly merges same-group entries (killing the
+      // tracegroupgap between them and tying their legend toggles).
+      lgroup: traj.key || traj.name,
       customdata: aggResults.map((r) => r ? { count: r.count, ci: r.ci } : null),
-      hoverinfo: "none",
     });
   }
   traces.push(...lineTraces);
 
-  const xRange = tightXRange(config, trajectories);
-  const layout = getPlotlyLayout({
-    margin: { l: 105, r: 4, t: 8, b: 50 },
-    xaxis: { automargin: false, title: config.xAxisLabel, ...(xRange && { range: xRange }) },
-    yaxis: {
-      title: "", range: yRange,
-      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
-      zeroline: state.currentNormalization === "zscore",
-    },
-    showlegend: trajectories.length > 1,
-    ...legendLayout(config),
-  });
+  const layout = progressLayout(config, trajectories, yRange, trajectories.length > 1);
   plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), onProgressUnhover);
 }
 
 function renderGroupedProgress(config, group) {
   const trajectories = config.getTrajectories();
   const metric = getEffectiveMetric(group.benchmarks[0]);
-  const useNorm = state.currentNormalization !== "none";
-  const needAllRaw = ["minmax", "zscore", "percentile"].includes(state.currentNormalization);
-  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
-  const traces = [];
-  const allYVals = [];
+  const needAll = normNeedsAllValues();
+  const useCI = wantCI();
 
-  // Collect y-range (see renderAggregateProgress for the yRangeSkipFirst
-  // semantics: displayed shot only, first checkpoint excluded; the
-  // normalization basis `raws` keeps all checkpoints to match the
-  // plotting loop below).
-  const rangeShots = config.yRangeSkipFirst ? [state.currentShot] : config.allShots;
-  for (const shot of rangeShots) {
-    for (const traj of trajectories) {
-      for (const bench of group.benchmarks) {
-        const xs = traj.checkpoints();
-        const rangeXs = config.yRangeSkipFirst ? xs.slice(1) : xs;
-        const raws = xs.map((x) => getScore(traj.dataSource, x, bench, shot, metric)).filter((v) => v !== undefined);
-        for (const x of rangeXs) {
-          const raw = getScore(traj.dataSource, x, bench, shot, metric);
-          if (raw === undefined) continue;
-          allYVals.push(useNorm
-            ? applyNorm(raw, bench, needAllRaw ? raws : null, metric)
-            : toDisplayScale(raw, bench, metric));
-        }
+  // Collect y-range values. The normalization basis `raws` keeps all
+  // checkpoints to match the plotting loop below.
+  const allYVals = [];
+  forEachRangeSlice(config, trajectories, (traj, shot, checkpoints, rangeXs) => {
+    for (const bench of group.benchmarks) {
+      const raws = checkpoints.map((x) => getScore(traj.dataSource, x, bench, shot, metric)).filter((v) => v !== undefined);
+      for (const x of rangeXs) {
+        const raw = getScore(traj.dataSource, x, bench, shot, metric);
+        if (raw !== undefined) allYVals.push(applyNorm(raw, bench, needAll ? raws : null, metric));
       }
     }
-  }
+  });
   const yRange = computeYRange(allYVals, !!config.yRangeSkipFirst, config.yMaxHeadroom || 0);
 
   // Bands and lines in separate passes so every band paints below every line.
+  const traces = [];
   const lineTraces = [];
   for (const traj of trajectories) {
     const xValues = traj.checkpoints();
-    const xs = xValues.map(config.xToTokens);
     group.benchmarks.forEach((bench, i) => {
-      const allRaw = needAllRaw
+      const allRaw = needAll
         ? xValues.map((x) => getScore(traj.dataSource, x, bench, state.currentShot, metric)).filter((v) => v !== undefined)
         : null;
       const ys = xValues.map((x) => {
         const raw = getScore(traj.dataSource, x, bench, state.currentShot, metric);
-        if (raw == null) return null;
-        return useNorm ? applyNorm(raw, bench, allRaw, metric) : toDisplayScale(raw, bench, metric);
+        return raw == null ? null : applyNorm(raw, bench, allRaw, metric);
       });
-      const cis = wantSE ? xValues.map((x) => {
+      const cis = useCI ? xValues.map((x) => {
         const ci = getCombinedCI(traj.dataSource, x, bench, state.currentShot, metric);
         return scaleCIDistances(ci, bench, metric, allRaw);
       }) : null;
-      const lineColor = i === 0 ? traj.color : darkenColor(traj.color, 0.3);
-      const traceName = (trajectories.length > 1 ? traj.name + " — " : "") + group.labels[i];
-      const lref = legendRefFor(config, traj);
-      const lgroup = (traj.key || traj.name) + " — " + group.labels[i];
-      const emph = emphasisFor(traj);
-      if (wantSE && cis) {
-        const band = makeBandTrace(xs, ys, cis, lineColor, lgroup);
-        if (band) {
-          if (lref) band.legend = lref;
-          traces.push(band);
-        }
-      }
-      lineTraces.push({
-        x: xs, y: ys, mode: "lines+markers",
-        name: traceName,
-        legendgroup: lgroup,
-        ...(lref && { legend: lref }),
-        ...(traj.zorder != null && { zorder: traj.zorder }),
-        line: { color: lineColor, width: emph.baseW }, marker: { size: emph.baseS, symbol: emph.symbol },
-        _emph: emph,
+      pushRunTraces(traces, lineTraces, config, traj, {
+        xs: xValues.map(config.xToTokens),
+        ys, cis,
+        name: (trajectories.length > 1 ? traj.name + " — " : "") + group.labels[i],
+        color: i === 0 ? traj.color : darkenColor(traj.color, 0.3),
+        lgroup: (traj.key || traj.name) + " — " + group.labels[i],
         customdata: (cis || ys.map(() => null)).map((c) => c ? { ci: c } : null),
-        hoverinfo: "none",
       });
     });
   }
   traces.push(...lineTraces);
 
-  const yLabel = useNorm ? getNormYLabel() : getMetricYLabel(group.benchmarks[0], metric);
-  const xRange = tightXRange(config, trajectories);
-  const layout = getPlotlyLayout({
-    margin: { l: 105, r: 4, t: 8, b: 50 },
-    xaxis: { automargin: false, title: config.xAxisLabel, ...(xRange && { range: xRange }) },
-    yaxis: {
-      title: "", range: yRange,
-      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
-      zeroline: state.currentNormalization === "zscore",
-    },
-    ...legendLayout(config),
-  });
+  const layout = progressLayout(config, trajectories, yRange);
   plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), onProgressUnhover);
 }
 
 function renderSingleProgress(config, benchmark) {
-  const info = state.metricsSetup[benchmark];
-  if (!info) return;
+  if (!state.metricsSetup[benchmark]) return;
   const trajectories = config.getTrajectories();
   const metric = getEffectiveMetric(benchmark);
-  const useNorm = state.currentNormalization !== "none";
-  const wantSE = (state.showStderr || state.showPromptDeviation) && isStderrCompatible();
-  const traces = [];
-  const allYVals = [];
+  const useCI = wantCI();
 
-  // With yRangeSkipFirst, the y-range tracks only the displayed shot and
-  // each trajectory's first checkpoint is excluded (still plotted).
-  const rangeShots = config.yRangeSkipFirst ? [state.currentShot] : config.allShots;
-  for (const shot of rangeShots) {
-    for (const traj of trajectories) {
-      const checkpoints = traj.checkpoints();
-      const rangeXs = config.yRangeSkipFirst ? checkpoints.slice(1) : checkpoints;
-      for (const x of rangeXs) {
-        const raw = getScore(traj.dataSource, x, benchmark, shot, metric);
-        if (raw != null) {
-          allYVals.push(useNorm
-            ? applyNorm(raw, benchmark, null, metric)
-            : toDisplayScale(raw, benchmark, metric));
-        }
-      }
+  const allYVals = [];
+  forEachRangeSlice(config, trajectories, (traj, shot, checkpoints, rangeXs) => {
+    for (const x of rangeXs) {
+      const raw = getScore(traj.dataSource, x, benchmark, shot, metric);
+      if (raw != null) allYVals.push(applyNorm(raw, benchmark, null, metric));
     }
-  }
+  });
   const tight = !!config.yRangeSkipFirst;
-  const yRange = (useNorm || tight)
+  const yRange = (state.currentNormalization !== "none" || tight)
     ? computeYRange(allYVals, tight, config.yMaxHeadroom || 0)
     : [0, computeYMax(allYVals)];
 
   // Bands and lines in separate passes so every band paints below every line.
+  const traces = [];
   const lineTraces = [];
   for (const traj of trajectories) {
     const xValues = traj.checkpoints();
     if (!xValues.length) continue;
-    const xs = xValues.map(config.xToTokens);
     const ys = xValues.map((x) => {
       const raw = getScore(traj.dataSource, x, benchmark, state.currentShot, metric);
-      if (raw == null) return null;
-      return useNorm ? applyNorm(raw, benchmark, null, metric) : toDisplayScale(raw, benchmark, metric);
+      return raw == null ? null : applyNorm(raw, benchmark, null, metric);
     });
-    const cis = wantSE ? xValues.map((x) => {
+    const cis = useCI ? xValues.map((x) => {
       const ci = getCombinedCI(traj.dataSource, x, benchmark, state.currentShot, metric);
       return scaleCIDistances(ci, benchmark, metric);
     }) : null;
-    const lref = legendRefFor(config, traj);
-    const lgroup = traj.key || traj.name;
-    const emph = emphasisFor(traj);
-    if (wantSE && cis) {
-      const band = makeBandTrace(xs, ys, cis, traj.color, lgroup);
-      if (band) {
-        if (lref) band.legend = lref;
-        traces.push(band);
-      }
-    }
-    lineTraces.push({
-      x: xs, y: ys, mode: "lines+markers", name: traj.name,
-      legendgroup: lgroup,
-      ...(lref && { legend: lref }),
-      ...(traj.zorder != null && { zorder: traj.zorder }),
-      line: { color: traj.color, width: emph.baseW }, marker: { size: emph.baseS, symbol: emph.symbol },
-      _emph: emph,
+    pushRunTraces(traces, lineTraces, config, traj, {
+      xs: xValues.map(config.xToTokens),
+      ys, cis,
+      name: traj.name,
+      color: traj.color,
+      lgroup: traj.key || traj.name,
       customdata: (cis || ys.map(() => null)).map((c) => c ? { ci: c } : null),
-      hoverinfo: "none",
     });
   }
   traces.push(...lineTraces);
 
-  const yLabel = state.currentPromptAgg === "stdev"
-    ? getNormYLabel()
-    : (useNorm ? getNormYLabel() : getMetricYLabel(benchmark, metric));
-  const xRange = tightXRange(config, trajectories);
-  const layout = getPlotlyLayout({
-    margin: { l: 105, r: 4, t: 8, b: 50 },
-    xaxis: { automargin: false, title: config.xAxisLabel, ...(xRange && { range: xRange }) },
-    yaxis: {
-      title: "", range: yRange,
-      showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
-      zeroline: state.currentNormalization === "zscore",
-    },
-    showlegend: trajectories.length > 1,
-    ...legendLayout(config),
-  });
+  const layout = progressLayout(config, trajectories, yRange, trajectories.length > 1);
   plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), onProgressUnhover);
 }
 
@@ -584,58 +519,19 @@ function getChartTitleDescription(config) {
   if (isAggregateSelection(sel)) {
     return { body: getProgressAggregateDescription(), footer: "" };
   }
-  let body = "", url = "";
   if (config.groupBenchmarks && sel.startsWith("__group__")) {
     const g = config.groupBenchmarks(sel.slice(9));
-    if (g) {
-      const info = state.metricsSetup[g.benchmarks[0]];
-      if (info) {
-        body = info.description || "";
-        url = info.url || "";
-        const metric = getEffectiveMetric(g.benchmarks[0]);
-        const metricName = METRIC_DISPLAY[metric] || metric;
-        const baseMetric = getBaseMetric(metric);
-        const metricDesc = METRIC_DESCRIPTIONS[baseMetric] || METRIC_DESCRIPTIONS[metric] || "";
-        body = (body ? body + " " : "") + "Metric: " + metricName + ". " + metricDesc;
-      }
-    }
+    if (g) return taskTitleDescription(g.benchmarks[0]);
   } else if (state.metricsSetup[sel]) {
-    const info = state.metricsSetup[sel];
-    body = info.description || "";
-    url = info.url || "";
-    const metric = getEffectiveMetric(sel);
-    const metricName = METRIC_DISPLAY[metric] || metric;
-    const baseMetric = getBaseMetric(metric);
-    const metricDesc = METRIC_DESCRIPTIONS[baseMetric] || METRIC_DESCRIPTIONS[metric] || "";
-    body = (body ? body + " " : "") + "Metric: " + metricName + ". " + metricDesc;
+    return taskTitleDescription(sel);
   }
-  const footer = url ? url.replace("https://huggingface.co/", "https://hf.co/") : "";
-  return { body, footer };
+  return { body: "", footer: "" };
 }
-
-/** Capitalize the first letter (so lowercase pretty_names lead with a capital). */
-function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
 
 /** Update the chart title and the inline description (shown when the user
  *  expands the <details> wrapping the title). */
 export function updateProgressTitle(config) {
-  const titleEl = document.getElementById("chart-title");
-  if (titleEl) titleEl.textContent = capitalize(getChartTitleText(config));
-
-  const descEl = document.getElementById("chart-description");
-  if (!descEl) return;
-  const { body, footer } = getChartTitleDescription(config);
-  descEl.innerHTML = "";
-  if (body) descEl.appendChild(document.createTextNode(body));
-  if (footer) {
-    if (body) descEl.appendChild(document.createElement("br"));
-    const a = document.createElement("a");
-    a.href = footer.startsWith("hf.co/") ? "https://" + footer : footer;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    a.textContent = footer;
-    descEl.appendChild(a);
-  }
+  setChartHeader(capitalize(getChartTitleText(config)), getChartTitleDescription(config));
 }
 
 function getProgressAggregateDescription() {

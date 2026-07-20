@@ -47,7 +47,7 @@
                                 <p>Shaded bands are <strong>asymmetric 95% CIs</strong> for the score under the selected prompt aggregation (max by default).</p>
                                 <p><strong>For max.</strong> The lower bound has a <a href="https://en.wikipedia.org/wiki/Bonferroni_correction">Bonferroni</a> correction across the $k$ partitions; the upper bound does not, so bands are wider below the line than above.</p>
                                 <p class="about-formula">$$L = \max_i \ell\!\left(c_i,\, n_i,\, \tfrac{\alpha}{2k}\right), \qquad U = \max_i u\!\left(c_i,\, n_i,\, \tfrac{\alpha}{2}\right)$$</p>
-                                <p>Per-prompt bounds use exact <a href="https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Clopper%E2%80%93Pearson_interval">Clopper&ndash;Pearson</a> quantiles for accuracy / exact-match metrics and a normal approximation with the harness <a href="https://en.wikipedia.org/wiki/Bootstrapping_(statistics)">bootstrap</a> SE otherwise. <strong>For mean:</strong> <a href="https://en.wikipedia.org/wiki/Welch%E2%80%93Satterthwaite_equation">Welch&ndash;Satterthwaite</a> on sampling + between-prompt variance. Toggle the <em>prompt uncertainty</em> checkbox to hide the band.</p>
+                                <p>Per-prompt bounds use exact <a href="https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Clopper%E2%80%93Pearson_interval">Clopper&ndash;Pearson</a> quantiles for accuracy / exact-match metrics and a normal approximation with the harness <a href="https://en.wikipedia.org/wiki/Bootstrapping_(statistics)">bootstrap</a> SE otherwise. <strong>For mean:</strong> <a href="https://en.wikipedia.org/wiki/Welch%E2%80%93Satterthwaite_equation">Welch&ndash;Satterthwaite</a> on sampling + between-prompt variance.</p>
                             </div>
 
                             <div class="about-section">
@@ -134,13 +134,6 @@
                         <div class="control-group" id="metric-control" style="display:none;">
                             <label for="metric-select">Metric:</label>
                             <select id="metric-select" class="control-select"></select>
-                        </div>
-
-                        <div class="control-group">
-                            <label class="toggle-label">
-                                <input type="checkbox" id="prompt-dev-toggle" checked>
-                                <span id="prompt-dev-label">Prompt uncertainty</span>
-                            </label>
                         </div>
                     </div>
                     <div id="chart"></div>
