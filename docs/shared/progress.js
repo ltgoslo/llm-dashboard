@@ -20,7 +20,7 @@ import {
   getScore, getCombinedCI, scaleCIDistances, applyNorm,
   aggregateScores, isAggregateSelection, isMacroSelection,
   getEffectiveMetric, formatTitleWithShot, capitalize, taskTitleDescription,
-  wantCI, normNeedsAllValues, scoreDecimals,
+  wantCI, normNeedsAllValues, scoreDecimals, isRawScaleMetric,
 } from "./core.js";
 import {
   darkenColor, getPlotlyLayout, plotChart,
@@ -401,7 +401,8 @@ function renderGroupedProgress(config, group) {
       }
     }
   });
-  const yRange = computeYRange(allYVals, !!config.yRangeSkipFirst, config.yMaxHeadroom || 0);
+  const yRange = computeYRange(
+    allYVals, !!config.yRangeSkipFirst, config.yMaxHeadroom || 0, isRawScaleMetric(metric));
 
   // Bands and lines in separate passes so every band paints below every line.
   const traces = [];
@@ -450,8 +451,9 @@ function renderSingleProgress(config, benchmark) {
     }
   });
   const tight = !!config.yRangeSkipFirst;
-  const yRange = (state.currentNormalization !== "none" || tight)
-    ? computeYRange(allYVals, tight, config.yMaxHeadroom || 0)
+  const rawScale = isRawScaleMetric(metric);
+  const yRange = (state.currentNormalization !== "none" || tight || rawScale)
+    ? computeYRange(allYVals, tight, config.yMaxHeadroom || 0, rawScale)
     : [0, computeYMax(allYVals)];
 
   // Bands and lines in separate passes so every band paints below every line.

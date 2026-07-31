@@ -46,6 +46,7 @@ export const METRIC_DISPLAY = {
   mcc: "MCC",
   errant: "ERRANT F0.5",
   errant_f05: "ERRANT F0.5",
+  norm_loglikelihood_corr: "log-likelihood (correct answer)",
 };
 
 export const METRIC_SCALES = {
@@ -60,7 +61,15 @@ export const METRIC_SCALES = {
   chrf: "percent", ter: "percent", rouge1: "percent",
   rougeL_max: "percent", rougeL_avg: "percent",
   rouge1_max: "percent", rouge2_max: "percent",
+  // "raw": shown on its native scale (no ×100), may be negative, and is
+  // exempt from the random-baseline normalization and the y ≥ 0 axis floor.
+  norm_loglikelihood_corr: "raw",
 };
+
+/** Whether a metric is displayed on its own raw (possibly negative) scale. */
+export function isRawScaleMetric(metric) {
+  return METRIC_SCALES[getBaseMetric(metric)] === "raw";
+}
 
 export const METRIC_DESCRIPTIONS = {
   acc: "Proportion of correctly classified examples.",
@@ -87,6 +96,7 @@ export const METRIC_DESCRIPTIONS = {
   errant: "Grammar error correction metric emphasizing precision (F0.5) over recall.",
   errant_f05: "Grammar error correction metric emphasizing precision (F0.5) over recall.",
   mcc: "Matthews correlation coefficient for classification.",
+  norm_loglikelihood_corr: "Length-normalized log-likelihood of the correct answer. Raw (negative) scale; higher is better.",
 };
 
 // Proper capitalization for dataset/acronym names appearing as the
@@ -252,7 +262,12 @@ export function baselineNorm(raw, benchmark) {
 export function applyNorm(raw, benchmark, allRaw, metric) {
   if (state.currentPromptAgg === "stdev") return toDisplayScale(raw, benchmark, metric);
   if (state.currentNormalization === "none") return toDisplayScale(raw, benchmark, metric);
-  if (state.currentNormalization === "baseline") return baselineNorm(raw, benchmark);
+  if (state.currentNormalization === "baseline") {
+    // The task's random baseline is defined for its main metric, not for a
+    // raw-scale metric like a log-likelihood — show those unnormalized.
+    if (metric && isRawScaleMetric(metric)) return toDisplayScale(raw, benchmark, metric);
+    return baselineNorm(raw, benchmark);
+  }
   if (state.currentNormalization === "minmax") {
     if (!allRaw || allRaw.length < 2) return toDisplayScale(raw, benchmark, metric);
     const mn = Math.min(...allRaw), mx = Math.max(...allRaw);
@@ -280,6 +295,7 @@ function scaleDistance(dist, benchmark, metric, allRaw) {
   if (dist === undefined || dist === null) return undefined;
   if (state.currentNormalization === "none") return toDisplayScale(dist, benchmark, metric);
   if (state.currentNormalization === "baseline") {
+    if (metric && isRawScaleMetric(metric)) return toDisplayScale(dist, benchmark, metric);
     const info = state.metricsSetup[benchmark];
     const range = info.max_performance - info.random_baseline;
     return range === 0 ? 0 : (dist / range) * 100;

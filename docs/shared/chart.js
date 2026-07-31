@@ -1225,12 +1225,14 @@ export function makeBandTrace(xValues, yValues, ciValues, color, legendGroup) {
  *  from a trimmed checkpoint set and clipped at the plot edges.
  *  `topHeadroom` adds extra space above the max (as a fraction of the data
  *  span), e.g. to clear a top-anchored legend. */
-export function computeYRange(values, tight = false, topHeadroom = 0) {
+export function computeYRange(values, tight = false, topHeadroom = 0, unclamped = false) {
   if (!values.length) return state.currentNormalization === "zscore" ? [-2, 2] : [0, 100];
   const mx = Math.max(...values);
   const mn = Math.min(...values);
   const extra = (mx - mn) * topHeadroom;
-  if (state.currentNormalization === "zscore") {
+  // Unclamped (raw-scale metrics like log-likelihoods): pad both sides, no
+  // y ≥ 0 floor and no percent-scale ceiling.
+  if (unclamped || state.currentNormalization === "zscore") {
     const pad = Math.max((mx - mn) * 0.15, 0.3);
     return [mn - pad, mx + pad + extra];
   }
