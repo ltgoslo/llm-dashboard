@@ -136,7 +136,7 @@
                             <select id="acc-norm-select" class="control-select">
                                 <option value="max" selected>max</option>
                                 <option value="acc">no norm</option>
-                                <option value="acc_norm">token norm</option>
+                                <option value="acc_norm">character norm</option>
                                 <option value="acc_mutual_info">PMI norm</option>
                             </select>
                         </div>
@@ -152,6 +152,14 @@
                         <div class="control-group" id="metric-control" style="display:none;">
                             <label for="metric-select">Metric:</label>
                             <select id="metric-select" class="control-select"></select>
+                        </div>
+
+                        <div class="control-group">
+                            <label>Error bands:</label>
+                            <div class="shot-toggle">
+                                <button class="ci-btn active" data-ci="1">shown</button>
+                                <button class="ci-btn" data-ci="0">hidden</button>
+                            </div>
                         </div>
                     </div>
                     <div id="chart"></div>

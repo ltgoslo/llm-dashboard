@@ -33,6 +33,7 @@ const plotlyConfig = makePlotlyConfig("multisynt-chart", () => ({
   formulation: state.currentFormulation,
   accuracy_norm: state.currentAccNorm,
   normalization: state.currentNormalization,
+  error_bands: state.showCIBands ? "shown" : "hidden",
 }));
 
 let currentLang = null;
@@ -331,6 +332,14 @@ function bindEventListeners() {
     state.currentAccNorm = e.target.value;
     render();
   });
+  document.querySelectorAll(".ci-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelector(".ci-btn.active")?.classList.remove("active");
+      btn.classList.add("active");
+      state.showCIBands = btn.dataset.ci === "1";
+      render();
+    });
+  });
   document.getElementById("norm-select").addEventListener("change", (e) => {
     state.currentNormalization = e.target.value;
     render();
@@ -517,6 +526,7 @@ function setupUrlState() {
     { key: "pagg", get: () => state.currentPromptAgg, set: (v) => state.currentPromptAgg = v, default: "max" },
     { key: "form", get: () => state.currentFormulation, set: (v) => state.currentFormulation = v, default: "max" },
     { key: "anorm", get: () => state.currentAccNorm, set: (v) => state.currentAccNorm = v, default: "max" },
+    { key: "ci", get: () => state.showCIBands ? "1" : "0", set: (v) => state.showCIBands = v !== "0", default: "1" },
     { key: "norm", get: () => state.currentNormalization, set: (v) => state.currentNormalization = v, default: "baseline" },
     { key: "metric", get: () => state.currentMetric || "", set: (v) => state.currentMetric = v, default: "" },
     {
@@ -599,6 +609,8 @@ async function init() {
       document.getElementById("norm-select").value = state.currentNormalization;
       document.querySelectorAll(".shot-btn").forEach((b) =>
         b.classList.toggle("active", b.dataset.shot === state.currentShot));
+      document.querySelectorAll(".ci-btn").forEach((b) =>
+        b.classList.toggle("active", b.dataset.ci === (state.showCIBands ? "1" : "0")));
       document.querySelectorAll(".tab-btn").forEach((b) =>
         b.classList.toggle("active", b.dataset.lang === currentLang));
       syncTaskCheckboxStates(() => state.currentTaskSelection === "__filtered__" ? filter.allBenchmarks : state.checkedTasks);

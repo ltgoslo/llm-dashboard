@@ -12,6 +12,7 @@ export const state = {
   currentPromptAgg: "max",
   currentNormalization: "baseline",
   currentMetric: null,        // null = use the benchmark's main_metric
+  showCIBands: true,          // false hides CI bands (multisynt toggle)
   // Multisynt-only selectors; null = inactive (other dashboards never set them).
   currentFormulation: null,   // "max" | "cf" | "mcf" | "hybrid"
   currentAccNorm: null,       // "max" | "acc" | "acc_norm" | "acc_mutual_info"

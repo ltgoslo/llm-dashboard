@@ -18,7 +18,7 @@ export const MODEL_COLORS = [
 
 export const METRIC_DISPLAY = {
   acc: "accuracy",
-  acc_norm: "accuracy (token norm)",
+  acc_norm: "accuracy (character norm)",
   acc_mutual_info: "accuracy (PMI norm)",
   f1: "F1",
   em: "exact match",
@@ -64,7 +64,7 @@ export const METRIC_SCALES = {
 
 export const METRIC_DESCRIPTIONS = {
   acc: "Proportion of correctly classified examples.",
-  acc_norm: "Accuracy after normalizing answer log-likelihoods by token length.",
+  acc_norm: "Accuracy after normalizing answer log-likelihoods by character length.",
   acc_mutual_info: "Accuracy after normalizing answer log-likelihoods by their unconditional (PMI) likelihood.",
   f1: "Harmonic mean of precision and recall.",
   em: "Proportion of predictions that exactly match the reference.",
@@ -310,9 +310,10 @@ export function scaleCIDistances(ci, benchmark, metric, allRaw) {
 
 /** Whether error bars / CI bands should be rendered for the current view.
  *  CIs are shown under every normalization except percentile — a non-linear
- *  rank transform with no meaningful interval. */
+ *  rank transform with no meaningful interval — and can be turned off
+ *  entirely via the multisynt error-bands toggle. */
 export function wantCI() {
-  return state.currentNormalization !== "percentile";
+  return state.showCIBands && state.currentNormalization !== "percentile";
 }
 
 /** Whether the current normalization needs the raw scores of all compared

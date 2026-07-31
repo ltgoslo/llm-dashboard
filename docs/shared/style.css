@@ -343,16 +343,16 @@ header.dashboard-header h1 {
 
 /* Shot toggle — segmented 0/1/5-shot button group. */
 .shot-toggle { display: flex; gap: 0; }
-.shot-btn {
+.shot-btn, .ci-btn {
   padding: 0.3rem 0.6rem; border: 1px solid var(--border); background: var(--surface);
   cursor: pointer; font-family: var(--font-sans); font-size: 0.9rem;
   color: var(--fg-muted); transition: all 0.15s;
 }
-.shot-btn:first-child { border-radius: 6px 0 0 6px; }
-.shot-btn:last-child { border-radius: 0 6px 6px 0; }
-.shot-btn:not(:first-child) { border-left: none; }
-.shot-btn:hover { background: var(--accent-light); color: var(--accent); }
-.shot-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+.shot-btn:first-child, .ci-btn:first-child { border-radius: 6px 0 0 6px; }
+.shot-btn:last-child, .ci-btn:last-child { border-radius: 0 6px 6px 0; }
+.shot-btn:not(:first-child), .ci-btn:not(:first-child) { border-left: none; }
+.shot-btn:hover, .ci-btn:hover { background: var(--accent-light); color: var(--accent); }
+.shot-btn.active, .ci-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
 
 /* Generic small select (prompt aggregation, normalization, metric). */
 .control-select {
