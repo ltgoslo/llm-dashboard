@@ -1,40 +1,36 @@
-arc_challenge_fi_cf_fbv2:
+arc_challenge_fi_fbv2:
   category: world knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
-  pretty_name: ARC Challenge (Finnish, CF)
-  random_baseline: 0.25
-arc_challenge_fi_mcf_fbv2:
-  category: world knowledge
-  main_metric: acc
-  max_performance: 1.0
-  metric_scale: unit
-  pretty_name: ARC Challenge (Finnish, MCF)
+  paths:
+  - arc_challenge_fi_cf_fbv2
+  - arc_challenge_fi_mcf_fbv2
+  pretty_name: ARC Challenge (Finnish)
   random_baseline: 0.25
 ask_gec:
   category: linguistic knowledge
+  evaluation_type: generation
   main_metric: errant
   max_performance: 1.0
   metric_scale: unit
   pretty_name: ASK GEC
   random_baseline: 0.0
-belebele_fin_cf_fbv2:
+belebele_fin_fbv2:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
-  pretty_name: Belebele (Finnish, CF)
-  random_baseline: 0.25
-belebele_fin_mcf_fbv2:
-  category: language understanding
-  main_metric: acc
-  max_performance: 1.0
-  metric_scale: unit
-  pretty_name: Belebele (Finnish, MCF)
+  paths:
+  - belebele_fin_cf_fbv2
+  - belebele_fin_mcf_fbv2
+  pretty_name: Belebele (Finnish)
   random_baseline: 0.25
 cocoteros_es:
   category: generation & summarization
+  evaluation_type: generation
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -42,6 +38,7 @@ cocoteros_es:
   random_baseline: 0.0
 copa_es:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -49,83 +46,70 @@ copa_es:
   random_baseline: 0.25
 escola:
   category: linguistic knowledge
+  evaluation_type: classification
   main_metric: mcc
   max_performance: 1.0
   metric_scale: unit
   pretty_name: EsCoLA
   random_baseline: 0.0
-finbench_analogies_cf_fbv2:
+finbench_analogies_fbv2:
   category: linguistic knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
-  pretty_name: FinnBench Analogies (CF)
+  paths:
+  - finbench_analogies_cf_fbv2
+  - finbench_analogies_mcf_fbv2
+  pretty_name: FinnBench Analogies
   random_baseline: 0.2
-finbench_analogies_mcf_fbv2:
-  category: linguistic knowledge
-  main_metric: acc
-  max_performance: 1.0
-  metric_scale: unit
-  pretty_name: FinnBench Analogies (MCF)
-  random_baseline: 0.2
-finbench_emotions_1k_cf_fbv2:
+finbench_emotions_1k_fbv2:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
-  pretty_name: FinnBench Emotions (CF)
+  paths:
+  - finbench_emotions_1k_cf_fbv2
+  - finbench_emotions_1k_mcf_fbv2
+  pretty_name: FinnBench Emotions
   random_baseline: 0.125
-finbench_emotions_1k_mcf_fbv2:
-  category: language understanding
-  main_metric: acc
-  max_performance: 1.0
-  metric_scale: unit
-  pretty_name: FinnBench Emotions (MCF)
-  random_baseline: 0.125
-finbench_general_knowledge_cf_fbv2:
+finbench_general_knowledge_fbv2:
   category: world knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
-  pretty_name: FinnBench General Knowledge (CF)
+  paths:
+  - finbench_general_knowledge_cf_fbv2
+  - finbench_general_knowledge_mcf_fbv2
+  pretty_name: FinnBench General Knowledge
   random_baseline: 0.133
-finbench_general_knowledge_mcf_fbv2:
-  category: world knowledge
-  main_metric: acc
-  max_performance: 1.0
-  metric_scale: unit
-  pretty_name: FinnBench General Knowledge (MCF)
-  random_baseline: 0.133
-finbench_hhh_alignment_cf_fbv2:
+finbench_hhh_alignment_fbv2:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
-  pretty_name: FinnBench HHH Alignment (CF)
+  paths:
+  - finbench_hhh_alignment_cf_fbv2
+  - finbench_hhh_alignment_mcf_fbv2
+  pretty_name: FinnBench HHH Alignment
   random_baseline: 0.5
-finbench_hhh_alignment_mcf_fbv2:
-  category: language understanding
-  main_metric: acc
-  max_performance: 1.0
-  metric_scale: unit
-  pretty_name: FinnBench HHH Alignment (MCF)
-  random_baseline: 0.5
-finbench_similarities_abstraction_cf_fbv2:
+finbench_similarities_abstraction_fbv2:
   category: linguistic knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
-  pretty_name: FinnBench Similarities (CF)
-  random_baseline: 0.25
-finbench_similarities_abstraction_mcf_fbv2:
-  category: linguistic knowledge
-  main_metric: acc
-  max_performance: 1.0
-  metric_scale: unit
-  pretty_name: FinnBench Similarities (MCF)
+  paths:
+  - finbench_similarities_abstraction_cf_fbv2
+  - finbench_similarities_abstraction_mcf_fbv2
+  pretty_name: FinnBench Similarities
   random_baseline: 0.25
 flores_en-es:
   category: translation
+  evaluation_type: generation
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -133,6 +117,7 @@ flores_en-es:
   random_baseline: 0.0
 fquad:
   category: language understanding
+  evaluation_type: generation
   main_metric: exact
   max_performance: 1.0
   metric_scale: unit
@@ -140,6 +125,7 @@ fquad:
   random_baseline: 0.0
 frabelebele:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -147,6 +133,7 @@ frabelebele:
   random_baseline: 0.25
 french_bench_arc_challenge:
   category: world knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -154,6 +141,7 @@ french_bench_arc_challenge:
   random_baseline: 0.25
 french_bench_boolqa:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -161,6 +149,7 @@ french_bench_boolqa:
   random_baseline: 0.5
 french_bench_grammar:
   category: linguistic knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -168,6 +157,7 @@ french_bench_grammar:
   random_baseline: 0.25
 french_bench_hellaswag:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc_norm
   max_performance: 1.0
   metric_scale: unit
@@ -175,6 +165,7 @@ french_bench_hellaswag:
   random_baseline: 0.25
 french_bench_multifquad:
   category: language understanding
+  evaluation_type: generation
   main_metric: exact
   max_performance: 1.0
   metric_scale: unit
@@ -182,6 +173,7 @@ french_bench_multifquad:
   random_baseline: 0.0
 french_bench_reading:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -189,6 +181,7 @@ french_bench_reading:
   random_baseline: 0.25
 french_bench_trivia:
   category: world knowledge
+  evaluation_type: generation
   main_metric: exact
   max_performance: 1.0
   metric_scale: unit
@@ -196,6 +189,7 @@ french_bench_trivia:
   random_baseline: 0.0
 french_bench_vocabulary:
   category: linguistic knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -203,6 +197,7 @@ french_bench_vocabulary:
   random_baseline: 0.25
 french_xnli:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -210,6 +205,7 @@ french_xnli:
   random_baseline: 0.333333
 global_mmlu_french:
   category: world knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -217,27 +213,26 @@ global_mmlu_french:
   random_baseline: 0.25
 global_mmlu_spanish:
   category: world knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
   pretty_name: Global MMLU (Spanish)
   random_baseline: 0.25
-goldenswag_ht_fi_cf_fbv2:
+goldenswag_ht_fi_fbv2:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
-  pretty_name: GoldenSwag (Finnish, CF)
-  random_baseline: 0.25
-goldenswag_ht_fi_mcf_fbv2:
-  category: language understanding
-  main_metric: acc
-  max_performance: 1.0
-  metric_scale: unit
-  pretty_name: GoldenSwag (Finnish, MCF)
+  paths:
+  - goldenswag_ht_fi_cf_fbv2
+  - goldenswag_ht_fi_mcf_fbv2
+  pretty_name: GoldenSwag (Finnish)
   random_baseline: 0.25
 include_french:
   category: world knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -245,6 +240,7 @@ include_french:
   random_baseline: 0.25
 include_spanish:
   category: world knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -252,6 +248,7 @@ include_spanish:
   random_baseline: 0.25
 mgsm_direct_es:
   category: math reasoning
+  evaluation_type: generation
   main_metric: exact_match
   max_performance: 1.0
   metric_scale: unit
@@ -259,6 +256,7 @@ mgsm_direct_es:
   random_baseline: 0.0
 ncb:
   category: linguistic knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -266,6 +264,7 @@ ncb:
   random_baseline: 0.5
 nocola:
   category: linguistic knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -273,6 +272,7 @@ nocola:
   random_baseline: 0.5
 norbelebele:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -280,6 +280,7 @@ norbelebele:
   random_baseline: 0.25
 norcommonsenseqa_nno:
   category: world knowledge & reasoning
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -287,6 +288,7 @@ norcommonsenseqa_nno:
   random_baseline: 0.2
 norcommonsenseqa_nob:
   category: world knowledge & reasoning
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -294,6 +296,7 @@ norcommonsenseqa_nob:
   random_baseline: 0.2
 norec_document:
   category: language understanding
+  evaluation_type: classification
   main_metric: f1
   max_performance: 1.0
   metric_scale: unit
@@ -301,6 +304,7 @@ norec_document:
   random_baseline: 0.5
 norec_sentence:
   category: language understanding
+  evaluation_type: classification
   main_metric: f1
   max_performance: 1.0
   metric_scale: unit
@@ -309,6 +313,7 @@ norec_sentence:
 noreval_multiblimp:
   aggregator: multiblimp
   category: linguistic knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -316,6 +321,7 @@ noreval_multiblimp:
   random_baseline: 0.5
 noridiom_nno:
   category: linguistic knowledge
+  evaluation_type: generation
   main_metric: em_first
   max_performance: 1.0
   metric_scale: unit
@@ -323,6 +329,7 @@ noridiom_nno:
   random_baseline: 0.0
 noridiom_nob:
   category: linguistic knowledge
+  evaluation_type: generation
   main_metric: em_first
   max_performance: 1.0
   metric_scale: unit
@@ -330,6 +337,7 @@ noridiom_nob:
   random_baseline: 0.0
 noropenbookqa_nno:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -338,6 +346,7 @@ noropenbookqa_nno:
   random_baseline: 0.25
 noropenbookqa_no_fact_nno:
   category: world knowledge & reasoning
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -346,6 +355,7 @@ noropenbookqa_no_fact_nno:
   random_baseline: 0.25
 noropenbookqa_no_fact_nob:
   category: world knowledge & reasoning
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -354,6 +364,7 @@ noropenbookqa_no_fact_nob:
   random_baseline: 0.25
 noropenbookqa_nob:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -362,6 +373,7 @@ noropenbookqa_nob:
   random_baseline: 0.25
 norquad:
   category: language understanding
+  evaluation_type: generation
   main_metric: f1
   max_performance: 1.0
   metric_scale: unit
@@ -369,6 +381,7 @@ norquad:
   random_baseline: 0.0
 norrewrite_instruct:
   category: generation & summarization
+  evaluation_type: generation
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -376,6 +389,7 @@ norrewrite_instruct:
   random_baseline: 0.0
 norsumm_nno:
   category: generation & summarization
+  evaluation_type: generation
   main_metric: rougeL_max
   max_performance: 100.0
   metric_scale: percent
@@ -383,6 +397,7 @@ norsumm_nno:
   random_baseline: 0.0
 norsumm_nob:
   category: generation & summarization
+  evaluation_type: generation
   main_metric: rougeL_max
   max_performance: 100.0
   metric_scale: percent
@@ -390,6 +405,7 @@ norsumm_nob:
   random_baseline: 0.0
 norsummarize_instruct:
   category: generation & summarization
+  evaluation_type: generation
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -397,6 +413,7 @@ norsummarize_instruct:
   random_baseline: 0.0
 nortruthfulqa_gen_nno:
   category: world knowledge & reasoning
+  evaluation_type: generation
   main_metric: rougeL_max
   max_performance: 100.0
   metric_scale: percent
@@ -404,6 +421,7 @@ nortruthfulqa_gen_nno:
   random_baseline: 0.0
 nortruthfulqa_gen_nob:
   category: world knowledge & reasoning
+  evaluation_type: generation
   main_metric: rougeL_max
   max_performance: 100.0
   metric_scale: percent
@@ -411,6 +429,7 @@ nortruthfulqa_gen_nob:
   random_baseline: 0.0
 nortruthfulqa_mc_nno:
   category: world knowledge & reasoning
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -418,6 +437,7 @@ nortruthfulqa_mc_nno:
   random_baseline: 0.233118
 nortruthfulqa_mc_nob:
   category: world knowledge & reasoning
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -425,6 +445,7 @@ nortruthfulqa_mc_nob:
   random_baseline: 0.231703
 nrk_quiz_qa_nno:
   category: world knowledge & reasoning
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -432,6 +453,7 @@ nrk_quiz_qa_nno:
   random_baseline: 0.278847
 nrk_quiz_qa_nob:
   category: world knowledge & reasoning
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -439,6 +461,7 @@ nrk_quiz_qa_nob:
   random_baseline: 0.28363
 ogx_truthfulqax_gen_fi_fbv2:
   category: world knowledge
+  evaluation_type: generation
   main_metric: bleu_max
   max_performance: 100.0
   metric_scale: percent
@@ -446,6 +469,7 @@ ogx_truthfulqax_gen_fi_fbv2:
   random_baseline: 0.0
 ogx_truthfulqax_mc1_fi_fbv2:
   category: world knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -453,6 +477,7 @@ ogx_truthfulqax_mc1_fi_fbv2:
   random_baseline: 0.25
 ogx_truthfulqax_mc2_fi_fbv2:
   category: world knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -460,6 +485,7 @@ ogx_truthfulqax_mc2_fi_fbv2:
   random_baseline: 0.5
 openbookqa_es:
   category: world knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -467,41 +493,37 @@ openbookqa_es:
   random_baseline: 0.25
 paws_es:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
   pretty_name: PAWS (Spanish)
   random_baseline: 0.5
-scandisent_fi_cf_fbv2:
+scandisent_fi_fbv2:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
-  pretty_name: ScandiSent (Finnish, CF)
+  paths:
+  - scandisent_fi_cf_fbv2
+  - scandisent_fi_mcf_fbv2
+  pretty_name: ScandiSent (Finnish)
   random_baseline: 0.333333
-scandisent_fi_mcf_fbv2:
+sib200_fi_fbv2:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
-  pretty_name: ScandiSent (Finnish, MCF)
-  random_baseline: 0.333333
-sib200_fi_cf_fbv2:
-  category: language understanding
-  main_metric: acc
-  max_performance: 1.0
-  metric_scale: unit
-  pretty_name: SIB-200 (Finnish, CF)
-  random_baseline: 0.142857
-sib200_fi_mcf_fbv2:
-  category: language understanding
-  main_metric: acc
-  max_performance: 1.0
-  metric_scale: unit
-  pretty_name: SIB-200 (Finnish, MCF)
+  paths:
+  - sib200_fi_cf_fbv2
+  - sib200_fi_mcf_fbv2
+  pretty_name: SIB-200 (Finnish)
   random_baseline: 0.142857
 slide:
   category: linguistic knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -509,6 +531,7 @@ slide:
   random_baseline: 0.212892
 spabelebele:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -516,6 +539,7 @@ spabelebele:
   random_baseline: 0.25
 squad_fi_gen_fbv2:
   category: language understanding
+  evaluation_type: generation
   main_metric: f1
   max_performance: 1.0
   metric_scale: unit
@@ -523,6 +547,7 @@ squad_fi_gen_fbv2:
   random_baseline: 0.0
 tatoeba_eng_nno:
   category: translation
+  evaluation_type: generation
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -530,6 +555,7 @@ tatoeba_eng_nno:
   random_baseline: 0.0
 tatoeba_eng_nob:
   category: translation
+  evaluation_type: generation
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -537,6 +563,7 @@ tatoeba_eng_nob:
   random_baseline: 0.0
 tatoeba_nno_eng:
   category: translation
+  evaluation_type: generation
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -544,6 +571,7 @@ tatoeba_nno_eng:
   random_baseline: 0.0
 tatoeba_nob_eng:
   category: translation
+  evaluation_type: generation
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -551,6 +579,7 @@ tatoeba_nob_eng:
   random_baseline: 0.0
 tatoeba_nob_sme:
   category: translation
+  evaluation_type: generation
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -558,6 +587,7 @@ tatoeba_nob_sme:
   random_baseline: 0.0
 tatoeba_sme_nob:
   category: translation
+  evaluation_type: generation
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -565,6 +595,7 @@ tatoeba_sme_nob:
   random_baseline: 0.0
 topic_based_nli:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -572,6 +603,7 @@ topic_based_nli:
   random_baseline: 0.333333
 veritasqa_es_gen:
   category: world knowledge
+  evaluation_type: generation
   main_metric: bleu_max
   max_performance: 100.0
   metric_scale: percent
@@ -579,6 +611,7 @@ veritasqa_es_gen:
   random_baseline: 0.0
 veritasqa_es_mc1:
   category: world knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -586,6 +619,7 @@ veritasqa_es_mc1:
   random_baseline: 0.243
 veritasqa_es_mc2:
   category: world knowledge
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -593,6 +627,7 @@ veritasqa_es_mc2:
   random_baseline: 0.154
 wmt14-en-fr:
   category: translation
+  evaluation_type: generation
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -600,6 +635,7 @@ wmt14-en-fr:
   random_baseline: 0.0
 wmt14-fr-en:
   category: translation
+  evaluation_type: generation
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -607,6 +643,7 @@ wmt14-fr-en:
   random_baseline: 0.0
 xnli_es:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit
@@ -614,6 +651,7 @@ xnli_es:
   random_baseline: 0.333333
 xquad_es:
   category: language understanding
+  evaluation_type: generation
   main_metric: exact_match
   max_performance: 1.0
   metric_scale: unit
@@ -621,6 +659,7 @@ xquad_es:
   random_baseline: 0.0
 xstorycloze_es:
   category: language understanding
+  evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
   metric_scale: unit

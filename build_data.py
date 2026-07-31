@@ -725,15 +725,20 @@ def build_norolmo_data(metrics_setup):
 # ─────────────────────────────────────────────────────────────
 
 
-def multisynt_extract(results_json_path, benchmark_name, task_config_entry):
+def multisynt_extract(results_json_path, benchmark_name, task_config_entry, match_name=None):
     """Read one MultiSynt partition's results JSON.
 
     MultiSynt scores use suffixes other than `,none` (e.g. `,remove_whitespace`),
     so we accept any `,<suffix>` form. Only the benchmark's own (or per-
     partition `_p<N>`) entries are read — subtask entries like
     `global_mmlu_french_business_p0` are skipped, since lm-eval also reports
-    the group aggregate under `results`. Returns {metric: (value, se, n)} or None.
+    the group aggregate under `results`. `match_name` overrides the name used
+    to match result keys (e.g. `norbelebele_cf` for a formulation variant of
+    `norbelebele`); `benchmark_name` still keys the metric exclusions.
+    Returns {metric: (value, se, n)} or None.
     """
+    if match_name is None:
+        match_name = benchmark_name
     with open(results_json_path) as f:
         data = json.load(f)
     results = data.get("results", {})
@@ -747,7 +752,7 @@ def multisynt_extract(results_json_path, benchmark_name, task_config_entry):
 
     metrics = {}
     for task_key, task_results in results.items():
-        if not (task_key == benchmark_name or task_key.startswith(f"{benchmark_name}_p")):
+        if not (task_key == match_name or task_key.startswith(f"{match_name}_p")):
             continue
         n_samples = get_n_samples(n_samples_dict, task_key)
         for key, val in task_results.items():
@@ -811,48 +816,116 @@ def multisynt_process_multiblimp(bench_path):
     return {"acc": (micro_acc, se, total_n)}
 
 
+# Prompt-formulation subdirs (Norwegian v2 layout): each holds its own p<N>
+# partitions, all pooled as prompt variants of the parent task.
+MULTISYNT_FORMULATIONS = ("cf", "mcf", "hybrid")
+
+# Matches a formulation tag embedded in a variant dir name (Finnish layout,
+# e.g. `arc_challenge_fi_cf_fbv2`).
+MULTISYNT_FORMULATION_RE = re.compile(
+    r"(?:^|_)(" + "|".join(MULTISYNT_FORMULATIONS) + r")(?:_|$)"
+)
+
+
+def multisynt_partition_dirs(path):
+    """Sorted p<N> partition subdirs of `path` (empty if un-partitioned)."""
+    return sorted(
+        os.path.join(path, d)
+        for d in os.listdir(path)
+        if os.path.isdir(os.path.join(path, d)) and d.startswith("p") and d[1:].isdigit()
+    )
+
+
 def multisynt_process_checkpoint(ckpt_path, task_configs, shot):
     """Process one checkpoint directory. Returns {bench: {shot: {metric: {…}}}}."""
     scores = {}
     for benchmark, config in task_configs.items():
-        rel_path = config.get("path", benchmark)
-        bench_path = os.path.join(ckpt_path, rel_path)
-        if not os.path.isdir(bench_path):
-            continue
-
         partition_results = []
         if config.get("aggregator") == "multiblimp":
+            bench_path = os.path.join(ckpt_path, config.get("path", benchmark))
             agg_metrics = multisynt_process_multiblimp(bench_path)
             if agg_metrics:
-                partition_results.append(agg_metrics)
+                partition_results.append((None, agg_metrics))
         else:
-            # One p<N> subdir per prompt/partition; a bare directory means a
-            # single un-partitioned run.
-            partitions = sorted(
-                d for d in os.listdir(bench_path)
-                if os.path.isdir(os.path.join(bench_path, d))
-                and d.startswith("p") and d[1:].isdigit()
-            )
-            search_dirs = [os.path.join(bench_path, p) for p in partitions] or [bench_path]
-            for path in search_dirs:
+            # A task's runs may live under several variant sources, all pooled
+            # as prompt variants: multiple `paths` (Finnish's sibling
+            # `*_cf_fbv2`/`*_mcf_fbv2` dirs, matched by their own dir name) and
+            # cf/mcf/hybrid formulation subdirs inside a source (Norwegian v2,
+            # matched as `<task>_<formulation>`). Each source holds one p<N>
+            # subdir per prompt; a bare directory means a single
+            # un-partitioned run.
+            # Each source carries a formulation label: the subdir name for
+            # formulation subdirs, or a tag embedded in a multi-`paths` dir
+            # name (`arc_challenge_fi_cf_fbv2` → "cf"). Labels drive the
+            # per-formulation `by_form` sub-aggregates below.
+            if "paths" in config:
+                sources = []
+                for p in config["paths"]:
+                    m = MULTISYNT_FORMULATION_RE.search(p.rsplit("/", 1)[-1])
+                    sources.append(
+                        (os.path.join(ckpt_path, p), p.replace("/", "_"),
+                         m.group(1) if m else None)
+                    )
+            else:
+                sources = [
+                    (os.path.join(ckpt_path, config.get("path", benchmark)), benchmark, None)
+                ]
+
+            search_dirs = []
+            for src_dir, src_name, src_form in sources:
+                if not os.path.isdir(src_dir):
+                    continue
+                found = [
+                    (p, src_name, src_form) for p in multisynt_partition_dirs(src_dir)
+                ]
+                for form in MULTISYNT_FORMULATIONS:
+                    form_dir = os.path.join(src_dir, form)
+                    if not os.path.isdir(form_dir):
+                        continue
+                    form_name = f"{src_name}_{form}"
+                    found += [
+                        (p, form_name, form) for p in multisynt_partition_dirs(form_dir)
+                    ] or [(form_dir, form_name, form)]
+                search_dirs += found or [(src_dir, src_name, src_form)]
+
+            for path, match_name, form in search_dirs:
                 results_file = find_latest_results_json(path)
                 if results_file is None:
                     continue
-                metrics = multisynt_extract(results_file, benchmark, config)
+                metrics = multisynt_extract(results_file, benchmark, config, match_name)
                 if metrics:
-                    partition_results.append(metrics)
+                    partition_results.append((form, metrics))
 
         if not partition_results:
             continue
 
-        # Reduce list-of-{metric: (val, se, n)} to {metric: prompt-agg dict}
-        metric_values = {}
-        for pmetrics in partition_results:
-            for metric_name, tup in pmetrics.items():
-                metric_values.setdefault(metric_name, []).append(tup)
-        agg = aggregate_prompt_variants(metric_values, config.get("metric_scale", "unit"))
-        if agg is not None:
-            scores[benchmark] = {shot: agg}
+        # Reduce the (form_label, {metric: (val, se, n)}) pairs to
+        # {metric: prompt-agg dict}.
+        def collect(results):
+            metric_values = {}
+            for pmetrics in results:
+                for metric_name, tup in pmetrics.items():
+                    metric_values.setdefault(metric_name, []).append(tup)
+            return metric_values
+
+        scale = config.get("metric_scale", "unit")
+        agg = aggregate_prompt_variants(collect([m for _, m in partition_results]), scale)
+        if agg is None:
+            continue
+
+        # With ≥2 formulations, additionally aggregate each one on its own so
+        # the dashboard's formulation selector can show it in isolation.
+        labels = {form for form, _ in partition_results if form}
+        if len(labels) >= 2:
+            for form in (f for f in MULTISYNT_FORMULATIONS if f in labels):
+                sub = aggregate_prompt_variants(
+                    collect([m for f, m in partition_results if f == form]), scale
+                )
+                for metric_name, entry in (sub or {}).items():
+                    if metric_name in agg:
+                        agg[metric_name].setdefault("by_form", {})[form] = entry
+
+        scores[benchmark] = {shot: agg}
     return scores
 
 
@@ -877,11 +950,20 @@ def multisynt_parse_checkpoint_name(name):
 
 
 def multisynt_discover_language_tasks(lang_dir, task_configs):
-    """Find which configured tasks have results in this language."""
+    """Find which configured tasks have results in this language.
+
+    A task may declare one nested `path` (e.g. `noropenbookqa/noropenbookqa_nob`)
+    or several `paths` (Finnish's sibling `*_cf_fbv2`/`*_mcf_fbv2` variant
+    dirs), so every configured path is probed directly rather than walking
+    the tree.
+    """
     found = set()
     unknown = set()
-    configured_paths = {cfg.get("path", key): key for key, cfg in task_configs.items()}
-    nested_parents = {p.split("/", 1)[0] for p in configured_paths if "/" in p}
+    configured_paths = {}
+    for key, cfg in task_configs.items():
+        for p in cfg.get("paths", [cfg.get("path", key)]):
+            configured_paths[p] = key
+    known_tops = {p.split("/", 1)[0] for p in configured_paths}
 
     for model_dir in os.listdir(lang_dir):
         model_path = os.path.join(lang_dir, model_dir)
@@ -891,22 +973,15 @@ def multisynt_discover_language_tasks(lang_dir, task_configs):
             ckpt_path = os.path.join(model_path, ckpt)
             if not os.path.isdir(ckpt_path) or ckpt.startswith("."):
                 continue
+            for path, task in configured_paths.items():
+                if task not in found and os.path.isdir(os.path.join(ckpt_path, path)):
+                    found.add(task)
             for top in os.listdir(ckpt_path):
                 top_path = os.path.join(ckpt_path, top)
                 if not os.path.isdir(top_path) or top.startswith("."):
                     continue
-                if top in configured_paths:
-                    found.add(configured_paths[top])
-                    continue
-                if top in nested_parents:
-                    for sub in os.listdir(top_path):
-                        sub_full = f"{top}/{sub}"
-                        if sub_full in configured_paths and os.path.isdir(
-                            os.path.join(top_path, sub)
-                        ):
-                            found.add(configured_paths[sub_full])
-                    continue
-                unknown.add(top)
+                if top not in known_tops:
+                    unknown.add(top)
     return found, unknown
 
 
@@ -933,6 +1008,7 @@ def build_multisynt_data():
             print(f"  WARNING: no config for task '{u}', skipping")
 
         discovered = {}
+        discovered_forms = {}
         models_out = {}
 
         # Group model dirs by base name (hplt2_0shot_checkpoints + _5shot → hplt2)
@@ -971,6 +1047,10 @@ def build_multisynt_data():
                             bucket.setdefault(bench, {}).update(shot_data)
                             for metric_data in shot_data.values():
                                 discovered.setdefault(bench, set()).update(metric_data.keys())
+                                for entry in metric_data.values():
+                                    discovered_forms.setdefault(bench, set()).update(
+                                        entry.get("by_form", ())
+                                    )
 
             models_out[base_model] = {
                 "display_name": display_name,
@@ -1000,14 +1080,18 @@ def build_multisynt_data():
             available = (
                 ([main_metric] if main_metric in disc else []) + base_others
             )
+            forms = discovered_forms.get(task, set())
             metrics_setup_out[task] = {
                 "pretty_name": config["pretty_name"],
                 "main_metric": main_metric,
                 "random_baseline": config["random_baseline"],
                 "max_performance": max_perf,
                 "category": config.get("category", "uncategorized"),
+                "evaluation_type": config.get("evaluation_type", "classification"),
                 "metric_scale": config.get("metric_scale", "unit"),
                 "available_metrics": available,
+                **({"formulations": [f for f in MULTISYNT_FORMULATIONS if f in forms]}
+                   if forms else {}),
             }
 
         output["languages"][lang_name] = {

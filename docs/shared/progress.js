@@ -552,6 +552,7 @@ function getProgressAggregateDescription() {
   else if (sel === "__filtered__") scope = count + " signal-filtered tasks (task average, HPLT-E criteria)";
   else if (sel === "__custom__") scope = count + " selected tasks (task average)";
   else if (sel.startsWith("__cat__")) scope = count + " tasks in the \"" + sel.slice(7) + "\" category";
+  else if (sel.startsWith("__eval__")) scope = "all " + count + " " + sel.slice(8) + " tasks";
 
   const avgDesc = macro
     ? "Scores are first averaged within each task category, then averaged across categories. This gives equal weight to each category regardless of how many tasks it contains. "

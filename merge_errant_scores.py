@@ -6,9 +6,9 @@ The lm-eval harness emits the ASK-GEC `exact_match` metric in
 external scorer and saved alongside as `samples_<task>_<partition>_<...>_errant.json`
 containing `{"errant": <value>}`.
 
-This script walks every `samples_*_errant.json` under `results/Norwegian/**/ask_gec/`
-and merges the ERRANT score into the corresponding `results_*.json` as
-`errant,none` under the task's results entry. Idempotent.
+This script walks every `samples_*_errant.json` under `results/*/**/ask_gec/`
+(all languages) and merges the ERRANT score into the corresponding
+`results_*.json` as `errant,none` under the task's results entry. Idempotent.
 """
 
 import json
@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent
-ASK_GEC_GLOB = "data/multisynt/results/Norwegian/**/ask_gec/**/samples_*_errant.json"
+ASK_GEC_GLOB = "data/multisynt/results/*/**/ask_gec/**/samples_*_errant.json"
 
 
 def find_results_json(directory):

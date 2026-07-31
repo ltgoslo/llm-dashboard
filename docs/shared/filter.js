@@ -10,6 +10,7 @@
 // identity for percent metrics) rather than on baseline-normalized scores.
 
 import { state } from "./state.js";
+import { resolveScoreObj } from "./core.js";
 import { attachHelpTooltip } from "./ui.js";
 
 // Module-level filter state. `initFilter()` resets criteria and uiConfig.
@@ -98,7 +99,7 @@ function noiseScaleFactor(benchmark) {
 
 /** Linearly interpolate a model's score at an x-axis value not on its grid. */
 function interpolateScore(progressData, xValues, target, benchmark, shot, metric) {
-  const exact = progressData[String(target)]?.[benchmark]?.[shot]?.[metric];
+  const exact = resolveScoreObj(progressData[String(target)]?.[benchmark]?.[shot], benchmark, metric);
   if (exact !== undefined && exact !== null) {
     return typeof exact === "number" ? exact : exact[state.currentPromptAgg];
   }
@@ -108,8 +109,8 @@ function interpolateScore(progressData, xValues, target, benchmark, shot, metric
     if (v >= target && hi === null) hi = v;
   }
   if (lo === null || hi === null || lo === hi) return null;
-  const loObj = progressData[String(lo)]?.[benchmark]?.[shot]?.[metric];
-  const hiObj = progressData[String(hi)]?.[benchmark]?.[shot]?.[metric];
+  const loObj = resolveScoreObj(progressData[String(lo)]?.[benchmark]?.[shot], benchmark, metric);
+  const hiObj = resolveScoreObj(progressData[String(hi)]?.[benchmark]?.[shot], benchmark, metric);
   if (!loObj || !hiObj) return null;
   const loScore = typeof loObj === "number" ? loObj : loObj[state.currentPromptAgg];
   const hiScore = typeof hiObj === "number" ? hiObj : hiObj[state.currentPromptAgg];
@@ -178,7 +179,7 @@ function computeFilterCriteriaForBench(bench, shot, models) {
       const windowCkpts = checkpoints.filter((x) => x >= cfg.min && x <= cfg.max);
       const pairs = [];
       for (const x of windowCkpts) {
-        const obj = m.progress[String(x)]?.[bench]?.[shot]?.[mainMetric];
+        const obj = resolveScoreObj(m.progress[String(x)]?.[bench]?.[shot], bench, mainMetric);
         if (!obj) continue;
         const rawScore = typeof obj === "number" ? obj : obj[state.currentPromptAgg];
         if (rawScore == null) continue;

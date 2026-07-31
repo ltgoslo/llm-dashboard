@@ -7,7 +7,7 @@
 
 import { state } from "../shared/state.js";
 import {
-  MODEL_COLORS, isAggregateSelection, capitalize,
+  MODEL_COLORS, isAggregateSelection, capitalize, ACC_NORM_VARIANTS,
 } from "../shared/core.js";
 import { makePlotlyConfig, downloadJSON } from "../shared/chart.js";
 import {
@@ -30,6 +30,8 @@ const plotlyConfig = makePlotlyConfig("multisynt-chart", () => ({
   shot: state.currentShot + "-shot",
   task_selection: state.currentTaskSelection,
   prompt_aggregation: state.currentPromptAgg,
+  formulation: state.currentFormulation,
+  accuracy_norm: state.currentAccNorm,
   normalization: state.currentNormalization,
 }));
 
@@ -164,7 +166,7 @@ const chartConfig = {
   groupBenchmarks: null,         // multisynt has no task groups
   hoverXFormat: (x, traceName) => `${traceName || ""} — ${x}B tokens`,
   // Recomputed every render so it tracks language tab changes.
-  titlePrefix: () => currentLang,
+  titlePrefix: () => currentLang.replace(/_/g, " "),
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -179,6 +181,10 @@ function getBenchmarksForSelection(sel) {
     const c = sel.slice(7);
     return Object.keys(ms).filter((b) => ms[b].category === c);
   }
+  if (sel.startsWith("__eval__")) {
+    const e = sel.slice(8);
+    return Object.keys(ms).filter((b) => ms[b].evaluation_type === e);
+  }
   if (ms[sel]) return [sel];
   return [];
 }
@@ -186,6 +192,46 @@ function getBenchmarksForSelection(sel) {
 function autoSetNormalization() {
   state.currentNormalization = "baseline";
   document.getElementById("norm-select").value = state.currentNormalization;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Formulation / accuracy-norm selectors
+// ─────────────────────────────────────────────────────────────
+
+const FORMULATION_LABELS = { cf: "CF", mcf: "MCF", hybrid: "Hybrid" };
+
+/** Show/hide the formulation and accuracy-norm selectors depending on what
+ *  the current language's tasks provide, and rebuild the formulation options
+ *  from the formulations actually present (e.g. Finnish has no "hybrid").
+ *  Both selectors only affect tasks carrying the corresponding variants —
+ *  see resolveScoreObj in core.js. */
+function updateVariantControls() {
+  const ms = state.metricsSetup;
+  const forms = new Set();
+  let hasAccVariants = false;
+  for (const info of Object.values(ms)) {
+    for (const f of info.formulations || []) forms.add(f);
+    if (info.main_metric === "acc"
+        && ACC_NORM_VARIANTS.every((m) => (info.available_metrics || []).includes(m))) {
+      hasAccVariants = true;
+    }
+  }
+
+  const formSelect = document.getElementById("formulation-select");
+  document.getElementById("formulation-control").style.display = forms.size ? "" : "none";
+  formSelect.innerHTML = "";
+  const options = ["max", ...Object.keys(FORMULATION_LABELS).filter((f) => forms.has(f))];
+  for (const f of options) {
+    const opt = document.createElement("option");
+    opt.value = f;
+    opt.textContent = FORMULATION_LABELS[f] || f;
+    formSelect.appendChild(opt);
+  }
+  if (!options.includes(state.currentFormulation)) state.currentFormulation = "max";
+  formSelect.value = state.currentFormulation;
+
+  document.getElementById("acc-norm-control").style.display = hasAccVariants ? "" : "none";
+  document.getElementById("acc-norm-select").value = state.currentAccNorm;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -199,7 +245,7 @@ function buildLangTabs(languages) {
     const btn = document.createElement("button");
     btn.className = "tab-btn" + (lang === currentLang ? " active" : "");
     btn.dataset.lang = lang;
-    btn.textContent = lang;
+    btn.textContent = lang.replace(/_/g, " ");
     nav.appendChild(btn);
   }
 }
@@ -223,6 +269,19 @@ function populateTaskDropdown() {
       catGroup.appendChild(opt);
     }
     select.appendChild(catGroup);
+  }
+
+  const evalTypes = new Set(Object.values(ms).map((info) => info.evaluation_type).filter(Boolean));
+  if (evalTypes.size > 1) {
+    const evalGroup = document.createElement("optgroup");
+    evalGroup.label = "Aggregate by evaluation type";
+    for (const et of [...evalTypes].sort()) {
+      const opt = document.createElement("option");
+      opt.value = "__eval__" + et;
+      opt.textContent = capitalize(et) + " tasks";
+      evalGroup.appendChild(opt);
+    }
+    select.appendChild(evalGroup);
   }
 
   const taskGroup = document.createElement("optgroup");
@@ -262,6 +321,14 @@ function bindEventListeners() {
 
   document.getElementById("prompt-agg-select").addEventListener("change", (e) => {
     state.currentPromptAgg = e.target.value;
+    render();
+  });
+  document.getElementById("formulation-select").addEventListener("change", (e) => {
+    state.currentFormulation = e.target.value;
+    render();
+  });
+  document.getElementById("acc-norm-select").addEventListener("change", (e) => {
+    state.currentAccNorm = e.target.value;
     render();
   });
   document.getElementById("norm-select").addEventListener("change", (e) => {
@@ -394,12 +461,21 @@ function setLanguage(lang) {
   applyFilterDefaults(lang);
 
   populateTaskDropdown();
-  if (!isAggregateSelection(state.currentTaskSelection) && !state.metricsSetup[state.currentTaskSelection]) {
+  updateVariantControls();
+  // Reset selections that don't exist in the new language: unknown individual
+  // tasks, and category/eval-type subsets that match nothing here.
+  const sel = state.currentTaskSelection;
+  if ((!isAggregateSelection(sel) && !state.metricsSetup[sel])
+      || ((sel.startsWith("__cat__") || sel.startsWith("__eval__"))
+          && getBenchmarksForSelection(sel).length === 0)) {
     state.currentTaskSelection = "__filtered__";
-    document.getElementById("task-select").value = "__filtered__";
   }
+  document.getElementById("task-select").value = state.currentTaskSelection;
   filter.allBenchmarks = new Set(Object.keys(state.metricsSetup));
-  state.checkedTasks = new Set(Object.keys(state.metricsSetup));
+  // Re-derive the checked set from the kept selection (a category/eval-type
+  // subset means different tasks in the new language); fall back to all tasks.
+  const kept = getBenchmarksForSelection(state.currentTaskSelection);
+  state.checkedTasks = new Set(kept.length ? kept : Object.keys(state.metricsSetup));
   buildTaskCheckboxes({
     filterSourceFn: () => state.currentTaskSelection === "__filtered__" ? filter.allBenchmarks : state.checkedTasks,
     onChange: onTaskCheckboxChange,
@@ -439,6 +515,8 @@ function setupUrlState() {
     { key: "shot", get: () => state.currentShot, set: (v) => state.currentShot = v, default: "5" },
     { key: "task", get: () => state.currentTaskSelection, set: (v) => state.currentTaskSelection = v, default: "__filtered__" },
     { key: "pagg", get: () => state.currentPromptAgg, set: (v) => state.currentPromptAgg = v, default: "max" },
+    { key: "form", get: () => state.currentFormulation, set: (v) => state.currentFormulation = v, default: "max" },
+    { key: "anorm", get: () => state.currentAccNorm, set: (v) => state.currentAccNorm = v, default: "max" },
     { key: "norm", get: () => state.currentNormalization, set: (v) => state.currentNormalization = v, default: "baseline" },
     { key: "metric", get: () => state.currentMetric || "", set: (v) => state.currentMetric = v, default: "" },
     {
@@ -489,6 +567,8 @@ async function init() {
 
     currentLang = languages[0];
     applyFilterDefaults(currentLang);
+    state.currentFormulation = "max";
+    state.currentAccNorm = "max";
     setupUrlState();
     const hasURL = urlState.load();
     if (!state.DATA.languages[currentLang]) {
@@ -497,11 +577,14 @@ async function init() {
     }
 
     state.metricsSetup = state.DATA.languages[currentLang].metrics_setup;
-    state.checkedTasks = new Set(Object.keys(state.metricsSetup));
+    // A URL-restored category/eval-type selection means a task subset, not all.
+    const initBenches = getBenchmarksForSelection(state.currentTaskSelection);
+    state.checkedTasks = new Set(initBenches.length ? initBenches : Object.keys(state.metricsSetup));
     filter.allBenchmarks = new Set(Object.keys(state.metricsSetup));
 
     buildLangTabs(languages);
     populateTaskDropdown();
+    updateVariantControls();
     bindEventListeners();
     buildTaskCheckboxes({
       filterSourceFn: () => state.currentTaskSelection === "__filtered__" ? filter.allBenchmarks : state.checkedTasks,

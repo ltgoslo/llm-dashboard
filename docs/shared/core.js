@@ -18,7 +18,8 @@ export const MODEL_COLORS = [
 
 export const METRIC_DISPLAY = {
   acc: "accuracy",
-  acc_norm: "accuracy (normalized)",
+  acc_norm: "accuracy (token norm)",
+  acc_mutual_info: "accuracy (PMI norm)",
   f1: "F1",
   em: "exact match",
   em_first: "exact match (first word)",
@@ -48,7 +49,8 @@ export const METRIC_DISPLAY = {
 };
 
 export const METRIC_SCALES = {
-  acc: "unit", acc_norm: "unit", f1: "unit", em: "unit", em_first: "unit",
+  acc: "unit", acc_norm: "unit", acc_mutual_info: "unit",
+  f1: "unit", em: "unit", em_first: "unit",
   exact: "unit", exact_match: "unit", fscore: "unit", bleu_acc: "unit",
   rougeL_acc: "unit", rouge1_acc: "unit", rouge2_acc: "unit",
   mcc: "unit", is_included: "unit",
@@ -62,7 +64,8 @@ export const METRIC_SCALES = {
 
 export const METRIC_DESCRIPTIONS = {
   acc: "Proportion of correctly classified examples.",
-  acc_norm: "Accuracy after normalizing for answer option length.",
+  acc_norm: "Accuracy after normalizing answer log-likelihoods by token length.",
+  acc_mutual_info: "Accuracy after normalizing answer log-likelihoods by their unconditional (PMI) likelihood.",
   f1: "Harmonic mean of precision and recall.",
   em: "Proportion of predictions that exactly match the reference.",
   em_first: "Exact match accuracy of the first generated word against the correct completion word.",
@@ -143,11 +146,54 @@ export function toDisplayScale(value, benchmark, metric) {
 // Score access (prompt-aggregation aware)
 // ─────────────────────────────────────────────────────────────
 
+/** The accuracy-normalization variants the multisynt "Accuracy norm"
+ *  selector chooses between (in the order they are compared for "max"). */
+export const ACC_NORM_VARIANTS = ["acc", "acc_norm", "acc_mutual_info"];
+
+/** Resolve the stored score entry for one (bench, shot) block, honoring the
+ *  multisynt formulation and accuracy-normalization selectors. Inert on
+ *  dashboards that never set those state fields (both null) or for tasks
+ *  without the corresponding variants:
+ *   - state.currentFormulation ("cf"/"mcf"/"hybrid") swaps in the entry's
+ *     `by_form` sub-aggregate when the task has one; "max" keeps the pooled
+ *     aggregate over all formulations.
+ *   - state.currentAccNorm redirects the main-metric "acc" lookup to one of
+ *     ACC_NORM_VARIANTS, or, for "max", to whichever variant scores highest
+ *     under the current prompt aggregation. Only applies when the block
+ *     carries all three variants; an explicit non-acc metric selection
+ *     bypasses it. */
+export function resolveScoreObj(shotBlock, bench, metric) {
+  if (!shotBlock) return undefined;
+  const main = state.metricsSetup[bench]?.main_metric;
+  metric = metric || main;
+  const form = state.currentFormulation;
+  const pickForm = (obj) =>
+    obj && typeof obj === "object" && form && form !== "max" && obj.by_form?.[form]
+      ? obj.by_form[form]
+      : obj;
+
+  const anorm = state.currentAccNorm;
+  if (anorm && metric === "acc" && main === "acc"
+      && ACC_NORM_VARIANTS.every((m) => shotBlock[m] != null)) {
+    if (anorm !== "max") return pickForm(shotBlock[anorm]);
+    // "stdev" has no score to rank variants by; use the best prompt instead.
+    const aggField = state.currentPromptAgg === "stdev" ? "max" : state.currentPromptAgg;
+    let best;
+    let bestV = -Infinity;
+    for (const m of ACC_NORM_VARIANTS) {
+      const o = pickForm(shotBlock[m]);
+      const v = typeof o === "number" ? o : o?.[aggField];
+      if (v != null && v > bestV) { best = o; bestV = v; }
+    }
+    if (best !== undefined) return best;
+  }
+  return pickForm(shotBlock[metric]);
+}
+
 /** Pull raw score from a data source, respecting the current prompt aggregation.
  *  The "stdev" prompt-agg returns prompt_sd (used by multisynt). */
 export function getScore(dataSource, entity, bench, shot, metric) {
-  metric = metric || state.metricsSetup[bench]?.main_metric;
-  const obj = dataSource[entity]?.[bench]?.[shot]?.[metric];
+  const obj = resolveScoreObj(dataSource[entity]?.[bench]?.[shot], bench, metric);
   if (obj === undefined || obj === null) return undefined;
   if (typeof obj === "number") return state.currentPromptAgg === "stdev" ? 0 : obj;
   if (state.currentPromptAgg === "stdev") return obj.prompt_sd != null ? obj.prompt_sd : undefined;
@@ -169,8 +215,7 @@ export function getScore(dataSource, entity, bench, shot, metric) {
  *  Estimand: θ_k = aggregation_{i ≤ k} μ(p_i) — over the k specific prompts
  *  evaluated, not the prompt-population supremum. */
 export function getCIDistances(dataSource, entity, bench, shot, metric) {
-  metric = metric || state.metricsSetup[bench]?.main_metric;
-  const obj = dataSource[entity]?.[bench]?.[shot]?.[metric];
+  const obj = resolveScoreObj(dataSource[entity]?.[bench]?.[shot], bench, metric);
   if (!obj || typeof obj === "number") return undefined;
   const agg = state.currentPromptAgg;
   if (agg === "stdev") return undefined;
