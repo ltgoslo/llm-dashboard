@@ -54,18 +54,18 @@ norcommonsenseqa_nob:
   url: https://huggingface.co/datasets/ltg/norcommonsenseqa
 norec_document:
   pretty_name: sentiment analysis (document)
-  description: "Binary document-level sentiment analysis based on the NoReC dataset. The main metric is F1 score, with a random baseline of 0.5."
+  description: "Binary document-level sentiment analysis based on the NoReC dataset. The main metric is macro F1 score, with a random baseline of approximately 0.485 (expected macro F1 of a uniform random classifier on this class-imbalanced test set)."
   main_metric: f1
-  random_baseline: 0.5
+  random_baseline: 0.4850709806
   category: language understanding
   evaluation_type: classification
   metric_scale: unit
   url: https://huggingface.co/datasets/ltg/norec_document
 norec_sentence:
   pretty_name: sentiment analysis (sentence)
-  description: "Binary sentence-level sentiment analysis based on the NoReC dataset. The main metric is F1 score, with a random baseline of 0.5."
+  description: "Binary sentence-level sentiment analysis based on the NoReC dataset. The main metric is macro F1 score, with a random baseline of approximately 0.482 (expected macro F1 of a uniform random classifier on this class-imbalanced test set)."
   main_metric: f1
-  random_baseline: 0.5
+  random_baseline: 0.4815172167
   category: language understanding
   evaluation_type: classification
   metric_scale: unit
