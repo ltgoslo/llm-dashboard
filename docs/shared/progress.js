@@ -23,12 +23,13 @@ import {
   wantCI, normNeedsAllValues, scoreDecimals, isRawScaleMetric,
 } from "./core.js";
 import {
-  darkenColor, getPlotlyLayout, plotChart,
+  getPlotlyLayout, plotChart,
   makeBandTrace, computeYRange, computeYMax, makeYAxis,
 } from "./chart.js";
 import {
   showTooltip, hideTooltip,
   populateMetricSelector, hideMetricSelector, setChartHeader,
+  defaultTaskDisplayName,
 } from "./ui.js";
 
 const PROGRESS_LEGEND = {
@@ -131,7 +132,6 @@ function attachLegendHoverEmphasis(chartEl) {
 
 /** Render a progress chart for the current task selection.
  *  config = { getTrajectories, xToTokens, xAxisLabel, hoverXFormat, titlePrefix,
- *             groupBenchmarks (optional, for grouped/paired views),
  *             plotlyConfig, legendPosition: "bottom-right"|"top-left",
  *             onTooltipExtra: optional callback for additional tooltip enrichment } */
 export function renderProgressChart(config) {
@@ -148,12 +148,6 @@ export function renderProgressChart(config) {
   if (isAggregateSelection(sel)) {
     hideMetricSelector();
     renderAggregateProgress(config);
-  } else if (config.groupBenchmarks && sel.startsWith("__group__")) {
-    const g = config.groupBenchmarks(sel.slice(9));
-    if (g) {
-      populateMetricSelector(g.benchmarks);
-      renderGroupedProgress(config, g);
-    }
   } else if (state.metricsSetup[sel]) {
     populateMetricSelector([sel]);
     renderSingleProgress(config, sel);
@@ -305,8 +299,6 @@ function makeHoverHandler(config) {
       const unit = isMacroSelection() ? "categories" : "tasks";
       const countStr = cd && typeof cd === "object" ? cd.count : null;
       body = "Average: " + scoreStr + ciStr + (countStr != null ? " (" + countStr + " " + unit + ")" : "");
-    } else if (state.currentTaskSelection.startsWith("__group__") && pt.data.name && config.groupBenchmarks) {
-      body = pt.data.name + ": " + scoreStr + ciStr;
     } else {
       body = "Score: " + scoreStr + ciStr;
     }
@@ -383,60 +375,6 @@ function renderAggregateProgress(config) {
   plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), onProgressUnhover);
 }
 
-function renderGroupedProgress(config, group) {
-  const trajectories = config.getTrajectories();
-  const metric = getEffectiveMetric(group.benchmarks[0]);
-  const needAll = normNeedsAllValues();
-  const useCI = wantCI();
-
-  // Collect y-range values. The normalization basis `raws` keeps all
-  // checkpoints to match the plotting loop below.
-  const allYVals = [];
-  forEachRangeSlice(config, trajectories, (traj, shot, checkpoints, rangeXs) => {
-    for (const bench of group.benchmarks) {
-      const raws = checkpoints.map((x) => getScore(traj.dataSource, x, bench, shot, metric)).filter((v) => v !== undefined);
-      for (const x of rangeXs) {
-        const raw = getScore(traj.dataSource, x, bench, shot, metric);
-        if (raw !== undefined) allYVals.push(applyNorm(raw, bench, needAll ? raws : null, metric));
-      }
-    }
-  });
-  const yRange = computeYRange(
-    allYVals, !!config.yRangeSkipFirst, config.yMaxHeadroom || 0, isRawScaleMetric(metric));
-
-  // Bands and lines in separate passes so every band paints below every line.
-  const traces = [];
-  const lineTraces = [];
-  for (const traj of trajectories) {
-    const xValues = traj.checkpoints();
-    group.benchmarks.forEach((bench, i) => {
-      const allRaw = needAll
-        ? xValues.map((x) => getScore(traj.dataSource, x, bench, state.currentShot, metric)).filter((v) => v !== undefined)
-        : null;
-      const ys = xValues.map((x) => {
-        const raw = getScore(traj.dataSource, x, bench, state.currentShot, metric);
-        return raw == null ? null : applyNorm(raw, bench, allRaw, metric);
-      });
-      const cis = useCI ? xValues.map((x) => {
-        const ci = getCombinedCI(traj.dataSource, x, bench, state.currentShot, metric);
-        return scaleCIDistances(ci, bench, metric, allRaw);
-      }) : null;
-      pushRunTraces(traces, lineTraces, config, traj, {
-        xs: xValues.map(config.xToTokens),
-        ys, cis,
-        name: (trajectories.length > 1 ? traj.name + " — " : "") + group.labels[i],
-        color: i === 0 ? traj.color : darkenColor(traj.color, 0.3),
-        lgroup: (traj.key || traj.name) + " — " + group.labels[i],
-        customdata: (cis || ys.map(() => null)).map((c) => c ? { ci: c } : null),
-      });
-    });
-  }
-  traces.push(...lineTraces);
-
-  const layout = progressLayout(config, trajectories, yRange);
-  plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), onProgressUnhover);
-}
-
 function renderSingleProgress(config, benchmark) {
   if (!state.metricsSetup[benchmark]) return;
   const trajectories = config.getTrajectories();
@@ -507,11 +445,7 @@ function getChartTitleText(config) {
   if (sel === "__lang__nob") return lead + avg + " across Bokmål tasks (" + shot + ")";
   if (sel === "__lang__nno") return lead + avg + " across Nynorsk tasks (" + shot + ")";
   if (sel === "__lang__sme") return lead + avg + " across Northern Sámi tasks (" + shot + ")";
-  if (config.groupBenchmarks && sel.startsWith("__group__")) {
-    const g = config.groupBenchmarks(sel.slice(9));
-    if (g) return lead + formatTitleWithShot(g.name, shot);
-  }
-  if (state.metricsSetup[sel]) return lead + formatTitleWithShot(state.metricsSetup[sel].pretty_name, shot);
+  if (state.metricsSetup[sel]) return lead + formatTitleWithShot(defaultTaskDisplayName(sel), shot);
   return lead.replace(/ — $/, "");
 }
 
@@ -521,10 +455,7 @@ function getChartTitleDescription(config) {
   if (isAggregateSelection(sel)) {
     return { body: getProgressAggregateDescription(), footer: "" };
   }
-  if (config.groupBenchmarks && sel.startsWith("__group__")) {
-    const g = config.groupBenchmarks(sel.slice(9));
-    if (g) return taskTitleDescription(g.benchmarks[0]);
-  } else if (state.metricsSetup[sel]) {
+  if (state.metricsSetup[sel]) {
     return taskTitleDescription(sel);
   }
   return { body: "", footer: "" };

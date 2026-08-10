@@ -4,12 +4,12 @@
 // to a selection, and the control listeners those dashboards share.
 //
 // multisynt keeps its own small variants — its task universe (per-language
-// metrics_setup, no groups/languages/eval-types) and its "__filtered__"
+// metrics_setup, no languages/eval-types) and its "__filtered__"
 // mode behave differently.
 
 import { state } from "./state.js";
 import { capitalize, isAggregateSelection } from "./core.js";
-import { syncTaskCheckboxStates } from "./ui.js";
+import { syncTaskCheckboxStates, defaultTaskDisplayName } from "./ui.js";
 
 export function setsEqual(a, b) {
   if (a.size !== b.size) return false;
@@ -44,22 +44,13 @@ export function getBenchmarksForSelection(sel) {
       (!nnoOnly.has(b) && !smeOnly.has(b)) || nobNno.has(b) || shared.has(b));
   }
   if (sel === "__lang__sme") return state.DATA.sme_benchmarks || [];
-  if (sel.startsWith("__group__")) {
-    const g = state.DATA.task_groups[sel.slice(9)];
-    return g ? g.benchmarks : [];
-  }
   if (state.metricsSetup[sel]) return [sel];
   return [];
 }
 
-/** Dropdown value that shows `bench`: its pair-group if it belongs to one,
- *  itself if it's a standalone option, else null. */
+/** Dropdown value that shows `bench`: itself if it's a known task, else null. */
 export function findDropdownValueForBench(bench) {
-  for (const [gn, g] of Object.entries(state.DATA.task_groups || {})) {
-    if (g.benchmarks.includes(bench)) return "__group__" + gn;
-  }
-  if (state.DATA.standalone_benchmarks?.includes(bench)) return bench;
-  return null;
+  return state.metricsSetup[bench] ? bench : null;
 }
 
 /** Apply the selection-dependent default normalization (baseline for
@@ -70,7 +61,7 @@ export function autoSetNormalization() {
 }
 
 /** Populate the task <select> with the category / eval-type / language
- *  aggregate optgroups and the individual tasks (pair groups + standalones). */
+ *  aggregate optgroups and the individual tasks. */
 export function populateTaskDropdown() {
   const select = document.getElementById("task-select");
 
@@ -116,13 +107,8 @@ export function populateTaskDropdown() {
   const taskGroup = document.createElement("optgroup");
   taskGroup.label = "Individual tasks";
   const entries = [];
-  for (const groupName of Object.keys(state.DATA.task_groups || {})) {
-    entries.push({ value: "__group__" + groupName, label: capitalize(groupName) });
-  }
-  const standalones = state.DATA.standalone_benchmarks || Object.keys(state.metricsSetup);
-  for (const bench of standalones) {
-    const info = state.metricsSetup[bench];
-    if (info) entries.push({ value: bench, label: capitalize(info.pretty_name) });
+  for (const bench of Object.keys(state.metricsSetup)) {
+    entries.push({ value: bench, label: capitalize(defaultTaskDisplayName(bench)) });
   }
   entries.sort((a, b) => a.label.localeCompare(b.label));
   for (const entry of entries) {
@@ -134,8 +120,8 @@ export function populateTaskDropdown() {
 }
 
 /** Handle a task-checkbox change: collapse the checked set back to a single
- *  benchmark or a 2-benchmark pair group when it matches one (so the
- *  dropdown, metric selector, and title follow), else "__custom__". */
+ *  benchmark when it matches one (so the dropdown, metric selector, and
+ *  title follow), else "__custom__". */
 export function onTaskCheckboxChange(render) {
   if (state.checkedTasks.size === 1) {
     const bench = [...state.checkedTasks][0];
@@ -145,18 +131,6 @@ export function onTaskCheckboxChange(render) {
     autoSetNormalization();
     render();
     return;
-  }
-  if (state.checkedTasks.size === 2 && state.DATA.task_groups) {
-    const arr = [...state.checkedTasks];
-    for (const [gn, g] of Object.entries(state.DATA.task_groups)) {
-      if (g.benchmarks.length === 2 && g.benchmarks.includes(arr[0]) && g.benchmarks.includes(arr[1])) {
-        state.currentTaskSelection = "__group__" + gn;
-        document.getElementById("task-select").value = state.currentTaskSelection;
-        autoSetNormalization();
-        render();
-        return;
-      }
-    }
   }
   state.currentTaskSelection = "__custom__";
   document.getElementById("task-select").value = "__custom__";

@@ -89,65 +89,6 @@ ABLATION_COLOR_MAP = {
     "stage3-mainline": "#5acc2d",                               # light green
 }
 
-# NorEval cross-benchmark task groups (paired bar charts).
-NOREVAL_TASK_GROUPS = {
-    "multiple-choice QA (commonsense)": {
-        "benchmarks": ["norcommonsenseqa_nob", "norcommonsenseqa_nno"],
-        "labels": ["Bokmål", "Nynorsk"],
-    },
-    "reading comprehension (openbookqa)": {
-        "benchmarks": ["noropenbookqa_nob", "noropenbookqa_nno"],
-        "labels": ["Bokmål", "Nynorsk"],
-    },
-    "multiple-choice QA (openbookqa)": {
-        "benchmarks": ["noropenbookqa_no_fact_nob", "noropenbookqa_no_fact_nno"],
-        "labels": ["Bokmål", "Nynorsk"],
-    },
-    "multiple-choice QA (truthfulqa)": {
-        "benchmarks": ["nortruthfulqa_mc_nob", "nortruthfulqa_mc_nno"],
-        "labels": ["Bokmål", "Nynorsk"],
-    },
-    "generative QA (truthfulqa)": {
-        "benchmarks": ["nortruthfulqa_gen_nob", "nortruthfulqa_gen_nno"],
-        "labels": ["Bokmål", "Nynorsk"],
-    },
-    "multiple-choice QA (nrk-quiz)": {
-        "benchmarks": ["nrk_quiz_qa_nob", "nrk_quiz_qa_nno"],
-        "labels": ["Bokmål", "Nynorsk"],
-    },
-    "idiom completion": {
-        "benchmarks": ["noridiom_nob", "noridiom_nno"],
-        "labels": ["Bokmål", "Nynorsk"],
-    },
-    "summarization (norsumm)": {
-        "benchmarks": ["norsumm_nob", "norsumm_nno"],
-        "labels": ["Bokmål", "Nynorsk"],
-    },
-    "translation (English↔Bokmål)": {
-        "benchmarks": ["tatoeba_nob_eng", "tatoeba_eng_nob"],
-        "labels": ["Bokmål→English", "English→Bokmål"],
-    },
-    "translation (English↔Nynorsk)": {
-        "benchmarks": ["tatoeba_nno_eng", "tatoeba_eng_nno"],
-        "labels": ["Nynorsk→English", "English→Nynorsk"],
-    },
-    "translation (Bokmål↔Sámi)": {
-        "benchmarks": ["tatoeba_nob_sme", "tatoeba_sme_nob"],
-        "labels": ["Bokmål→Sámi", "Sámi→Bokmål"],
-    },
-    "translation (Bokmål↔Nynorsk)": {
-        "benchmarks": ["norsumm_nob_nno_translation", "norsumm_nno_nob_translation"],
-        "labels": ["Bokmål→Nynorsk", "Nynorsk→Bokmål"],
-    },
-}
-
-NOREVAL_STANDALONE_BENCHMARKS = [
-    "norbelebele", "norquad", "norec_sentence", "norec_document",
-    "norsummarize_instruct", "norrewrite_instruct", "ask_gec",
-    "ncb", "nocola", "noreval_multiblimp", "slide",
-]
-
-
 # ─────────────────────────────────────────────────────────────
 # Shared helpers (used by all dashboards)
 # ─────────────────────────────────────────────────────────────
@@ -651,8 +592,6 @@ def build_comparison_data(results_dir, models_yaml, metrics_setup):
 
     return {
         "metrics_setup": build_noreval_metrics_info(metrics_setup, discovered),
-        "task_groups": NOREVAL_TASK_GROUPS,
-        "standalone_benchmarks": NOREVAL_STANDALONE_BENCHMARKS,
         "nno_benchmarks": nno,
         "sme_benchmarks": sme,
         "nob_nno_translation_benchmarks": nob_nno,
@@ -709,8 +648,6 @@ def build_norolmo_data(metrics_setup):
 
     return {
         "metrics_setup": build_noreval_metrics_info(metrics_setup, discovered),
-        "task_groups": NOREVAL_TASK_GROUPS,
-        "standalone_benchmarks": NOREVAL_STANDALONE_BENCHMARKS,
         "nno_benchmarks": nno,
         "sme_benchmarks": sme,
         "nob_nno_translation_benchmarks": nob_nno,

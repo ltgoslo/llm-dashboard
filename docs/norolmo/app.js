@@ -185,10 +185,6 @@ const chartConfig = {
     { title: "Stage 3", x: 0.5 },
   ],
   plotlyConfig,
-  groupBenchmarks: (name) => {
-    const g = state.DATA.task_groups?.[name];
-    return g ? { name, benchmarks: g.benchmarks, labels: g.labels } : null;
-  },
   hoverXFormat: (xTokens, traceName) => {
     const step = Math.round(xTokens / TOKENS_PER_STEP);
     const tokensB = (xTokens / 1e9).toFixed(1);
@@ -214,7 +210,17 @@ function render() {
 function setupUrlState() {
   urlState = new UrlState([
     { key: "shot", get: () => state.currentShot, set: (v) => state.currentShot = v, default: "5" },
-    { key: "task", get: () => state.currentTaskSelection, set: (v) => state.currentTaskSelection = v, default: "__all_macro__" },
+    {
+      key: "task",
+      get: () => state.currentTaskSelection,
+      // Unknown values (e.g. "__group__…" pair selections from old URLs)
+      // fall back to the default aggregate view instead of an empty chart.
+      set: (v) => {
+        state.currentTaskSelection = (v === "__custom__" || getBenchmarksForSelection(v).length > 0)
+          ? v : "__all_macro__";
+      },
+      default: "__all_macro__",
+    },
     { key: "prompt", get: () => state.currentPromptAgg, set: (v) => state.currentPromptAgg = v, default: "max" },
     {
       key: "metric",

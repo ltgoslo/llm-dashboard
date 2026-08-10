@@ -19,11 +19,6 @@ export function lightenColor(hex, amount) {
   return rgbToHex(r + (255 - r) * amount, g + (255 - g) * amount, b + (255 - b) * amount);
 }
 
-export function darkenColor(hex, amount) {
-  const [r, g, b] = hexToRgb(hex);
-  return rgbToHex(r * (1 - amount), g * (1 - amount), b * (1 - amount));
-}
-
 export function hexToRgba(hex, alpha) {
   const [r, g, b] = hexToRgb(hex);
   return `rgba(${r},${g},${b},${alpha})`;

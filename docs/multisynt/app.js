@@ -164,7 +164,6 @@ const chartConfig = {
   allShots: ALL_SHOTS,
   legendPosition: "top-left",
   plotlyConfig,
-  groupBenchmarks: null,         // multisynt has no task groups
   hoverXFormat: (x, traceName) => `${traceName || ""} — ${x}B tokens`,
   // Recomputed every render so it tracks language tab changes.
   titlePrefix: () => currentLang.replace(/_/g, " "),

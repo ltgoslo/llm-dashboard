@@ -23,6 +23,17 @@ norolmo-13b-stage2:
   default: false
   color: "#DD0000"
 
+NorOLMo-stage2-newmix-step-29000:
+  display_name: "NorOLMo 13B (stage 2, new mix)"
+  category: norwegian
+  organization: LTG/UiO
+  parameters: 13.7
+  license: "Apache 2.0"
+  fully_open: true
+  description: "A tentative stage-2 checkpoint (step 29,000) of NorOLMo-13B trained with an updated data mixture. NorOLMo is a fully-open Norwegian language model continually-trained on OLMo2, trained by the Language Technology Group at the University of Oslo."
+  default: false
+  color: "#DD0000"
+
 norolmo-13b-stage1:
   display_name: "NorOLMo 13B (stage 1)"
   category: norwegian

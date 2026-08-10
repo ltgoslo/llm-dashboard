@@ -10,20 +10,20 @@
 import { state } from "./state.js";
 import {
   MODEL_COLORS,
-  getScore, getCombinedCI, scaleCIDistances, applyNorm, toDisplayScale,
+  getScore, getCombinedCI, scaleCIDistances, applyNorm,
   getBaseMetric, aggregateScores, isAggregateSelection, isMacroSelection,
   getEffectiveMetric, formatTitleWithShot, capitalize, taskTitleDescription,
   wantCI, normNeedsAllValues, scoreDecimals,
 } from "./core.js";
 import {
-  darkenColor, makePlotlyConfig, getPlotlyLayout, plotChart,
-  computeTickAngle, computeAnnotationFontSize, computeYRange, computeYMax,
+  makePlotlyConfig, getPlotlyLayout, plotChart,
+  computeTickAngle, computeAnnotationFontSize, computeYRange,
   makeYAxis, makeErrorY,
 } from "./chart.js";
 import {
   showTooltip, hideTooltip, populateMetricSelector, hideMetricSelector,
   buildTaskCheckboxes, bindModuleActionStopPropagation,
-  attachControlTooltips, markAppReady, setChartHeader,
+  attachControlTooltips, markAppReady, setChartHeader, defaultTaskDisplayName,
 } from "./ui.js";
 import {
   setsEqual, getBenchmarksForSelection, autoSetNormalization,
@@ -112,9 +112,9 @@ function buildScatterOrgImages(modelDirs, xs, paperYs) {
       source: `../shared/logos/${filename}`,
       xref: "x", yref: "paper",
       x: Math.log10(xs[i]), y: paperYs[i],
-      // Sized to fit inside the 32px (single/aggregate) / 24px (grouped)
-      // scatter markers. sizex is in log10 units (≈ 0.045 ≈ 2% of plot
-      // width on the 1–150B range); sizey is a paper-height fraction.
+      // Sized to fit inside the 32px scatter markers. sizex is in log10
+      // units (≈ 0.045 ≈ 2% of plot width on the 1–150B range); sizey is
+      // a paper-height fraction.
       sizex: 0.045 * scale, sizey: 0.045 * scale,
       xanchor: "center", yanchor: "middle",
       sizing: "contain",
@@ -296,12 +296,6 @@ function buildTaskAliasMaps() {
     const sel = "__lang__" + lang, a = "l:" + lang;
     taskAlias._toAlias[sel] = a; taskAlias._toSel[a] = sel;
   }
-  if (state.DATA.task_groups) {
-    for (const gn of Object.keys(state.DATA.task_groups)) {
-      const sel = "__group__" + gn, a = "g:" + slugify(gn);
-      taskAlias._toAlias[sel] = a; taskAlias._toSel[a] = sel;
-    }
-  }
 }
 
 const modelAlias = { _toAlias: {}, _toSel: {} };
@@ -322,7 +316,13 @@ function setupUrlState() {
     {
       key: "task",
       get: () => taskAlias._toAlias[state.currentTaskSelection] || state.currentTaskSelection,
-      set: (v) => { state.currentTaskSelection = taskAlias._toSel[v] || v; },
+      // Unknown values (e.g. "g:…" pair-group aliases from old URLs) fall
+      // back to the default aggregate view instead of an empty chart.
+      set: (v) => {
+        const sel = taskAlias._toSel[v] || v;
+        state.currentTaskSelection = (sel === "__custom__" || getBenchmarksForSelection(sel).length > 0)
+          ? sel : "__all_macro__";
+      },
       default: "__all_macro__",
     },
     { key: "prompt", get: () => state.currentPromptAgg, set: (v) => state.currentPromptAgg = v, default: "max" },
@@ -629,25 +629,6 @@ function getModelList() {
     });
 }
 
-/** Populate (or clear) the HTML chart legend in the Model-size controls bar.
- *  Pass an array of {name, color} entries to render the legend; pass [] to clear.
- *  CSS hides the element automatically when empty. */
-function updateChartLegend(entries) {
-  const el = document.getElementById("chart-legend");
-  if (!el) return;
-  el.innerHTML = "";
-  for (const e of entries || []) {
-    const item = document.createElement("span");
-    item.className = "legend-item";
-    const dot = document.createElement("span");
-    dot.className = "legend-dot";
-    dot.style.backgroundColor = e.color;
-    item.appendChild(dot);
-    item.appendChild(document.createTextNode(e.name));
-    el.appendChild(item);
-  }
-}
-
 /** Numeric x positions for the models — uniformly spaced (1 unit apart).
  *  Previously this added extra spacing between different organizations, but
  *  the user found that visually confusing. Kept as a separate function so
@@ -817,8 +798,6 @@ function onChartHover(data) {
     const unit = isMacroSelection() ? "categories" : "tasks";
     const countStr = cd && typeof cd === "object" ? cd.count : cd;
     scoreBody = "Average: " + scoreStr + ciStr + (countStr != null ? " (" + countStr + " " + unit + ")" : "");
-  } else if (sel.startsWith("__group__") && pt.data.name) {
-    scoreBody = pt.data.name + ": " + scoreStr + ciStr;
   } else {
     scoreBody = "Score: " + scoreStr + ciStr;
   }
@@ -844,9 +823,6 @@ function renderChart() {
   // Metric selector
   if (isAggregateSelection(sel)) {
     hideMetricSelector();
-  } else if (sel.startsWith("__group__")) {
-    const g = state.DATA.task_groups[sel.slice(9)];
-    if (g) populateMetricSelector(g.benchmarks);
   } else if (state.metricsSetup[sel]) {
     populateMetricSelector([sel]);
   }
@@ -861,9 +837,6 @@ function renderChart() {
   if (isAggregateSelection(sel)) {
     if (useScatter) renderAggregateScatter();
     else renderAggregateBarChart();
-  } else if (sel.startsWith("__group__")) {
-    if (useScatter) renderGroupedScatter(sel.slice(9));
-    else renderGroupedBarChart(sel.slice(9));
   } else {
     if (useScatter) renderSingleBenchmarkScatter(sel);
     else renderSingleBenchmarkBarChart(sel);
@@ -923,7 +896,6 @@ function scatterXAxis() {
  *  single-benchmark views. `values` / `ciValues` / `customdata` are parallel
  *  to `modelNames`; `ciValues` is null when CIs are off. */
 function renderModelBars(modelNames, { values, ciValues, customdata, yRange }) {
-  updateChartLegend([]);
   const labels = modelNames.map(getModelLabel);
   const xPositions = computeOrgXPositions(modelNames);
   const xRange = xPositions.length
@@ -976,118 +948,7 @@ function renderAggregateBarChart() {
   });
 }
 
-/** Y-range for a paired-benchmark (group) view. Normalized: computed across
- *  all shot settings so the axis stays stable when switching shots; raw:
- *  0 … padded max. Shared by the grouped bar and grouped scatter views. */
-function computeGroupYRange(group, metric) {
-  if (state.currentNormalization === "none") {
-    return [0, computeRawYMax(group.benchmarks, metric)];
-  }
-  const modelNames = getModelList();
-  const needAll = normNeedsAllValues();
-  const vals = [];
-  for (const shot of ALL_SHOTS) {
-    for (const bench of group.benchmarks) {
-      const raws = modelNames.map((m) => getScore(state.DATA.models, m, bench, shot, metric)).filter((v) => v !== undefined);
-      for (const raw of raws) vals.push(applyNorm(raw, bench, needAll ? raws : null, metric));
-    }
-  }
-  return computeYRange(vals);
-}
-
-/** Populate the HTML chart legend with a representative light/dark shade per
- *  sub-benchmark (per-model bar colors vary; the legend only needs to show
- *  WHICH sub-bar shade is which label). */
-function updateGroupLegend(group) {
-  const repColor = MODEL_COLORS[0];
-  updateChartLegend(group.labels.map((name, i) => ({
-    name,
-    color: i === 0 ? repColor : darkenColor(repColor, 0.3),
-  })));
-}
-
-function renderGroupedBarChart(groupName) {
-  const group = state.DATA.task_groups[groupName];
-  if (!group) return;
-  const metric = getEffectiveMetric(group.benchmarks[0]);
-  const modelNames = getModelList();
-  const labels = modelNames.map(getModelLabel);
-  const needAll = normNeedsAllValues();
-  const useCI = wantCI();
-  const fmt = scoreDecimals();
-  const groupValuesArr = [], groupSeArrs = [];
-
-  const xPositions = computeOrgXPositions(modelNames);
-  const xRange = xPositions.length
-    ? [xPositions[0] - 0.6, xPositions[xPositions.length - 1] + 0.5]
-    : null;
-  const nBars = group.benchmarks.length;
-  const totalGroupWidth = 0.85;
-  const barWidth = totalGroupWidth / nBars;
-
-  const dataTraces = group.benchmarks.map((bench, i) => {
-    const allRaw = needAll ? allRawScores(modelNames, bench, metric) : null;
-    const points = modelNames.map((m) => modelScoreCI(m, bench, metric, allRaw));
-    const values = points.map((p) => p ? p.score : null);
-    const ciValues = useCI ? points.map((p) => p ? p.ci : null) : null;
-    const barColors = modelNames.map((m) => {
-      const base = getModelColor(m);
-      return i === 0 ? base : darkenColor(base, 0.3);
-    });
-    const hiArr = ciValues ? ciValues.map((c) => c?.hiDist ?? 0) : null;
-    // Bar offset (relative to x): place sub-bars side-by-side, centered on x.
-    const offset = -totalGroupWidth / 2 + i * barWidth;
-    const trace = {
-      x: xPositions, y: values, name: group.labels[i], type: "bar",
-      width: barWidth, offset,
-      marker: { color: barColors, line: { width: 0 }, cornerradius: 6 },
-      customdata: modelNames.map((m, j) => ({ ci: ciValues ? ciValues[j] : null, modelDir: m })),
-      hoverinfo: "none", showlegend: true,
-      ...(ciValues && { error_y: makeErrorY(ciValues) }),
-    };
-    groupValuesArr.push(values);
-    groupSeArrs.push(hiArr);  // used only for annotation y-offset (top of error bar)
-    return trace;
-  });
-
-  const annotations = [];
-  const annAnim = [];
-  labels.forEach((_, catIdx) => {
-    groupValuesArr.forEach((values, gi) => {
-      if (values[catIdx] == null) return;
-      const se = groupSeArrs[gi] ? (groupSeArrs[gi][catIdx] || 0) : 0;
-      // Centre of the i-th sub-bar in [-totalGroupWidth/2 … +totalGroupWidth/2]
-      const subBarCentre = -totalGroupWidth / 2 + (gi + 0.5) * barWidth;
-      annotations.push({
-        x: xPositions[catIdx] + subBarCentre,
-        y: values[catIdx] + se,
-        text: values[catIdx].toFixed(fmt),
-        showarrow: false, yshift: 10,
-        xanchor: "center",
-        font: { size: computeAnnotationFontSize(labels.length * nBars), color: "#000", weight: 500 },
-      });
-      annAnim.push({ score: values[catIdx], se });
-    });
-  });
-  const layout = getPlotlyLayout({
-    yaxis: makeYAxis(computeGroupYRange(group, metric)),
-    xaxis: { automargin: false,
-      range: xRange,
-      tickvals: xPositions, ticktext: labels,
-      tickangle: computeTickAngle(labels), showgrid: false,
-    },
-    margin: { l: 105, r: 4, t: 8, b: 100 },
-    showlegend: false,
-    annotations,
-    images: buildOrgImages(modelNames, xPositions),
-  });
-  layout._annAnim = annAnim;
-  updateGroupLegend(group);
-  plotChart(dataTraces, layout, plotlyConfig, onChartHover, hideTooltip);
-}
-
 function renderSingleBenchmarkBarChart(benchmark) {
-  updateChartLegend([]);
   if (!state.metricsSetup[benchmark]) return;
   const metric = getEffectiveMetric(benchmark);
   const modelNames = getModelList();
@@ -1110,7 +971,6 @@ function renderSingleBenchmarkBarChart(benchmark) {
 // ─────────────────────────────────────────────────────────────
 
 function renderAggregateScatter() {
-  updateChartLegend([]);
   const modelNames = getModelList();
   const { xs, ys, dirs, colors, cis, extras } = collectScatterPoints(modelNames, (m) => {
     const res = aggregateModelResult(m, modelNames);
@@ -1120,7 +980,6 @@ function renderAggregateScatter() {
 }
 
 function renderSingleBenchmarkScatter(benchmark) {
-  updateChartLegend([]);
   if (!state.metricsSetup[benchmark]) return;
   const metric = getEffectiveMetric(benchmark);
   const modelNames = getModelList();
@@ -1130,71 +989,6 @@ function renderSingleBenchmarkScatter(benchmark) {
   const { xs, ys, dirs, colors, cis, extras } = collectScatterPoints(
     modelNames, (m) => modelScoreCI(m, benchmark, metric, allRaw));
   plotScatter(xs, ys, dirs, colors, cis, computeSingleYRange(benchmark, metric), extras);
-}
-
-function renderGroupedScatter(groupName) {
-  const group = state.DATA.task_groups[groupName];
-  if (!group) return;
-  const metric = getEffectiveMetric(group.benchmarks[0]);
-  const modelNames = getModelList();
-  const needAll = normNeedsAllValues();
-
-  // One trace per sub-benchmark, distinguished by colored dots only (no
-  // logos in grouped scatter — overlapping logos at the same x would be
-  // unreadable). The HTML chart legend tells the viewer which is which.
-  const allLogoDirs = [];
-  const allLogoXs = [];
-  const allLogoYs = [];
-  const traces = group.benchmarks.map((bench, gi) => {
-    const allRaw = needAll ? allRawScores(modelNames, bench, metric) : null;
-    const xs = [], ys = [], dirs = [], colors = [], cis = [];
-    for (const m of modelNames) {
-      const size = state.DATA.model_parameters?.[m];
-      if (!size) continue;
-      const p = modelScoreCI(m, bench, metric, allRaw);
-      if (!p) continue;
-      xs.push(size); ys.push(p.score); dirs.push(m); cis.push(p.ci);
-      const base = getModelColor(m);
-      colors.push(gi === 0 ? base : darkenColor(base, 0.3));
-    }
-    // Only the first sub-benchmark contributes logo positions, placed at
-    // the midpoint of the two sub-scores — keeps the org-mark associated
-    // with the model rather than duplicated above each sub-point.
-    if (gi === 0) {
-      const partnerBench = group.benchmarks[1] || bench;
-      const partnerAllRaw = needAll ? allRawScores(modelNames, partnerBench, metric) : null;
-      dirs.forEach((m, i) => {
-        const partner = modelScoreCI(m, partnerBench, metric, partnerAllRaw);
-        allLogoDirs.push(m);
-        allLogoXs.push(xs[i]);
-        allLogoYs.push((ys[i] + (partner ? partner.score : ys[i])) / 2);
-      });
-    }
-    return {
-      x: xs, y: ys, type: "scatter", mode: "markers",
-      name: group.labels[gi], showlegend: true,
-      marker: { size: 24, color: colors, line: { width: 1.4, color: "rgba(255,255,255,0.95)" } },
-      customdata: dirs.map((m, i) => ({ modelDir: m, ci: cis[i] })),
-      hoverinfo: "none",
-    };
-  });
-
-  const yRange = computeGroupYRange(group, metric);
-  const paperYs = allLogoYs.map((y) => paperFraction(y, yRange));
-  const layout = getPlotlyLayout({
-    yaxis: makeYAxis(yRange),
-    xaxis: scatterXAxis(),
-    showlegend: false,
-    margin: { l: 105, r: 20, t: 8, b: 60 },
-    images: buildScatterOrgImages(allLogoDirs, allLogoXs, paperYs),
-  });
-
-  updateGroupLegend(group);
-
-  // Grouped scatter uses Plotly dots (no composite images): clear any stale
-  // map from a prior single-trace scatter so chart.js keeps Plotly's hover.
-  document.getElementById("chart")._scatterImageMap = null;
-  plotChart(traces, layout, plotlyConfig, onChartHover, hideTooltip);
 }
 
 /** Build a single-trace scatter chart: one marker per model, org logos
@@ -1234,8 +1028,6 @@ function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
 // Y-range helpers
 // ─────────────────────────────────────────────────────────────
 
-const ALL_SHOTS = ["0", "1", "5"];
-
 function computeAggregateYRange() {
   const modelNames = getModelList();
   const allAvgs = [];
@@ -1245,24 +1037,6 @@ function computeAggregateYRange() {
     if (result) allAvgs.push(result.score + (result.ci?.hiDist ?? 0));
   }
   return computeYRange(allAvgs);
-}
-
-/** Padded maximum of the raw display-scale scores (plus error-bar tops)
- *  across the listed models and `benchmarks`. */
-function computeRawYMax(benchmarks, metric) {
-  const useCI = wantCI();
-  const vals = [];
-  for (const m of getModelList()) {
-    for (const bench of benchmarks) {
-      const raw = getScore(state.DATA.models, m, bench, state.currentShot, metric);
-      if (raw == null) continue;
-      const ci = useCI
-        ? scaleCIDistances(getCombinedCI(state.DATA.models, m, bench, state.currentShot, metric), bench, metric)
-        : null;
-      vals.push(toDisplayScale(raw, bench, metric) + (ci?.hiDist ?? 0));
-    }
-  }
-  return computeYMax(vals);
 }
 
 function computeSingleYRange(benchmark, metric) {
@@ -1282,12 +1056,12 @@ function computeSingleYRange(benchmark, metric) {
 
 /** Natural-language plot title for the current state.
  *  Aggregate views lead with "Category average" (macro) or "Task average" (micro);
- *  single-task or group views just name the task / group.
+ *  single-task views just name the task.
  *  Examples:
  *    "Category average across all NorEval tasks (5-shot)"
  *    "Task average across Bokmål tasks (5-shot)"
  *    "MultiBLiMP (5-shot)"
- *    "translation (English↔Bokmål; 5-shot)" */
+ *    "translation (English → Bokmål; 5-shot)" */
 function getChartTitleText() {
   const sel = state.currentTaskSelection;
   const shot = state.currentShot + "-shot";
@@ -1303,8 +1077,7 @@ function getChartTitleText() {
   if (sel === "__lang__nob") return prefix + " across Bokmål tasks (" + shot + ")";
   if (sel === "__lang__nno") return prefix + " across Nynorsk tasks (" + shot + ")";
   if (sel === "__lang__sme") return prefix + " across Northern Sámi tasks (" + shot + ")";
-  if (sel.startsWith("__group__")) return formatTitleWithShot(sel.slice(9), shot);
-  if (state.metricsSetup[sel]) return formatTitleWithShot(state.metricsSetup[sel].pretty_name, shot);
+  if (state.metricsSetup[sel]) return formatTitleWithShot(defaultTaskDisplayName(sel), shot);
   return "";
 }
 
@@ -1327,10 +1100,7 @@ function getChartTitleDescription() {
   if (isAggregateSelection(sel)) {
     return { body: getAggregateDescription(), footer: "" };
   }
-  if (sel.startsWith("__group__")) {
-    const g = state.DATA.task_groups[sel.slice(9)];
-    if (g) return taskTitleDescription(g.benchmarks[0], getSubtaskDescription);
-  } else if (state.metricsSetup[sel]) {
+  if (state.metricsSetup[sel]) {
     return taskTitleDescription(sel, getSubtaskDescription);
   }
   return { body: "", footer: "" };
