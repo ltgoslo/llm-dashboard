@@ -72,6 +72,7 @@ ABLATION_NAME_MAP = {
     "stage2-ablation-no-len-ext-stage1-data": "pretraining data, 1→0 decay",
     "stage2-no-len-ext-stage1-data-half-decay": "pretraining data, 1→½ decay",
     "stage2-no-len-ext-stage2-data-half-decay": "midtraining data, 1→½ decay",
+    "stage2-newmix": "updated data mixture, 1→½ decay",
     "stage3-no-rope-scaling": "midtraining data, 1→0 decay",
     "stage3-rope-scaling": "midtraining data, RoPE scaling, 1→0 decay",
     "stage3-mainline": "midtraining data, RoPE scaling, ½→0 decay",
@@ -82,6 +83,7 @@ ABLATION_COLOR_MAP = {
     "stage2-ablation-no-len-ext-stage1-data": "#e63946",        # red
     "stage2-no-len-ext-stage1-data-half-decay": "#c70eff",      # magenta
     "stage2-no-len-ext-stage2-data-half-decay": "#2ca02c",      # green
+    "stage2-newmix": "#9333ea",                                 # violet
     "stage3-no-rope-scaling": "#ff7f0e",                        # orange
     "stage3-rope-scaling": "#d62728",                           # dark red
     "stage3-mainline": "#5acc2d",                               # light green

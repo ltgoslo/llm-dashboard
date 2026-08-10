@@ -53,6 +53,7 @@ const RUN_COLOR = {
   "main-stage3": "#7c2d12",                                // original run (brown)
   "stage2-ablation-no-len-ext-stage1-data": "#f97316",     // orange
   "stage2-no-len-ext-stage1-data-half-decay": "#dc2626",   // red
+  "stage2-newmix": "#9333ea",                              // violet
   "stage3-no-rope-scaling": "#fb923c",                     // light orange
   "stage3-rope-scaling": "#b45309",                        // amber
 };
