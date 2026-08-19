@@ -54,6 +54,7 @@ const RUN_COLOR = {
   "stage2-ablation-no-len-ext-stage1-data": "#f97316",     // orange
   "stage2-no-len-ext-stage1-data-half-decay": "#dc2626",   // red
   "stage2-newmix": "#9333ea",                              // violet
+  "stage3-newmix": "#9333ea",                              // violet
   "stage3-no-rope-scaling": "#fb923c",                     // light orange
   "stage3-rope-scaling": "#b45309",                        // amber
 };
@@ -65,9 +66,15 @@ function colorFor(key) {
 // Each ablation forked off a parent run; prepending the parent's checkpoint
 // at the fork connects the lines visually instead of leaving a gap.
 // Stage 2 ablations forked from the main run at step 24,000 (201.3B tokens);
-// the older stage 3 ablations continue the last "stage 1 data, full decay"
-// checkpoint, and stage3-mainline continues "stage 2 data, ½ decay".
+// each stage 3 run continues the last checkpoint of its stage-2 parent
+// (STAGE3_PARENT; the older ablations continue "stage 1 data, full decay").
 const STAGE2_FORK_STEP = 24000;
+
+const STAGE3_PARENT = {
+  "stage3-mainline": "stage2-no-len-ext-stage2-data-half-decay",
+  "stage3-newmix": "stage2-newmix",
+};
+const STAGE3_DEFAULT_PARENT = "stage2-ablation-no-len-ext-stage1-data";
 
 function lastStep(data) {
   return Math.max(...Object.keys(data || {}).map(Number));
@@ -78,10 +85,7 @@ function getForkPoint(ablName) {
   if (ablName.startsWith("stage2")) {
     return { data: state.DATA.progress, step: STAGE2_FORK_STEP };
   }
-  const parentName = ablName === "stage3-mainline"
-    ? "stage2-no-len-ext-stage2-data-half-decay"
-    : "stage2-ablation-no-len-ext-stage1-data";
-  const parent = abl[parentName];
+  const parent = abl[STAGE3_PARENT[ablName] || STAGE3_DEFAULT_PARENT];
   return parent ? { data: parent, step: lastStep(parent) } : null;
 }
 
