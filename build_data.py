@@ -712,49 +712,51 @@ def multisynt_extract(results_json_path, benchmark_name, task_config_entry, matc
     return metrics if metrics else None
 
 
-def multisynt_process_multiblimp(bench_path):
-    """Aggregate noreval_multiblimp's per-phenomenon subdirs into one accuracy.
+# Metric families micro-averaged by `aggregator: multiblimp` tasks (each is a
+# Bernoulli proportion, so sample-weighted averaging and Wilson CIs apply).
+MULTIBLIMP_AGG_METRICS = ("acc", "acc_norm", "acc_mutual_info")
 
-    Each subdir holds a single results JSON; we micro-average accuracy weighted
-    by sample count to mimic how noreval_multiblimp is reported in noreval-stats.
+
+def multisynt_process_multiblimp(sub_entries, bench_exclusions):
+    """Aggregate multiblimp per-phenomenon results into micro-averaged scores.
+
+    `sub_entries` holds (subdir_path, results_key) pairs, one per phenomenon,
+    each keyed by the lm-eval task name inside its results JSON. Accuracy-family
+    metrics are micro-averaged weighted by sample count to mimic how
+    noreval_multiblimp is reported in noreval-stats.
     """
-    if not os.path.isdir(bench_path):
-        return None
-    sub_dirs = sorted(
-        d for d in os.listdir(bench_path)
-        if os.path.isdir(os.path.join(bench_path, d))
-        and d.startswith("noreval_multiblimp_")
-    )
-    if not sub_dirs:
-        return None
-
-    total_correct = 0.0
-    total_n = 0
-    for sub in sub_dirs:
-        sub_path = os.path.join(bench_path, sub)
+    totals = {}
+    for sub_path, key in sub_entries:
         results_file = find_latest_results_json(sub_path)
         if results_file is None:
             continue
         with open(results_file) as f:
             data = json.load(f)
-        task_results = data.get("results", {}).get(sub)
+        task_results = data.get("results", {}).get(key)
         if not task_results:
             continue
-        acc = task_results.get("acc,none")
         n = (
-            data.get("n-samples", {}).get(sub, {}).get("effective")
-            or data.get("n-samples", {}).get(sub, {}).get("original")
+            data.get("n-samples", {}).get(key, {}).get("effective")
+            or data.get("n-samples", {}).get(key, {}).get("original")
         )
-        if acc is None or not n:
+        if not n:
             continue
-        total_correct += acc * n
-        total_n += n
+        for metric in MULTIBLIMP_AGG_METRICS:
+            if metric in bench_exclusions:
+                continue
+            val = task_results.get(f"{metric},none")
+            if val is None:
+                continue
+            totals.setdefault(metric, [0.0, 0])
+            totals[metric][0] += val * n
+            totals[metric][1] += n
 
-    if total_n == 0:
-        return None
-    micro_acc = total_correct / total_n
-    se = wilson_se(micro_acc, total_n, "unit") or 0.0
-    return {"acc": (micro_acc, se, total_n)}
+    out = {}
+    for metric, (weighted, total_n) in totals.items():
+        micro = weighted / total_n
+        se = wilson_se(micro, total_n, "unit") or 0.0
+        out[metric] = (micro, se, total_n)
+    return out or None
 
 
 # Prompt-formulation subdirs (Norwegian v2 layout): each holds its own p<N>
@@ -766,6 +768,35 @@ MULTISYNT_FORMULATIONS = ("cf", "mcf", "hybrid")
 MULTISYNT_FORMULATION_RE = re.compile(
     r"(?:^|_)(" + "|".join(MULTISYNT_FORMULATIONS) + r")(?:_|$)"
 )
+
+# Suffix of a flat variant dir name (NorEval-1.2 layout), where formulation
+# and prompt partition are embedded in the name itself rather than nested as
+# subdirs: `norbelebele_nob_cf_p0`, or `ask_gec_nob_p3` (no formulation).
+MULTISYNT_FLAT_SUFFIX = r"(?:_(%s))?_p\d+" % "|".join(MULTISYNT_FORMULATIONS)
+MULTISYNT_FLAT_SUFFIX_RE = re.compile(MULTISYNT_FLAT_SUFFIX + r"$")
+
+
+def multisynt_flat_variant_dirs(ckpt_path, src_dir, src_form):
+    """Variant dirs for a task whose nested source dir is absent (flat layout).
+
+    Looks next to where the source dir would be — and, for nested `path`
+    configs, in the checkpoint dir itself — for `<base>[_<form>]_p<N>` dirs.
+    Each one is a single prompt variant; its dir name doubles as the results
+    key inside its JSON.
+    """
+    base = os.path.basename(src_dir)
+    pattern = re.compile(re.escape(base) + MULTISYNT_FLAT_SUFFIX)
+    for parent in dict.fromkeys((os.path.dirname(src_dir), ckpt_path)):
+        if not os.path.isdir(parent):
+            continue
+        found = []
+        for entry in sorted(os.listdir(parent)):
+            m = pattern.fullmatch(entry)
+            if m and os.path.isdir(os.path.join(parent, entry)):
+                found.append((os.path.join(parent, entry), entry, m.group(1) or src_form))
+        if found:
+            return found
+    return []
 
 
 def multisynt_partition_dirs(path):
@@ -783,8 +814,20 @@ def multisynt_process_checkpoint(ckpt_path, task_configs, shot):
     for benchmark, config in task_configs.items():
         partition_results = []
         if config.get("aggregator") == "multiblimp":
+            # Phenomenon subdirs live either inside the task's own directory
+            # (nested layout) or directly in the checkpoint dir with the task
+            # name as prefix (NorEval-1.2 flat layout).
             bench_path = os.path.join(ckpt_path, config.get("path", benchmark))
-            agg_metrics = multisynt_process_multiblimp(bench_path)
+            parent = bench_path if os.path.isdir(bench_path) else ckpt_path
+            sub_entries = [
+                (os.path.join(parent, d), d)
+                for d in sorted(os.listdir(parent))
+                if d.startswith(f"{benchmark}_")
+                and os.path.isdir(os.path.join(parent, d))
+            ]
+            agg_metrics = multisynt_process_multiblimp(
+                sub_entries, EXCLUDED_METRICS_PER_BENCHMARK.get(benchmark, set())
+            )
             if agg_metrics:
                 partition_results.append((None, agg_metrics))
         else:
@@ -815,6 +858,9 @@ def multisynt_process_checkpoint(ckpt_path, task_configs, shot):
             search_dirs = []
             for src_dir, src_name, src_form in sources:
                 if not os.path.isdir(src_dir):
+                    search_dirs += multisynt_flat_variant_dirs(
+                        ckpt_path, src_dir, src_form
+                    )
                     continue
                 found = [
                     (p, src_name, src_form) for p in multisynt_partition_dirs(src_dir)
@@ -896,7 +942,10 @@ def multisynt_discover_language_tasks(lang_dir, task_configs):
     A task may declare one nested `path` (e.g. `noropenbookqa/noropenbookqa_nob`)
     or several `paths` (Finnish's sibling `*_cf_fbv2`/`*_mcf_fbv2` variant
     dirs), so every configured path is probed directly rather than walking
-    the tree.
+    the tree. Flat-layout dirs (NorEval 1.2) are recognized by stripping the
+    embedded formulation/partition suffix and matching the config whose path
+    basename remains; aggregator tasks instead claim every dir sharing their
+    name as prefix (`multiblimp_ltg_sme_1-23`).
     """
     found = set()
     unknown = set()
@@ -905,6 +954,10 @@ def multisynt_discover_language_tasks(lang_dir, task_configs):
         for p in cfg.get("paths", [cfg.get("path", key)]):
             configured_paths[p] = key
     known_tops = {p.split("/", 1)[0] for p in configured_paths}
+    flat_bases = {os.path.basename(p): key for p, key in configured_paths.items()}
+    aggregator_prefixes = {
+        f"{key}_": key for key, cfg in task_configs.items() if cfg.get("aggregator")
+    }
 
     for model_dir in os.listdir(lang_dir):
         model_path = os.path.join(lang_dir, model_dir)
@@ -921,7 +974,18 @@ def multisynt_discover_language_tasks(lang_dir, task_configs):
                 top_path = os.path.join(ckpt_path, top)
                 if not os.path.isdir(top_path) or top.startswith("."):
                     continue
-                if top not in known_tops:
+                if top in known_tops:
+                    continue
+                base = MULTISYNT_FLAT_SUFFIX_RE.sub("", top)
+                agg_key = next(
+                    (k for p, k in aggregator_prefixes.items() if top.startswith(p)),
+                    None,
+                )
+                if base != top and base in flat_bases:
+                    found.add(flat_bases[base])
+                elif agg_key is not None:
+                    found.add(agg_key)
+                else:
                     unknown.add(top)
     return found, unknown
 

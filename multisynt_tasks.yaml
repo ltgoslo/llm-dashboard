@@ -17,6 +17,14 @@ ask_gec:
   metric_scale: unit
   pretty_name: ASK GEC
   random_baseline: 0.0
+ask_gec_nob:
+  category: linguistic knowledge
+  evaluation_type: generation
+  main_metric: errant_f05
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: ASK GEC
+  random_baseline: 0.0
 belebele_fin_fbv2:
   category: language understanding
   evaluation_type: classification
@@ -254,7 +262,24 @@ mgsm_direct_es:
   metric_scale: unit
   pretty_name: MGSM Direct (Spanish)
   random_baseline: 0.0
+multiblimp_ltg_sme:
+  aggregator: multiblimp
+  category: linguistic knowledge
+  evaluation_type: classification
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: MultiBLiMP (Sámi)
+  random_baseline: 0.5
 ncb:
+  category: linguistic knowledge
+  evaluation_type: classification
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: NCB (Norwegian Cloze)
+  random_baseline: 0.5
+ncb_nob:
   category: linguistic knowledge
   evaluation_type: classification
   main_metric: acc
@@ -270,7 +295,23 @@ nocola:
   metric_scale: unit
   pretty_name: NoCoLA
   random_baseline: 0.5
+nocola_nob:
+  category: linguistic knowledge
+  evaluation_type: classification
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: NoCoLA
+  random_baseline: 0.5
 norbelebele:
+  category: language understanding
+  evaluation_type: classification
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: Belebele (Norwegian)
+  random_baseline: 0.25
+norbelebele_nob:
   category: language understanding
   evaluation_type: classification
   main_metric: acc
@@ -302,7 +343,23 @@ norec_document:
   metric_scale: unit
   pretty_name: NoReC Document Sentiment
   random_baseline: 0.485071
+norec_document_nob:
+  category: language understanding
+  evaluation_type: classification
+  main_metric: f1
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: NoReC Document Sentiment
+  random_baseline: 0.485071
 norec_sentence:
+  category: language understanding
+  evaluation_type: classification
+  main_metric: f1
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: NoReC Sentence Sentiment
+  random_baseline: 0.481517
+norec_sentence_nob:
   category: language understanding
   evaluation_type: classification
   main_metric: f1
@@ -379,7 +436,23 @@ norquad:
   metric_scale: unit
   pretty_name: NorQuAD
   random_baseline: 0.0
+norquad_nob:
+  category: language understanding
+  evaluation_type: generation
+  main_metric: f1
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: NorQuAD
+  random_baseline: 0.0
 norrewrite_instruct:
+  category: generation & summarization
+  evaluation_type: generation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: NorRewrite Instruct
+  random_baseline: 0.0
+norrewrite_instruct_nob:
   category: generation & summarization
   evaluation_type: generation
   main_metric: bleu
@@ -404,6 +477,14 @@ norsumm_nob:
   pretty_name: NorSumm (Bokmål)
   random_baseline: 0.0
 norsummarize_instruct:
+  category: generation & summarization
+  evaluation_type: generation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: NorSummarize Instruct
+  random_baseline: 0.0
+norsummarize_instruct_nob:
   category: generation & summarization
   evaluation_type: generation
   main_metric: bleu
@@ -529,6 +610,14 @@ slide:
   metric_scale: unit
   pretty_name: SLIDE (Scandinavian LID)
   random_baseline: 0.212892
+slide_nob_nno_swe_dan:
+  category: linguistic knowledge
+  evaluation_type: classification
+  main_metric: acc
+  max_performance: 1.0
+  metric_scale: unit
+  pretty_name: SLIDE (Scandinavian LID)
+  random_baseline: 0.212892
 spabelebele:
   category: language understanding
   evaluation_type: classification
@@ -601,6 +690,70 @@ topic_based_nli:
   metric_scale: unit
   pretty_name: Topic-Based NLI
   random_baseline: 0.333333
+translation_eng_nno:
+  category: translation
+  evaluation_type: generation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: Translation (EN→Nynorsk)
+  random_baseline: 0.0
+translation_eng_nob:
+  category: translation
+  evaluation_type: generation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: Translation (EN→Bokmål)
+  random_baseline: 0.0
+translation_nno_eng:
+  category: translation
+  evaluation_type: generation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: Translation (Nynorsk→EN)
+  random_baseline: 0.0
+translation_nno_nob:
+  category: translation
+  evaluation_type: generation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: Translation (Nynorsk→Bokmål)
+  random_baseline: 0.0
+translation_nob_eng:
+  category: translation
+  evaluation_type: generation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: Translation (Bokmål→EN)
+  random_baseline: 0.0
+translation_nob_nno:
+  category: translation
+  evaluation_type: generation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: Translation (Bokmål→Nynorsk)
+  random_baseline: 0.0
+translation_nob_sme:
+  category: translation
+  evaluation_type: generation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: Translation (Bokmål→Sámi)
+  random_baseline: 0.0
+translation_sme_nob:
+  category: translation
+  evaluation_type: generation
+  main_metric: bleu
+  max_performance: 100.0
+  metric_scale: percent
+  pretty_name: Translation (Sámi→Bokmål)
+  random_baseline: 0.0
 veritasqa_es_gen:
   category: world knowledge
   evaluation_type: generation

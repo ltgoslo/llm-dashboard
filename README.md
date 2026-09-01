@@ -87,15 +87,15 @@ For an instruction-tuned model, swap `data/noreval-gen/results/` and
    in `data/norolmo/progress/`
 2. Add a `<your-bench>:` entry to `metrics_setup.yaml` (pretty_name, main_metric,
    random_baseline, category, evaluation_type, metric_scale, url)
-3. If it's part of a NOB/NNO or translation-direction pair, add it to
-   `NOREVAL_TASK_GROUPS` in `build_data.py`; otherwise add it to
-   `NOREVAL_STANDALONE_BENCHMARKS`
-4. Run `build_data.py` and commit
+3. Run `build_data.py` and commit
 
 ### … new MultiSynt task
 
 1. Add the results dirs under
-   `data/multisynt/results/<Lang>/<model>_<N>shot_checkpoints/<ckpt>/<your-task>/p<N>/results.json`
+   `data/multisynt/results/<Lang>/<model>_<N>shot_checkpoints/<ckpt>/<your-task>/p<N>/results.json`,
+   or in the flat NorEval-1.2 layout, where formulation and prompt partition
+   are embedded in the dir name itself:
+   `.../<ckpt>/<your-task>[_<cf|mcf|hybrid>]_p<N>/results.json`
 2. Add a `<your-task>:` entry to `multisynt_tasks.yaml`. Optionally use the
    `path:` field if the result files live under a sub-directory
    (e.g. `path: noropenbookqa/noropenbookqa_no_fact_nob`)
