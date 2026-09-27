@@ -4,7 +4,7 @@ Interactive evaluation dashboards for language models, maintained by the
 [Language Technology Group](https://www.mn.uio.no/ifi/english/research/groups/ltg/)
 at the University of Oslo.
 
-Four independent dashboards live under one repository:
+Five independent dashboards live under one repository:
 
 | URL | Source data | Purpose |
 | --- | --- | --- |
@@ -12,6 +12,7 @@ Four independent dashboards live under one repository:
 | [`/noreval-gen`](https://ltgoslo.github.io/llm-dashboard/noreval-gen/) | `data/noreval-gen/` | Instruction-tuned model comparison on NorEval |
 | [`/norolmo`](https://ltgoslo.github.io/llm-dashboard/norolmo/) | `data/norolmo/` | NorOLMo 13B training-progress + ablations |
 | [`/multisynt`](https://ltgoslo.github.io/llm-dashboard/multisynt/) | `data/multisynt/` | Multilingual training progress (Spanish, French, Finnish, Norwegian) |
+| [`/prelude`](https://ltgoslo.github.io/llm-dashboard/prelude/) | `data/prelude/` | OpenEuroLLM Prelude 9B training progress on NorEval 1.2 |
 
 Each dashboard has its own URL and its own `data.json`. The shared JavaScript /
 CSS library lives in `docs/shared/` — score access, normalization, the chart
@@ -23,20 +24,23 @@ each dashboard via ES modules.
 ```
 llm-dashboard/
 ├── README.md
-├── build_data.py                 ← single script, builds all 4 data.json files
+├── build_data.py                 ← single script, builds all 5 data.json files
 ├── metrics_setup.yaml            ← NorEval benchmark configs (used by 3 dashboards)
 ├── models_setup.yaml             ← NorEval base-model metadata
 ├── models_instruct_setup.yaml    ← NorEval instruct-model metadata
 ├── multisynt_tasks.yaml          ← MultiSynt task configs
 ├── multisynt_models.yaml         ← MultiSynt model display names + colors
+├── noreval12_setup.yaml          ← NorEval 1.2 benchmark configs (prelude dashboard)
 ├── check_missing.py              ← validates that every model has every benchmark
 ├── check_corrupt.py              ← finds corrupt result JSON files
 ├── merge_errant_scores.py        ← merges external ERRANT scores into ask_gec results
+├── import_prelude_results.py     ← fans a Prelude results JSONL out into data/prelude/
 ├── data/                         ← evaluation result JSONs (input to build_data.py)
 │   ├── noreval/results/<model>/<bench>/<N-shot>/.../results_*.json
 │   ├── noreval-gen/results/<model>/<bench>/<N-shot>/.../results_*.json
 │   ├── norolmo/progress/NorOLMo-step-<N>/<bench>/<N-shot>/.../results_*.json
-│   └── multisynt/results/<Lang>/<model>_<N>shot_checkpoints/<ckpt>/<bench>/p<N>/results.json
+│   ├── multisynt/results/<Lang>/<model>_<N>shot_checkpoints/<ckpt>/<bench>/p<N>/results.json
+│   └── prelude/progress/<branch>/<bench>/results_*.json  (+ prelude/checkpoints.json)
 └── docs/                         ← GitHub Pages root (served as static site)
     ├── index.html                ← redirects to /noreval/
     ├── shared/
@@ -53,14 +57,15 @@ llm-dashboard/
     ├── noreval/{index.html, app.js, data.json}
     ├── noreval-gen/{index.html, app.js, data.json}
     ├── norolmo/{index.html, app.js, data.json}
-    └── multisynt/{index.html, app.js, data.json}
+    ├── multisynt/{index.html, app.js, data.json}
+    └── prelude/{index.html, app.js, data.json}
 ```
 
 ## Building locally
 
 ```bash
 pip install pyyaml scipy
-python3 build_data.py             # regenerates all four data.json files
+python3 build_data.py             # regenerates all five data.json files
 python3 -m http.server 8000 -d docs   # serves at http://localhost:8000/noreval/
 ```
 
@@ -106,6 +111,21 @@ For an instruction-tuned model, swap `data/noreval-gen/results/` and
 1. Drop result dirs at `data/multisynt/results/<NewLanguage>/...`
 2. Make sure each task name there appears in `multisynt_tasks.yaml`
 3. Run `build_data.py` — the language tab is auto-discovered
+
+### … Prelude checkpoint (NorEval 1.2)
+
+1. Get the evaluation dump as a JSONL file — one complete lm-eval results
+   document per line, one task (all its prompt/formulation variants) per
+   line — and run `python3 import_prelude_results.py path/to/results.jsonl`.
+   It writes `data/prelude/progress/<branch>/<task>/results_<date>.json`,
+   resolving each line's snapshot hash to the `openeurollm/prelude` branch it
+   came from (`iter_0002400`, `anneal300b_iter_0955200`, …) through
+   `data/prelude/checkpoints.json` and the Hugging Face refs API. Main-line
+   branches (`iter_<N>`) form the Prelude trajectory; `<run>_iter_<N>`
+   branches are drawn as side runs forking off it.
+2. A task not yet in `noreval12_setup.yaml` needs a `<task>:` entry there
+   (same fields as `metrics_setup.yaml`)
+3. Run `build_data.py` and commit
 
 ### … new MultiSynt model
 

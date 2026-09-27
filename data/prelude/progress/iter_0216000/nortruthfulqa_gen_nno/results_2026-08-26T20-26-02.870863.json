@@ -1,0 +1,934 @@
+{
+  "results": {
+    "nortruthfulqa_gen_nno_p0": {
+      "alias": "nortruthfulqa_gen_nno_p0",
+      "bleu_max,sampling": 8.678280314195911,
+      "bleu_max_stderr,sampling": 0.7463764963028334,
+      "bleu_acc,sampling": 0.31225,
+      "bleu_acc_stderr,sampling": 0.018865557881853068,
+      "bleu_diff,sampling": -0.7054702271110206,
+      "bleu_diff_stderr,sampling": 0.45824936812667133,
+      "rouge1_max,sampling": 25.240955130313978,
+      "rouge1_max_stderr,sampling": 1.23645676834059,
+      "rouge1_acc,sampling": 0.3625,
+      "rouge1_acc_stderr,sampling": 0.02141950893235477,
+      "rouge1_diff,sampling": -1.3453775139579063,
+      "rouge1_diff_stderr,sampling": 0.7888574054562477,
+      "rouge2_max,sampling": 12.017829863468647,
+      "rouge2_max_stderr,sampling": 1.0423074383226694,
+      "rouge2_acc,sampling": 0.19775,
+      "rouge2_acc_stderr,sampling": 0.01670190495219806,
+      "rouge2_diff,sampling": -1.2598430920651893,
+      "rouge2_diff_stderr,sampling": 0.7163060717906528,
+      "rougeL_max,sampling": 23.146123297965108,
+      "rougeL_max_stderr,sampling": 1.1712484497563482,
+      "rougeL_acc,sampling": 0.34675,
+      "rougeL_acc_stderr,sampling": 0.020056698864839118,
+      "rougeL_diff,sampling": -1.4644601673414177,
+      "rougeL_diff_stderr,sampling": 0.7484471944559076
+    },
+    "nortruthfulqa_gen_nno_p1": {
+      "alias": "nortruthfulqa_gen_nno_p1",
+      "bleu_max,sampling": 8.640255233588022,
+      "bleu_max_stderr,sampling": 0.7434030819106259,
+      "bleu_acc,sampling": 0.29975,
+      "bleu_acc_stderr,sampling": 0.01892757311948757,
+      "bleu_diff,sampling": -0.9291125811547072,
+      "bleu_diff_stderr,sampling": 0.48518193837351303,
+      "rouge1_max,sampling": 25.42655625020425,
+      "rouge1_max_stderr,sampling": 1.2135125694143671,
+      "rouge1_acc,sampling": 0.36,
+      "rouge1_acc_stderr,sampling": 0.021556143873839712,
+      "rouge1_diff,sampling": -2.0264511690534497,
+      "rouge1_diff_stderr,sampling": 0.9088611148151944,
+      "rouge2_max,sampling": 11.877439147002503,
+      "rouge2_max_stderr,sampling": 1.0447699769644183,
+      "rouge2_acc,sampling": 0.18925,
+      "rouge2_acc_stderr,sampling": 0.01609692166523693,
+      "rouge2_diff,sampling": -1.9564034658214333,
+      "rouge2_diff_stderr,sampling": 0.8149618176860122,
+      "rougeL_max,sampling": 23.25192441221392,
+      "rougeL_max_stderr,sampling": 1.144633340449883,
+      "rougeL_acc,sampling": 0.338,
+      "rougeL_acc_stderr,sampling": 0.020842221222409835,
+      "rougeL_diff,sampling": -2.2646718360758022,
+      "rougeL_diff_stderr,sampling": 0.8449367385615952
+    },
+    "nortruthfulqa_gen_nno_p2": {
+      "alias": "nortruthfulqa_gen_nno_p2",
+      "bleu_max,sampling": 8.665382981958727,
+      "bleu_max_stderr,sampling": 0.7009157487649378,
+      "bleu_acc,sampling": 0.29075,
+      "bleu_acc_stderr,sampling": 0.017621353431964117,
+      "bleu_diff,sampling": -1.3063019597166607,
+      "bleu_diff_stderr,sampling": 0.49934724548304243,
+      "rouge1_max,sampling": 25.470347882892835,
+      "rouge1_max_stderr,sampling": 1.2109321233017023,
+      "rouge1_acc,sampling": 0.3465,
+      "rouge1_acc_stderr,sampling": 0.02073503152295806,
+      "rouge1_diff,sampling": -2.499662079372268,
+      "rouge1_diff_stderr,sampling": 0.9369092525790451,
+      "rouge2_max,sampling": 12.152212318450154,
+      "rouge2_max_stderr,sampling": 1.025790300493118,
+      "rouge2_acc,sampling": 0.181,
+      "rouge2_acc_stderr,sampling": 0.016010549697399627,
+      "rouge2_diff,sampling": -2.1986738505897594,
+      "rouge2_diff_stderr,sampling": 0.8575799192228611,
+      "rougeL_max,sampling": 23.590193450493228,
+      "rougeL_max_stderr,sampling": 1.1480971299475167,
+      "rougeL_acc,sampling": 0.3285,
+      "rougeL_acc_stderr,sampling": 0.019695949927545687,
+      "rougeL_diff,sampling": -2.618336102170305,
+      "rougeL_diff_stderr,sampling": 0.8909996445345705
+    },
+    "nortruthfulqa_gen_nno_p3": {
+      "alias": "nortruthfulqa_gen_nno_p3",
+      "bleu_max,sampling": 8.155915249864504,
+      "bleu_max_stderr,sampling": 0.6445238082801977,
+      "bleu_acc,sampling": 0.2795,
+      "bleu_acc_stderr,sampling": 0.017535620430169208,
+      "bleu_diff,sampling": -1.096312894226981,
+      "bleu_diff_stderr,sampling": 0.4769359623550374,
+      "rouge1_max,sampling": 24.83470528140781,
+      "rouge1_max_stderr,sampling": 1.175279425251877,
+      "rouge1_acc,sampling": 0.35075,
+      "rouge1_acc_stderr,sampling": 0.020301606880626072,
+      "rouge1_diff,sampling": -1.9448979948458813,
+      "rouge1_diff_stderr,sampling": 0.8610952493954278,
+      "rouge2_max,sampling": 11.211948215703202,
+      "rouge2_max_stderr,sampling": 0.9345051432364271,
+      "rouge2_acc,sampling": 0.1705,
+      "rouge2_acc_stderr,sampling": 0.015278430663794862,
+      "rouge2_diff,sampling": -1.8541555016414013,
+      "rouge2_diff_stderr,sampling": 0.778831722190094,
+      "rougeL_max,sampling": 22.91044901645167,
+      "rougeL_max_stderr,sampling": 1.103737177129562,
+      "rougeL_acc,sampling": 0.33175,
+      "rougeL_acc_stderr,sampling": 0.019490692567843595,
+      "rougeL_diff,sampling": -2.203634852297165,
+      "rougeL_diff_stderr,sampling": 0.8269786106027012
+    },
+    "nortruthfulqa_gen_nno_p4": {
+      "alias": "nortruthfulqa_gen_nno_p4",
+      "bleu_max,sampling": 8.109733704173738,
+      "bleu_max_stderr,sampling": 0.6464667411894748,
+      "bleu_acc,sampling": 0.2985,
+      "bleu_acc_stderr,sampling": 0.017125367902805815,
+      "bleu_diff,sampling": -1.3537398461195864,
+      "bleu_diff_stderr,sampling": 0.47955243703668876,
+      "rouge1_max,sampling": 24.72468671610949,
+      "rouge1_max_stderr,sampling": 1.139896074882196,
+      "rouge1_acc,sampling": 0.35175,
+      "rouge1_acc_stderr,sampling": 0.020348228503380986,
+      "rouge1_diff,sampling": -2.4885032142565082,
+      "rouge1_diff_stderr,sampling": 0.8687105961334332,
+      "rouge2_max,sampling": 11.186816322419942,
+      "rouge2_max_stderr,sampling": 0.9579865595206648,
+      "rouge2_acc,sampling": 0.17425,
+      "rouge2_acc_stderr,sampling": 0.01535559685713029,
+      "rouge2_diff,sampling": -2.3747171181818025,
+      "rouge2_diff_stderr,sampling": 0.7943384347705231,
+      "rougeL_max,sampling": 22.633735535558564,
+      "rougeL_max_stderr,sampling": 1.0647315675328686,
+      "rougeL_acc,sampling": 0.32575,
+      "rougeL_acc_stderr,sampling": 0.018700418315141784,
+      "rougeL_diff,sampling": -2.7266490849684195,
+      "rougeL_diff_stderr,sampling": 0.808867857844037
+    }
+  },
+  "group_subtasks": {
+    "nortruthfulqa_gen_nno_p4": [],
+    "nortruthfulqa_gen_nno_p3": [],
+    "nortruthfulqa_gen_nno_p2": [],
+    "nortruthfulqa_gen_nno_p1": [],
+    "nortruthfulqa_gen_nno_p0": []
+  },
+  "configs": {
+    "nortruthfulqa_gen_nno_p0": {
+      "task": "nortruthfulqa_gen_nno_p0",
+      "tag": "nortruthfulqa_gen_nno",
+      "dataset_path": "ltg/nortruthfulqa_gen",
+      "dataset_name": "nn",
+      "validation_split": "validation",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    return dataset.map(preprocess_function)\n",
+      "doc_to_text": "question",
+      "doc_to_target": "best_answer",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    # results[0] holds the K sampled generations; average their scores\n    scored = [_score_one(doc, completion) for completion in results[0]]\n    return {key: sum(s[key] for s in scored) / len(scored) for key in scored[0]}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x1549c29fbe20>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "question",
+        "doc_to_choice": null,
+        "doc_to_target": "best_answer",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": true,
+        "temperature": 1.0,
+        "top_p": 1.0,
+        "top_k": 0,
+        "max_new_tokens": 64
+      },
+      "repeats": 32,
+      "filter_list": [
+        {
+          "name": "sampling",
+          "filter": [
+            {
+              "function": "take_first_k",
+              "k": 32
+            }
+          ]
+        }
+      ],
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "rougeL_max",
+        "random_baseline": 0.0,
+        "category": "world_knowledge_and_reasoning",
+        "language": "nno",
+        "pretrained": "/pfs/lustrep3/scratch/project_465002530/cache/hub/models--openeurollm--prelude-checkpoints/snapshots/83f9fa1e800ae2309ae149db99a223e979231962",
+        "trust_remote_code": true
+      }
+    },
+    "nortruthfulqa_gen_nno_p1": {
+      "task": "nortruthfulqa_gen_nno_p1",
+      "tag": "nortruthfulqa_gen_nno",
+      "dataset_path": "ltg/nortruthfulqa_gen",
+      "dataset_name": "nn",
+      "validation_split": "validation",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    return dataset.map(preprocess_function)\n",
+      "doc_to_text": "Spørsmål: {{question}}\nSvar:",
+      "doc_to_target": "best_answer",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    # results[0] holds the K sampled generations; average their scores\n    scored = [_score_one(doc, completion) for completion in results[0]]\n    return {key: sum(s[key] for s in scored) / len(scored) for key in scored[0]}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x1549c29c2700>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Spørsmål: {{question}}\nSvar:",
+        "doc_to_choice": null,
+        "doc_to_target": "best_answer",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": true,
+        "temperature": 1.0,
+        "top_p": 1.0,
+        "top_k": 0,
+        "max_new_tokens": 64
+      },
+      "repeats": 32,
+      "filter_list": [
+        {
+          "name": "sampling",
+          "filter": [
+            {
+              "function": "take_first_k",
+              "k": 32
+            }
+          ]
+        }
+      ],
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "rougeL_max",
+        "random_baseline": 0.0,
+        "category": "world_knowledge_and_reasoning",
+        "language": "nno",
+        "pretrained": "/pfs/lustrep3/scratch/project_465002530/cache/hub/models--openeurollm--prelude-checkpoints/snapshots/83f9fa1e800ae2309ae149db99a223e979231962",
+        "trust_remote_code": true
+      }
+    },
+    "nortruthfulqa_gen_nno_p2": {
+      "task": "nortruthfulqa_gen_nno_p2",
+      "tag": "nortruthfulqa_gen_nno",
+      "dataset_path": "ltg/nortruthfulqa_gen",
+      "dataset_name": "nn",
+      "validation_split": "validation",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    return dataset.map(preprocess_function)\n",
+      "doc_to_text": "Skriv svaret på følgande spørsmål: {{question}}\nSvar:",
+      "doc_to_target": "best_answer",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    # results[0] holds the K sampled generations; average their scores\n    scored = [_score_one(doc, completion) for completion in results[0]]\n    return {key: sum(s[key] for s in scored) / len(scored) for key in scored[0]}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x1549c29c2d40>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Skriv svaret på følgande spørsmål: {{question}}\nSvar:",
+        "doc_to_choice": null,
+        "doc_to_target": "best_answer",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": true,
+        "temperature": 1.0,
+        "top_p": 1.0,
+        "top_k": 0,
+        "max_new_tokens": 64
+      },
+      "repeats": 32,
+      "filter_list": [
+        {
+          "name": "sampling",
+          "filter": [
+            {
+              "function": "take_first_k",
+              "k": 32
+            }
+          ]
+        }
+      ],
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "rougeL_max",
+        "random_baseline": 0.0,
+        "category": "world_knowledge_and_reasoning",
+        "language": "nno",
+        "pretrained": "/pfs/lustrep3/scratch/project_465002530/cache/hub/models--openeurollm--prelude-checkpoints/snapshots/83f9fa1e800ae2309ae149db99a223e979231962",
+        "trust_remote_code": true
+      }
+    },
+    "nortruthfulqa_gen_nno_p3": {
+      "task": "nortruthfulqa_gen_nno_p3",
+      "tag": "nortruthfulqa_gen_nno",
+      "dataset_path": "ltg/nortruthfulqa_gen",
+      "dataset_name": "nn",
+      "validation_split": "validation",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    return dataset.map(preprocess_function)\n",
+      "doc_to_text": "{{question}}\nKva er rett svar på spørsmålet?\nSvar:",
+      "doc_to_target": "best_answer",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    # results[0] holds the K sampled generations; average their scores\n    scored = [_score_one(doc, completion) for completion in results[0]]\n    return {key: sum(s[key] for s in scored) / len(scored) for key in scored[0]}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x1549c2b7fe20>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{question}}\nKva er rett svar på spørsmålet?\nSvar:",
+        "doc_to_choice": null,
+        "doc_to_target": "best_answer",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": true,
+        "temperature": 1.0,
+        "top_p": 1.0,
+        "top_k": 0,
+        "max_new_tokens": 64
+      },
+      "repeats": 32,
+      "filter_list": [
+        {
+          "name": "sampling",
+          "filter": [
+            {
+              "function": "take_first_k",
+              "k": 32
+            }
+          ]
+        }
+      ],
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "rougeL_max",
+        "random_baseline": 0.0,
+        "category": "world_knowledge_and_reasoning",
+        "language": "nno",
+        "pretrained": "/pfs/lustrep3/scratch/project_465002530/cache/hub/models--openeurollm--prelude-checkpoints/snapshots/83f9fa1e800ae2309ae149db99a223e979231962",
+        "trust_remote_code": true
+      }
+    },
+    "nortruthfulqa_gen_nno_p4": {
+      "task": "nortruthfulqa_gen_nno_p4",
+      "tag": "nortruthfulqa_gen_nno",
+      "dataset_path": "ltg/nortruthfulqa_gen",
+      "dataset_name": "nn",
+      "validation_split": "validation",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    return dataset.map(preprocess_function)\n",
+      "doc_to_text": "Svar sant på følgande: {{question}}\nSvar:",
+      "doc_to_target": "best_answer",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    # results[0] holds the K sampled generations; average their scores\n    scored = [_score_one(doc, completion) for completion in results[0]]\n    return {key: sum(s[key] for s in scored) / len(scored) for key in scored[0]}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x1549c2b209a0>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Svar sant på følgande: {{question}}\nSvar:",
+        "doc_to_choice": null,
+        "doc_to_target": "best_answer",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": true,
+        "temperature": 1.0,
+        "top_p": 1.0,
+        "top_k": 0,
+        "max_new_tokens": 64
+      },
+      "repeats": 32,
+      "filter_list": [
+        {
+          "name": "sampling",
+          "filter": [
+            {
+              "function": "take_first_k",
+              "k": 32
+            }
+          ]
+        }
+      ],
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "rougeL_max",
+        "random_baseline": 0.0,
+        "category": "world_knowledge_and_reasoning",
+        "language": "nno",
+        "pretrained": "/pfs/lustrep3/scratch/project_465002530/cache/hub/models--openeurollm--prelude-checkpoints/snapshots/83f9fa1e800ae2309ae149db99a223e979231962",
+        "trust_remote_code": true
+      }
+    }
+  },
+  "versions": {
+    "nortruthfulqa_gen_nno_p0": 1.2,
+    "nortruthfulqa_gen_nno_p1": 1.2,
+    "nortruthfulqa_gen_nno_p2": 1.2,
+    "nortruthfulqa_gen_nno_p3": 1.2,
+    "nortruthfulqa_gen_nno_p4": 1.2
+  },
+  "n-shot": {
+    "nortruthfulqa_gen_nno_p0": 5,
+    "nortruthfulqa_gen_nno_p1": 5,
+    "nortruthfulqa_gen_nno_p2": 5,
+    "nortruthfulqa_gen_nno_p3": 5,
+    "nortruthfulqa_gen_nno_p4": 5
+  },
+  "higher_is_better": {
+    "nortruthfulqa_gen_nno_p0": {
+      "rougeL_max": true,
+      "bleu_max": true,
+      "bleu_acc": true,
+      "bleu_diff": true,
+      "rouge1_max": true,
+      "rouge1_acc": true,
+      "rouge1_diff": true,
+      "rouge2_max": true,
+      "rouge2_acc": true,
+      "rouge2_diff": true,
+      "rougeL_acc": true,
+      "rougeL_diff": true
+    },
+    "nortruthfulqa_gen_nno_p1": {
+      "rougeL_max": true,
+      "bleu_max": true,
+      "bleu_acc": true,
+      "bleu_diff": true,
+      "rouge1_max": true,
+      "rouge1_acc": true,
+      "rouge1_diff": true,
+      "rouge2_max": true,
+      "rouge2_acc": true,
+      "rouge2_diff": true,
+      "rougeL_acc": true,
+      "rougeL_diff": true
+    },
+    "nortruthfulqa_gen_nno_p2": {
+      "rougeL_max": true,
+      "bleu_max": true,
+      "bleu_acc": true,
+      "bleu_diff": true,
+      "rouge1_max": true,
+      "rouge1_acc": true,
+      "rouge1_diff": true,
+      "rouge2_max": true,
+      "rouge2_acc": true,
+      "rouge2_diff": true,
+      "rougeL_acc": true,
+      "rougeL_diff": true
+    },
+    "nortruthfulqa_gen_nno_p3": {
+      "rougeL_max": true,
+      "bleu_max": true,
+      "bleu_acc": true,
+      "bleu_diff": true,
+      "rouge1_max": true,
+      "rouge1_acc": true,
+      "rouge1_diff": true,
+      "rouge2_max": true,
+      "rouge2_acc": true,
+      "rouge2_diff": true,
+      "rougeL_acc": true,
+      "rougeL_diff": true
+    },
+    "nortruthfulqa_gen_nno_p4": {
+      "rougeL_max": true,
+      "bleu_max": true,
+      "bleu_acc": true,
+      "bleu_diff": true,
+      "rouge1_max": true,
+      "rouge1_acc": true,
+      "rouge1_diff": true,
+      "rouge2_max": true,
+      "rouge2_acc": true,
+      "rouge2_diff": true,
+      "rougeL_acc": true,
+      "rougeL_diff": true
+    }
+  },
+  "n-samples": {
+    "nortruthfulqa_gen_nno_p0": {
+      "original": 125,
+      "effective": 125
+    },
+    "nortruthfulqa_gen_nno_p1": {
+      "original": 125,
+      "effective": 125
+    },
+    "nortruthfulqa_gen_nno_p2": {
+      "original": 125,
+      "effective": 125
+    },
+    "nortruthfulqa_gen_nno_p3": {
+      "original": 125,
+      "effective": 125
+    },
+    "nortruthfulqa_gen_nno_p4": {
+      "original": 125,
+      "effective": 125
+    }
+  },
+  "config": {
+    "model": "hf",
+    "model_args": {
+      "pretrained": "/pfs/lustrep3/scratch/project_465002530/cache/hub/models--openeurollm--prelude-checkpoints/snapshots/83f9fa1e800ae2309ae149db99a223e979231962",
+      "trust_remote_code": true
+    },
+    "model_num_parameters": 9094607872,
+    "model_dtype": "torch.bfloat16",
+    "model_revision": "main",
+    "model_sha": "",
+    "batch_size": "auto",
+    "batch_sizes": [],
+    "device": "cuda:0",
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {},
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": null,
+  "date": 1787775962.8708634,
+  "pretty_env_info": "PyTorch version: 2.7.1+rocm6.4.1.git2a215e4a\nIs debug build: False\nCUDA used to build PyTorch: N/A\nROCM used to build PyTorch: 6.4.43483-a187df25c\n\nOS: Ubuntu 24.04.2 LTS (x86_64)\nGCC version: (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0\nClang version: 19.0.0git (https://github.com/RadeonOpenCompute/llvm-project roc-6.4.0 25133 c7fe45cf4b819c5991fe208aaa96edf142730f1d)\nCMake version: version 3.18.5\nLibc version: glibc-2.39\n\nPython version: 3.12.10 | packaged by conda-forge | (main, Apr 10 2025, 22:21:13) [GCC 13.3.0] (64-bit runtime)\nPython platform: Linux-6.4.0-150600.23.73_15.0.14-cray_shasta_c-x86_64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: Could not collect\nCUDA_MODULE_LOADING set to: LAZY\nGPU models and configuration: AMD Instinct MI250X (gfx90a:sramecc+:xnack-)\nNvidia driver version: Could not collect\ncuDNN version: Could not collect\nHIP runtime version: 6.4.43483\nMIOpen runtime version: 3.4.0\nIs XNNPACK available: True\n\nCPU:\nArchitecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  128\nOn-line CPU(s) list:                     0-127\nVendor ID:                               AuthenticAMD\nModel name:                              AMD EPYC 7A53 64-Core Processor\nCPU family:                              25\nModel:                                   48\nThread(s) per core:                      2\nCore(s) per socket:                      64\nSocket(s):                               1\nStepping:                                1\nFrequency boost:                         enabled\nCPU(s) scaling MHz:                      56%\nCPU max MHz:                             3541.0149\nCPU min MHz:                             1500.0000\nBogoMIPS:                                3992.33\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local user_shstk clzero irperf xsaveerptr rdpru wbnoinvd amd_ppin arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold avic v_vmsave_vmload vgif v_spec_ctrl umip pku ospke vaes vpclmulqdq rdpid overflow_recov succor smca fsrm ibpb_exit_to_user\nVirtualization:                          AMD-V\nL1d cache:                               2 MiB (64 instances)\nL1i cache:                               2 MiB (64 instances)\nL2 cache:                                32 MiB (64 instances)\nL3 cache:                                256 MiB (8 instances)\nNUMA node(s):                            4\nNUMA node0 CPU(s):                       0-15,64-79\nNUMA node1 CPU(s):                       16-31,80-95\nNUMA node2 CPU(s):                       32-47,96-111\nNUMA node3 CPU(s):                       48-63,112-127\nVulnerability Gather data sampling:      Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Mitigation; Safe RET\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Retpolines; IBPB conditional; IBRS_FW; STIBP always-on; RSB filling; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Vulnerable: No microcode\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB before exit to userspace\n\nVersions of relevant libraries:\n[pip3] mypy==1.14.0\n[pip3] mypy_extensions==1.1.0\n[pip3] numpy==1.26.2\n[pip3] onnx==1.17.0\n[pip3] onnxscript==0.2.2\n[pip3] optree==0.13.0\n[pip3] pytorch-triton-rocm==3.3.1+rocm6.4.1.git40e90a0a\n[pip3] torch==2.7.1+rocm6.4.1.git2a215e4a\n[pip3] torchaudio==2.7.1+rocm6.4.1.git95c61b41\n[pip3] torchcodec==0.4.0\n[pip3] torchvision==0.22.1+rocm6.4.1.git59a3e1f9\n[conda] No relevant packages",
+  "transformers_version": "5.2.0",
+  "lm_eval_version": "0.4.11",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<pad>",
+    "262144"
+  ],
+  "tokenizer_eos_token": [
+    "<eos>",
+    "2"
+  ],
+  "tokenizer_bos_token": [
+    "<bos>",
+    "1"
+  ],
+  "eot_token_id": 2,
+  "max_length": 4096,
+  "task_hashes": {
+    "nortruthfulqa_gen_nno_p0": "2127134557710150206eebd769ea0caa45ac2210a520abf319d395666403e692",
+    "nortruthfulqa_gen_nno_p1": "c65210424c68d6ba44d6e6b7ca71304c266bbfacc6903aff8803c5ba2f95fa0f",
+    "nortruthfulqa_gen_nno_p2": "a0e210742525f0ce34473f85763a639af98c8e41e4ff38d5da3dbbc44b1034e3",
+    "nortruthfulqa_gen_nno_p3": "7c30cc33b363c45a237d08b4f22aed5714e44c92e079ac7728ede53f4a9337c9",
+    "nortruthfulqa_gen_nno_p4": "6398ffa35ec465856631fa4c66b0ce435f4d9336438b777b0b2cfe078d5ed102"
+  },
+  "model_source": "hf",
+  "model_name": "/pfs/lustrep3/scratch/project_465002530/cache/hub/models--openeurollm--prelude-checkpoints/snapshots/83f9fa1e800ae2309ae149db99a223e979231962",
+  "model_name_sanitized": "__pfs__lustrep3__scratch__project_465002530__cache__hub__models--openeurollm--prelude-checkpoints__snapshots__83f9fa1e800ae2309ae149db99a223e979231962",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": null,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "total_evaluation_time_seconds": "18795.404634353006"
+}

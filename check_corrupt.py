@@ -19,6 +19,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROGRESS_DIR = os.path.join(BASE_DIR, "data", "norolmo", "progress")
 RESULTS_DIR = os.path.join(BASE_DIR, "data", "noreval", "results")
 INSTRUCT_DIR = os.path.join(BASE_DIR, "data", "noreval-gen", "results")
+PRELUDE_DIR = os.path.join(BASE_DIR, "data", "prelude", "progress")
 
 
 def check_results_file(filepath):
@@ -72,7 +73,12 @@ def parse_ablation_info(rel_path):
 def main():
     found_issues = False
 
-    for label, directory in [("data/norolmo/progress", PROGRESS_DIR), ("data/noreval/results", RESULTS_DIR), ("data/noreval-gen/results", INSTRUCT_DIR)]:
+    for label, directory in [
+        ("data/norolmo/progress", PROGRESS_DIR),
+        ("data/noreval/results", RESULTS_DIR),
+        ("data/noreval-gen/results", INSTRUCT_DIR),
+        ("data/prelude/progress", PRELUDE_DIR),
+    ]:
         if not os.path.isdir(directory):
             continue
 

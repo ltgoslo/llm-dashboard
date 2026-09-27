@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the four data.json files served by the dashboards.
+"""Build the five data.json files served by the dashboards.
 
 Reads benchmark/model configs from YAML files at the repo root and result
 JSONs from data/<dashboard>/{results,progress}/, and writes one consolidated
@@ -10,12 +10,17 @@ Outputs:
     docs/noreval-gen/data.json    — instruction-tuned NorEval comparison
     docs/norolmo/data.json        — NorOLMo progression + ablations
     docs/multisynt/data.json      — multilingual progression
+    docs/prelude/data.json        — OpenEuroLLM Prelude progression (NorEval 1.2)
 
 NorEval-side code (noreval, noreval-gen, norolmo) shares prompt-aggregation
 and metric-extraction logic in `noreval_lib`. MultiSynt is in its own block
 because its directory layout and aggregator quirks are non-trivially
 different (per-partition scores via p0/p1/p2 dirs, MultiBLiMP custom
 aggregation, multiple shot dirs combined into one model, etc.).
+The Prelude dashboard reads NorEval-1.2 results — flat
+`<task>[_<formulation>]_p<N>` result keys — and reuses the MultiSynt
+formulation-aware extraction/reduction helpers on a NorOLMo-shaped
+(single trajectory, per-step) data.json.
 """
 
 import glob
@@ -37,17 +42,20 @@ MODELS_SETUP_YAML = BASE_DIR / "models_setup.yaml"
 INSTRUCT_MODELS_SETUP_YAML = BASE_DIR / "models_instruct_setup.yaml"
 MULTISYNT_TASKS_YAML = BASE_DIR / "multisynt_tasks.yaml"
 MULTISYNT_MODELS_YAML = BASE_DIR / "multisynt_models.yaml"
+NOREVAL12_SETUP_YAML = BASE_DIR / "noreval12_setup.yaml"
 
 NOREVAL_RESULTS = BASE_DIR / "data" / "noreval" / "results"
 NOREVAL_GEN_RESULTS = BASE_DIR / "data" / "noreval-gen" / "results"
 NOROLMO_PROGRESS = BASE_DIR / "data" / "norolmo" / "progress"
 MULTISYNT_RESULTS = BASE_DIR / "data" / "multisynt" / "results"
+PRELUDE_PROGRESS = BASE_DIR / "data" / "prelude" / "progress"
 
 # Output paths
 NOREVAL_OUT = BASE_DIR / "docs" / "noreval" / "data.json"
 NOREVAL_GEN_OUT = BASE_DIR / "docs" / "noreval-gen" / "data.json"
 NOROLMO_OUT = BASE_DIR / "docs" / "norolmo" / "data.json"
 MULTISYNT_OUT = BASE_DIR / "docs" / "multisynt" / "data.json"
+PRELUDE_OUT = BASE_DIR / "docs" / "prelude" / "data.json"
 
 SHOT_SETTINGS = ["0", "1", "5"]
 SHOT_DIRS = {"0": "0-shot", "1": "1-shot", "5": "5-shot"}
@@ -66,6 +74,14 @@ EXCLUDED_METRICS_PER_BENCHMARK = {
 
 # NorOLMo training: 8M tokens per step (8192 × 1024).
 NOROLMO_TOKENS_PER_STEP = 8192 * 1024
+
+# OpenEuroLLM Prelude training: 2048 sequences × 4096 tokens per iteration.
+PRELUDE_TOKENS_PER_STEP = 2048 * 4096
+
+# Display names for Prelude side runs (checkpoint dirs `<run>_iter_<N>`).
+PRELUDE_RUN_NAME_MAP = {
+    "anneal300b": "300B-token anneal",
+}
 
 # NorOLMo ablation display names and colors.
 ABLATION_NAME_MAP = {
@@ -666,6 +682,29 @@ def build_norolmo_data(metrics_setup):
 # ─────────────────────────────────────────────────────────────
 
 
+def extract_task_metrics(task_results, n_samples, bench_exclusions, metric_scale):
+    """{metric: (value, se, n)} for one lm-eval task entry.
+
+    Accepts any `<metric>,<suffix>` key (`,none`, `,sampling`, …), skipping
+    the alias, stderr entries, excluded and non-finite metrics. The SE comes
+    from resolve_se() (Wilson for proportions, else the harness bootstrap).
+    """
+    metrics = {}
+    for key, val in task_results.items():
+        if key == "alias" or "," not in key or "_stderr," in key:
+            continue
+        metric_name, metric_suffix = key.rsplit(",", 1)
+        if metric_name in bench_exclusions:
+            continue
+        if isinstance(val, (int, float)) and math.isfinite(val):
+            harness_se = task_results.get(f"{metric_name}_stderr,{metric_suffix}")
+            if not (isinstance(harness_se, (int, float)) and math.isfinite(harness_se)):
+                harness_se = None
+            se = resolve_se(metric_name, val, harness_se, n_samples, metric_scale)
+            metrics[metric_name] = (val, se, n_samples)
+    return metrics
+
+
 def multisynt_extract(results_json_path, benchmark_name, task_config_entry, match_name=None):
     """Read one MultiSynt partition's results JSON.
 
@@ -695,19 +734,10 @@ def multisynt_extract(results_json_path, benchmark_name, task_config_entry, matc
     for task_key, task_results in results.items():
         if not (task_key == match_name or task_key.startswith(f"{match_name}_p")):
             continue
-        n_samples = get_n_samples(n_samples_dict, task_key)
-        for key, val in task_results.items():
-            if key == "alias" or "," not in key or "_stderr," in key:
-                continue
-            metric_name, metric_suffix = key.rsplit(",", 1)
-            if metric_name in bench_exclusions:
-                continue
-            if isinstance(val, (int, float)) and math.isfinite(val):
-                harness_se = task_results.get(f"{metric_name}_stderr,{metric_suffix}")
-                if not (isinstance(harness_se, (int, float)) and math.isfinite(harness_se)):
-                    harness_se = None
-                se = resolve_se(metric_name, val, harness_se, n_samples, metric_scale)
-                metrics[metric_name] = (val, se, n_samples)
+        metrics.update(extract_task_metrics(
+            task_results, get_n_samples(n_samples_dict, task_key),
+            bench_exclusions, metric_scale,
+        ))
 
     return metrics if metrics else None
 
@@ -717,29 +747,17 @@ def multisynt_extract(results_json_path, benchmark_name, task_config_entry, matc
 MULTIBLIMP_AGG_METRICS = ("acc", "acc_norm", "acc_mutual_info")
 
 
-def multisynt_process_multiblimp(sub_entries, bench_exclusions):
-    """Aggregate multiblimp per-phenomenon results into micro-averaged scores.
+def micro_average_multiblimp(entries, bench_exclusions):
+    """Micro-average per-phenomenon multiblimp results.
 
-    `sub_entries` holds (subdir_path, results_key) pairs, one per phenomenon,
-    each keyed by the lm-eval task name inside its results JSON. Accuracy-family
-    metrics are micro-averaged weighted by sample count to mimic how
-    noreval_multiblimp is reported in noreval-stats.
+    `entries` holds (task_results, n_samples) pairs, one per phenomenon.
+    Each accuracy-family metric is averaged weighted by sample count (as
+    noreval_multiblimp is reported in noreval-stats) and gets a Wilson SE.
+    Returns {metric: (micro, se, total_n)} or None.
     """
     totals = {}
-    for sub_path, key in sub_entries:
-        results_file = find_latest_results_json(sub_path)
-        if results_file is None:
-            continue
-        with open(results_file) as f:
-            data = json.load(f)
-        task_results = data.get("results", {}).get(key)
-        if not task_results:
-            continue
-        n = (
-            data.get("n-samples", {}).get(key, {}).get("effective")
-            or data.get("n-samples", {}).get(key, {}).get("original")
-        )
-        if not n:
+    for task_results, n in entries:
+        if not task_results or not n:
             continue
         for metric in MULTIBLIMP_AGG_METRICS:
             if metric in bench_exclusions:
@@ -757,6 +775,27 @@ def multisynt_process_multiblimp(sub_entries, bench_exclusions):
         se = wilson_se(micro, total_n, "unit") or 0.0
         out[metric] = (micro, se, total_n)
     return out or None
+
+
+def multisynt_process_multiblimp(sub_entries, bench_exclusions):
+    """Aggregate multiblimp per-phenomenon result dirs into micro-averaged scores.
+
+    `sub_entries` holds (subdir_path, results_key) pairs, one per phenomenon,
+    each keyed by the lm-eval task name inside its results JSON.
+    """
+    entries = []
+    for sub_path, key in sub_entries:
+        results_file = find_latest_results_json(sub_path)
+        if results_file is None:
+            continue
+        with open(results_file) as f:
+            data = json.load(f)
+        entries.append((
+            data.get("results", {}).get(key),
+            data.get("n-samples", {}).get(key, {}).get("effective")
+            or data.get("n-samples", {}).get(key, {}).get("original"),
+        ))
+    return micro_average_multiblimp(entries, bench_exclusions)
 
 
 # Prompt-formulation subdirs (Norwegian v2 layout): each holds its own p<N>
@@ -806,6 +845,35 @@ def multisynt_partition_dirs(path):
         for d in os.listdir(path)
         if os.path.isdir(os.path.join(path, d)) and d.startswith("p") and d[1:].isdigit()
     )
+
+
+def reduce_prompt_variants(partition_results, scale):
+    """Reduce (form_label, {metric: (val, se, n)}) pairs — one per prompt
+    variant — to {metric: prompt-aggregation dict}. With ≥2 formulation
+    labels, each formulation is additionally aggregated on its own under the
+    entry's `by_form` so the dashboards' formulation selector can show it in
+    isolation."""
+    def collect(results):
+        metric_values = {}
+        for pmetrics in results:
+            for metric_name, tup in pmetrics.items():
+                metric_values.setdefault(metric_name, []).append(tup)
+        return metric_values
+
+    agg = aggregate_prompt_variants(collect([m for _, m in partition_results]), scale)
+    if agg is None:
+        return None
+
+    labels = {form for form, _ in partition_results if form}
+    if len(labels) >= 2:
+        for form in (f for f in MULTISYNT_FORMULATIONS if f in labels):
+            sub = aggregate_prompt_variants(
+                collect([m for f, m in partition_results if f == form]), scale
+            )
+            for metric_name, entry in (sub or {}).items():
+                if metric_name in agg:
+                    agg[metric_name].setdefault("by_form", {})[form] = entry
+    return agg
 
 
 def multisynt_process_checkpoint(ckpt_path, task_configs, shot):
@@ -886,32 +954,9 @@ def multisynt_process_checkpoint(ckpt_path, task_configs, shot):
         if not partition_results:
             continue
 
-        # Reduce the (form_label, {metric: (val, se, n)}) pairs to
-        # {metric: prompt-agg dict}.
-        def collect(results):
-            metric_values = {}
-            for pmetrics in results:
-                for metric_name, tup in pmetrics.items():
-                    metric_values.setdefault(metric_name, []).append(tup)
-            return metric_values
-
-        scale = config.get("metric_scale", "unit")
-        agg = aggregate_prompt_variants(collect([m for _, m in partition_results]), scale)
+        agg = reduce_prompt_variants(partition_results, config.get("metric_scale", "unit"))
         if agg is None:
             continue
-
-        # With ≥2 formulations, additionally aggregate each one on its own so
-        # the dashboard's formulation selector can show it in isolation.
-        labels = {form for form, _ in partition_results if form}
-        if len(labels) >= 2:
-            for form in (f for f in MULTISYNT_FORMULATIONS if f in labels):
-                sub = aggregate_prompt_variants(
-                    collect([m for f, m in partition_results if f == form]), scale
-                )
-                for metric_name, entry in (sub or {}).items():
-                    if metric_name in agg:
-                        agg[metric_name].setdefault("by_form", {})[form] = entry
-
         scores[benchmark] = {shot: agg}
     return scores
 
@@ -1108,6 +1153,200 @@ def build_multisynt_data():
 
 
 # ─────────────────────────────────────────────────────────────
+# OpenEuroLLM Prelude progression dashboard (NorEval 1.2)
+# ─────────────────────────────────────────────────────────────
+
+# Checkpoint dirs are named after the Hugging Face branches of
+# openeurollm/prelude: `iter_0002400` on the main line, or `<run>_iter_<N>`
+# for a side run (e.g. `anneal300b_iter_0955200`).
+PRELUDE_CKPT_RE = re.compile(r"^(?:(?P<run>.+?)_)?iter_(?P<step>\d+)$")
+
+# Tail of a NorEval-1.2 result key after the task name: nothing, `_p<N>`, or
+# `_<formulation>_p<N>`.
+NOREVAL12_VARIANT_SUFFIX = r"(?:_(%s))?(?:_p\d+)?" % "|".join(MULTISYNT_FORMULATIONS)
+
+
+def noreval12_load_task_dir(task_dir):
+    """Merge every results JSON under one task dir into a single
+    {"results", "n-samples", "n-shot"} dict. A task's prompt variants may
+    have been evaluated in separate lm-eval runs (one file each), so the
+    files complement each other; on a duplicated key the newest file, by
+    name, wins."""
+    merged = {"results": {}, "n-samples": {}, "n-shot": {}}
+    files = sorted(
+        glob.glob(os.path.join(task_dir, "**", "results_*.json"), recursive=True),
+        key=os.path.basename,
+    )
+    for path in files:
+        try:
+            with open(path) as f:
+                data = json.load(f)
+        except json.JSONDecodeError:
+            print(f"  WARNING: corrupt JSON, skipping: {path}")
+            continue
+        for section in merged:
+            merged[section].update(data.get(section) or {})
+    return merged
+
+
+def noreval12_extract_task(merged, benchmark, config):
+    """Prompt-aggregated metrics of one NorEval-1.2 task, per shot setting.
+
+    Regular tasks pool every `<task>[_<form>][_p<N>]` entry as prompt
+    variants, labelled by formulation so reduce_prompt_variants() also builds
+    the per-formulation `by_form` sub-aggregates. `aggregator: multiblimp`
+    tasks are instead micro-averaged over their `<task>_<phenomenon>`
+    entries, and each configured phenomenon subtask is additionally exposed
+    as a `<metric>: <pretty>` metric for the accuracy families.
+    Returns {shot: {metric: entry}}.
+    """
+    results = merged["results"]
+    n_samples_dict = merged["n-samples"]
+    n_shot = merged["n-shot"]
+    bench_exclusions = EXCLUDED_METRICS | EXCLUDED_METRICS_PER_BENCHMARK.get(
+        benchmark, set()
+    )
+    scale = config.get("metric_scale", "unit")
+    by_shot = {}  # shot -> [(form_label, {metric: (value, se, n)}), ...]
+
+    def shot_of(key):
+        return str(n_shot.get(key, 5))
+
+    if config.get("aggregator") == "multiblimp":
+        sub_keys = sorted(k for k in results if k.startswith(f"{benchmark}_"))
+        if not sub_keys:
+            return {}
+        agg = micro_average_multiblimp(
+            [(results[k], get_n_samples(n_samples_dict, k)) for k in sub_keys],
+            bench_exclusions,
+        )
+        if agg:
+            by_shot.setdefault(shot_of(sub_keys[0]), []).append((None, agg))
+        for code, subtask in (config.get("subtasks") or {}).items():
+            key = f"{benchmark}_{code}"
+            if key not in results:
+                continue
+            sub = extract_task_metrics(
+                results[key], get_n_samples(n_samples_dict, key), bench_exclusions, scale
+            )
+            sub = {
+                f"{m}: {subtask['pretty_name']}": t
+                for m, t in sub.items() if m in MULTIBLIMP_AGG_METRICS
+            }
+            if sub:
+                by_shot.setdefault(shot_of(key), []).append((None, sub))
+    else:
+        pattern = re.compile(re.escape(benchmark) + NOREVAL12_VARIANT_SUFFIX)
+        for key in sorted(results):
+            m = pattern.fullmatch(key)
+            if not m:
+                continue
+            metrics = extract_task_metrics(
+                results[key], get_n_samples(n_samples_dict, key), bench_exclusions, scale
+            )
+            if metrics:
+                by_shot.setdefault(shot_of(key), []).append((m.group(1), metrics))
+
+    out = {}
+    for shot, partition_results in by_shot.items():
+        agg = reduce_prompt_variants(partition_results, scale)
+        if agg:
+            out[shot] = agg
+    return out
+
+
+def build_noreval12_lang_lists(setup):
+    """Language-membership lists for NorEval-1.2 task names, whose language
+    codes are `_`-separated name parts: `translation_nob_nno` (both
+    Norwegian varieties), `slide_nob_nno_swe_dan` (shared by all),
+    `multiblimp_ltg_sme` (Northern Sámi). Same four lists the NorEval
+    dashboards' language aggregates read (see selection.js)."""
+    def parts(b):
+        return set(b.split("_"))
+
+    shared = sorted(b for b in setup if b.startswith("slide"))
+    nob_nno = sorted(
+        b for b in setup
+        if b.startswith("translation_") and {"nob", "nno"} <= parts(b)
+    )
+    sme = sorted(b for b in setup if "sme" in parts(b))
+    nno = sorted(
+        b for b in setup
+        if "nno" in parts(b) and b not in shared and b not in nob_nno and b not in sme
+    )
+    return nno, sme, nob_nno, shared
+
+
+def build_prelude_data(setup):
+    """Walk data/prelude/progress/ and build the prelude data.json."""
+    progress = {}
+    runs = {}
+    discovered = {}
+    discovered_forms = {}
+    shots = set()
+
+    if PRELUDE_PROGRESS.is_dir():
+        for ckpt_dir in sorted(os.listdir(PRELUDE_PROGRESS)):
+            ckpt_path = PRELUDE_PROGRESS / ckpt_dir
+            if not ckpt_path.is_dir() or ckpt_dir.startswith("."):
+                continue
+            m = PRELUDE_CKPT_RE.match(ckpt_dir)
+            if not m:
+                print(f"  WARNING: cannot parse checkpoint dir '{ckpt_dir}', skipping")
+                continue
+            step, run = int(m.group("step")), m.group("run")
+            print(f"  {'Checkpoint' if run is None else 'Run ' + run}: iteration {step}")
+            scores = {}
+            for task in sorted(os.listdir(ckpt_path)):
+                task_path = ckpt_path / task
+                if not task_path.is_dir() or task.startswith("."):
+                    continue
+                config = setup.get(task)
+                if config is None:
+                    print(f"  WARNING: no config for task '{task}', skipping")
+                    continue
+                per_shot = noreval12_extract_task(
+                    noreval12_load_task_dir(str(task_path)), task, config
+                )
+                if not per_shot:
+                    continue
+                scores[task] = per_shot
+                for shot, agg in per_shot.items():
+                    shots.add(shot)
+                    discovered.setdefault(task, set()).update(agg.keys())
+                    for entry in agg.values():
+                        discovered_forms.setdefault(task, set()).update(
+                            entry.get("by_form", ())
+                        )
+            if scores:
+                (progress if run is None else runs.setdefault(run, {}))[step] = scores
+
+    # Only tasks with results make it into the dashboard.
+    present = {b: cfg for b, cfg in setup.items() if b in discovered}
+    metrics_info = build_noreval_metrics_info(present, discovered)
+    for task, forms in discovered_forms.items():
+        if forms:
+            metrics_info[task]["formulations"] = [
+                f for f in MULTISYNT_FORMULATIONS if f in forms
+            ]
+    nno, sme, nob_nno, shared = build_noreval12_lang_lists(present)
+
+    return {
+        "metrics_setup": metrics_info,
+        "nno_benchmarks": nno,
+        "sme_benchmarks": sme,
+        "nob_nno_translation_benchmarks": nob_nno,
+        "shared_language_benchmarks": shared,
+        "shots": sorted(shots, key=int),
+        "tokens_per_step": PRELUDE_TOKENS_PER_STEP,
+        "progress": progress,
+        "runs": runs,
+        "run_display_names": {
+            r: PRELUDE_RUN_NAME_MAP.get(r, r.replace("_", " ")) for r in runs
+        },
+    }
+
+# ─────────────────────────────────────────────────────────────
 # Driver
 # ─────────────────────────────────────────────────────────────
 
@@ -1148,6 +1387,13 @@ def main():
     write_data(MULTISYNT_OUT, multisynt)
     for lang, ld in multisynt["languages"].items():
         print(f"  {lang}: {len(ld['models'])} models, {len(ld['metrics_setup'])} tasks")
+
+    print("\n=== Building docs/prelude/data.json (OpenEuroLLM Prelude, NorEval 1.2) ===")
+    prelude = build_prelude_data(load_yaml(NOREVAL12_SETUP_YAML))
+    write_data(PRELUDE_OUT, prelude)
+    print(f"  Checkpoints: {len(prelude['progress'])}, tasks: {len(prelude['metrics_setup'])}")
+    if prelude["runs"]:
+        print(f"  Side runs: {list(prelude['runs'])}")
 
     print("\nDone.")
 
