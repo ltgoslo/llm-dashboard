@@ -24,6 +24,7 @@ formulation-aware extraction/reduction helpers on a NorOLMo-shaped
 """
 
 import glob
+import hashlib
 import json
 import math
 import os
@@ -71,6 +72,16 @@ EXCLUDED_METRICS_PER_BENCHMARK = {
     "ask_gec": {"exact_match"},
     "noreval_multiblimp": {"acc_norm"},
 }
+
+# A MultiSynt language may carry a sibling `<Lang>_greedy` results tree with
+# greedy-decoding runs of its generative tasks (old-layout dirs named by the
+# task's `greedy_path`). They are attached to the sampling-decoding entries as
+# `by_decoding.greedy` sub-aggregates — the dashboards' "Decoding" selector —
+# and never form a language tab of their own.
+MULTISYNT_DECODING_SUFFIX = "_greedy"
+# Metric names that differ between the greedy (pre-NorEval-1.2) files and the
+# sampling ones; the greedy side is renamed to the sampling side's name.
+GREEDY_METRIC_ALIASES = {"errant": "errant_f05"}
 
 # NorOLMo training: 8M tokens per step (8192 × 1024).
 NOROLMO_TOKENS_PER_STEP = 8192 * 1024
@@ -320,13 +331,25 @@ def welch_mean_ci(triples, scale, is_proportion):
     return mean_v - half, mean_v + half
 
 
-def aggregate_prompt_variants(metric_values, metric_scale="unit"):
+def single_prompt_index(task_name):
+    """Stable pseudo-random prompt pick for a task: the dashboards' "single
+    prompt" aggregation shows one prompt chosen at random per task, and that
+    pick must stay the same across checkpoints and models (otherwise the
+    trajectory would be noise). Taken modulo the prompt count by the
+    caller, so the same task draws the same ordinal in every variant list."""
+    return int(hashlib.md5(task_name.encode("utf-8")).hexdigest()[:8], 16)
+
+
+def aggregate_prompt_variants(metric_values, metric_scale="unit", single_pick=None):
     """Reduce per-prompt (value, stderr, n) triples to a prompt-aggregation dict.
 
     Returns {metric_name: entry} where each entry has:
       max / mean / median / min / first        ← point estimates
       <agg>_ci_lo / <agg>_ci_hi                ← 95% asymmetric CIs
       max_prompt_idx, n_prompts, prompt_sd, prompt_mad
+    With `single_pick` (an integer, see single_prompt_index) the entry also
+    carries `single` — the score of prompt `single_pick mod n_prompts` —
+    plus its sampling CI and `single_prompt_idx`.
     """
     if not metric_values:
         return None
@@ -372,6 +395,13 @@ def aggregate_prompt_variants(metric_values, metric_scale="unit"):
         v_f, se_f, n_f = triples[0]
         lo, hi = sampling_ci(v_f, se_f, n_f, metric_scale, is_proportion)
         entry["first_ci_lo"], entry["first_ci_hi"] = round(lo, 6), round(hi, 6)
+        if single_pick is not None:
+            idx = single_pick % len(values)
+            v_s, se_s, n_s = triples[idx]
+            lo, hi = sampling_ci(v_s, se_s, n_s, metric_scale, is_proportion)
+            entry["single"] = round(v_s, 6)
+            entry["single_ci_lo"], entry["single_ci_hi"] = round(lo, 6), round(hi, 6)
+            entry["single_prompt_idx"] = idx
 
         entry["n_prompts"] = len(values)
         if len(values) >= 2:
@@ -522,6 +552,17 @@ def build_noreval_metrics_info(metrics_setup, discovered_metrics):
             "url": config.get("url", ""),
             "available_metrics": available,
         }
+        # Optional soft counterpart of the main metric (see the multisynt
+        # builder for the semantics); only NorEval 1.2 configs declare one.
+        soft_metric = config.get("soft_metric")
+        if soft_metric:
+            if soft_metric in disc:
+                entry["soft_metric"] = soft_metric
+                if "soft_random_baseline" in config:
+                    entry["soft_random_baseline"] = config["soft_random_baseline"]
+            else:
+                print(f"  WARNING: soft metric '{soft_metric}' of '{benchmark}' "
+                      "not found in results, ignoring")
         if config.get("subtasks"):
             entry["subtasks"] = {
                 code: {
@@ -847,12 +888,13 @@ def multisynt_partition_dirs(path):
     )
 
 
-def reduce_prompt_variants(partition_results, scale):
+def reduce_prompt_variants(partition_results, scale, single_pick=None):
     """Reduce (form_label, {metric: (val, se, n)}) pairs — one per prompt
     variant — to {metric: prompt-aggregation dict}. With ≥2 formulation
     labels, each formulation is additionally aggregated on its own under the
     entry's `by_form` so the dashboards' formulation selector can show it in
-    isolation."""
+    isolation. `single_pick` (see single_prompt_index) adds the `single`
+    aggregate to the pooled and the per-formulation entries alike."""
     def collect(results):
         metric_values = {}
         for pmetrics in results:
@@ -860,7 +902,9 @@ def reduce_prompt_variants(partition_results, scale):
                 metric_values.setdefault(metric_name, []).append(tup)
         return metric_values
 
-    agg = aggregate_prompt_variants(collect([m for _, m in partition_results]), scale)
+    agg = aggregate_prompt_variants(
+        collect([m for _, m in partition_results]), scale, single_pick
+    )
     if agg is None:
         return None
 
@@ -868,7 +912,8 @@ def reduce_prompt_variants(partition_results, scale):
     if len(labels) >= 2:
         for form in (f for f in MULTISYNT_FORMULATIONS if f in labels):
             sub = aggregate_prompt_variants(
-                collect([m for f, m in partition_results if f == form]), scale
+                collect([m for f, m in partition_results if f == form]), scale,
+                single_pick,
             )
             for metric_name, entry in (sub or {}).items():
                 if metric_name in agg:
@@ -876,8 +921,36 @@ def reduce_prompt_variants(partition_results, scale):
     return agg
 
 
-def multisynt_process_checkpoint(ckpt_path, task_configs, shot):
-    """Process one checkpoint directory. Returns {bench: {shot: {metric: {…}}}}."""
+def multisynt_greedy_partitions(greedy_ckpt_path, benchmark, config):
+    """(None, {metric: (val, se, n)}) per prompt of the task's greedy-decoding
+    run under the sibling `<Lang>_greedy` checkpoint dir (old nested layout:
+    `<greedy_path>/p<N>/` subdirs, or a bare dir for a single prompt).
+    Greedy-only metric names are mapped through GREEDY_METRIC_ALIASES."""
+    if greedy_ckpt_path is None or not config.get("greedy_path"):
+        return []
+    src_dir = os.path.join(greedy_ckpt_path, config["greedy_path"])
+    if not os.path.isdir(src_dir):
+        return []
+    match_name = os.path.basename(config["greedy_path"])
+    out = []
+    for path in multisynt_partition_dirs(src_dir) or [src_dir]:
+        results_file = find_latest_results_json(path)
+        if results_file is None:
+            continue
+        # Result keys carry either the old dir name (`tatoeba_eng_nob_p0`)
+        # or, for runs redone under the 1.2 config, the current task name.
+        metrics = (multisynt_extract(results_file, benchmark, config, match_name)
+                   or multisynt_extract(results_file, benchmark, config, benchmark))
+        if metrics:
+            out.append((None, {GREEDY_METRIC_ALIASES.get(m, m): t for m, t in metrics.items()}))
+    return out
+
+
+def multisynt_process_checkpoint(ckpt_path, task_configs, shot, greedy_ckpt_path=None):
+    """Process one checkpoint directory. Returns {bench: {shot: {metric: {…}}}}.
+    With `greedy_ckpt_path` (the same checkpoint in the language's sibling
+    greedy-decoding tree), each metric entry of a task that has a greedy run
+    also carries it under `by_decoding.greedy`."""
     scores = {}
     for benchmark, config in task_configs.items():
         partition_results = []
@@ -954,9 +1027,22 @@ def multisynt_process_checkpoint(ckpt_path, task_configs, shot):
         if not partition_results:
             continue
 
-        agg = reduce_prompt_variants(partition_results, config.get("metric_scale", "unit"))
+        agg = reduce_prompt_variants(
+            partition_results, config.get("metric_scale", "unit"),
+            single_pick=single_prompt_index(benchmark),
+        )
         if agg is None:
             continue
+        greedy = reduce_prompt_variants(
+            multisynt_greedy_partitions(greedy_ckpt_path, benchmark, config),
+            config.get("metric_scale", "unit"),
+            single_pick=single_prompt_index(benchmark),
+        )
+        # Only the metrics the sampling run reports (drops e.g. the old
+        # ask_gec exact_match placeholder).
+        for metric_name, entry in (greedy or {}).items():
+            if metric_name in agg:
+                agg[metric_name].setdefault("by_decoding", {})["greedy"] = entry
         scores[benchmark] = {shot: agg}
     return scores
 
@@ -1046,9 +1132,13 @@ def build_multisynt_data():
     output = {"languages": {}}
     for lang_name in sorted(os.listdir(MULTISYNT_RESULTS)):
         lang_dir = MULTISYNT_RESULTS / lang_name
-        if not lang_dir.is_dir() or lang_name.startswith("."):
+        if (not lang_dir.is_dir() or lang_name.startswith(".")
+                or lang_name.endswith(MULTISYNT_DECODING_SUFFIX)):
             continue
+        greedy_dir = MULTISYNT_RESULTS / (lang_name + MULTISYNT_DECODING_SUFFIX)
         print(f"\n=== MultiSynt language: {lang_name} ===")
+        if greedy_dir.is_dir():
+            print(f"  (greedy-decoding tree: {greedy_dir.name})")
 
         lang_tasks, unknown_tasks = multisynt_discover_language_tasks(
             str(lang_dir), all_task_configs
@@ -1059,6 +1149,7 @@ def build_multisynt_data():
 
         discovered = {}
         discovered_forms = {}
+        discovered_decodings = {}
         models_out = {}
 
         # Group model dirs by base name (hplt2_0shot_checkpoints + _5shot → hplt2)
@@ -1088,8 +1179,10 @@ def build_multisynt_data():
                     tokens_b = multisynt_parse_checkpoint_name(ckpt_name)
                     if tokens_b is None:
                         continue
+                    greedy_ckpt = greedy_dir / model_dir_name / ckpt_name
                     scores = multisynt_process_checkpoint(
-                        str(ckpt_path), task_configs, shot
+                        str(ckpt_path), task_configs, shot,
+                        greedy_ckpt_path=str(greedy_ckpt) if greedy_ckpt.is_dir() else None,
                     )
                     if scores:
                         bucket = progress.setdefault(tokens_b, {})
@@ -1100,6 +1193,9 @@ def build_multisynt_data():
                                 for entry in metric_data.values():
                                     discovered_forms.setdefault(bench, set()).update(
                                         entry.get("by_form", ())
+                                    )
+                                    discovered_decodings.setdefault(bench, set()).update(
+                                        entry.get("by_decoding", ())
                                     )
 
             models_out[base_model] = {
@@ -1131,6 +1227,21 @@ def build_multisynt_data():
                 ([main_metric] if main_metric in disc else []) + base_others
             )
             forms = discovered_forms.get(task, set())
+            decodings = discovered_decodings.get(task, set())
+            # The optional "soft" counterpart of the main ("hard") metric —
+            # e.g. the probability mass on the correct answer instead of
+            # accuracy / F1 — with its own random baseline when the hard
+            # metric's doesn't transfer (macro-F1 vs. 1/k for NoReC).
+            soft = {}
+            soft_metric = config.get("soft_metric")
+            if soft_metric:
+                if soft_metric in disc:
+                    soft["soft_metric"] = soft_metric
+                    if "soft_random_baseline" in config:
+                        soft["soft_random_baseline"] = config["soft_random_baseline"]
+                else:
+                    print(f"  WARNING: soft metric '{soft_metric}' of '{task}' "
+                          "not found in results, ignoring")
             metrics_setup_out[task] = {
                 "pretty_name": config["pretty_name"],
                 "main_metric": main_metric,
@@ -1140,8 +1251,12 @@ def build_multisynt_data():
                 "evaluation_type": config.get("evaluation_type", "classification"),
                 "metric_scale": config.get("metric_scale", "unit"),
                 "available_metrics": available,
+                **soft,
                 **({"formulations": [f for f in MULTISYNT_FORMULATIONS if f in forms]}
                    if forms else {}),
+                # The sampling run is the entry itself; the greedy run its
+                # `by_decoding.greedy` sub-aggregate.
+                **({"decodings": ["sampling"] + sorted(decodings)} if decodings else {}),
             }
 
         output["languages"][lang_name] = {
@@ -1249,7 +1364,9 @@ def noreval12_extract_task(merged, benchmark, config):
 
     out = {}
     for shot, partition_results in by_shot.items():
-        agg = reduce_prompt_variants(partition_results, scale)
+        agg = reduce_prompt_variants(
+            partition_results, scale, single_pick=single_prompt_index(benchmark)
+        )
         if agg:
             out[shot] = agg
     return out

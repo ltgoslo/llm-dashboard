@@ -1,0 +1,28 @@
+{
+ "results": {
+  "french_bench_multifquad": {
+   "alias": "french_bench_multifquad",
+   "exact,none": 0.0,
+   "exact_stderr,none": 0.0,
+   "f1,none": 0.0720709078576612,
+   "f1_stderr,none": 0.004280906261140176,
+   "rouge1,none": 0.09694106516112694
+  }
+ },
+ "n-samples": {
+  "french_bench_multifquad": {
+   "original": 400,
+   "effective": 400
+  }
+ },
+ "n-shot": {
+  "french_bench_multifquad": 5
+ },
+ "configs": {
+  "french_bench_multifquad": {
+   "task": "french_bench_multifquad",
+   "output_type": "generate_until"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

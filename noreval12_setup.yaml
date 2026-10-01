@@ -66,6 +66,7 @@ ncb_nob:
   description: "Linguistic acceptability based on the NCB dataset, which focuses on correct placement of commas. The main metric is accuracy, with a random baseline of 0.5."
   main_metric: acc
   random_baseline: 0.5
+  soft_metric: prob_correct
   category: linguistic knowledge
   evaluation_type: classification
   metric_scale: unit
@@ -75,6 +76,7 @@ nocola_nob:
   description: "Linguistic acceptability based on the BLiMP-like NoCoLA dataset, which includes a variety of linguistic phenomena. The main metric is accuracy, with a random baseline of 0.5."
   main_metric: acc
   random_baseline: 0.5
+  soft_metric: prob_correct
   category: linguistic knowledge
   evaluation_type: classification
   metric_scale: unit
@@ -84,6 +86,7 @@ norbelebele_nob:
   description: "Reading comprehension based on the NorBelebele dataset, which includes questions about a given passage. The main metric is accuracy, with a random baseline of 0.25."
   main_metric: acc
   random_baseline: 0.25
+  soft_metric: prob_correct
   category: language understanding
   evaluation_type: classification
   metric_scale: unit
@@ -93,6 +96,7 @@ norcommonsenseqa_nno:
   description: "Commonsense question-answering based on the NorCommonsenseQA dataset, which includes multiple-choice questions that require commonsense reasoning. The main metric is accuracy, with a random baseline of 0.2."
   main_metric: acc
   random_baseline: 0.2
+  soft_metric: prob_correct
   category: world knowledge & reasoning
   evaluation_type: classification
   metric_scale: unit
@@ -102,6 +106,7 @@ norcommonsenseqa_nob:
   description: "Commonsense question-answering based on the NorCommonsenseQA dataset, which includes multiple-choice questions that require commonsense reasoning. The main metric is accuracy, with a random baseline of 0.2."
   main_metric: acc
   random_baseline: 0.2
+  soft_metric: prob_correct
   category: world knowledge & reasoning
   evaluation_type: classification
   metric_scale: unit
@@ -111,6 +116,8 @@ norec_document_nob:
   description: "Binary document-level sentiment analysis based on the NoReC dataset. The main metric is macro F1 score, with a random baseline of approximately 0.485 (expected macro F1 of a uniform random classifier on this class-imbalanced test set)."
   main_metric: f1
   random_baseline: 0.4850709806
+  soft_metric: prob_correct
+  soft_random_baseline: 0.5
   category: language understanding
   evaluation_type: classification
   metric_scale: unit
@@ -120,6 +127,8 @@ norec_sentence_nob:
   description: "Binary sentence-level sentiment analysis based on the NoReC dataset. The main metric is macro F1 score, with a random baseline of approximately 0.482 (expected macro F1 of a uniform random classifier on this class-imbalanced test set)."
   main_metric: f1
   random_baseline: 0.4815172167
+  soft_metric: prob_correct
+  soft_random_baseline: 0.5
   category: language understanding
   evaluation_type: classification
   metric_scale: unit
@@ -147,6 +156,7 @@ noropenbookqa_nno:
   description: "Reading comprehension based on the NorOpenBookQA dataset, which includes multiple-choice questions about a given factual statement. The main metric is accuracy, with a random baseline of 0.25."
   main_metric: acc
   random_baseline: 0.25
+  soft_metric: prob_correct
   category: language understanding
   evaluation_type: classification
   metric_scale: unit
@@ -156,6 +166,7 @@ noropenbookqa_nob:
   description: "Reading comprehension based on the NorOpenBookQA dataset, which includes multiple-choice questions about a given factual statement. The main metric is accuracy, with a random baseline of 0.25."
   main_metric: acc
   random_baseline: 0.25
+  soft_metric: prob_correct
   category: language understanding
   evaluation_type: classification
   metric_scale: unit
@@ -165,6 +176,7 @@ noropenbookqa_no_fact_nno:
   description: "Openbook question-answering based on the NorOpenBookQA dataset, but without the factual statement provided. The model must rely on its own knowledge to answer the questions. The main metric is accuracy, with a random baseline of 0.25."
   main_metric: acc
   random_baseline: 0.25
+  soft_metric: prob_correct
   category: world knowledge & reasoning
   evaluation_type: classification
   metric_scale: unit
@@ -174,6 +186,7 @@ noropenbookqa_no_fact_nob:
   description: "Openbook question-answering based on the NorOpenBookQA dataset, but without the factual statement provided. The model must rely on its own knowledge to answer the questions. The main metric is accuracy, with a random baseline of 0.25."
   main_metric: acc
   random_baseline: 0.25
+  soft_metric: prob_correct
   category: world knowledge & reasoning
   evaluation_type: classification
   metric_scale: unit
@@ -246,6 +259,7 @@ nortruthfulqa_mc_nno:
   description: "Multiple-choice question-answering based on the TruthfulQA dataset, which includes questions that some humans would answer falsely due to a false belief or misconception. The model must select the correct answer from multiple choices, and the main metric is accuracy. The random baseline is approximately 0.233 since the model must choose the correct answer from multiple options."
   main_metric: acc
   random_baseline: 0.23311814890762259
+  soft_metric: prob_correct
   category: world knowledge & reasoning
   evaluation_type: classification
   metric_scale: unit
@@ -255,6 +269,7 @@ nortruthfulqa_mc_nob:
   description: "Multiple-choice question-answering based on the TruthfulQA dataset, which includes questions that some humans would answer falsely due to a false belief or misconception. The model must select the correct answer from multiple choices, and the main metric is accuracy. The random baseline is approximately 0.232 since the model must choose the correct answer from multiple options."
   main_metric: acc
   random_baseline: 0.23170337745132827
+  soft_metric: prob_correct
   category: world knowledge & reasoning
   evaluation_type: classification
   metric_scale: unit
@@ -264,6 +279,7 @@ nrk_quiz_qa_nno:
   description: "Multiple-choice question-answering based on the NRK quiz dataset. The model must select the correct answer from multiple choices, and the main metric is accuracy. The random baseline is approximately 0.279 since the model must choose the correct answer from multiple options."
   main_metric: acc
   random_baseline: 0.27884711779448623
+  soft_metric: prob_correct
   category: world knowledge & reasoning
   evaluation_type: classification
   metric_scale: unit
@@ -273,6 +289,7 @@ nrk_quiz_qa_nob:
   description: "Multiple-choice question-answering based on the NRK quiz dataset. The model must select the correct answer from multiple choices, and the main metric is accuracy. The random baseline is approximately 0.284 since the model must choose the correct answer from multiple options."
   main_metric: acc
   random_baseline: 0.2836296296296296
+  soft_metric: prob_correct
   category: world knowledge & reasoning
   evaluation_type: classification
   metric_scale: unit
@@ -282,6 +299,7 @@ slide_nob_nno_swe_dan:
   description: "Language identification based on the multi-labeled SLIDE dataset, which includes sentences in various Scandinavian languages. The model must identify the language of each sentence, and the main metric is accuracy. The random baseline is approximately 0.213 since there are multiple languages to choose from."
   main_metric: acc
   random_baseline: 0.21289208633093526
+  soft_metric: prob_correct
   category: linguistic knowledge
   evaluation_type: classification
   metric_scale: unit

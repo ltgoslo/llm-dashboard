@@ -1,0 +1,27 @@
+{
+ "results": {
+  "fquad_p0": {
+   "alias": "fquad_p0",
+   "exact,none": 0.08375,
+   "exact_stderr,none": 0.009799998563254983,
+   "f1,none": 0.17492445879728474,
+   "f1_stderr,none": 0.011530739420863646
+  }
+ },
+ "n-samples": {
+  "fquad_p0": {
+   "original": 800,
+   "effective": 800
+  }
+ },
+ "n-shot": {
+  "fquad_p0": 5
+ },
+ "configs": {
+  "fquad_p0": {
+   "task": "fquad_p0",
+   "output_type": "generate_until"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

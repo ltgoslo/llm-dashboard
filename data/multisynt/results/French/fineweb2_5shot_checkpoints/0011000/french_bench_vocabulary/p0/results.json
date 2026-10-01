@@ -1,0 +1,29 @@
+{
+ "results": {
+  "french_bench_vocabulary_p0": {
+   "alias": "french_bench_vocabulary_p0",
+   "acc,none": 0.773109243697479,
+   "acc_stderr,none": 0.03855563237965161,
+   "acc_norm,none": 0.7310924369747899,
+   "acc_norm_stderr,none": 0.040817523402587604,
+   "norm_loglikelihood_corr,none": -0.9416641963286945,
+   "norm_loglikelihood_corr_stderr,none": 0.024859134939301756
+  }
+ },
+ "n-samples": {
+  "french_bench_vocabulary_p0": {
+   "original": 119,
+   "effective": 119
+  }
+ },
+ "n-shot": {
+  "french_bench_vocabulary_p0": 5
+ },
+ "configs": {
+  "french_bench_vocabulary_p0": {
+   "task": "french_bench_vocabulary_p0",
+   "output_type": "multiple_choice"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

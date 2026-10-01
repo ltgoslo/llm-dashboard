@@ -1,0 +1,29 @@
+{
+ "results": {
+  "french_bench_reading_p0": {
+   "alias": "french_bench_reading_p0",
+   "acc,none": 0.5492957746478874,
+   "acc_stderr,none": 0.059470271877380014,
+   "acc_norm,none": 0.5492957746478874,
+   "acc_norm_stderr,none": 0.059470271877380014,
+   "norm_loglikelihood_corr,none": -0.8256691514389318,
+   "norm_loglikelihood_corr_stderr,none": 0.043064439200830334
+  }
+ },
+ "n-samples": {
+  "french_bench_reading_p0": {
+   "original": 71,
+   "effective": 71
+  }
+ },
+ "n-shot": {
+  "french_bench_reading_p0": 5
+ },
+ "configs": {
+  "french_bench_reading_p0": {
+   "task": "french_bench_reading_p0",
+   "output_type": "multiple_choice"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

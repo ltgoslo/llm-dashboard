@@ -4,11 +4,10 @@
 // to a selection, and the control listeners those dashboards share.
 //
 // multisynt keeps its own small variants — its task universe (per-language
-// metrics_setup, no languages/eval-types) and its "__filtered__"
-// mode behave differently.
+// metrics_setup, no languages/eval-types) behaves differently.
 
 import { state } from "./state.js";
-import { capitalize, isAggregateSelection } from "./core.js";
+import { capitalize, isAggregateSelection, isMacroSelection } from "./core.js";
 import { syncTaskCheckboxStates, defaultTaskDisplayName } from "./ui.js";
 
 export function setsEqual(a, b) {
@@ -19,8 +18,8 @@ export function setsEqual(a, b) {
 
 /** Benchmarks covered by a task-selection value (dropdown option / URL). */
 export function getBenchmarksForSelection(sel) {
-  if (sel === "__all__" || sel === "__all_macro__" || sel === "__filtered__") return Object.keys(state.metricsSetup);
-  if (sel === "__custom__") return [];
+  if (sel === "__all__" || sel === "__all_macro__") return Object.keys(state.metricsSetup);
+  if (sel === "__custom__" || sel === "__custom_macro__") return [];
   if (sel.startsWith("__cat__")) {
     const c = sel.slice(7);
     return Object.keys(state.metricsSetup).filter((b) => state.metricsSetup[b].category === c);
@@ -61,8 +60,9 @@ export function autoSetNormalization() {
 }
 
 /** Populate the task <select> with the category / eval-type / language
- *  aggregate optgroups and the individual tasks. */
-export function populateTaskDropdown() {
+ *  aggregate optgroups and the individual tasks. `evalTypes: false` leaves
+ *  out the eval-type group (pages with a task-type selector). */
+export function populateTaskDropdown({ evalTypes = true } = {}) {
   const select = document.getElementById("task-select");
 
   const categories = {};
@@ -79,14 +79,14 @@ export function populateTaskDropdown() {
   }
   select.appendChild(catGroup);
 
-  const evalTypes = {};
+  const evalGroups = {};
   for (const [bench, info] of Object.entries(state.metricsSetup)) {
-    if (info.evaluation_type) (evalTypes[info.evaluation_type] = evalTypes[info.evaluation_type] || []).push(bench);
+    if (info.evaluation_type) (evalGroups[info.evaluation_type] = evalGroups[info.evaluation_type] || []).push(bench);
   }
-  if (Object.keys(evalTypes).length > 0) {
+  if (evalTypes && Object.keys(evalGroups).length > 0) {
     const evalGroup = document.createElement("optgroup");
     evalGroup.label = "Aggregate by evaluation type";
-    for (const etName of Object.keys(evalTypes).sort()) {
+    for (const etName of Object.keys(evalGroups).sort()) {
       const opt = document.createElement("option");
       opt.value = "__eval__" + etName;
       opt.textContent = capitalize(etName);
@@ -121,7 +121,9 @@ export function populateTaskDropdown() {
 
 /** Handle a task-checkbox change: collapse the checked set back to a single
  *  benchmark when it matches one (so the dropdown, metric selector, and
- *  title follow), else "__custom__". */
+ *  title follow), else a custom subset. Pages whose dropdown carries a
+ *  hidden "__custom_macro__" option keep category averaging for a subset
+ *  picked from a category-average view. */
 export function onTaskCheckboxChange(render) {
   if (state.checkedTasks.size === 1) {
     const bench = [...state.checkedTasks][0];
@@ -132,16 +134,19 @@ export function onTaskCheckboxChange(render) {
     render();
     return;
   }
-  state.currentTaskSelection = "__custom__";
-  document.getElementById("task-select").value = "__custom__";
+  const keepMacro = isMacroSelection()
+    && document.querySelector('#task-select option[value="__custom_macro__"]');
+  state.currentTaskSelection = keepMacro ? "__custom_macro__" : "__custom__";
+  document.getElementById("task-select").value = state.currentTaskSelection;
   autoSetNormalization();
   render();
 }
 
 /** Bind the control listeners shared by the NorEval dashboards: shot buttons,
  *  prompt-aggregation / normalization / metric selects, the task dropdown,
- *  and the task "Select all" / "Select none" buttons. */
-export function bindTaskControls(render) {
+ *  and the task "Select all" / "Select none" buttons. `selectAll` is the
+ *  selection "Select all" switches to. */
+export function bindTaskControls(render, { selectAll = "__all__" } = {}) {
   document.querySelectorAll(".shot-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       document.querySelector(".shot-btn.active")?.classList.remove("active");
@@ -175,8 +180,8 @@ export function bindTaskControls(render) {
 
   document.getElementById("select-all-btn").addEventListener("click", () => {
     state.checkedTasks = new Set(Object.keys(state.metricsSetup));
-    state.currentTaskSelection = "__all__";
-    document.getElementById("task-select").value = "__all__";
+    state.currentTaskSelection = selectAll;
+    document.getElementById("task-select").value = selectAll;
     syncTaskCheckboxStates(() => state.checkedTasks);
     autoSetNormalization();
     render();

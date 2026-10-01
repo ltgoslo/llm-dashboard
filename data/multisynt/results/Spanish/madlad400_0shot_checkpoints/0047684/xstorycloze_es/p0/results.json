@@ -1,0 +1,29 @@
+{
+ "results": {
+  "xstorycloze_es_p0": {
+   "alias": "xstorycloze_es_p0",
+   "acc,none": 0.6360026472534746,
+   "acc_stderr,none": 0.01238198006878836,
+   "acc_norm,none": 0.6982131039046989,
+   "acc_norm_stderr,none": 0.011812877848905222,
+   "norm_loglikelihood_corr,none": -0.5498139470075781,
+   "norm_loglikelihood_corr_stderr,none": 0.004023130263164942
+  }
+ },
+ "n-samples": {
+  "xstorycloze_es_p0": {
+   "original": 1511,
+   "effective": 1511
+  }
+ },
+ "n-shot": {
+  "xstorycloze_es_p0": 0
+ },
+ "configs": {
+  "xstorycloze_es_p0": {
+   "task": "xstorycloze_es_p0",
+   "output_type": "multiple_choice"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

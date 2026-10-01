@@ -1,0 +1,30 @@
+{
+ "results": {
+  "french_bench_trivia": {
+   "alias": "french_bench_trivia",
+   "exact,none": 0.013157894736842105,
+   "exact_stderr,none": 0.005853254860466382,
+   "f1,none": 0.026884609291230682,
+   "f1_stderr,none": 0.006900745594108833,
+   "rouge1,none": 0.03110205306893147,
+   "is_included,none": 0.02368421052631579,
+   "is_included_stderr,none": 0.007810970685873156
+  }
+ },
+ "n-samples": {
+  "french_bench_trivia": {
+   "original": 380,
+   "effective": 380
+  }
+ },
+ "n-shot": {
+  "french_bench_trivia": 5
+ },
+ "configs": {
+  "french_bench_trivia": {
+   "task": "french_bench_trivia",
+   "output_type": "generate_until"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

@@ -1,0 +1,29 @@
+{
+ "results": {
+  "wmt14-fr-en": {
+   "alias": "wmt14-fr-en",
+   "bleu,none": 11.342667805248153,
+   "bleu_stderr,none": 0.277695736648621,
+   "ter,none": 97.01466200391414,
+   "ter_stderr,none": 2.0387707663847907,
+   "chrf,none": 37.466303528165554,
+   "chrf_stderr,none": 0.28210901307618325
+  }
+ },
+ "n-samples": {
+  "wmt14-fr-en": {
+   "original": 3003,
+   "effective": 3003
+  }
+ },
+ "n-shot": {
+  "wmt14-fr-en": 5
+ },
+ "configs": {
+  "wmt14-fr-en": {
+   "task": "wmt14-fr-en",
+   "output_type": "generate_until"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

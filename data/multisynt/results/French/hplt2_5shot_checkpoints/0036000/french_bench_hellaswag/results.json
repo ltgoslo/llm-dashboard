@@ -1,0 +1,29 @@
+{
+ "results": {
+  "french_bench_hellaswag": {
+   "alias": "french_bench_hellaswag",
+   "acc,none": 0.36870850289141144,
+   "acc_stderr,none": 0.004992899990441771,
+   "acc_norm,none": 0.47033626044120797,
+   "acc_norm_stderr,none": 0.005165360923560173,
+   "norm_loglikelihood_corr,none": -0.488387884913371,
+   "norm_loglikelihood_corr_stderr,none": 0.001468139160475188
+  }
+ },
+ "n-samples": {
+  "french_bench_hellaswag": {
+   "original": 9338,
+   "effective": 9338
+  }
+ },
+ "n-shot": {
+  "french_bench_hellaswag": 5
+ },
+ "configs": {
+  "french_bench_hellaswag": {
+   "task": "french_bench_hellaswag",
+   "output_type": "multiple_choice"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

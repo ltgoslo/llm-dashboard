@@ -1,0 +1,29 @@
+{
+ "results": {
+  "french_bench_arc_challenge": {
+   "alias": "french_bench_arc_challenge",
+   "acc,none": 0.32335329341317365,
+   "acc_stderr,none": 0.013686683016589485,
+   "acc_norm,none": 0.3575705731394354,
+   "acc_norm_stderr,none": 0.014024008839911907,
+   "norm_loglikelihood_corr,none": -0.7177986768376143,
+   "norm_loglikelihood_corr_stderr,none": 0.016608226785642482
+  }
+ },
+ "n-samples": {
+  "french_bench_arc_challenge": {
+   "original": 1169,
+   "effective": 1169
+  }
+ },
+ "n-shot": {
+  "french_bench_arc_challenge": 0
+ },
+ "configs": {
+  "french_bench_arc_challenge": {
+   "task": "french_bench_arc_challenge",
+   "output_type": "multiple_choice"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

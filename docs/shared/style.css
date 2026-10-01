@@ -287,6 +287,17 @@ header.dashboard-header h1 {
 .chart-description a { color: var(--accent); text-decoration: none; }
 .chart-description a:hover { color: var(--accent-hover); }
 
+/* Plain chart title (no expandable description) with the FineWeb2 signal
+   measures of the plotted curves on the line below it. */
+.chart-title-block { margin: 0 0 1rem; }
+.chart-signals {
+  display: flex; flex-wrap: wrap; gap: 0.2rem 1.4rem;
+  margin-top: 0.2rem; font-size: 0.88rem; color: var(--fg-muted);
+}
+.chart-signal { cursor: help; }
+.chart-signal-label::after { content: " "; }
+.chart-signal-value { font-weight: 600; color: var(--fg); font-variant-numeric: tabular-nums; }
+
 /* ──── Controls bar — two flex rows of inline controls ────
    Layout: each row is a .controls-bar; items inside are
    .control-group (label + control). Specific controls below
@@ -661,6 +672,10 @@ header.dashboard-header h1 {
 .checkbox-category details.task-item > summary:hover { background: rgba(99, 102, 241, 0.08); }
 .checkbox-category details.task-item > summary:hover::after { color: var(--accent); }
 .checkbox-category .task-name { flex: 1; min-width: 0; }
+/* Tasks masked out of the aggregate by the multisynt task-type selector:
+   still checked, but greyed out and not toggleable. */
+.checkbox-category details.task-item.type-excluded > summary { opacity: 0.45; }
+.checkbox-category details.task-item.type-excluded > summary input[type="checkbox"] { cursor: not-allowed; }
 
 .task-description-inline {
   font-size: 0.82rem;
@@ -805,78 +820,6 @@ header.dashboard-header h1 {
    the user can enable + threshold (each with pass/fail thresholds),
    plus a downstream table showing each model's pass/fail per criterion.
    ──────────────────────────────────────────────────────────── */
-
-.filter-panel {
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border);
-}
-.filter-panel-header {
-  display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
-}
-.filter-panel-header h3 {
-  font-family: var(--font-serif); font-weight: 700;
-  font-size: 1.02rem; color: var(--fg); margin-bottom: 0.2rem; margin-top: 0.5rem;
-}
-.filter-panel-header a { color: var(--accent); text-decoration: none; }
-.filter-panel-header a:hover { color: var(--accent-hover); }
-#filter-panel-content h3 {
-  font-family: var(--font-serif); font-weight: 700;
-  font-size: 1.02rem; margin: 0.6rem 0 0.2rem;
-}
-.filter-description { font-size: 0.85rem; color: var(--fg-muted); margin-bottom: 0.75rem; }
-.filter-criteria-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 0.6rem;
-}
-.filter-criterion {
-  padding: 0.55rem 0.7rem; border: 1px solid var(--border-light);
-  border-radius: 8px; background: var(--surface); transition: opacity 0.15s;
-}
-.filter-criterion.disabled { opacity: 0.45; }
-.filter-criterion-header {
-  display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;
-}
-.filter-criterion-header input[type="checkbox"] { cursor: pointer; }
-.filter-criterion-header .criterion-label {
-  font-size: 0.85rem; font-weight: 500; color: var(--fg); cursor: pointer;
-}
-.filter-criterion-header .criterion-desc {
-  font-size: 0.72rem; color: var(--fg-muted); margin-left: auto;
-}
-.filter-criterion-controls {
-  display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;
-}
-.filter-criterion-controls label {
-  font-size: 0.75rem; color: var(--fg-muted);
-  display: flex; align-items: center; gap: 0.25rem;
-}
-.filter-criterion-controls input[type="number"] {
-  width: 70px; padding: 0.2rem 0.35rem; font-family: var(--font-sans); font-size: 0.9rem;
-  border: 1px solid var(--border); border-radius: 5px; background: var(--surface); color: var(--fg);
-}
-.filter-criterion-controls .threshold-input { width: 60px; }
-
-.filter-summary { font-size: 0.85rem; color: var(--fg-muted); }
-.filter-table-content { overflow-x: auto; }
-.filter-table {
-  width: 100%; border-collapse: collapse; font-size: 0.78rem; margin-top: 0.6rem;
-}
-.filter-table th {
-  font-family: var(--font-sans);
-  font-weight: 600; text-align: center; padding: 0.35rem 0.5rem;
-  border-bottom: 2px solid var(--border); color: var(--fg-muted);
-  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap;
-}
-.filter-table th:first-child { text-align: left; }
-.filter-table td {
-  padding: 0.3rem 0.5rem; text-align: center; border-bottom: 1px solid var(--border-light);
-}
-.filter-table td:first-child { text-align: left; font-weight: 500; white-space: nowrap; }
-.filter-table td.pass { background: #dcfce7; color: #166534; }
-.filter-table td.fail { background: #fef2f2; color: #991b1b; }
-.filter-table td.na { background: rgba(255,255,255,0.06); color: var(--fg-muted); }
-.filter-table tr.pass-row td:first-child { color: #4ade80; }
-.filter-table tr.fail-row td:first-child { color: #f87171; }
 
 /* ────────────────────────────────────────────────────────────
    App loading overlay — covers the page until the dashboard's

@@ -1,0 +1,29 @@
+{
+ "results": {
+  "include_spanish_p0": {
+   "alias": "include_spanish_p0",
+   "acc,none": 0.20909090909090908,
+   "acc_stderr,none": 0.017355802000249113,
+   "acc_norm,none": 0.20909090909090908,
+   "acc_norm_stderr,none": 0.017355802000249113,
+   "norm_loglikelihood_corr,none": -1.9186308446797458,
+   "norm_loglikelihood_corr_stderr,none": 0.0408452792761823
+  }
+ },
+ "n-samples": {
+  "include_spanish_p0": {
+   "original": 550,
+   "effective": 550
+  }
+ },
+ "n-shot": {
+  "include_spanish_p0": 5
+ },
+ "configs": {
+  "include_spanish_p0": {
+   "task": "include_spanish_p0",
+   "output_type": "multiple_choice"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

@@ -1238,6 +1238,18 @@ export function computeYRange(values, tight = false, topHeadroom = 0, unclamped 
   return [0, Math.min(mx + Math.max(mx * 0.15, 2) + extra, 115)];
 }
 
+/** A y-range fitted to exactly the plotted values: their extent plus 5% of
+ *  the span on either side, with no floor at 0 and no ceiling — the chart
+ *  is always fully zoomed to what it shows. Pass the CI extremes along
+ *  with the points when bands are drawn so the bands fit too. */
+export function computeFitRange(values) {
+  if (!values.length) return state.currentNormalization === "zscore" ? [-2, 2] : [0, 100];
+  const mx = Math.max(...values);
+  const mn = Math.min(...values);
+  const pad = Math.max((mx - mn) * 0.05, Math.abs(mx) * 0.01, 0.05);
+  return [mn - pad, mx + pad];
+}
+
 /** Compute a single yMax for raw, non-normalized data. */
 export function computeYMax(values) {
   if (!values.length) return 100;

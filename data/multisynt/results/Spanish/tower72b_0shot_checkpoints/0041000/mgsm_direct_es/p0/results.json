@@ -1,0 +1,27 @@
+{
+ "results": {
+  "mgsm_direct_es_p0": {
+   "alias": "mgsm_direct_es_p0",
+   "exact_match,remove_whitespace": 0.004,
+   "exact_match_stderr,remove_whitespace": 0.004000000000000003,
+   "exact_match,flexible-extract": 0.024,
+   "exact_match_stderr,flexible-extract": 0.009699087026964256
+  }
+ },
+ "n-samples": {
+  "mgsm_direct_es_p0": {
+   "original": 250,
+   "effective": 250
+  }
+ },
+ "n-shot": {
+  "mgsm_direct_es_p0": 0
+ },
+ "configs": {
+  "mgsm_direct_es_p0": {
+   "task": "mgsm_direct_es_p0",
+   "output_type": "generate_until"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

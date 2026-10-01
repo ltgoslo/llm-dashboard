@@ -1,0 +1,129 @@
+{
+ "results": {
+  "global_mmlu_french_business_p1": {
+   "alias": "global_mmlu_french_business_p1",
+   "acc,none": 0.24339360222531292,
+   "acc_stderr,none": 0.016015015439517787,
+   "acc_norm,none": 0.24339360222531292,
+   "acc_norm_stderr,none": 0.016015015439517787,
+   "norm_loglikelihood_corr,none": -2.0950059247447985,
+   "norm_loglikelihood_corr_stderr,none": 0.02464729281556693
+  },
+  "global_mmlu_french_humanities_p1": {
+   "alias": "global_mmlu_french_humanities_p1",
+   "acc,none": 0.2671625929861849,
+   "acc_stderr,none": 0.006451459616643292,
+   "acc_norm,none": 0.2671625929861849,
+   "acc_norm_stderr,none": 0.006451459616643292,
+   "norm_loglikelihood_corr,none": -2.253144258292398,
+   "norm_loglikelihood_corr_stderr,none": 0.010656918120056716
+  },
+  "global_mmlu_french_medical_p1": {
+   "alias": "global_mmlu_french_medical_p1",
+   "acc,none": 0.24518272425249169,
+   "acc_stderr,none": 0.011092819101806858,
+   "acc_norm,none": 0.24518272425249169,
+   "acc_norm_stderr,none": 0.011092819101806858,
+   "norm_loglikelihood_corr,none": -2.0899237370174193,
+   "norm_loglikelihood_corr_stderr,none": 0.01689602428631075
+  },
+  "global_mmlu_french_other_p1": {
+   "alias": "global_mmlu_french_other_p1",
+   "acc,none": 0.2480181200453001,
+   "acc_stderr,none": 0.014541563394541783,
+   "acc_norm,none": 0.2480181200453001,
+   "acc_norm_stderr,none": 0.014541563394541783,
+   "norm_loglikelihood_corr,none": -2.25665451614935,
+   "norm_loglikelihood_corr_stderr,none": 0.024080631254951988
+  },
+  "global_mmlu_french_social_sciences_p1": {
+   "alias": "global_mmlu_french_social_sciences_p1",
+   "acc,none": 0.2622684432889178,
+   "acc_stderr,none": 0.00793101980070877,
+   "acc_norm,none": 0.2622684432889178,
+   "acc_norm_stderr,none": 0.00793101980070877,
+   "norm_loglikelihood_corr,none": -2.0329361069229543,
+   "norm_loglikelihood_corr_stderr,none": 0.011893978384300855
+  },
+  "global_mmlu_french_stem_p1": {
+   "alias": "global_mmlu_french_stem_p1",
+   "acc,none": 0.27339042182048845,
+   "acc_stderr,none": 0.00793869473356601,
+   "acc_norm,none": 0.27339042182048845,
+   "acc_norm_stderr,none": 0.00793869473356601,
+   "norm_loglikelihood_corr,none": -2.163059111421085,
+   "norm_loglikelihood_corr_stderr,none": 0.011422076326425034
+  },
+  "global_mmlu_french_p1": {
+   "alias": "global_mmlu_french_p1",
+   "acc,none": 0.2627118644067797,
+   "acc_stderr,none": 0.0037138725888284188,
+   "acc_norm,none": 0.2627118644067797,
+   "acc_norm_stderr,none": 0.0037138725888284188,
+   "norm_loglikelihood_corr,none": -2.159292403962466,
+   "norm_loglikelihood_corr_stderr,none": 0.005769427560544527
+  }
+ },
+ "n-samples": {
+  "global_mmlu_french_business_p1": {
+   "original": 719,
+   "effective": 719
+  },
+  "global_mmlu_french_humanities_p1": {
+   "original": 4705,
+   "effective": 4705
+  },
+  "global_mmlu_french_medical_p1": {
+   "original": 1505,
+   "effective": 1505
+  },
+  "global_mmlu_french_other_p1": {
+   "original": 883,
+   "effective": 883
+  },
+  "global_mmlu_french_social_sciences_p1": {
+   "original": 3077,
+   "effective": 3077
+  },
+  "global_mmlu_french_stem_p1": {
+   "original": 3153,
+   "effective": 3153
+  }
+ },
+ "n-shot": {
+  "global_mmlu_french_business_p1": 0,
+  "global_mmlu_french_humanities_p1": 0,
+  "global_mmlu_french_medical_p1": 0,
+  "global_mmlu_french_other_p1": 0,
+  "global_mmlu_french_social_sciences_p1": 0,
+  "global_mmlu_french_stem_p1": 0,
+  "global_mmlu_french_p1": 0
+ },
+ "configs": {
+  "global_mmlu_french_business_p1": {
+   "task": "global_mmlu_french_business_p1",
+   "output_type": "multiple_choice"
+  },
+  "global_mmlu_french_humanities_p1": {
+   "task": "global_mmlu_french_humanities_p1",
+   "output_type": "multiple_choice"
+  },
+  "global_mmlu_french_medical_p1": {
+   "task": "global_mmlu_french_medical_p1",
+   "output_type": "multiple_choice"
+  },
+  "global_mmlu_french_other_p1": {
+   "task": "global_mmlu_french_other_p1",
+   "output_type": "multiple_choice"
+  },
+  "global_mmlu_french_social_sciences_p1": {
+   "task": "global_mmlu_french_social_sciences_p1",
+   "output_type": "multiple_choice"
+  },
+  "global_mmlu_french_stem_p1": {
+   "task": "global_mmlu_french_stem_p1",
+   "output_type": "multiple_choice"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation): subject-group scores as extracted; the group aggregate is the size-weighted mean with lm-eval's pooled sample stderr."
+}

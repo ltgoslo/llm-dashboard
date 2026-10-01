@@ -25,39 +25,6 @@
             <header class="dashboard-header">
                 <div class="header-titles">
                     <h1>MultiSynt dashboard</h1>
-                    <details class="about-inline">
-                        <summary>Multilingual training-progress evaluation — click here for more information</summary>
-                        <div class="about-content">
-                            <div class="about-section">
-                                <h2>About MultiSynt</h2>
-                                <p>
-                                    MultiSynt tracks the training trajectories of several pretraining runs across four languages
-                                    (Spanish, French, Finnish, and Norwegian — the latter evaluated with NorEval 1.2), at multiple
-                                    checkpoints. Each language has
-                                    its own set of benchmarks, with at least a few prompt variants per benchmark.
-                                </p>
-                                <p>
-                                    The "Signal-filtered tasks" option in the task dropdown applies HPLT-E-style quality criteria
-                                    (monotonicity, signal-to-noise ratio, prompt sensitivity, cross-model ranking consistency, etc.)
-                                    to identify benchmarks with reliable training signal.
-                                </p>
-                            </div>
-
-                            <div class="about-section">
-                                <h3>Confidence bands</h3>
-                                <p>Shaded bands are <strong>asymmetric 95% CIs</strong> for the score under the selected prompt aggregation (max by default).</p>
-                                <p><strong>For max.</strong> The lower bound has a <a href="https://en.wikipedia.org/wiki/Bonferroni_correction">Bonferroni</a> correction across the $k$ partitions; the upper bound does not, so bands are wider below the line than above.</p>
-                                <p class="about-formula">$$L = \max_i \ell\!\left(c_i,\, n_i,\, \tfrac{\alpha}{2k}\right), \qquad U = \max_i u\!\left(c_i,\, n_i,\, \tfrac{\alpha}{2}\right)$$</p>
-                                <p>Per-prompt bounds use exact <a href="https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Clopper%E2%80%93Pearson_interval">Clopper&ndash;Pearson</a> quantiles for accuracy / exact-match metrics and a normal approximation with the harness <a href="https://en.wikipedia.org/wiki/Bootstrapping_(statistics)">bootstrap</a> SE otherwise. <strong>For mean:</strong> <a href="https://en.wikipedia.org/wiki/Welch%E2%80%93Satterthwaite_equation">Welch&ndash;Satterthwaite</a> on sampling + between-prompt variance.</p>
-                            </div>
-
-                            <div class="about-section">
-                                <h3>Normalization</h3>
-                                <p>The default <em>random baseline</em> normalization subtracts each task's random baseline
-                                    (clamped at 0) and rescales to a 0–100 range, so different tasks can be averaged on a common scale.</p>
-                            </div>
-                        </div>
-                    </details>
                 </div>
             </header>
         </div>
@@ -70,36 +37,18 @@
                 <!-- Tabs populated by app.js from data.languages -->
             </nav>
             <section class="chart-section">
-                <div id="filter-panel" class="filter-panel" style="display:none;">
-                    <div class="filter-panel-header">
-                        <button id="filter-panel-toggle" class="small-btn">Show signal criteria</button>
-                        <button id="filter-download-btn" class="small-btn" title="Download criteria settings as JSON">↓ Download</button>
-                        <button id="filter-upload-btn" class="small-btn" title="Upload criteria settings from JSON">↑ Upload</button>
-                        <input type="file" id="filter-upload-input" accept=".json" style="display:none;">
-                        <span id="filter-summary" class="filter-summary"></span>
-                    </div>
-                    <div id="filter-panel-content" style="display:none;">
-                        <h3>Task-signal criteria</h3>
-                        <p class="filter-description">Based on <a href="https://github.com/hplt-project/hplt-e">HPLT-E</a> task selection. Only benchmarks passing all enabled criteria are aggregated.</p>
-                        <div id="filter-criteria-grid" class="filter-criteria-grid"></div>
-                        <div id="filter-table-content" class="filter-table-content">
-                            <table id="filter-table" class="filter-table"></table>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="chart-zone">
-                    <details class="chart-title-details">
-                        <summary><span class="chart-title" id="chart-title">&nbsp;</span></summary>
-                        <div class="chart-description" id="chart-description"></div>
-                    </details>
+                    <div class="chart-title-block">
+                        <span class="chart-title" id="chart-title">&nbsp;</span>
+                        <div class="chart-signals" id="chart-signals"></div>
+                    </div>
                     <div class="controls-bar">
                         <div class="control-group">
                             <label for="task-select">Task:</label>
                             <select id="task-select">
-                                <option value="__filtered__" title="Micro-average over tasks passing HPLT-E signal-quality criteria">Signal-filtered tasks</option>
-                                <option value="__all_macro__" title="Scores averaged within categories, then averaged across categories">All (category-average)</option>
+                                <option value="__all_macro__" selected title="Scores averaged within categories, then averaged across categories">All (category-average)</option>
                                 <option value="__all__" title="Simple average across all tasks">All (task-average)</option>
+                                <option value="__custom_macro__" hidden>Custom (category-average)</option>
                                 <option value="__custom__" hidden>Custom (task-average)</option>
                             </select>
                         </div>
@@ -112,6 +61,40 @@
                             </div>
                         </div>
 
+                        <div class="control-group" id="task-type-control">
+                            <label for="task-type-select">Task type:</label>
+                            <select id="task-type-select" class="control-select">
+                                <option value="all" selected>generative &amp; classification</option>
+                                <option value="generation">only generative</option>
+                                <option value="classification">only classification</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" id="metric-mode-control" style="display:none;">
+                            <label for="metric-mode-select">Metric type:</label>
+                            <select id="metric-mode-select" class="control-select">
+                                <option value="hard" selected>hard</option>
+                                <option value="soft">soft</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" id="decoding-control" style="display:none;">
+                            <label for="decoding-select">Decoding:</label>
+                            <select id="decoding-select" class="control-select">
+                                <option value="sampling" selected>random sampling</option>
+                                <option value="greedy">greedy</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="prompt-agg-select">Prompts:</label>
+                            <select id="prompt-agg-select" class="control-select">
+                                <option value="single">single prompt</option>
+                                <option value="mean">all (mean)</option>
+                                <option value="max" selected>all (max)</option>
+                            </select>
+                        </div>
+
                         <div class="control-group" id="formulation-control" style="display:none;">
                             <label for="formulation-select">Formulation:</label>
                             <select id="formulation-select" class="control-select">
@@ -119,33 +102,23 @@
                             </select>
                         </div>
 
-                        <div class="control-group">
-                            <label for="prompt-agg-select">Prompt aggregation:</label>
-                            <select id="prompt-agg-select" class="control-select">
-                                <option value="max" selected>max</option>
-                                <option value="mean">mean</option>
-                                <option value="median">median</option>
-                                <option value="min">min</option>
-                                <option value="first">first</option>
-                                <option value="stdev">stdev</option>
-                            </select>
-                        </div>
-
                         <div class="control-group" id="acc-norm-control" style="display:none;">
-                            <label for="acc-norm-select">Accuracy norm:</label>
+                            <label for="acc-norm-select">Loglikelihood normalization:</label>
                             <select id="acc-norm-select" class="control-select">
                                 <option value="max" selected>max</option>
-                                <option value="acc">no norm</option>
-                                <option value="acc_norm">character norm</option>
-                                <option value="acc_mutual_info">PMI norm</option>
+                                <option value="none">none</option>
+                                <option value="norm">character length</option>
+                                <option value="mutual_info">PMI</option>
                             </select>
                         </div>
 
                         <div class="control-group">
                             <label for="norm-select">Normalization:</label>
                             <select id="norm-select" class="control-select">
-                                <option value="none">none</option>
                                 <option value="baseline" selected>random baseline</option>
+                                <option value="zscore">z-score</option>
+                                <option value="minmax">min-max</option>
+                                <option value="none">none</option>
                             </select>
                         </div>
 
@@ -157,8 +130,8 @@
                         <div class="control-group">
                             <label>Error bands:</label>
                             <div class="shot-toggle">
-                                <button class="ci-btn active" data-ci="1">shown</button>
-                                <button class="ci-btn" data-ci="0">hidden</button>
+                                <button class="ci-btn" data-ci="1">shown</button>
+                                <button class="ci-btn active" data-ci="0">hidden</button>
                             </div>
                         </div>
                     </div>

@@ -1,0 +1,29 @@
+{
+ "results": {
+  "french_xnli_p2": {
+   "alias": "french_xnli_p2",
+   "acc,none": 0.3383233532934132,
+   "acc_stderr,none": 0.006685184166851517,
+   "acc_norm,none": 0.3321357285429142,
+   "acc_norm_stderr,none": 0.006654667909419971,
+   "norm_loglikelihood_corr,none": -0.14134506050637766,
+   "norm_loglikelihood_corr_stderr,none": 0.0008411318677452616
+  }
+ },
+ "n-samples": {
+  "french_xnli_p2": {
+   "original": 5010,
+   "effective": 5010
+  }
+ },
+ "n-shot": {
+  "french_xnli_p2": 5
+ },
+ "configs": {
+  "french_xnli_p2": {
+   "task": "french_xnli_p2",
+   "output_type": "multiple_choice"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

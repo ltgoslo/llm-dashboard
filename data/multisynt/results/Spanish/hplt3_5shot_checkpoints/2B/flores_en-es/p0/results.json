@@ -1,0 +1,27 @@
+{
+ "results": {
+  "flores_en-es_p0": {
+   "alias": "flores_en-es_p0",
+   "bleu,none": 0.02395816053311675,
+   "bleu_stderr,none": 0.00889234473520963,
+   "chrf,none": 4.0652268399364315,
+   "chrf_stderr,none": 0.08487536549251512
+  }
+ },
+ "n-samples": {
+  "flores_en-es_p0": {
+   "original": 1012,
+   "effective": 1012
+  }
+ },
+ "n-shot": {
+  "flores_en-es_p0": 5
+ },
+ "configs": {
+  "flores_en-es_p0": {
+   "task": "flores_en-es_p0",
+   "output_type": "generate_until"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

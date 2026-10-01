@@ -20,7 +20,15 @@ export const METRIC_DISPLAY = {
   acc: "accuracy",
   acc_norm: "accuracy (character norm)",
   acc_mutual_info: "accuracy (PMI norm)",
+  prob_correct: "probability of correct answer",
+  prob_correct_norm: "probability of correct answer (character norm)",
+  prob_correct_mutual_info: "probability of correct answer (PMI norm)",
+  loglikelihood_correct: "log-likelihood of correct answer",
+  loglikelihood_correct_norm: "log-likelihood of correct answer (character norm)",
+  loglikelihood_correct_mutual_info: "log-likelihood of correct answer (PMI norm)",
   f1: "F1",
+  f1_norm: "F1 (character norm)",
+  f1_mutual_info: "F1 (PMI norm)",
   em: "exact match",
   em_first: "exact match (first word)",
   exact: "exact match",
@@ -51,7 +59,8 @@ export const METRIC_DISPLAY = {
 
 export const METRIC_SCALES = {
   acc: "unit", acc_norm: "unit", acc_mutual_info: "unit",
-  f1: "unit", em: "unit", em_first: "unit",
+  prob_correct: "unit", prob_correct_norm: "unit", prob_correct_mutual_info: "unit",
+  f1: "unit", f1_norm: "unit", f1_mutual_info: "unit", em: "unit", em_first: "unit",
   exact: "unit", exact_match: "unit", fscore: "unit", bleu_acc: "unit",
   rougeL_acc: "unit", rouge1_acc: "unit", rouge2_acc: "unit",
   mcc: "unit", is_included: "unit",
@@ -64,6 +73,8 @@ export const METRIC_SCALES = {
   // "raw": shown on its native scale (no ×100), may be negative, and is
   // exempt from the random-baseline normalization and the y ≥ 0 axis floor.
   norm_loglikelihood_corr: "raw",
+  loglikelihood_correct: "raw", loglikelihood_correct_norm: "raw",
+  loglikelihood_correct_mutual_info: "raw",
 };
 
 /** Whether a metric is displayed on its own raw (possibly negative) scale. */
@@ -75,6 +86,8 @@ export const METRIC_DESCRIPTIONS = {
   acc: "Proportion of correctly classified examples.",
   acc_norm: "Accuracy after normalizing answer log-likelihoods by character length.",
   acc_mutual_info: "Accuracy after normalizing answer log-likelihoods by their unconditional (PMI) likelihood.",
+  prob_correct: "Soft accuracy: the probability mass the model puts on the correct answer, after normalizing the answer likelihoods over the choices.",
+  loglikelihood_correct: "Log-likelihood the model assigns to the correct answer. Raw (negative) scale; higher is better.",
   f1: "Harmonic mean of precision and recall.",
   em: "Proportion of predictions that exactly match the reference.",
   em_first: "Exact match accuracy of the first generated word against the correct completion word.",
@@ -152,62 +165,208 @@ export function toDisplayScale(value, benchmark, metric) {
   return scale === "unit" ? value * 100 : value;
 }
 
+// ── Log-likelihood normalization variants ──
+// NorEval 1.2 scores every answer-ranking metric under three normalizations
+// of the answer log-likelihoods: none (`<m>`), character length (`<m>_norm`)
+// and PMI (`<m>_mutual_info`). The multisynt "Loglikelihood normalization"
+// selector picks one of them (or the best-scoring one) orthogonally to the
+// base metric; see resolvePoint().
+
+/** Suffix a selector value maps to; undefined for "max" (best of the three).
+ *  Accepts both the generic values and the legacy acc-named ones. */
+const LL_NORM_SUFFIX = {
+  none: "", norm: "_norm", mutual_info: "_mutual_info",
+  acc: "", acc_norm: "_norm", acc_mutual_info: "_mutual_info",
+};
+
+/** "acc_norm" → "acc", "prob_correct_mutual_info" → "prob_correct"; a base
+ *  metric (or a subtask metric, or `norm_loglikelihood_corr`) is returned
+ *  unchanged. */
+export function llNormBase(metric) {
+  if (!metric || metric.indexOf(": ") !== -1) return metric;
+  for (const suffix of ["_mutual_info", "_norm"]) {
+    if (metric.endsWith(suffix) && metric.length > suffix.length) {
+      return metric.slice(0, -suffix.length);
+    }
+  }
+  return metric;
+}
+
+/** The three normalization variants of a base metric. */
+export function llNormVariants(base) {
+  return [base, base + "_norm", base + "_mutual_info"];
+}
+
+/** Whether `metrics` (an array or Set) carries all three variants of `base`. */
+export function hasLLNormVariants(metrics, base) {
+  const set = metrics instanceof Set ? metrics : new Set(metrics || []);
+  return llNormVariants(base).every((m) => set.has(m));
+}
+
+/** A task's metric under the hard/soft selector: the configured
+ *  `soft_metric` (e.g. the probability of the correct answer) when the
+ *  multisynt "Metric type" is soft and the task has one, else `main_metric`. */
+export function taskBaseMetric(benchmark) {
+  const info = state.metricsSetup[benchmark];
+  if (!info) return undefined;
+  return state.metricMode === "soft" && info.soft_metric ? info.soft_metric : info.main_metric;
+}
+
+/** Random baseline of a task for `metric`: the soft metric's own baseline
+ *  when it has one (`soft_random_baseline`), else the task's. */
+export function taskRandomBaseline(benchmark, metric) {
+  const info = state.metricsSetup[benchmark];
+  metric = metric || taskBaseMetric(benchmark);
+  if (metric && info.soft_metric && llNormBase(metric) === info.soft_metric
+      && info.soft_random_baseline != null) {
+    return info.soft_random_baseline;
+  }
+  return info.random_baseline;
+}
+
+/** Whether a task is kept by the multisynt task-type selector (null/"all"
+ *  on the other dashboards keeps everything). */
+export function taskTypeMatches(benchmark) {
+  const t = state.taskTypeFilter;
+  if (!t || t === "all") return true;
+  return state.metricsSetup[benchmark]?.evaluation_type === t;
+}
+
+/** The checked tasks that pass the task-type selector — the set every
+ *  aggregate view averages over. */
+export function getAggregatedTasks() {
+  return [...state.checkedTasks].filter(taskTypeMatches);
+}
+
 // ─────────────────────────────────────────────────────────────
 // Score access (prompt-aggregation aware)
 // ─────────────────────────────────────────────────────────────
 
-/** The accuracy-normalization variants the multisynt "Accuracy norm"
- *  selector chooses between (in the order they are compared for "max"). */
+/** The accuracy-normalization variants the "Accuracy norm" selector of the
+ *  prelude dashboard chooses between (in the order they are compared for
+ *  "max"). */
 export const ACC_NORM_VARIANTS = ["acc", "acc_norm", "acc_mutual_info"];
 
-/** Resolve the stored score entry for one (bench, shot) block, honoring the
- *  multisynt formulation and accuracy-normalization selectors. Inert on
- *  dashboards that never set those state fields (both null) or for tasks
- *  without the corresponding variants:
- *   - state.currentFormulation ("cf"/"mcf"/"hybrid") swaps in the entry's
- *     `by_form` sub-aggregate when the task has one; "max" keeps the pooled
- *     aggregate over all formulations.
- *   - state.currentAccNorm redirects the main-metric "acc" lookup to one of
- *     ACC_NORM_VARIANTS, or, for "max", to whichever variant scores highest
- *     under the current prompt aggregation. Only applies when the block
- *     carries all three variants; an explicit non-acc metric selection
- *     bypasses it. */
-export function resolveScoreObj(shotBlock, bench, metric) {
-  if (!shotBlock) return undefined;
-  const main = state.metricsSetup[bench]?.main_metric;
-  metric = metric || main;
-  const form = state.currentFormulation;
-  const pickForm = (obj) =>
-    obj && typeof obj === "object" && form && form !== "max" && obj.by_form?.[form]
-      ? obj.by_form[form]
-      : obj;
+/** The stored prompt-aggregation entry of `metric` in one (bench, shot)
+ *  block: the greedy-decoding run (`by_decoding.greedy`) when the Decoding
+ *  selector asks for it and the entry has one, and within that the
+ *  formulation's `by_form` sub-aggregate when `form` names one the entry
+ *  has (else the pooled entry). */
+function pickEntry(shotBlock, metric, form) {
+  let e = shotBlock[metric];
+  const dec = state.currentDecoding;
+  if (dec && dec !== "sampling" && e && typeof e === "object" && e.by_decoding?.[dec]) e = e.by_decoding[dec];
+  return form && e && typeof e === "object" && e.by_form?.[form] ? e.by_form[form] : e;
+}
 
-  const anorm = state.currentAccNorm;
-  if (anorm && metric === "acc" && main === "acc"
-      && ACC_NORM_VARIANTS.every((m) => shotBlock[m] != null)) {
-    if (anorm !== "max") return pickForm(shotBlock[anorm]);
-    // "stdev" has no score to rank variants by; use the best prompt instead.
-    const aggField = state.currentPromptAgg === "stdev" ? "max" : state.currentPromptAgg;
-    let best;
-    let bestV = -Infinity;
-    for (const m of ACC_NORM_VARIANTS) {
-      const o = pickForm(shotBlock[m]);
-      const v = typeof o === "number" ? o : o?.[aggField];
-      if (v != null && v > bestV) { best = o; bestV = v; }
-    }
-    if (best !== undefined) return best;
+/** {value, loDist, hiDist, obj} of one stored entry under the prompt
+ *  aggregation `agg`; undefined when the entry has no such aggregate. */
+function entryPoint(entry, agg) {
+  if (entry == null) return undefined;
+  if (typeof entry === "number") return { value: agg === "stdev" ? 0 : entry, obj: null };
+  if (agg === "stdev") return entry.prompt_sd != null ? { value: entry.prompt_sd, obj: entry } : undefined;
+  const v = entry[agg];
+  if (v == null) return undefined;
+  const lo = entry[agg + "_ci_lo"], hi = entry[agg + "_ci_hi"];
+  return {
+    value: v,
+    loDist: lo != null ? Math.max(0, v - lo) : undefined,
+    hiDist: hi != null ? Math.max(0, hi - v) : undefined,
+    obj: entry,
+  };
+}
+
+/** The log-likelihood-normalization variants the selector may choose from
+ *  for `metric` in this block: all three when the selector is active and the
+ *  block carries them, else just `metric` itself. The default scope ("acc")
+ *  only redirects a task's main "acc" metric (prelude); multisynt widens it
+ *  to every base metric (`state.llNormScope = "all"`). An explicitly chosen
+ *  variant such as "acc_norm" is always taken literally. */
+function llVariantsInBlock(shotBlock, bench, metric) {
+  if (!state.currentAccNorm || metric !== llNormBase(metric)) return [metric];
+  if ((state.llNormScope || "acc") === "acc"
+      && !(metric === "acc" && state.metricsSetup[bench]?.main_metric === "acc")) {
+    return [metric];
   }
-  return pickForm(shotBlock[metric]);
+  const vs = llNormVariants(metric);
+  return vs.every((m) => shotBlock[m] != null) ? vs : [metric];
+}
+
+/** The variant of `metric` the selector resolves to: the chosen one, or for
+ *  "max" whichever scores highest under the current prompt aggregation
+ *  (within `form` when a formulation is selected). The variants of a
+ *  raw-scale metric (a log-likelihood, its length-normalized form and its
+ *  PMI) live on different scales, so "max" keeps the plain one there. */
+function chooseVariant(shotBlock, bench, metric, form) {
+  const vs = llVariantsInBlock(shotBlock, bench, metric);
+  if (vs.length === 1) return vs[0];
+  const suffix = LL_NORM_SUFFIX[state.currentAccNorm];
+  if (suffix !== undefined) return metric + suffix;
+  if (isRawScaleMetric(metric)) return metric;
+  // "stdev" has no score to rank variants by; use the best prompt instead.
+  const rankAgg = state.currentPromptAgg === "stdev" ? "max" : state.currentPromptAgg;
+  let best = vs[0], bestV = -Infinity;
+  for (const m of vs) {
+    const e = pickEntry(shotBlock, m, form);
+    const v = typeof e === "number" ? e : e?.[rankAgg];
+    if (v != null && v > bestV) { best = m; bestV = v; }
+  }
+  return best;
+}
+
+/** Resolve the displayed point of one (bench, shot) block — the score under
+ *  the current prompt aggregation plus its stored 95% CI distances — honoring
+ *  the multisynt/prelude selectors. Returns {value, loDist, hiDist, obj} or
+ *  undefined; `obj` is the stored entry the point came from (for the
+ *  prompt-noise fields the signal filter reads).
+ *   - state.currentAccNorm picks the log-likelihood normalization variant
+ *     (see chooseVariant); null on dashboards without the selector.
+ *   - state.currentDecoding ("greedy") swaps in a generative task's
+ *     greedy-decoding run where it has one; "sampling" (or null) keeps the
+ *     entry itself.
+ *   - state.currentFormulation ("cf"/"mcf"/"hybrid") swaps in the entry's
+ *     `by_form` sub-aggregate when the task has one. "max" keeps the pooled
+ *     aggregate over all formulations — unless state.formulationCombine is
+ *     set (multisynt): then "max"/"mean" aggregate *across* formulations the
+ *     per-formulation scores obtained under the prompt aggregation. max∘max
+ *     and mean∘mean (with equally many prompts per formulation) coincide
+ *     with the pooled aggregate, whose precomputed CI is exact and is used;
+ *     the mixed combinations take the CI of the best formulation (max) or
+ *     combine the per-formulation CI distances in quadrature (mean). */
+export function resolvePoint(shotBlock, bench, metric) {
+  if (!shotBlock) return undefined;
+  metric = metric || taskBaseMetric(bench);
+  const agg = state.currentPromptAgg;
+  const form = state.currentFormulation;
+  const pooled = pickEntry(shotBlock, metric, null);
+  const byForm = pooled && typeof pooled === "object" ? pooled.by_form : undefined;
+  const forms = byForm ? Object.keys(byForm) : [];
+  const pointFor = (f) => entryPoint(pickEntry(shotBlock, chooseVariant(shotBlock, bench, metric, f), f), agg);
+
+  if (!form || !forms.length) return pointFor(null);
+  if (form !== "max" && form !== "mean") return pointFor(forms.includes(form) ? form : null);
+  if (!state.formulationCombine || forms.length < 2) return pointFor(null);
+
+  const equalCounts = forms.every((f) => byForm[f].n_prompts === byForm[forms[0]].n_prompts);
+  if (equalCounts && agg === form) return pointFor(null);
+  const pts = forms.map(pointFor).filter(Boolean);
+  if (!pts.length) return undefined;
+  if (form === "max") return pts.reduce((a, b) => (b.value > a.value ? b : a));
+  const k = pts.length;
+  const quad = (key) => pts.every((p) => p[key] != null)
+    ? Math.sqrt(pts.reduce((sum, p) => sum + p[key] * p[key], 0)) / k
+    : undefined;
+  return {
+    value: pts.reduce((sum, p) => sum + p.value, 0) / k,
+    loDist: quad("loDist"), hiDist: quad("hiDist"),
+    obj: pointFor(null)?.obj ?? null,
+  };
 }
 
 /** Pull raw score from a data source, respecting the current prompt aggregation.
  *  The "stdev" prompt-agg returns prompt_sd (used by multisynt). */
 export function getScore(dataSource, entity, bench, shot, metric) {
-  const obj = resolveScoreObj(dataSource[entity]?.[bench]?.[shot], bench, metric);
-  if (obj === undefined || obj === null) return undefined;
-  if (typeof obj === "number") return state.currentPromptAgg === "stdev" ? 0 : obj;
-  if (state.currentPromptAgg === "stdev") return obj.prompt_sd != null ? obj.prompt_sd : undefined;
-  return obj[state.currentPromptAgg];
+  return resolvePoint(dataSource[entity]?.[bench]?.[shot], bench, metric)?.value;
 }
 
 /** Pull stored asymmetric 95% CI (loDist, hiDist) for the current prompt
@@ -220,20 +379,15 @@ export function getScore(dataSource, entity, bench, shot, metric) {
  *                  Wilson SE otherwise. Intentionally asymmetric.
  *    - mean:       Welch–Satterthwaite combination of sampling and between-
  *                  prompt variance.
- *    - median / first: sampling CI of the selected prompt (no Bonferroni).
+ *    - median / first / single: sampling CI of the selected prompt (no
+ *                  Bonferroni).
  *
  *  Estimand: θ_k = aggregation_{i ≤ k} μ(p_i) — over the k specific prompts
  *  evaluated, not the prompt-population supremum. */
 export function getCIDistances(dataSource, entity, bench, shot, metric) {
-  const obj = resolveScoreObj(dataSource[entity]?.[bench]?.[shot], bench, metric);
-  if (!obj || typeof obj === "number") return undefined;
-  const agg = state.currentPromptAgg;
-  if (agg === "stdev") return undefined;
-  const v = obj[agg];
-  const lo = obj[agg + "_ci_lo"];
-  const hi = obj[agg + "_ci_hi"];
-  if (v == null || lo == null || hi == null) return undefined;
-  return { loDist: Math.max(0, v - lo), hiDist: Math.max(0, hi - v) };
+  const pt = resolvePoint(dataSource[entity]?.[bench]?.[shot], bench, metric);
+  if (!pt || pt.loDist == null || pt.hiDist == null) return undefined;
+  return { loDist: pt.loDist, hiDist: pt.hiDist };
 }
 
 /** CI distances for display. Returns undefined for the "stdev" prompt-
@@ -249,10 +403,11 @@ export function getCombinedCI(dataSource, entity, bench, shot, metric) {
 // Normalization
 // ─────────────────────────────────────────────────────────────
 
-/** Baseline normalization: 0 = random baseline, 100 = perfect. */
-export function baselineNorm(raw, benchmark) {
+/** Baseline normalization: 0 = random baseline, 100 = perfect. The
+ *  baseline is the task's, or the soft metric's own when `metric` is it. */
+export function baselineNorm(raw, benchmark, metric) {
   const info = state.metricsSetup[benchmark];
-  const base = info.random_baseline, max = info.max_performance;
+  const base = taskRandomBaseline(benchmark, metric), max = info.max_performance;
   return max === base ? 0 : ((raw - base) / (max - base)) * 100;
 }
 
@@ -266,7 +421,7 @@ export function applyNorm(raw, benchmark, allRaw, metric) {
     // The task's random baseline is defined for its main metric, not for a
     // raw-scale metric like a log-likelihood — show those unnormalized.
     if (metric && isRawScaleMetric(metric)) return toDisplayScale(raw, benchmark, metric);
-    return baselineNorm(raw, benchmark);
+    return baselineNorm(raw, benchmark, metric);
   }
   if (state.currentNormalization === "minmax") {
     if (!allRaw || allRaw.length < 2) return toDisplayScale(raw, benchmark, metric);
@@ -297,7 +452,7 @@ function scaleDistance(dist, benchmark, metric, allRaw) {
   if (state.currentNormalization === "baseline") {
     if (metric && isRawScaleMetric(metric)) return toDisplayScale(dist, benchmark, metric);
     const info = state.metricsSetup[benchmark];
-    const range = info.max_performance - info.random_baseline;
+    const range = info.max_performance - taskRandomBaseline(benchmark, metric);
     return range === 0 ? 0 : (dist / range) * 100;
   }
   if (state.currentNormalization === "minmax") {
@@ -369,7 +524,8 @@ export function getMetricYLabel(benchmark, metric) {
 // ─────────────────────────────────────────────────────────────
 
 export function isMacroSelection() {
-  return state.currentTaskSelection === "__all_macro__";
+  return state.currentTaskSelection === "__all_macro__"
+      || state.currentTaskSelection === "__custom_macro__";
 }
 
 /** Group a benchmark set by category for macro-averaging. */
@@ -438,16 +594,17 @@ export function aggregateScores(benchmarks, scoreFn, macro) {
   };
 }
 
-/** True for any aggregating task selection (all / category / language / eval-type / custom / filtered). */
+/** True for any aggregating task selection (all / category / language / eval-type / custom). */
 export function isAggregateSelection(sel) {
   return sel === "__all__" || sel === "__all_macro__" || sel === "__custom__"
-      || sel === "__filtered__"
+      || sel === "__custom_macro__"
       || sel.startsWith("__cat__") || sel.startsWith("__lang__") || sel.startsWith("__eval__");
 }
 
-/** Effective metric for an individual/group view (currentMetric override, else main_metric). */
+/** Effective metric for an individual/group view: the currentMetric
+ *  override, else the task's metric under the hard/soft selector. */
 export function getEffectiveMetric(benchmark) {
-  return state.currentMetric || state.metricsSetup[benchmark]?.main_metric;
+  return state.currentMetric || taskBaseMetric(benchmark);
 }
 
 /** Chart-title description for a single benchmark: the task description plus

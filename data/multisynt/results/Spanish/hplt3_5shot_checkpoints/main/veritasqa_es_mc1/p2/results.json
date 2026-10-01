@@ -1,0 +1,29 @@
+{
+ "results": {
+  "veritasqa_es_mc1_p2": {
+   "alias": "veritasqa_es_mc1_p2",
+   "acc,none": 0.9405099150141643,
+   "acc_stderr,none": 0.01260760669269361,
+   "acc_norm,none": 0.9348441926345609,
+   "acc_norm_stderr,none": 0.013154515312327699,
+   "norm_loglikelihood_corr,none": -0.013230199065762522,
+   "norm_loglikelihood_corr_stderr,none": 0.0007354716197644747
+  }
+ },
+ "n-samples": {
+  "veritasqa_es_mc1_p2": {
+   "original": 353,
+   "effective": 353
+  }
+ },
+ "n-shot": {
+  "veritasqa_es_mc1_p2": 5
+ },
+ "configs": {
+  "veritasqa_es_mc1_p2": {
+   "task": "veritasqa_es_mc1_p2",
+   "output_type": "multiple_choice"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

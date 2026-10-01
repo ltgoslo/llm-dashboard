@@ -3,115 +3,62 @@
 // Each language is a separate dataset ({metrics_setup, models}); switching the
 // language tab re-binds state.metricsSetup and rebuilds the dropdown/checkbox grid.
 //
-// This is the only dashboard that uses the HPLT-E signal-quality filter.
+// Besides the controls shared with the other progress dashboards, multisynt
+// has: a task-type mask (classification / generative) and a hard/soft metric
+// switch for aggregate views, a "Prompts" selector that folds the prompt
+// aggregation together with a single random prompt, a formulation selector
+// that also aggregates across formulations, a decoding selector, and a
+// log-likelihood normalization selector that is orthogonal to the metric
+// shown (see resolvePoint() in core.js; the controls are shared with prelude
+// through ui.js). Under the chart title it shows the FineWeb2 signal
+// measures of the plotted curves (shared/signals.js).
 
 import { state } from "../shared/state.js";
 import {
-  MODEL_COLORS, isAggregateSelection, capitalize, ACC_NORM_VARIANTS,
+  MODEL_COLORS, isAggregateSelection, isMacroSelection, capitalize,
 } from "../shared/core.js";
-import { makePlotlyConfig, downloadJSON } from "../shared/chart.js";
+import { makePlotlyConfig } from "../shared/chart.js";
 import {
   buildTaskCheckboxes, syncTaskCheckboxStates,
   bindModuleActionStopPropagation, attachControlTooltips, markAppReady,
+  populateFormulationOptions, updateVariantControlVisibility, applyTaskTypeMask,
+  VARIANT_CONTROL_TOOLTIPS,
 } from "../shared/ui.js";
 import {
   renderProgressChart, updateProgressTitle,
 } from "../shared/progress.js";
-import {
-  filter, initFilter, runFilter, showFilterUI, hideFilterUI,
-  resetFilterPanel, serializeCriteria, deserializeCriteria,
-} from "../shared/filter.js";
+import { computeSignals, renderSignals } from "../shared/signals.js";
 import { UrlState } from "../shared/url-state.js";
 
 const ALL_SHOTS = ["0", "5"];
+const DEFAULT_SELECTION = "__all_macro__";
+const DEFAULT_LANGUAGE = "Norwegian";   // falls back to the first language in data.json
 
 const plotlyConfig = makePlotlyConfig("multisynt-chart", () => ({
   language: currentLang,
   shot: state.currentShot + "-shot",
   task_selection: state.currentTaskSelection,
-  prompt_aggregation: state.currentPromptAgg,
+  task_type: state.taskTypeFilter,
+  metric_type: state.metricMode,
+  decoding: state.currentDecoding,
+  prompts: state.currentPromptAgg,
   formulation: state.currentFormulation,
-  accuracy_norm: state.currentAccNorm,
+  loglikelihood_normalization: state.currentAccNorm,
   normalization: state.currentNormalization,
+  ...(state.currentMetric && { metric: state.currentMetric }),
   error_bands: state.showCIBands ? "shown" : "hidden",
+  ...(lastSignals && {
+    signals: {
+      monotonicity: lastSignals.monotonicity,
+      ranking_consistency: lastSignals.rankingConsistency,
+      non_randomness: lastSignals.nonRandomness,
+    },
+  }),
 }));
 
 let currentLang = null;
 let urlState;
-
-// ─────────────────────────────────────────────────────────────
-// HPLT-E filter definitions
-// ─────────────────────────────────────────────────────────────
-
-const DEFAULT_CRITERIA = () => ({
-  monotonicity: {
-    enabled: true, min: 10, max: 100, threshold: 0.5, direction: ">=",
-    label: "Monotonicity", description: "Spearman ρ (tokens vs. score)",
-    tooltip: "Spearman rank correlation between checkpoint token count and benchmark score. Measures whether performance improves monotonically during training. Default threshold: ≥ 0.5.",
-  },
-  snr: {
-    enabled: false, min: 10, max: 100, threshold: 3.0, direction: ">=",
-    label: "Signal-to-noise ratio (SNR)", description: "Signal-to-noise ratio",
-    tooltip: "Ratio of mean signal (score minus random baseline) to mean prompt standard deviation across checkpoints. Note: unlike the original HPLT-E implementation, the random baseline is subtracted from the signal so that chance-level performance yields SNR ≈ 0. Default threshold: ≥ 3.",
-  },
-  cv: {
-    enabled: false, min: 10, max: 100, threshold: 15.0, direction: "<=",
-    label: "Stable pretraining (CV)", description: "Coefficient of variation (%)",
-    tooltip: "Standard deviation divided by mean score across checkpoints, as percentage. Measures score stability during training. Default threshold: ≤ 15%.",
-  },
-  mad: {
-    enabled: false, min: 10, max: 100, threshold: 5.0, direction: "<=",
-    label: "Prompt sensitivity (MAD)", description: "Median MAD across prompts",
-    tooltip: "Median Absolute Deviation of scores across prompt variants, taken as the median over all checkpoints. Default threshold: ≤ 5.",
-  },
-  consistency: {
-    enabled: false, min: 10, max: 100, threshold: 0.5, direction: ">=",
-    label: "Ranking consistency", description: "Kendall τ (model rankings)",
-    tooltip: "Average Kendall's τ correlation of model rankings between successive checkpoints. Measures whether the relative ordering of models is preserved across training. Default threshold: ≥ 0.5.",
-  },
-  promptSwitch: {
-    enabled: false, min: 10, max: 100, threshold: 20.0, direction: "<=",
-    label: "Prompt-switch rate", description: "Best-prompt change rate (%)",
-    tooltip: "Fraction of checkpoints where the best-performing prompt variant changes, as a percentage.",
-  },
-  nonRandom: {
-    enabled: false, min: 10, max: 100, threshold: 5.0, direction: ">=",
-    label: "Non-randomness", description: "Max score − random baseline",
-    tooltip: "Difference between the maximum score and the task's random baseline. Verifies the model learned beyond chance. Default threshold: ≥ 5.",
-  },
-});
-
-// Per-language filter defaults (only used on first load, before URL state
-// or user overrides). Migrated 1:1 from multisynt-dashboard/docs/app.js.
-const FILTER_DEFAULTS = {
-  French: {
-    monotonicity: { enabled: true, min: 2, max: 95, threshold: 0.25 },
-    snr:          { enabled: true, min: 10, max: 95, threshold: 1 },
-    cv:           { enabled: false, min: 10, max: 100, threshold: 15 },
-    mad:          { enabled: false, min: 10, max: 100, threshold: 5 },
-    consistency:  { enabled: true, min: 10, max: 95, threshold: 0.5 },
-    promptSwitch: { enabled: false, min: 10, max: 100, threshold: 20 },
-    nonRandom:    { enabled: true, min: 10, max: 95, threshold: 5 },
-  },
-  Spanish: {
-    monotonicity: { enabled: true, min: 2, max: 95, threshold: 0.25 },
-    snr:          { enabled: true, min: 10, max: 95, threshold: 1 },
-    cv:           { enabled: false, min: 10, max: 100, threshold: 15 },
-    mad:          { enabled: true, min: 10, max: 95, threshold: 5 },
-    consistency:  { enabled: true, min: 10, max: 95, threshold: 0 },
-    promptSwitch: { enabled: false, min: 10, max: 100, threshold: 20 },
-    nonRandom:    { enabled: true, min: 10, max: 95, threshold: 5 },
-  },
-};
-
-function applyFilterDefaults(lang) {
-  const defaults = FILTER_DEFAULTS[lang];
-  if (!defaults) return;
-  for (const [name, vals] of Object.entries(defaults)) {
-    if (!filter.criteria[name]) continue;
-    Object.assign(filter.criteria[name], vals);
-  }
-}
+let lastSignals = null;
 
 // ─────────────────────────────────────────────────────────────
 // Data helpers
@@ -137,18 +84,9 @@ function getTrajectories() {
   const models = getModels();
   return Object.entries(models).map(([modelDir, modelData]) => ({
     name: modelData.display_name,
+    key: modelDir,
     color: modelData.color || MODEL_COLORS[0],
     dataSource: modelData.progress,
-    checkpoints: () => getModelTokens(modelDir),
-  }));
-}
-
-function getAllModelsForFilter() {
-  // The filter module expects {name, color, progress, checkpoints} per model.
-  return Object.entries(getModels()).map(([modelDir, modelData]) => ({
-    name: modelDir,
-    color: modelData.color,
-    progress: modelData.progress,
     checkpoints: () => getModelTokens(modelDir),
   }));
 }
@@ -167,6 +105,17 @@ const chartConfig = {
   hoverXFormat: (x, traceName) => `${traceName || ""} — ${x}B tokens`,
   // Recomputed every render so it tracks language tab changes.
   titlePrefix: () => currentLang.replace(/_/g, " "),
+  // The trajectories are different models: z-score / min-max against the
+  // checkpoints of all of them, so the curves stay comparable.
+  normAcrossTrajectories: true,
+  // Always fully zoomed: the y-axis fits the plotted points (and bands) of
+  // the displayed shot on every render.
+  yRangeFit: true,
+  // FineWeb2 signal measures of exactly what is plotted, shown under the title.
+  onSeries: (series) => {
+    lastSignals = computeSignals(series);
+    renderSignals(document.getElementById("chart-signals"), lastSignals);
+  },
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -175,8 +124,8 @@ const chartConfig = {
 
 function getBenchmarksForSelection(sel) {
   const ms = state.metricsSetup;
-  if (sel === "__all__" || sel === "__all_macro__" || sel === "__filtered__") return Object.keys(ms);
-  if (sel === "__custom__") return [];
+  if (sel === "__all__" || sel === "__all_macro__") return Object.keys(ms);
+  if (sel === "__custom__" || sel === "__custom_macro__") return [];
   if (sel.startsWith("__cat__")) {
     const c = sel.slice(7);
     return Object.keys(ms).filter((b) => ms[b].category === c);
@@ -194,45 +143,7 @@ function autoSetNormalization() {
   document.getElementById("norm-select").value = state.currentNormalization;
 }
 
-// ─────────────────────────────────────────────────────────────
-// Formulation / accuracy-norm selectors
-// ─────────────────────────────────────────────────────────────
-
-const FORMULATION_LABELS = { cf: "CF", mcf: "MCF", hybrid: "Hybrid" };
-
-/** Show/hide the formulation and accuracy-norm selectors depending on what
- *  the current language's tasks provide, and rebuild the formulation options
- *  from the formulations actually present (e.g. Finnish has no "hybrid").
- *  Both selectors only affect tasks carrying the corresponding variants —
- *  see resolveScoreObj in core.js. */
-function updateVariantControls() {
-  const ms = state.metricsSetup;
-  const forms = new Set();
-  let hasAccVariants = false;
-  for (const info of Object.values(ms)) {
-    for (const f of info.formulations || []) forms.add(f);
-    if (info.main_metric === "acc"
-        && ACC_NORM_VARIANTS.every((m) => (info.available_metrics || []).includes(m))) {
-      hasAccVariants = true;
-    }
-  }
-
-  const formSelect = document.getElementById("formulation-select");
-  document.getElementById("formulation-control").style.display = forms.size ? "" : "none";
-  formSelect.innerHTML = "";
-  const options = ["max", ...Object.keys(FORMULATION_LABELS).filter((f) => forms.has(f))];
-  for (const f of options) {
-    const opt = document.createElement("option");
-    opt.value = f;
-    opt.textContent = FORMULATION_LABELS[f] || f;
-    formSelect.appendChild(opt);
-  }
-  if (!options.includes(state.currentFormulation)) state.currentFormulation = "max";
-  formSelect.value = state.currentFormulation;
-
-  document.getElementById("acc-norm-control").style.display = hasAccVariants ? "" : "none";
-  document.getElementById("acc-norm-select").value = state.currentAccNorm;
-}
+const checkedTasks = () => state.checkedTasks;
 
 // ─────────────────────────────────────────────────────────────
 // Tabs and dropdown
@@ -252,7 +163,7 @@ function buildLangTabs(languages) {
 
 function populateTaskDropdown() {
   const select = document.getElementById("task-select");
-  while (select.children.length > 4) select.removeChild(select.lastChild);
+  select.querySelectorAll("optgroup").forEach((g) => g.remove());
   const ms = state.metricsSetup;
 
   const categories = {};
@@ -269,19 +180,6 @@ function populateTaskDropdown() {
       catGroup.appendChild(opt);
     }
     select.appendChild(catGroup);
-  }
-
-  const evalTypes = new Set(Object.values(ms).map((info) => info.evaluation_type).filter(Boolean));
-  if (evalTypes.size > 1) {
-    const evalGroup = document.createElement("optgroup");
-    evalGroup.label = "Aggregate by evaluation type";
-    for (const et of [...evalTypes].sort()) {
-      const opt = document.createElement("option");
-      opt.value = "__eval__" + et;
-      opt.textContent = capitalize(et) + " tasks";
-      evalGroup.appendChild(opt);
-    }
-    select.appendChild(evalGroup);
   }
 
   const taskGroup = document.createElement("optgroup");
@@ -301,6 +199,13 @@ function populateTaskDropdown() {
 // Event listeners
 // ─────────────────────────────────────────────────────────────
 
+function bindSelect(id, apply) {
+  document.getElementById(id).addEventListener("change", (e) => {
+    apply(e.target.value);
+    render();
+  });
+}
+
 function bindEventListeners() {
   document.getElementById("tab-nav").addEventListener("click", (e) => {
     const btn = e.target.closest(".tab-btn");
@@ -318,19 +223,6 @@ function bindEventListeners() {
       render();
     });
   });
-
-  document.getElementById("prompt-agg-select").addEventListener("change", (e) => {
-    state.currentPromptAgg = e.target.value;
-    render();
-  });
-  document.getElementById("formulation-select").addEventListener("change", (e) => {
-    state.currentFormulation = e.target.value;
-    render();
-  });
-  document.getElementById("acc-norm-select").addEventListener("change", (e) => {
-    state.currentAccNorm = e.target.value;
-    render();
-  });
   document.querySelectorAll(".ci-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       document.querySelector(".ci-btn.active")?.classList.remove("active");
@@ -339,71 +231,41 @@ function bindEventListeners() {
       render();
     });
   });
-  document.getElementById("norm-select").addEventListener("change", (e) => {
-    state.currentNormalization = e.target.value;
-    render();
-  });
-  document.getElementById("metric-select").addEventListener("change", (e) => {
-    state.currentMetric = e.target.value;
-    render();
-  });
+
+  bindSelect("task-type-select", (v) => state.taskTypeFilter = v);
+  bindSelect("metric-mode-select", (v) => state.metricMode = v);
+  bindSelect("decoding-select", (v) => state.currentDecoding = v);
+  bindSelect("prompt-agg-select", (v) => state.currentPromptAgg = v);
+  bindSelect("formulation-select", (v) => state.currentFormulation = v);
+  bindSelect("acc-norm-select", (v) => state.currentAccNorm = v);
+  bindSelect("norm-select", (v) => state.currentNormalization = v);
+  bindSelect("metric-select", (v) => state.currentMetric = v);
 
   document.getElementById("task-select").addEventListener("change", (e) => {
     state.currentTaskSelection = e.target.value;
-    if (state.currentTaskSelection === "__filtered__") {
-      filter.allBenchmarks = new Set(Object.keys(state.metricsSetup));
-      state.checkedTasks = new Set(filter.allBenchmarks);
-      showFilterUI();
-      runFilter(getAllModelsForFilter(), state.currentShot);
-    } else {
-      hideFilterUI();
-      const benchmarks = getBenchmarksForSelection(state.currentTaskSelection);
-      if (benchmarks.length > 0) state.checkedTasks = new Set(benchmarks);
-    }
-    syncTaskCheckboxStates(() => state.currentTaskSelection === "__filtered__" ? filter.allBenchmarks : state.checkedTasks);
+    const benchmarks = getBenchmarksForSelection(state.currentTaskSelection);
+    if (benchmarks.length > 0) state.checkedTasks = new Set(benchmarks);
+    syncTaskCheckboxStates(checkedTasks);
     autoSetNormalization();
     render();
   });
 
   document.getElementById("select-all-btn").addEventListener("click", () => {
-    if (state.currentTaskSelection === "__filtered__") {
-      filter.allBenchmarks = new Set(Object.keys(state.metricsSetup));
-      syncTaskCheckboxStates(() => filter.allBenchmarks);
-      runFilter(getAllModelsForFilter(), state.currentShot);
-      render();
-    } else {
-      state.checkedTasks = new Set(Object.keys(state.metricsSetup));
-      state.currentTaskSelection = "__all__";
-      document.getElementById("task-select").value = "__all__";
-      syncTaskCheckboxStates(() => state.checkedTasks);
-      autoSetNormalization();
-      render();
-    }
+    state.checkedTasks = new Set(Object.keys(state.metricsSetup));
+    state.currentTaskSelection = DEFAULT_SELECTION;
+    document.getElementById("task-select").value = DEFAULT_SELECTION;
+    syncTaskCheckboxStates(checkedTasks);
+    autoSetNormalization();
+    render();
   });
   document.getElementById("select-none-btn").addEventListener("click", () => {
-    if (state.currentTaskSelection === "__filtered__") {
-      filter.allBenchmarks.clear();
-      syncTaskCheckboxStates(() => filter.allBenchmarks);
-      runFilter(getAllModelsForFilter(), state.currentShot);
-      render();
-    } else {
-      state.checkedTasks.clear();
-      syncTaskCheckboxStates(() => state.checkedTasks);
-      render();
-    }
+    state.checkedTasks.clear();
+    syncTaskCheckboxStates(checkedTasks);
+    render();
   });
 }
 
 function onTaskCheckboxChange() {
-  if (state.currentTaskSelection === "__filtered__") {
-    filter.allBenchmarks = new Set();
-    document.querySelectorAll("#checkbox-grid input[data-bench]").forEach((cb) => {
-      if (cb.checked) filter.allBenchmarks.add(cb.dataset.bench);
-    });
-    runFilter(getAllModelsForFilter(), state.currentShot);
-    render();
-    return;
-  }
   if (state.checkedTasks.size === 1) {
     const bench = [...state.checkedTasks][0];
     state.currentTaskSelection = bench;
@@ -412,51 +274,12 @@ function onTaskCheckboxChange() {
     render();
     return;
   }
-  state.currentTaskSelection = "__custom__";
-  document.getElementById("task-select").value = "__custom__";
+  // A hand-picked subset keeps the averaging of the view it was made from:
+  // category average stays category average.
+  state.currentTaskSelection = isMacroSelection() ? "__custom_macro__" : "__custom__";
+  document.getElementById("task-select").value = state.currentTaskSelection;
   autoSetNormalization();
   render();
-}
-
-// ─────────────────────────────────────────────────────────────
-// Filter UI bindings
-// ─────────────────────────────────────────────────────────────
-
-function onFilterChange() {
-  runFilter(getAllModelsForFilter(), state.currentShot);
-  render();
-}
-
-function bindFilterIO() {
-  // (Re)bind every time the filter UI is shown, since the buttons exist in the
-  // panel but the body is conditionally rendered.
-  const dlBtn = document.getElementById("filter-download-btn");
-  if (dlBtn) {
-    dlBtn.onclick = () => {
-      downloadJSON(serializeCriteria(),
-        "filter-criteria-" + (currentLang || "default").toLowerCase() + ".json");
-    };
-  }
-  const ulBtn = document.getElementById("filter-upload-btn");
-  const ulInput = document.getElementById("filter-upload-input");
-  if (ulBtn && ulInput) {
-    ulBtn.onclick = () => ulInput.click();
-    ulInput.onchange = () => {
-      const file = ulInput.files[0];
-      if (!file) return;
-      file.text().then((json) => {
-        try {
-          deserializeCriteria(JSON.parse(json));
-          showFilterUI();  // re-render with new values
-          runFilter(getAllModelsForFilter(), state.currentShot);
-          render();
-        } catch (e) {
-          console.error("Failed to import criteria:", e);
-        }
-      });
-      ulInput.value = "";
-    };
-  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -466,29 +289,23 @@ function bindFilterIO() {
 function setLanguage(lang) {
   currentLang = lang;
   state.metricsSetup = state.DATA.languages[lang].metrics_setup;
-  applyFilterDefaults(lang);
 
   populateTaskDropdown();
-  updateVariantControls();
+  populateFormulationOptions();
   // Reset selections that don't exist in the new language: unknown individual
-  // tasks, and category/eval-type subsets that match nothing here.
+  // tasks, and category subsets that match nothing here.
   const sel = state.currentTaskSelection;
   if ((!isAggregateSelection(sel) && !state.metricsSetup[sel])
       || ((sel.startsWith("__cat__") || sel.startsWith("__eval__"))
           && getBenchmarksForSelection(sel).length === 0)) {
-    state.currentTaskSelection = "__filtered__";
+    state.currentTaskSelection = DEFAULT_SELECTION;
   }
   document.getElementById("task-select").value = state.currentTaskSelection;
-  filter.allBenchmarks = new Set(Object.keys(state.metricsSetup));
-  // Re-derive the checked set from the kept selection (a category/eval-type
-  // subset means different tasks in the new language); fall back to all tasks.
+  // Re-derive the checked set from the kept selection (a category subset
+  // means different tasks in the new language); fall back to all tasks.
   const kept = getBenchmarksForSelection(state.currentTaskSelection);
   state.checkedTasks = new Set(kept.length ? kept : Object.keys(state.metricsSetup));
-  buildTaskCheckboxes({
-    filterSourceFn: () => state.currentTaskSelection === "__filtered__" ? filter.allBenchmarks : state.checkedTasks,
-    onChange: onTaskCheckboxChange,
-  });
-  resetFilterPanel();
+  buildTaskCheckboxes({ filterSourceFn: checkedTasks, onChange: onTaskCheckboxChange });
   autoSetNormalization();
   render();
 }
@@ -499,17 +316,11 @@ function setLanguage(lang) {
 
 function render() {
   updateProgressTitle(chartConfig);
-  if (state.currentTaskSelection === "__filtered__") {
-    if (filter.allBenchmarks.size === 0) {
-      filter.allBenchmarks = new Set(Object.keys(state.metricsSetup));
-    }
-    showFilterUI();
-    bindFilterIO();
-    runFilter(getAllModelsForFilter(), state.currentShot);
-  } else {
-    hideFilterUI();
-  }
   renderProgressChart(chartConfig);
+  // After the chart: the single-task metric selector is populated during
+  // the render, and the loglikelihood-normalization control follows it.
+  updateVariantControlVisibility();
+  applyTaskTypeMask();
   urlState.save();
 }
 
@@ -517,43 +328,66 @@ function render() {
 // URL state
 // ─────────────────────────────────────────────────────────────
 
+// Values written by earlier versions of the dashboard, mapped onto the
+// current selectors so old links keep working.
+const LEGACY_PROMPT_AGG = { median: "max", min: "max", first: "max", stdev: "max" };
+const LEGACY_LL_NORM = { acc: "none", acc_norm: "norm", acc_mutual_info: "mutual_info" };
+
 function setupUrlState() {
   urlState = new UrlState([
     { key: "lang", get: () => currentLang, set: (v) => currentLang = v, default: null, noDefault: true },
     { key: "shot", get: () => state.currentShot, set: (v) => state.currentShot = v, default: "5" },
-    { key: "task", get: () => state.currentTaskSelection, set: (v) => state.currentTaskSelection = v, default: "__filtered__" },
-    { key: "pagg", get: () => state.currentPromptAgg, set: (v) => state.currentPromptAgg = v, default: "max" },
-    { key: "form", get: () => state.currentFormulation, set: (v) => state.currentFormulation = v, default: "max" },
-    { key: "anorm", get: () => state.currentAccNorm, set: (v) => state.currentAccNorm = v, default: "max" },
-    { key: "ci", get: () => state.showCIBands ? "1" : "0", set: (v) => state.showCIBands = v !== "0", default: "1" },
-    { key: "norm", get: () => state.currentNormalization, set: (v) => state.currentNormalization = v, default: "baseline" },
-    { key: "metric", get: () => state.currentMetric || "", set: (v) => state.currentMetric = v, default: "" },
     {
-      key: "fc",
-      get: () => {
-        // Encode criteria compactly: name=enabled,min,max,thresh
-        const parts = [];
-        for (const [name, cfg] of Object.entries(filter.criteria)) {
-          parts.push(name + ":" + (cfg.enabled ? "1" : "0") + "," + cfg.min + "," + cfg.max + "," + cfg.threshold);
-        }
-        return parts.join(";");
-      },
+      key: "task",
+      get: () => state.currentTaskSelection,
       set: (v) => {
-        for (const part of v.split(";")) {
-          const [name, vals] = part.split(":");
-          if (!name || !vals || !filter.criteria[name]) continue;
-          const [en, mn, mx, th] = vals.split(",");
-          const cfg = filter.criteria[name];
-          cfg.enabled = en === "1";
-          if (!isNaN(Number(mn))) cfg.min = Number(mn);
-          if (!isNaN(Number(mx))) cfg.max = Number(mx);
-          if (!isNaN(Number(th))) cfg.threshold = Number(th);
+        // The former "aggregate by evaluation type" entries became the
+        // task-type selector; the former signal-filtered selection is gone.
+        if (v.startsWith("__eval__")) {
+          state.taskTypeFilter = v.slice(8);
+          state.currentTaskSelection = DEFAULT_SELECTION;
+        } else {
+          state.currentTaskSelection = v === "__filtered__" ? DEFAULT_SELECTION : v;
         }
       },
-      default: "",
-      noDefault: true,
+      default: DEFAULT_SELECTION,
     },
+    { key: "ttype", get: () => state.taskTypeFilter, set: (v) => state.taskTypeFilter = v, default: "all" },
+    { key: "mmode", get: () => state.metricMode, set: (v) => state.metricMode = v, default: "hard" },
+    { key: "dec", get: () => state.currentDecoding, set: (v) => state.currentDecoding = v, default: "sampling" },
+    { key: "pagg", get: () => state.currentPromptAgg, set: (v) => state.currentPromptAgg = LEGACY_PROMPT_AGG[v] || v, default: "max" },
+    { key: "form", get: () => state.currentFormulation, set: (v) => state.currentFormulation = v, default: "max" },
+    { key: "anorm", get: () => state.currentAccNorm, set: (v) => state.currentAccNorm = LEGACY_LL_NORM[v] || v, default: "max" },
+    { key: "ci", get: () => state.showCIBands ? "1" : "0", set: (v) => state.showCIBands = v !== "0", default: "0" },
+    { key: "norm", get: () => state.currentNormalization, set: (v) => state.currentNormalization = v === "percentile" ? "baseline" : v, default: "baseline" },
+    { key: "metric", get: () => state.currentMetric || "", set: (v) => state.currentMetric = v, default: "" },
   ], { mode: "search" });
+}
+
+/** Push every selector's state into its control (after a URL restore).
+ *  Unknown values (e.g. a removed option) fall back to the control's
+ *  default and are written back to the state. */
+function syncControlsFromState() {
+  const setSelect = (id, value, fallback) => {
+    const select = document.getElementById(id);
+    select.value = value;
+    if (select.value !== value) select.value = fallback;
+    return select.value;
+  };
+  setSelect("task-select", state.currentTaskSelection, DEFAULT_SELECTION);
+  state.taskTypeFilter = setSelect("task-type-select", state.taskTypeFilter, "all");
+  state.metricMode = setSelect("metric-mode-select", state.metricMode, "hard");
+  state.currentDecoding = setSelect("decoding-select", state.currentDecoding, "sampling");
+  state.currentPromptAgg = setSelect("prompt-agg-select", state.currentPromptAgg, "max");
+  state.currentFormulation = setSelect("formulation-select", state.currentFormulation, "max");
+  state.currentAccNorm = setSelect("acc-norm-select", state.currentAccNorm, "max");
+  state.currentNormalization = setSelect("norm-select", state.currentNormalization, "baseline");
+  document.querySelectorAll(".shot-btn").forEach((b) =>
+    b.classList.toggle("active", b.dataset.shot === state.currentShot));
+  document.querySelectorAll(".ci-btn").forEach((b) =>
+    b.classList.toggle("active", b.dataset.ci === (state.showCIBands ? "1" : "0")));
+  document.querySelectorAll(".tab-btn").forEach((b) =>
+    b.classList.toggle("active", b.dataset.lang === currentLang));
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -567,55 +401,46 @@ async function init() {
     const languages = Object.keys(state.DATA.languages);
     if (!languages.length) throw new Error("No languages found in data");
 
-    // Initialize filter module with criteria template + UI config
-    initFilter(DEFAULT_CRITERIA(), {
-      criterionOrder: ["monotonicity", "snr", "cv", "mad", "consistency", "promptSwitch", "nonRandom"],
-      criterionHeaders: ["Monotonicity", "SNR", "CV", "MAD", "Consistency", "Switch rate", "Non-Randomness"],
-      onChange: onFilterChange,
-    });
-
-    currentLang = languages[0];
-    applyFilterDefaults(currentLang);
+    currentLang = languages.includes(DEFAULT_LANGUAGE) ? DEFAULT_LANGUAGE : languages[0];
+    state.currentTaskSelection = DEFAULT_SELECTION;
+    state.showCIBands = false;
     state.currentFormulation = "max";
+    state.formulationCombine = true;
     state.currentAccNorm = "max";
+    state.llNormScope = "all";
+    state.metricMode = "hard";
+    state.taskTypeFilter = "all";
+    state.currentDecoding = "sampling";
     setupUrlState();
     const hasURL = urlState.load();
     if (!state.DATA.languages[currentLang]) {
-      currentLang = languages[0];
-      applyFilterDefaults(currentLang);
+      currentLang = languages.includes(DEFAULT_LANGUAGE) ? DEFAULT_LANGUAGE : languages[0];
     }
 
     state.metricsSetup = state.DATA.languages[currentLang].metrics_setup;
-    // A URL-restored category/eval-type selection means a task subset, not all.
+    // A restored task unknown here, or a category subset that is empty here,
+    // falls back to the default aggregate instead of an empty chart.
+    const restored = state.currentTaskSelection;
+    if ((!isAggregateSelection(restored) && !state.metricsSetup[restored])
+        || (restored.startsWith("__cat__") && getBenchmarksForSelection(restored).length === 0)) {
+      state.currentTaskSelection = DEFAULT_SELECTION;
+    }
+    // A URL-restored category selection means a task subset, not all.
     const initBenches = getBenchmarksForSelection(state.currentTaskSelection);
     state.checkedTasks = new Set(initBenches.length ? initBenches : Object.keys(state.metricsSetup));
-    filter.allBenchmarks = new Set(Object.keys(state.metricsSetup));
 
     buildLangTabs(languages);
     populateTaskDropdown();
-    updateVariantControls();
+    populateFormulationOptions();
     bindEventListeners();
-    buildTaskCheckboxes({
-      filterSourceFn: () => state.currentTaskSelection === "__filtered__" ? filter.allBenchmarks : state.checkedTasks,
-      onChange: onTaskCheckboxChange,
-    });
+    buildTaskCheckboxes({ filterSourceFn: checkedTasks, onChange: onTaskCheckboxChange });
     bindModuleActionStopPropagation();
-    attachControlTooltips();
+    attachControlTooltips(VARIANT_CONTROL_TOOLTIPS);
 
+    syncControlsFromState();
     if (hasURL) {
-      document.getElementById("task-select").value = state.currentTaskSelection;
-      document.getElementById("prompt-agg-select").value = state.currentPromptAgg;
-      document.getElementById("norm-select").value = state.currentNormalization;
-      document.querySelectorAll(".shot-btn").forEach((b) =>
-        b.classList.toggle("active", b.dataset.shot === state.currentShot));
-      document.querySelectorAll(".ci-btn").forEach((b) =>
-        b.classList.toggle("active", b.dataset.ci === (state.showCIBands ? "1" : "0")));
-      document.querySelectorAll(".tab-btn").forEach((b) =>
-        b.classList.toggle("active", b.dataset.lang === currentLang));
-      syncTaskCheckboxStates(() => state.currentTaskSelection === "__filtered__" ? filter.allBenchmarks : state.checkedTasks);
+      syncTaskCheckboxStates(checkedTasks);
     } else {
-      state.currentTaskSelection = "__filtered__";
-      document.getElementById("task-select").value = "__filtered__";
       autoSetNormalization();
     }
 

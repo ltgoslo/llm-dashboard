@@ -1,0 +1,29 @@
+{
+ "results": {
+  "topic_based_nli_p1": {
+   "alias": "topic_based_nli_p1",
+   "acc,none": 0.3333333333333333,
+   "acc_stderr,none": 0.019261066555232922,
+   "acc_norm,none": 0.3333333333333333,
+   "acc_norm_stderr,none": 0.019261066555232922,
+   "norm_loglikelihood_corr,none": -0.21882995312259534,
+   "norm_loglikelihood_corr_stderr,none": 0.0052469978627123215
+  }
+ },
+ "n-samples": {
+  "topic_based_nli_p1": {
+   "original": 600,
+   "effective": 600
+  }
+ },
+ "n-shot": {
+  "topic_based_nli_p1": 5
+ },
+ "configs": {
+  "topic_based_nli_p1": {
+   "task": "topic_based_nli_p1",
+   "output_type": "multiple_choice"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

@@ -20,6 +20,7 @@ ask_gec:
 ask_gec_nob:
   category: linguistic knowledge
   evaluation_type: generation
+  greedy_path: ask_gec
   main_metric: errant_f05
   max_performance: 1.0
   metric_scale: unit
@@ -287,6 +288,7 @@ ncb_nob:
   metric_scale: unit
   pretty_name: NCB (Norwegian Cloze)
   random_baseline: 0.5
+  soft_metric: prob_correct
 nocola:
   category: linguistic knowledge
   evaluation_type: classification
@@ -303,6 +305,7 @@ nocola_nob:
   metric_scale: unit
   pretty_name: NoCoLA
   random_baseline: 0.5
+  soft_metric: prob_correct
 norbelebele:
   category: language understanding
   evaluation_type: classification
@@ -319,6 +322,7 @@ norbelebele_nob:
   metric_scale: unit
   pretty_name: Belebele (Norwegian)
   random_baseline: 0.25
+  soft_metric: prob_correct
 norcommonsenseqa_nno:
   category: world knowledge & reasoning
   evaluation_type: classification
@@ -327,6 +331,7 @@ norcommonsenseqa_nno:
   metric_scale: unit
   pretty_name: CommonsenseQA (Nynorsk)
   random_baseline: 0.2
+  soft_metric: prob_correct
 norcommonsenseqa_nob:
   category: world knowledge & reasoning
   evaluation_type: classification
@@ -335,6 +340,7 @@ norcommonsenseqa_nob:
   metric_scale: unit
   pretty_name: CommonsenseQA (Bokmål)
   random_baseline: 0.2
+  soft_metric: prob_correct
 norec_document:
   category: language understanding
   evaluation_type: classification
@@ -351,6 +357,8 @@ norec_document_nob:
   metric_scale: unit
   pretty_name: NoReC Document Sentiment
   random_baseline: 0.485071
+  soft_metric: prob_correct
+  soft_random_baseline: 0.5
 norec_sentence:
   category: language understanding
   evaluation_type: classification
@@ -367,6 +375,8 @@ norec_sentence_nob:
   metric_scale: unit
   pretty_name: NoReC Sentence Sentiment
   random_baseline: 0.481517
+  soft_metric: prob_correct
+  soft_random_baseline: 0.5
 noreval_multiblimp:
   aggregator: multiblimp
   category: linguistic knowledge
@@ -379,6 +389,7 @@ noreval_multiblimp:
 noridiom_nno:
   category: linguistic knowledge
   evaluation_type: generation
+  greedy_path: noridiom_nno
   main_metric: em_first
   max_performance: 1.0
   metric_scale: unit
@@ -387,6 +398,7 @@ noridiom_nno:
 noridiom_nob:
   category: linguistic knowledge
   evaluation_type: generation
+  greedy_path: noridiom_nob
   main_metric: em_first
   max_performance: 1.0
   metric_scale: unit
@@ -401,6 +413,7 @@ noropenbookqa_nno:
   path: noropenbookqa/noropenbookqa_nno
   pretty_name: OpenBookQA (Nynorsk)
   random_baseline: 0.25
+  soft_metric: prob_correct
 noropenbookqa_no_fact_nno:
   category: world knowledge & reasoning
   evaluation_type: classification
@@ -410,6 +423,7 @@ noropenbookqa_no_fact_nno:
   path: noropenbookqa/noropenbookqa_no_fact_nno
   pretty_name: OpenBookQA No-Fact (Nynorsk)
   random_baseline: 0.25
+  soft_metric: prob_correct
 noropenbookqa_no_fact_nob:
   category: world knowledge & reasoning
   evaluation_type: classification
@@ -419,6 +433,7 @@ noropenbookqa_no_fact_nob:
   path: noropenbookqa/noropenbookqa_no_fact_nob
   pretty_name: OpenBookQA No-Fact (Bokmål)
   random_baseline: 0.25
+  soft_metric: prob_correct
 noropenbookqa_nob:
   category: language understanding
   evaluation_type: classification
@@ -428,6 +443,7 @@ noropenbookqa_nob:
   path: noropenbookqa/noropenbookqa_nob
   pretty_name: OpenBookQA (Bokmål)
   random_baseline: 0.25
+  soft_metric: prob_correct
 norquad:
   category: language understanding
   evaluation_type: generation
@@ -439,6 +455,7 @@ norquad:
 norquad_nob:
   category: language understanding
   evaluation_type: generation
+  greedy_path: norquad
   main_metric: f1
   max_performance: 1.0
   metric_scale: unit
@@ -455,6 +472,7 @@ norrewrite_instruct:
 norrewrite_instruct_nob:
   category: generation & summarization
   evaluation_type: generation
+  greedy_path: norrewrite_instruct
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -463,6 +481,7 @@ norrewrite_instruct_nob:
 norsumm_nno:
   category: generation & summarization
   evaluation_type: generation
+  greedy_path: norsumm_nno
   main_metric: rougeL_max
   max_performance: 100.0
   metric_scale: percent
@@ -471,6 +490,7 @@ norsumm_nno:
 norsumm_nob:
   category: generation & summarization
   evaluation_type: generation
+  greedy_path: norsumm_nob
   main_metric: rougeL_max
   max_performance: 100.0
   metric_scale: percent
@@ -487,6 +507,7 @@ norsummarize_instruct:
 norsummarize_instruct_nob:
   category: generation & summarization
   evaluation_type: generation
+  greedy_path: norsummarize_instruct
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -495,6 +516,7 @@ norsummarize_instruct_nob:
 nortruthfulqa_gen_nno:
   category: world knowledge & reasoning
   evaluation_type: generation
+  greedy_path: nortruthfulqa_gen_nno
   main_metric: rougeL_max
   max_performance: 100.0
   metric_scale: percent
@@ -503,6 +525,7 @@ nortruthfulqa_gen_nno:
 nortruthfulqa_gen_nob:
   category: world knowledge & reasoning
   evaluation_type: generation
+  greedy_path: nortruthfulqa_gen_nob
   main_metric: rougeL_max
   max_performance: 100.0
   metric_scale: percent
@@ -516,6 +539,7 @@ nortruthfulqa_mc_nno:
   metric_scale: unit
   pretty_name: TruthfulQA MC (Nynorsk)
   random_baseline: 0.233118
+  soft_metric: prob_correct
 nortruthfulqa_mc_nob:
   category: world knowledge & reasoning
   evaluation_type: classification
@@ -524,6 +548,7 @@ nortruthfulqa_mc_nob:
   metric_scale: unit
   pretty_name: TruthfulQA MC (Bokmål)
   random_baseline: 0.231703
+  soft_metric: prob_correct
 nrk_quiz_qa_nno:
   category: world knowledge & reasoning
   evaluation_type: classification
@@ -532,6 +557,7 @@ nrk_quiz_qa_nno:
   metric_scale: unit
   pretty_name: NRK Quiz QA (Nynorsk)
   random_baseline: 0.278847
+  soft_metric: prob_correct
 nrk_quiz_qa_nob:
   category: world knowledge & reasoning
   evaluation_type: classification
@@ -540,6 +566,7 @@ nrk_quiz_qa_nob:
   metric_scale: unit
   pretty_name: NRK Quiz QA (Bokmål)
   random_baseline: 0.28363
+  soft_metric: prob_correct
 ogx_truthfulqax_gen_fi_fbv2:
   category: world knowledge
   evaluation_type: generation
@@ -618,6 +645,7 @@ slide_nob_nno_swe_dan:
   metric_scale: unit
   pretty_name: SLIDE (Scandinavian LID)
   random_baseline: 0.212892
+  soft_metric: prob_correct
 spabelebele:
   category: language understanding
   evaluation_type: classification
@@ -693,6 +721,7 @@ topic_based_nli:
 translation_eng_nno:
   category: translation
   evaluation_type: generation
+  greedy_path: tatoeba_eng_nno
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -701,6 +730,7 @@ translation_eng_nno:
 translation_eng_nob:
   category: translation
   evaluation_type: generation
+  greedy_path: tatoeba_eng_nob
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -709,6 +739,7 @@ translation_eng_nob:
 translation_nno_eng:
   category: translation
   evaluation_type: generation
+  greedy_path: tatoeba_nno_eng
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -717,6 +748,7 @@ translation_nno_eng:
 translation_nno_nob:
   category: translation
   evaluation_type: generation
+  greedy_path: tatoeba_nno_nob
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -725,6 +757,7 @@ translation_nno_nob:
 translation_nob_eng:
   category: translation
   evaluation_type: generation
+  greedy_path: tatoeba_nob_eng
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -733,6 +766,7 @@ translation_nob_eng:
 translation_nob_nno:
   category: translation
   evaluation_type: generation
+  greedy_path: tatoeba_nob_nno
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -741,6 +775,7 @@ translation_nob_nno:
 translation_nob_sme:
   category: translation
   evaluation_type: generation
+  greedy_path: tatoeba_nob_sme
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent
@@ -749,6 +784,7 @@ translation_nob_sme:
 translation_sme_nob:
   category: translation
   evaluation_type: generation
+  greedy_path: tatoeba_sme_nob
   main_metric: bleu
   max_performance: 100.0
   metric_scale: percent

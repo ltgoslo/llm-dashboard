@@ -1,0 +1,29 @@
+{
+ "results": {
+  "openbookqa_es_p2": {
+   "alias": "openbookqa_es_p2",
+   "acc,none": 0.276,
+   "acc_stderr,none": 0.02001121929807355,
+   "acc_norm,none": 0.276,
+   "acc_norm_stderr,none": 0.02001121929807355,
+   "norm_loglikelihood_corr,none": -0.9164530471938197,
+   "norm_loglikelihood_corr_stderr,none": 0.006069567312447284
+  }
+ },
+ "n-samples": {
+  "openbookqa_es_p2": {
+   "original": 500,
+   "effective": 500
+  }
+ },
+ "n-shot": {
+  "openbookqa_es_p2": 0
+ },
+ "configs": {
+  "openbookqa_es_p2": {
+   "task": "openbookqa_es_p2",
+   "output_type": "multiple_choice"
+  }
+ },
+ "source": "Reconstructed from multisynt-eval-conditions/scripts/eval-conditions/cache/raw_extracted.csv.gz (2026-09-30 re-evaluation; the original lm-eval output files were not available)."
+}

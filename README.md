@@ -50,7 +50,7 @@ llm-dashboard/
     │   ├── chart.js              ← Plotly config, colors, layout helpers
     │   ├── ui.js                 ← tooltip, checkboxes, metric selector
     │   ├── selection.js          ← task-selection logic + shared control listeners
-    │   ├── filter.js             ← HPLT-E quality filter (multisynt only)
+    │   ├── signals.js            ← FineWeb2 signal measures of the plotted curves (multisynt)
     │   ├── url-state.js          ← URL hash/search save/restore
     │   ├── comparison.js         ← bar-chart logic shared by noreval + noreval-gen
     │   └── progress.js           ← line-chart logic shared by norolmo + multisynt
@@ -103,8 +103,25 @@ For an instruction-tuned model, swap `data/noreval-gen/results/` and
    `.../<ckpt>/<your-task>[_<cf|mcf|hybrid>]_p<N>/results.json`
 2. Add a `<your-task>:` entry to `multisynt_tasks.yaml`. Optionally use the
    `path:` field if the result files live under a sub-directory
-   (e.g. `path: noropenbookqa/noropenbookqa_no_fact_nob`)
+   (e.g. `path: noropenbookqa/noropenbookqa_no_fact_nob`). `category` drives
+   the category average and `evaluation_type` (`classification` /
+   `generation`) the dashboard's task-type selector. A task whose results
+   carry a soft counterpart of its main metric (NorEval 1.2's `prob_correct`,
+   the probability mass on the correct answer) can declare it as
+   `soft_metric`, plus `soft_random_baseline` when the main metric's random
+   baseline doesn't transfer (NoReC: macro-F1 vs. 0.5). A generative task
+   that was also run with greedy decoding can point at that run with
+   `greedy_path: <old-task-dir>`, resolved inside a sibling
+   `data/multisynt/results/<Lang>_greedy/<model>_<N>shot_checkpoints/<ckpt>/`
+   tree (old nested `<task>/p<N>/` layout); the build attaches it to the
+   sampling run's entries as `by_decoding.greedy` for the "Decoding" selector
 3. Run `build_data.py` and commit
+
+Besides the usual prompt aggregates (max / mean / median / min / first),
+every MultiSynt and Prelude score entry carries `single`: the score of one
+prompt template drawn at random per task — `md5(task name) mod n_prompts`,
+so the pick is the same for every checkpoint, model and formulation — for
+the dashboards' "single prompt" setting.
 
 ### … new MultiSynt language
 
@@ -124,7 +141,8 @@ For an instruction-tuned model, swap `data/noreval-gen/results/` and
    branches (`iter_<N>`) form the Prelude trajectory; `<run>_iter_<N>`
    branches are drawn as side runs forking off it.
 2. A task not yet in `noreval12_setup.yaml` needs a `<task>:` entry there
-   (same fields as `metrics_setup.yaml`)
+   (same fields as `metrics_setup.yaml`, plus the optional `soft_metric` /
+   `soft_random_baseline` described under the MultiSynt tasks)
 3. Run `build_data.py` and commit
 
 ### … new MultiSynt model

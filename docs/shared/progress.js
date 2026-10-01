@@ -14,17 +14,29 @@
 //                    multiplies by TOKENS_PER_STEP for norolmo)
 //   - xAxisLabel: "tokens (B)" or similar
 //   - getXAxisTickFormat(x): formats a hover-title (optional)
+//   - normAcrossTrajectories: reference set of the min-max / z-score
+//     normalizations spans every trajectory's checkpoints (multisynt, where
+//     the trajectories are different models) instead of each trajectory's own
+//   - yRangeFit: the y-axis is fitted to exactly the plotted points (and
+//     bands, when shown) of the displayed shot on every render — always
+//     fully zoomed, no floor at 0 (multisynt). Without it the range is
+//     computed up front by forEachRangeSlice: over every shot for stable
+//     axes when switching shots, or tightly with yRangeSkipFirst.
+//   - onSeries(series): optional, called after each render with the plotted
+//     series — [{name, key, xs, ys, baselines}] per trajectory (tokens,
+//     displayed scores, and where a chance-level model would be plotted) —
+//     e.g. for the FineWeb2 signal measures
 
 import { state } from "./state.js";
 import {
   getScore, getCombinedCI, scaleCIDistances, applyNorm,
-  aggregateScores, isAggregateSelection, isMacroSelection,
+  aggregateScores, isAggregateSelection, isMacroSelection, getAggregatedTasks,
   getEffectiveMetric, formatTitleWithShot, capitalize, taskTitleDescription,
-  wantCI, normNeedsAllValues, scoreDecimals, isRawScaleMetric,
+  wantCI, normNeedsAllValues, scoreDecimals, isRawScaleMetric, taskRandomBaseline,
 } from "./core.js";
 import {
   getPlotlyLayout, plotChart,
-  makeBandTrace, computeYRange, computeYMax, makeYAxis,
+  makeBandTrace, computeYRange, computeYMax, computeFitRange, makeYAxis,
 } from "./chart.js";
 import {
   showTooltip, hideTooltip,
@@ -222,6 +234,7 @@ function resolveTitlePrefix(config) {
  *  spill). `fn(traj, shot, checkpoints, rangeXs)` receives both the full
  *  checkpoint list (e.g. as a normalization basis) and the included subset. */
 function forEachRangeSlice(config, trajectories, fn) {
+  if (config.yRangeFit) return;   // fitted to the plotted values instead
   const rangeShots = config.yRangeSkipFirst ? [state.currentShot] : config.allShots;
   for (const shot of rangeShots) {
     for (const traj of trajectories) {
@@ -266,6 +279,39 @@ function progressLayout(config, trajectories, yRange, showlegend) {
     yaxis: makeYAxis(yRange),
     ...(showlegend !== undefined && { showlegend }),
     ...legendLayout(config),
+  });
+}
+
+/** Reference-set lookup for the min-max / z-score normalizations: the raw
+ *  scores of one task (and shot) over the checkpoints of either this
+ *  trajectory alone or, with config.normAcrossTrajectories, of all of them.
+ *  Memoized per render. */
+function makeRefScores(config, trajectories) {
+  const cache = new Map();
+  return (traj, bench, shot, metric) => {
+    const scope = config.normAcrossTrajectories ? "*" : (traj.key || traj.name);
+    const key = scope + "|" + bench + "|" + shot + "|" + (metric || "");
+    if (cache.has(key)) return cache.get(key);
+    const vals = [];
+    for (const t of config.normAcrossTrajectories ? trajectories : [traj]) {
+      for (const x of t.checkpoints()) {
+        const v = getScore(t.dataSource, String(x), bench, shot, metric);
+        if (v !== undefined) vals.push(v);
+      }
+    }
+    cache.set(key, vals);
+    return vals;
+  };
+}
+
+/** Collect the plotted extent of one run — its points, and the ends of its
+ *  CI bands when drawn — for the fitted y-range. */
+function collectFitValues(fitValues, ys, cis) {
+  ys.forEach((y, i) => {
+    if (y == null) return;
+    fitValues.push(y);
+    const ci = cis?.[i];
+    if (ci) fitValues.push(y - (ci.loDist ?? 0), y + (ci.hiDist ?? 0));
   });
 }
 
@@ -320,15 +366,15 @@ function renderAggregateProgress(config) {
   const macro = isMacroSelection();
   const useCI = wantCI();
   const needAll = normNeedsAllValues();
+  const tasks = getAggregatedTasks();
+  const refScores = makeRefScores(config, trajectories);
 
   /** Aggregate {score, count, ci} at one checkpoint of one trajectory. */
-  function aggregateAt(traj, x, xEntities, shot, withCI) {
-    return aggregateScores(state.checkedTasks, (bench) => {
+  function aggregateAt(traj, x, shot, withCI) {
+    return aggregateScores(tasks, (bench) => {
       const raw = getScore(traj.dataSource, x, bench, shot);
       if (raw === undefined) return undefined;
-      const allRaw = needAll
-        ? xEntities.map((s) => getScore(traj.dataSource, s, bench, shot)).filter((v) => v !== undefined)
-        : null;
+      const allRaw = needAll ? refScores(traj, bench, shot) : null;
       const score = applyNorm(raw, bench, allRaw);
       const ci = withCI
         ? scaleCIDistances(getCombinedCI(traj.dataSource, x, bench, shot), bench, undefined, allRaw)
@@ -337,29 +383,41 @@ function renderAggregateProgress(config) {
     }, macro);
   }
 
+  /** Where a chance-level model would be plotted at this checkpoint: each
+   *  task's random baseline sent through the same normalization, aggregated
+   *  over the same tasks that have a score here. */
+  function baselineAt(traj, x, shot) {
+    const r = aggregateScores(tasks, (bench) => {
+      if (getScore(traj.dataSource, x, bench, shot) === undefined) return undefined;
+      const allRaw = needAll ? refScores(traj, bench, shot) : null;
+      return { score: applyNorm(taskRandomBaseline(bench), bench, allRaw) };
+    }, macro);
+    return r ? r.score : null;
+  }
+
   const allYValues = [];
   forEachRangeSlice(config, trajectories, (traj, shot, checkpoints, rangeXs) => {
-    const xEntities = checkpoints.map(String);
     for (const x of rangeXs) {
-      const result = aggregateAt(traj, x, xEntities, shot, false);
+      const result = aggregateAt(traj, x, shot, false);
       if (result) allYValues.push(result.score);
     }
   });
-  const yRange = computeYRange(allYValues, !!config.yRangeSkipFirst, config.yMaxHeadroom || 0);
-
   // Build bands and lines in separate passes so every band paints below
   // every line — otherwise traj-N's band would occlude traj-(N-1)'s line.
   const traces = [];
   const lineTraces = [];
+  const series = [];
+  const fitValues = [];
   for (const traj of trajectories) {
     const xValues = traj.checkpoints();
     if (!xValues.length) continue;
-    const xEntities = xValues.map(String);
-    const aggResults = xValues.map((x) => aggregateAt(traj, x, xEntities, state.currentShot, useCI));
+    const aggResults = xValues.map((x) => aggregateAt(traj, x, state.currentShot, useCI));
+    const xs = xValues.map(config.xToTokens);
+    const ys = aggResults.map((r) => r ? r.score : null);
+    const cis = useCI ? aggResults.map((r) => r ? r.ci : null) : null;
+    collectFitValues(fitValues, ys, cis);
     pushRunTraces(traces, lineTraces, config, traj, {
-      xs: xValues.map(config.xToTokens),
-      ys: aggResults.map((r) => r ? r.score : null),
-      cis: useCI ? aggResults.map((r) => r ? r.ci : null) : null,
+      xs, ys, cis,
       name: traj.name,
       color: traj.color,
       // Group by stable key, not display name — names can repeat across
@@ -368,11 +426,21 @@ function renderAggregateProgress(config) {
       lgroup: traj.key || traj.name,
       customdata: aggResults.map((r) => r ? { count: r.count, ci: r.ci } : null),
     });
+    if (config.onSeries) {
+      series.push({
+        name: traj.name, key: traj.key || traj.name, xs, ys,
+        baselines: xValues.map((x) => baselineAt(traj, x, state.currentShot)),
+      });
+    }
   }
   traces.push(...lineTraces);
 
+  const yRange = config.yRangeFit
+    ? computeFitRange(fitValues)
+    : computeYRange(allYValues, !!config.yRangeSkipFirst, config.yMaxHeadroom || 0);
   const layout = progressLayout(config, trajectories, yRange, trajectories.length > 1);
   plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), onProgressUnhover);
+  if (config.onSeries) config.onSeries(series);
 }
 
 function renderSingleProgress(config, benchmark) {
@@ -380,47 +448,65 @@ function renderSingleProgress(config, benchmark) {
   const trajectories = config.getTrajectories();
   const metric = getEffectiveMetric(benchmark);
   const useCI = wantCI();
+  const needAll = normNeedsAllValues();
+  const refScores = makeRefScores(config, trajectories);
+  const refFor = (traj, shot) => (needAll ? refScores(traj, benchmark, shot, metric) : null);
 
   const allYVals = [];
   forEachRangeSlice(config, trajectories, (traj, shot, checkpoints, rangeXs) => {
     for (const x of rangeXs) {
       const raw = getScore(traj.dataSource, x, benchmark, shot, metric);
-      if (raw != null) allYVals.push(applyNorm(raw, benchmark, null, metric));
+      if (raw != null) allYVals.push(applyNorm(raw, benchmark, refFor(traj, shot), metric));
     }
   });
   const tight = !!config.yRangeSkipFirst;
   const rawScale = isRawScaleMetric(metric);
-  const yRange = (state.currentNormalization !== "none" || tight || rawScale)
-    ? computeYRange(allYVals, tight, config.yMaxHeadroom || 0, rawScale)
-    : [0, computeYMax(allYVals)];
 
   // Bands and lines in separate passes so every band paints below every line.
   const traces = [];
   const lineTraces = [];
+  const series = [];
+  const fitValues = [];
   for (const traj of trajectories) {
     const xValues = traj.checkpoints();
     if (!xValues.length) continue;
+    const allRaw = refFor(traj, state.currentShot);
+    const xs = xValues.map(config.xToTokens);
     const ys = xValues.map((x) => {
       const raw = getScore(traj.dataSource, x, benchmark, state.currentShot, metric);
-      return raw == null ? null : applyNorm(raw, benchmark, null, metric);
+      return raw == null ? null : applyNorm(raw, benchmark, allRaw, metric);
     });
     const cis = useCI ? xValues.map((x) => {
       const ci = getCombinedCI(traj.dataSource, x, benchmark, state.currentShot, metric);
-      return scaleCIDistances(ci, benchmark, metric);
+      return scaleCIDistances(ci, benchmark, metric, allRaw);
     }) : null;
+    collectFitValues(fitValues, ys, cis);
     pushRunTraces(traces, lineTraces, config, traj, {
-      xs: xValues.map(config.xToTokens),
-      ys, cis,
+      xs, ys, cis,
       name: traj.name,
       color: traj.color,
       lgroup: traj.key || traj.name,
       customdata: (cis || ys.map(() => null)).map((c) => c ? { ci: c } : null),
     });
+    if (config.onSeries) {
+      // A raw-scale metric (a log-likelihood) has no chance level to plot.
+      const baseline = rawScale ? null : applyNorm(taskRandomBaseline(benchmark, metric), benchmark, allRaw, metric);
+      series.push({
+        name: traj.name, key: traj.key || traj.name, xs, ys,
+        baselines: ys.map((y) => (y == null ? null : baseline)),
+      });
+    }
   }
   traces.push(...lineTraces);
 
+  const yRange = config.yRangeFit
+    ? computeFitRange(fitValues)
+    : (state.currentNormalization !== "none" || tight || rawScale)
+      ? computeYRange(allYVals, tight, config.yMaxHeadroom || 0, rawScale)
+      : [0, computeYMax(allYVals)];
   const layout = progressLayout(config, trajectories, yRange, trajectories.length > 1);
   plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), onProgressUnhover);
+  if (config.onSeries) config.onSeries(series);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -430,17 +516,24 @@ function renderSingleProgress(config, benchmark) {
 /** Natural-language chart title.
  *  config.titlePrefix may add a leading qualifier (e.g. language name for multisynt
  *  or "NorOLMo" for norolmo). Aggregate views start with "Category average" / "Task average". */
+/** "classification " / "generative " qualifier of the multisynt task-type
+ *  selector, for titles and descriptions ("" when everything is kept). */
+function taskTypeWord() {
+  return { classification: "classification ", generation: "generative " }[state.taskTypeFilter] || "";
+}
+
 function getChartTitleText(config) {
   const sel = state.currentTaskSelection;
   const shot = state.currentShot + "-shot";
   const prefix = resolveTitlePrefix(config);
   const lead = prefix ? prefix + " — " : "";
   const avg = isMacroSelection() ? "category average" : "task average";
+  const type = taskTypeWord();
+  const n = getAggregatedTasks().length;
 
-  if (sel === "__all_macro__" || sel === "__all__") return lead + avg + " across all tasks (" + shot + ")";
-  if (sel === "__filtered__") return lead + avg + " across " + state.checkedTasks.size + " signal-filtered tasks (" + shot + ")";
-  if (sel === "__custom__") return lead + avg + " across " + state.checkedTasks.size + " selected tasks (" + shot + ")";
-  if (sel.startsWith("__cat__")) return lead + avg + " across " + sel.slice(7) + " tasks (" + shot + ")";
+  if (sel === "__all_macro__" || sel === "__all__") return lead + avg + " across all " + type + "tasks (" + shot + ")";
+  if (sel === "__custom__" || sel === "__custom_macro__") return lead + avg + " across " + n + " selected " + type + "tasks (" + shot + ")";
+  if (sel.startsWith("__cat__")) return lead + avg + " across " + sel.slice(7) + " " + type + "tasks (" + shot + ")";
   if (sel.startsWith("__eval__")) return lead + avg + " across " + sel.slice(8) + " tasks (" + shot + ")";
   if (sel === "__lang__nob") return lead + avg + " across Bokmål tasks (" + shot + ")";
   if (sel === "__lang__nno") return lead + avg + " across Nynorsk tasks (" + shot + ")";
@@ -469,22 +562,20 @@ export function updateProgressTitle(config) {
 
 function getProgressAggregateDescription() {
   const sel = state.currentTaskSelection;
-  const count = sel === "__custom__" || sel === "__filtered__"
-    ? state.checkedTasks.size
-    : (state.checkedTasks.size > 0 ? state.checkedTasks.size : Object.keys(state.metricsSetup).length);
+  const aggregated = getAggregatedTasks();
+  const count = aggregated.length || (state.checkedTasks.size > 0 ? state.checkedTasks.size : Object.keys(state.metricsSetup).length);
   const macro = isMacroSelection();
+  const type = taskTypeWord();
+  const cats = new Set();
+  for (const b of aggregated) {
+    const info = state.metricsSetup[b];
+    if (info) cats.add(info.category);
+  }
+  const macroNote = macro ? " (" + cats.size + " categories, category average)" : " (task average)";
   let scope = "";
-  if (sel === "__all_macro__") {
-    const cats = new Set();
-    for (const b of state.checkedTasks) {
-      const info = state.metricsSetup[b];
-      if (info) cats.add(info.category);
-    }
-    scope = "all " + count + " tasks (" + cats.size + " categories, category average)";
-  } else if (sel === "__all__") scope = "all " + count + " tasks (task average)";
-  else if (sel === "__filtered__") scope = count + " signal-filtered tasks (task average, HPLT-E criteria)";
-  else if (sel === "__custom__") scope = count + " selected tasks (task average)";
-  else if (sel.startsWith("__cat__")) scope = count + " tasks in the \"" + sel.slice(7) + "\" category";
+  if (sel === "__all_macro__" || sel === "__all__") scope = "all " + count + " " + type + "tasks" + macroNote;
+  else if (sel === "__custom__" || sel === "__custom_macro__") scope = count + " selected " + type + "tasks" + macroNote;
+  else if (sel.startsWith("__cat__")) scope = count + " " + type + "tasks in the \"" + sel.slice(7) + "\" category";
   else if (sel.startsWith("__eval__")) scope = "all " + count + " " + sel.slice(8) + " tasks";
 
   const avgDesc = macro
@@ -493,8 +584,8 @@ function getProgressAggregateDescription() {
   const normDescs = {
     none: "Scores are shown on their native metric scales without normalization, then averaged.",
     baseline: "Each task score is normalized to a 0–100 scale where 0 = random baseline performance and 100 = perfect score, then averaged across tasks. This accounts for different chance levels across tasks (e.g. 25% for 4-choice QA vs. 50% for binary classification).",
-    minmax: "Each task score is normalized to 0–100 using the minimum and maximum scores observed across all entities for that task, then averaged.",
-    zscore: "Each task score is converted to a z-score, then averaged.",
+    minmax: "Each task score is normalized to 0–100 using the minimum and maximum scores observed for that task across all plotted checkpoints, then averaged.",
+    zscore: "Each task score is converted to a z-score (standard deviations from the mean score of that task across all plotted checkpoints), then averaged.",
     percentile: "Each task score is converted to a percentile rank, then averaged.",
   };
   const normDesc = normDescs[state.currentNormalization] || "";
