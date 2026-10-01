@@ -31,7 +31,7 @@ import { computeSignals, renderSignals } from "../shared/signals.js";
 import { UrlState } from "../shared/url-state.js";
 
 const ALL_SHOTS = ["0", "5"];
-const DEFAULT_SELECTION = "__all_macro__";
+const DEFAULT_SELECTION = "__all__";
 const DEFAULT_LANGUAGE = "Norwegian";   // falls back to the first language in data.json
 
 const plotlyConfig = makePlotlyConfig("multisynt-chart", () => ({

@@ -30,7 +30,7 @@ import { UrlState } from "../shared/url-state.js";
 let tokensPerStep = 2048 * 4096;   // 8,388,608 tokens per training iteration
 let allShots = ["5"];
 
-const DEFAULT_SELECTION = "__all_macro__";
+const DEFAULT_SELECTION = "__all__";
 const MAIN_COLOR = "#2563eb";                                          // blue
 const RUN_COLORS = ["#dc2626", "#f97316", "#9333ea", "#0d9488", "#b45309"];
 
