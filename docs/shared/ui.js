@@ -7,6 +7,7 @@ import {
   isAggregateSelection, getEffectiveMetric, taskTypeMatches,
 } from "./core.js";
 import { enhanceSelects } from "./dropdown.js";
+import { enhanceSegmentedControls } from "./segmented.js";
 
 // ─────────────────────────────────────────────────────────────
 // App-ready toggle — flips body.app-ready, which the stylesheet
@@ -547,19 +548,22 @@ export function syncTaskCheckboxStates(filterSourceFn) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Custom dropdowns — every <select> on the page is replaced by the
+// Custom controls — every <select> on the page is replaced by the
 // dashboards' own dropdown (dropdown.js) so the controls look the same
-// on every system. The native select stays as the state holder, so the
-// code above keeps populating it and reading its value as before. An
-// option's `title` is shown with the page tooltip. Module scripts run
-// once the document is parsed, so the selects exist by now; the
-// DOMContentLoaded branch covers an unusual loading order.
+// on every system, and the segmented button groups get their sliding
+// thumb (segmented.js). The native select stays as the state holder and
+// the buttons keep their .active class, so the code above keeps driving
+// them as before. An option's `title` is shown with the page tooltip.
+// Module scripts run once the document is parsed, so the controls exist
+// by now; the DOMContentLoaded branch covers an unusual loading order.
 // ─────────────────────────────────────────────────────────────
 
-const enhancePageSelects = () =>
+const enhancePageControls = () => {
   enhanceSelects({ tooltip: { attach: attachTooltip, hide: hideTooltip } });
+  enhanceSegmentedControls();
+};
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", enhancePageSelects);
+  document.addEventListener("DOMContentLoaded", enhancePageControls);
 } else {
-  enhancePageSelects();
+  enhancePageControls();
 }
