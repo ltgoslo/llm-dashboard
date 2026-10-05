@@ -110,9 +110,14 @@ For an instruction-tuned model, swap `data/noreval-gen/results/` and
    the category average and `evaluation_type` (`classification` /
    `generation`) the dashboard's task-type selector. A task whose results
    carry a soft counterpart of its main metric (NorEval 1.2's `prob_correct`,
-   the probability mass on the correct answer) can declare it as
+   the conditional probability of the correct answer among the choices) can
+   declare it as
    `soft_metric`, plus `soft_random_baseline` when the main metric's random
-   baseline doesn't transfer (NoReC: macro-F1 vs. 0.5). A generative task
+   baseline doesn't transfer (NoReC: macro-F1 vs. 0.5). A task without a
+   prompt (two candidate sentences only: NCB, NoCoLA, MultiBLiMP) is marked
+   `empty_prompt: true`: its 0-shot PMI-normalized accuracy is undefined
+   (every item ties and the tie-break always picks the correct sentence),
+   so the build replaces it by the random baseline. A generative task
    that was also run with greedy decoding can point at that run with
    `greedy_path: <old-task-dir>`, resolved inside a sibling
    `data/multisynt/results/<Lang>_greedy/<model>_<N>shot_checkpoints/<ckpt>/`

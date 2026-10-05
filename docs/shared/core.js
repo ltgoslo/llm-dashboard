@@ -20,12 +20,12 @@ export const METRIC_DISPLAY = {
   acc: "accuracy",
   acc_norm: "accuracy (character norm)",
   acc_mutual_info: "accuracy (PMI norm)",
-  prob_correct: "probability of correct answer",
-  prob_correct_norm: "probability of correct answer (character norm)",
-  prob_correct_mutual_info: "probability of correct answer (PMI norm)",
-  loglikelihood_correct: "log-likelihood of correct answer",
-  loglikelihood_correct_norm: "log-likelihood of correct answer (character norm)",
-  loglikelihood_correct_mutual_info: "log-likelihood of correct answer (PMI norm)",
+  prob_correct: "conditional probability of correct",
+  prob_correct_norm: "conditional probability of correct (character norm)",
+  prob_correct_mutual_info: "conditional probability of correct (PMI norm)",
+  likelihood_correct: "probability of correct",
+  likelihood_correct_norm: "probability of correct (character norm)",
+  pmi_correct: "PMI of correct answer",
   f1: "F1",
   f1_norm: "F1 (character norm)",
   f1_mutual_info: "F1 (PMI norm)",
@@ -60,6 +60,7 @@ export const METRIC_DISPLAY = {
 export const METRIC_SCALES = {
   acc: "unit", acc_norm: "unit", acc_mutual_info: "unit",
   prob_correct: "unit", prob_correct_norm: "unit", prob_correct_mutual_info: "unit",
+  likelihood_correct: "unit", likelihood_correct_norm: "unit",
   f1: "unit", f1_norm: "unit", f1_mutual_info: "unit", em: "unit", em_first: "unit",
   exact: "unit", exact_match: "unit", fscore: "unit", bleu_acc: "unit",
   rougeL_acc: "unit", rouge1_acc: "unit", rouge2_acc: "unit",
@@ -73,8 +74,7 @@ export const METRIC_SCALES = {
   // "raw": shown on its native scale (no ×100), may be negative, and is
   // exempt from the random-baseline normalization and the y ≥ 0 axis floor.
   norm_loglikelihood_corr: "raw",
-  loglikelihood_correct: "raw", loglikelihood_correct_norm: "raw",
-  loglikelihood_correct_mutual_info: "raw",
+  pmi_correct: "raw",
 };
 
 /** Whether a metric is displayed on its own raw (possibly negative) scale. */
@@ -82,12 +82,26 @@ export function isRawScaleMetric(metric) {
   return METRIC_SCALES[getBaseMetric(metric)] === "raw";
 }
 
+// Base metrics without a chance level: a task's random baseline is defined
+// for its main metric (and its soft metric); the probability of generating
+// the correct answer text, like a raw log-likelihood, has none.
+const NO_BASELINE_METRICS = new Set(["likelihood_correct", "pmi_correct"]);
+
+/** Whether the task's random baseline applies to `metric` — false for the
+ *  raw-scale metrics and the probability of the correct answer, which are
+ *  shown unnormalized under the random-baseline normalization. */
+export function hasRandomBaseline(metric) {
+  if (!metric) return true;
+  return !isRawScaleMetric(metric) && !NO_BASELINE_METRICS.has(llNormBase(getBaseMetric(metric)));
+}
+
 export const METRIC_DESCRIPTIONS = {
   acc: "Proportion of correctly classified examples.",
   acc_norm: "Accuracy after normalizing answer log-likelihoods by character length.",
   acc_mutual_info: "Accuracy after normalizing answer log-likelihoods by their unconditional (PMI) likelihood.",
-  prob_correct: "Soft accuracy: the probability mass the model puts on the correct answer, after normalizing the answer likelihoods over the choices.",
-  loglikelihood_correct: "Log-likelihood the model assigns to the correct answer. Raw (negative) scale; higher is better.",
+  prob_correct: "Conditional probability of the correct answer: the probability mass on it after normalizing the answer likelihoods over the choices (soft accuracy).",
+  likelihood_correct: "Probability of the correct answer text: the exponentiated mean log-likelihood the model assigns to it, not normalized over the choices. Under the character-length normalization this is a per-character probability.",
+  pmi_correct: "Pointwise mutual information of the correct answer text and the prompt: its log-likelihood given the prompt minus its log-likelihood without it. Raw (log) scale; higher is better.",
   f1: "Harmonic mean of precision and recall.",
   em: "Proportion of predictions that exactly match the reference.",
   em_first: "Exact match accuracy of the first generated word against the correct completion word.",
@@ -197,10 +211,13 @@ export function llNormVariants(base) {
   return [base, base + "_norm", base + "_mutual_info"];
 }
 
-/** Whether `metrics` (an array or Set) carries all three variants of `base`. */
+/** Whether `metrics` (an array or Set) carries `base` together with at
+ *  least one of its normalization variants (the probability of the correct
+ *  answer has only the character-length one). */
 export function hasLLNormVariants(metrics, base) {
   const set = metrics instanceof Set ? metrics : new Set(metrics || []);
-  return llNormVariants(base).every((m) => set.has(m));
+  const [plain, ...variants] = llNormVariants(base);
+  return set.has(plain) && variants.some((m) => set.has(m));
 }
 
 /** A task's metric under the hard/soft selector: the configured
@@ -288,21 +305,24 @@ function llVariantsInBlock(shotBlock, bench, metric) {
       && !(metric === "acc" && state.metricsSetup[bench]?.main_metric === "acc")) {
     return [metric];
   }
-  const vs = llNormVariants(metric);
-  return vs.every((m) => shotBlock[m] != null) ? vs : [metric];
+  const vs = llNormVariants(metric).filter((m) => shotBlock[m] != null);
+  return vs.length >= 2 && vs[0] === metric ? vs : [metric];
 }
 
 /** The variant of `metric` the selector resolves to: the chosen one, or for
  *  "max" whichever scores highest under the current prompt aggregation
  *  (within `form` when a formulation is selected). The variants of a
- *  raw-scale metric (a log-likelihood, its length-normalized form and its
- *  PMI) live on different scales, so "max" keeps the plain one there. */
+ *  likelihood (a probability, a per-character probability and a likelihood
+ *  ratio) or of a raw log-likelihood live on different scales, so "max"
+ *  keeps the plain one there. */
 function chooseVariant(shotBlock, bench, metric, form) {
   const vs = llVariantsInBlock(shotBlock, bench, metric);
   if (vs.length === 1) return vs[0];
   const suffix = LL_NORM_SUFFIX[state.currentAccNorm];
-  if (suffix !== undefined) return metric + suffix;
-  if (isRawScaleMetric(metric)) return metric;
+  // An explicitly chosen variant the metric doesn't have falls back to the
+  // plain one (the probability of the correct answer has no PMI variant).
+  if (suffix !== undefined) return vs.includes(metric + suffix) ? metric + suffix : metric;
+  if (!hasRandomBaseline(metric)) return metric;
   // "stdev" has no score to rank variants by; use the best prompt instead.
   const rankAgg = state.currentPromptAgg === "stdev" ? "max" : state.currentPromptAgg;
   let best = vs[0], bestV = -Infinity;
@@ -419,8 +439,9 @@ export function applyNorm(raw, benchmark, allRaw, metric) {
   if (state.currentNormalization === "none") return toDisplayScale(raw, benchmark, metric);
   if (state.currentNormalization === "baseline") {
     // The task's random baseline is defined for its main metric, not for a
-    // raw-scale metric like a log-likelihood — show those unnormalized.
-    if (metric && isRawScaleMetric(metric)) return toDisplayScale(raw, benchmark, metric);
+    // raw-scale log-likelihood or the probability of the answer text — show
+    // those unnormalized.
+    if (!hasRandomBaseline(metric)) return toDisplayScale(raw, benchmark, metric);
     return baselineNorm(raw, benchmark, metric);
   }
   if (state.currentNormalization === "minmax") {
@@ -450,7 +471,7 @@ function scaleDistance(dist, benchmark, metric, allRaw) {
   if (dist === undefined || dist === null) return undefined;
   if (state.currentNormalization === "none") return toDisplayScale(dist, benchmark, metric);
   if (state.currentNormalization === "baseline") {
-    if (metric && isRawScaleMetric(metric)) return toDisplayScale(dist, benchmark, metric);
+    if (!hasRandomBaseline(metric)) return toDisplayScale(dist, benchmark, metric);
     const info = state.metricsSetup[benchmark];
     const range = info.max_performance - taskRandomBaseline(benchmark, metric);
     return range === 0 ? 0 : (dist / range) * 100;

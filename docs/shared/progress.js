@@ -32,7 +32,7 @@ import {
   getScore, getCombinedCI, scaleCIDistances, applyNorm,
   aggregateScores, isAggregateSelection, isMacroSelection, getAggregatedTasks,
   getEffectiveMetric, formatTitleWithShot, capitalize, taskTitleDescription,
-  wantCI, normNeedsAllValues, scoreDecimals, isRawScaleMetric, taskRandomBaseline,
+  wantCI, normNeedsAllValues, scoreDecimals, isRawScaleMetric, taskRandomBaseline, hasRandomBaseline,
 } from "./core.js";
 import {
   getPlotlyLayout, plotChart,
@@ -499,8 +499,9 @@ function renderSingleProgress(config, benchmark) {
       customdata: (cis || ys.map(() => null)).map((c) => c ? { ci: c } : null),
     });
     if (config.onSeries) {
-      // A raw-scale metric (a log-likelihood) has no chance level to plot.
-      const baseline = rawScale ? null : applyNorm(taskRandomBaseline(benchmark, metric), benchmark, allRaw, metric);
+      // A raw log-likelihood or the probability of the answer text has no
+      // chance level to plot.
+      const baseline = hasRandomBaseline(metric) ? applyNorm(taskRandomBaseline(benchmark, metric), benchmark, allRaw, metric) : null;
       series.push({
         name: traj.name, key: traj.key || traj.name, xs, ys,
         baselines: ys.map((y) => (y == null ? null : baseline)),

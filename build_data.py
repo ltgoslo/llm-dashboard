@@ -69,6 +69,48 @@ SHOT_DIRS = {"0": "0-shot", "1": "1-shot", "5": "5-shot"}
 # computing a metric — the real value is patched in later.
 EXCLUDED_METRICS = {"bleu_diff", "rouge1_diff", "rouge2_diff", "rougeL_diff", "bypass"}
 
+# NorEval 1.2 reports the mean log-likelihood of the correct answer
+# (`loglikelihood_correct`, plus its character-length and PMI variants). The
+# dashboards show the plain and the character-length variants exponentiated —
+# the (geometric-mean) probability of the correct answer text, resp. per
+# character: `likelihood_correct`, `likelihood_correct_norm` — with the
+# standard error carried over by the delta method (se' = e^v · se). The PMI
+# variant is a log-likelihood *ratio* (answer given the prompt vs. without
+# it) whose exponential is unbounded, so it stays in log space as its own
+# raw-scale metric, `pmi_correct`. Not to be confused with `prob_correct`,
+# the probability of the correct answer conditional on the choice set (the
+# answer likelihoods normalized over the choices).
+LOGLIKELIHOOD_METRIC_RENAMES = {
+    "loglikelihood_correct": ("likelihood_correct", True),
+    "loglikelihood_correct_norm": ("likelihood_correct_norm", True),
+    "loglikelihood_correct_mutual_info": ("pmi_correct", False),
+}
+
+# Tasks flagged `empty_prompt: true` in their YAML (NCB, NoCoLA, MultiBLiMP:
+# two candidate sentences, no prompt) have no PMI at 0-shot — the answer
+# log-likelihood given the (empty) prompt equals its unconditional one, so
+# every item ties and lm-eval's argmax lands on index 0, which is always
+# the correct sentence: "accuracy" 1.0. Those degenerate 0-shot values are
+# replaced by the task's random baseline (0.5), with a Wilson SE for a
+# chance-level score, in every pipeline reading NorEval-1.2 results.
+PMI_DEGENERATE_METRICS = ("acc_mutual_info",)
+
+
+def force_degenerate_pmi(metrics, config, shot):
+    """Return `metrics` ({name: (value, se, n)}) with the 0-shot PMI
+    accuracies of an `empty_prompt` task forced to its random baseline.
+    Subtask metrics (`acc_mutual_info: <phenomenon>`) are forced too."""
+    if str(shot) != "0" or not config.get("empty_prompt") or not metrics:
+        return metrics
+    baseline = config["random_baseline"]
+    scale = config.get("metric_scale", "unit")
+    out = dict(metrics)
+    for name, (value, se, n) in metrics.items():
+        if name.split(": ", 1)[0] in PMI_DEGENERATE_METRICS:
+            out[name] = (baseline, wilson_se(baseline, n, scale) or se, n)
+    return out
+
+
 # Per-benchmark metric exclusions. ask_gec's `exact_match` is the lm-eval
 # placeholder; the real metric is ERRANT F0.5 (`errant`/`errant_f05`).
 EXCLUDED_METRICS_PER_BENCHMARK = {
@@ -762,6 +804,11 @@ def extract_task_metrics(task_results, n_samples, bench_exclusions, metric_scale
             if not (isinstance(harness_se, (int, float)) and math.isfinite(harness_se)):
                 harness_se = None
             se = resolve_se(metric_name, val, harness_se, n_samples, metric_scale)
+            if metric_name in LOGLIKELIHOOD_METRIC_RENAMES:
+                metric_name, exponentiate = LOGLIKELIHOOD_METRIC_RENAMES[metric_name]
+                if exponentiate:
+                    prob = math.exp(val)
+                    val, se = prob, (prob * se if se is not None else None)
             metrics[metric_name] = (val, se, n_samples)
     return metrics
 
@@ -986,9 +1033,9 @@ def multisynt_process_checkpoint(ckpt_path, task_configs, shot, greedy_ckpt_path
                 if d.startswith(f"{benchmark}_")
                 and os.path.isdir(os.path.join(parent, d))
             ]
-            agg_metrics = multisynt_process_multiblimp(
+            agg_metrics = force_degenerate_pmi(multisynt_process_multiblimp(
                 sub_entries, EXCLUDED_METRICS_PER_BENCHMARK.get(benchmark, set())
-            )
+            ), config, shot)
             if agg_metrics:
                 partition_results.append((None, agg_metrics))
         else:
@@ -1040,7 +1087,9 @@ def multisynt_process_checkpoint(ckpt_path, task_configs, shot, greedy_ckpt_path
                 results_file = find_latest_results_json(path)
                 if results_file is None:
                     continue
-                metrics = multisynt_extract(results_file, benchmark, config, match_name)
+                metrics = force_degenerate_pmi(
+                    multisynt_extract(results_file, benchmark, config, match_name), config, shot
+                )
                 if metrics:
                     partition_results.append((form, metrics))
 
@@ -1351,10 +1400,10 @@ def noreval12_extract_task(merged, benchmark, config):
         sub_keys = sorted(k for k in results if k.startswith(f"{benchmark}_"))
         if not sub_keys:
             return {}
-        agg = micro_average_multiblimp(
+        agg = force_degenerate_pmi(micro_average_multiblimp(
             [(results[k], get_n_samples(n_samples_dict, k)) for k in sub_keys],
             bench_exclusions,
-        )
+        ), config, shot_of(sub_keys[0]))
         if agg:
             by_shot.setdefault(shot_of(sub_keys[0]), []).append((None, agg))
         for code, subtask in (config.get("subtasks") or {}).items():
@@ -1364,10 +1413,10 @@ def noreval12_extract_task(merged, benchmark, config):
             sub = extract_task_metrics(
                 results[key], get_n_samples(n_samples_dict, key), bench_exclusions, scale
             )
-            sub = {
+            sub = force_degenerate_pmi({
                 f"{m}: {subtask['pretty_name']}": t
                 for m, t in sub.items() if m in MULTIBLIMP_AGG_METRICS
-            }
+            }, config, shot_of(key))
             if sub:
                 by_shot.setdefault(shot_of(key), []).append((None, sub))
     else:
@@ -1376,9 +1425,9 @@ def noreval12_extract_task(merged, benchmark, config):
             m = pattern.fullmatch(key)
             if not m:
                 continue
-            metrics = extract_task_metrics(
+            metrics = force_degenerate_pmi(extract_task_metrics(
                 results[key], get_n_samples(n_samples_dict, key), bench_exclusions, scale
-            )
+            ), config, shot_of(key))
             if metrics:
                 by_shot.setdefault(shot_of(key), []).append((m.group(1), metrics))
 

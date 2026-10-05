@@ -266,6 +266,7 @@ mgsm_direct_es:
 multiblimp_ltg_sme:
   aggregator: multiblimp
   category: linguistic knowledge
+  empty_prompt: true
   evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
@@ -282,6 +283,7 @@ ncb:
   random_baseline: 0.5
 ncb_nob:
   category: linguistic knowledge
+  empty_prompt: true
   evaluation_type: classification
   main_metric: acc
   max_performance: 1.0
@@ -299,6 +301,7 @@ nocola:
   random_baseline: 0.5
 nocola_nob:
   category: linguistic knowledge
+  empty_prompt: true
   evaluation_type: classification
   main_metric: acc
   max_performance: 1.0

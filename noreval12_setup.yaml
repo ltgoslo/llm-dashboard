@@ -61,6 +61,7 @@ multiblimp_ltg_sme:
     "DU-PL":
       pretty_name: "Number: DU→PL"
       description: "Correct sentence has dual agreement; distractor has plural. Subject-verb agreement on finite verbs and auxiliaries (n=84)."
+  empty_prompt: true
 ncb_nob:
   pretty_name: linguistic acceptability (punctuation)
   description: "Linguistic acceptability based on the NCB dataset, which focuses on correct placement of commas. The main metric is accuracy, with a random baseline of 0.5."
@@ -71,6 +72,7 @@ ncb_nob:
   evaluation_type: classification
   metric_scale: unit
   url: https://huggingface.co/datasets/hcfa/ncb
+  empty_prompt: true
 nocola_nob:
   pretty_name: linguistic acceptability (cola)
   description: "Linguistic acceptability based on the BLiMP-like NoCoLA dataset, which includes a variety of linguistic phenomena. The main metric is accuracy, with a random baseline of 0.5."
@@ -81,6 +83,7 @@ nocola_nob:
   evaluation_type: classification
   metric_scale: unit
   url: https://huggingface.co/datasets/ltg/nocola
+  empty_prompt: true
 norbelebele_nob:
   pretty_name: reading comprehension (belebele)
   description: "Reading comprehension based on the NorBelebele dataset, which includes questions about a given passage. The main metric is accuracy, with a random baseline of 0.25."

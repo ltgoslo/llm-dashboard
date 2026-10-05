@@ -150,7 +150,7 @@ const CONTROL_TOOLTIPS = [
   {
     anchor: "#metric-mode-select",
     title: "Metric type",
-    body: "Hard metrics score discrete predictions (accuracy, F1, …). Soft metrics score the probability the model assigns to the correct answer (soft accuracy); tasks without a soft metric contribute their hard one. For NoReC the hard metric is macro-F1 and the soft one the soft accuracy.",
+    body: "Hard metrics score discrete predictions (accuracy, F1, …). Soft metrics score the conditional probability of the correct answer — the probability mass on it among the choices (soft accuracy); tasks without a soft metric contribute their hard one. For NoReC the hard metric is macro-F1 and the soft one the soft accuracy.",
   },
   {
     anchor: "#size-slider-container",
