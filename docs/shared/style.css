@@ -451,36 +451,55 @@ select.ui-select-native { display: none !important; }
   cursor: default;
 }
 
-/* Segmented button groups (shots, error bands): one pill, the active
-   segment in the same accent-on-tint as the dropdown's highlighted row
-   (a solid accent fill was too loud next to the other controls); hovering
-   an inactive segment only colours its text. The shadow sits on the group
-   so the segments don't shade each other. */
+/* Segmented button groups (shots, error bands): a sliding segmented
+   control. The group is a tinted track in the controls' chrome; every
+   option is set in the normal ink (muted grey would read as disabled);
+   the selected one sits on a white raised thumb — the ::before below,
+   positioned by shared/segmented.js through --thumb-left / --thumb-width
+   — and takes the accent. Hovering another option lifts it on a
+   translucent white and colours its text, previewing the thumb. */
 .shot-toggle {
+  position: relative;
   display: inline-flex;
+  height: var(--control-h);
+  padding: 3px;
+  border: 1px solid var(--control-border);
   border-radius: var(--control-radius);
-  box-shadow: var(--control-shadow);
+  background: var(--bg-tint);
+  box-shadow: inset 0 1px 2px rgba(30, 41, 59, 0.06);
 }
+.shot-toggle::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: var(--thumb-left, 3px);
+  width: var(--thumb-width, 0);
+  border-radius: calc(var(--control-radius) - 2px);
+  background: var(--surface);
+  box-shadow: 0 1px 4px rgba(30, 41, 59, 0.16), 0 0 0 1px rgba(100, 116, 139, 0.18);
+}
+.shot-toggle.segmented-ready::before { transition: left 0.2s ease, width 0.2s ease; }
 .shot-btn, .ci-btn {
+  position: relative;      /* above the thumb */
+  z-index: 1;
   display: inline-flex;    /* centre the text ourselves, like .ui-select, */
   align-items: center;     /* rather than by each browser's button rules */
   justify-content: center;
-  height: var(--control-h);
+  height: 100%;
   padding: 0 0.7rem;
-  border: 1px solid var(--control-border);
-  background: var(--surface);
+  border: none;
+  border-radius: calc(var(--control-radius) - 2px);
+  background: transparent;
   cursor: pointer;
   font: var(--control-font);
-  color: var(--fg-muted);
+  color: var(--fg);
   outline: none;
-  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+  transition: color 0.15s, background-color 0.15s;
 }
-.shot-btn:first-child, .ci-btn:first-child { border-radius: var(--control-radius) 0 0 var(--control-radius); }
-.shot-btn:last-child, .ci-btn:last-child { border-radius: 0 var(--control-radius) var(--control-radius) 0; }
-.shot-btn:not(:first-child), .ci-btn:not(:first-child) { border-left: none; }
 .shot-btn:hover, .ci-btn:hover,
-.shot-btn:focus-visible, .ci-btn:focus-visible { color: var(--accent); }
-.shot-btn.active, .ci-btn.active { background: var(--accent-light); color: var(--accent); }
+.shot-btn:focus-visible, .ci-btn:focus-visible { color: var(--accent); background: rgba(255, 255, 255, 0.6); }
+.shot-btn.active, .ci-btn.active { color: var(--accent); background: transparent; cursor: default; }
 
 /* Checkboxes (task and model grids, the fully-open toggle): a drawn box
    in the controls' chrome; checked and indeterminate fill with the accent. */

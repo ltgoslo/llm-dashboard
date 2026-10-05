@@ -52,6 +52,7 @@ llm-dashboard/
     │   ├── chart.js              ← Plotly config, colors, layout helpers
     │   ├── ui.js                 ← tooltip, checkboxes, metric selector
     │   ├── dropdown.js           ← custom <select> dropdown (same look on every system)
+    │   ├── segmented.js          ← sliding thumb of the shot / error-band button groups
     │   ├── selection.js          ← task-selection logic + shared control listeners
     │   ├── signals.js            ← FineWeb2 signal measures of the plotted curves (multisynt)
     │   ├── url-state.js          ← URL hash/search save/restore
