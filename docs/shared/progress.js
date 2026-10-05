@@ -593,9 +593,9 @@ function getProgressAggregateDescription() {
     ? "Scores are first averaged within each task category, then averaged across categories. This gives equal weight to each category regardless of how many tasks it contains. "
     : "";
   const normDescs = {
-    none: "Scores are shown on their native metric scales without normalization, then averaged.",
-    baseline: "Each task score is normalized to a 0–100 scale where 0 = random baseline performance and 100 = perfect score, then averaged across tasks. This accounts for different chance levels across tasks (e.g. 25% for 4-choice QA vs. 50% for binary classification).",
-    minmax: "Each task score is normalized to 0–100 using the minimum and maximum scores observed for that task across all plotted checkpoints, then averaged.",
+    none: "Scores are shown on their native metric scales without rescaling, then averaged.",
+    baseline: "Each task score is rescaled to a 0–100 scale where 0 = random baseline performance and 100 = perfect score, then averaged across tasks. This accounts for different chance levels across tasks (e.g. 25% for 4-choice QA vs. 50% for binary classification).",
+    minmax: "Each task score is rescaled to 0–100 using the minimum and maximum scores observed for that task across all plotted checkpoints, then averaged.",
     zscore: "Each task score is converted to a z-score (standard deviations from the mean score of that task across all plotted checkpoints), then averaged.",
     percentile: "Each task score is converted to a percentile rank, then averaged.",
   };

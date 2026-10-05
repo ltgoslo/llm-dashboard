@@ -54,9 +54,9 @@
                             </div>
 
                             <div class="about-section">
-                                <h3>Normalization</h3>
-                                <p>Aggregate views normalize scores before averaging. The default <em>random baseline</em> normalization maps each score to:</p>
-                                <p class="about-formula">normalized = (raw &minus; random_baseline) / (max_performance &minus; random_baseline) &times; 100</p>
+                                <h3>Rescaling</h3>
+                                <p>Aggregate views rescale scores before averaging. The default <em>random baseline</em> rescaling maps each score to:</p>
+                                <p class="about-formula">rescaled = (raw &minus; random_baseline) / (max_performance &minus; random_baseline) &times; 100</p>
                                 <p>where 0 = random chance and 100 = perfect performance.</p>
                             </div>
 
@@ -116,7 +116,7 @@
                         </div>
 
                         <div class="control-group">
-                            <label for="norm-select">Normalization:</label>
+                            <label for="norm-select">Rescaling:</label>
                             <select id="norm-select" class="control-select">
                                 <option value="none">none</option>
                                 <option value="baseline" selected>random baseline</option>

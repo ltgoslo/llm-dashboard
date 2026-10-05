@@ -127,7 +127,7 @@ const CONTROL_TOOLTIPS = [
   },
   {
     anchor: "#norm-select",
-    title: "Normalization",
+    title: "Rescaling",
     body: "How task scores are rescaled before averaging. 'Random baseline' maps the chance score to 0 and a perfect score to 100; 'min-max' and 'percentile' rescale relative to the evaluated models; 'z-score' shows standard deviations from the mean. 'None' keeps raw metric values.",
   },
   {
@@ -168,7 +168,7 @@ const CONTROL_TOOLTIPS = [
 ];
 
 /** Attach hover tooltips to the control-bar settings (Shots, Prompt
- *  aggregation, Normalization, Model size, Fully-open, …). Skips controls
+ *  aggregation, Rescaling, Model size, Fully-open, …). Skips controls
  *  that don't exist on the current dashboard, so it's safe to call from
  *  any init flow. `overrides` maps an anchor selector to a replacement
  *  {title, body} for dashboards whose control has different options. */
@@ -450,7 +450,7 @@ export const FORMULATION_OPTIONS = [
   ["mcf", "MCF"], ["cf", "CF"], ["hybrid", "Hybrid"], ["mean", "all (mean)"], ["max", "all (max)"],
 ];
 
-/** attachControlTooltips() overrides for the "Prompts" and "Normalization"
+/** attachControlTooltips() overrides for the "Prompts" and "Rescaling"
  *  controls of those dashboards (their options differ from the others'). */
 export const VARIANT_CONTROL_TOOLTIPS = {
   "#prompt-agg-select": {
@@ -458,7 +458,7 @@ export const VARIANT_CONTROL_TOOLTIPS = {
     body: "Every task is evaluated with several prompt templates (five per formulation in NorEval 1.2). 'Single prompt' shows one template drawn at random per task — the same one for every checkpoint and model — mimicking an evaluation with a single prompt. 'All (mean)' averages over the templates; 'all (max)' takes the best one.",
   },
   "#norm-select": {
-    title: "Normalization",
+    title: "Rescaling",
     body: "How task scores are rescaled before averaging. 'Random baseline' maps the chance score to 0 and a perfect score to 100; 'z-score' and 'min-max' rescale each task relative to all plotted checkpoints; 'none' keeps raw metric values.",
   },
 };
