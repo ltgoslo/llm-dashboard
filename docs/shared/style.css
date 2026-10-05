@@ -16,6 +16,9 @@
    Other concerns scattered through the file:
      • CSS variables / palette          (:root)
      • Bands                            (.band, .band-white, .band-tint)
+     • Custom controls                  (.ui-select, .shot-btn, .small-btn,
+                                         checkboxes — drawn by the stylesheet
+                                         so they look alike on every system)
      • Hover tooltip                    (.custom-tooltip — fixed overlay)
      • Plotly modebar overrides         (.modebar-container, .modebar-btn)
      • Bar hover scale animation        (driven by chart.js, see #chart
@@ -35,6 +38,16 @@
   --border: #d2d9e4;
   --border-light: #eef0f3;
   --radius: 10px;
+
+  /* Controls — the chrome shared by the custom dropdowns, segmented
+     buttons, small buttons and checkboxes (see the Controls block). */
+  --control-h: 2.0625rem;                            /* 33px */
+  --control-border: rgba(100, 116, 139, 0.4);        /* --fg-muted at 40% */
+  --control-border-hover: rgba(99, 102, 241, 0.5);   /* --accent at 50% */
+  --control-radius: 0.35rem;
+  --control-shadow: 0 2px 10px rgba(30, 41, 59, 0.12);
+  --control-popup-shadow: 0 6px 20px rgba(30, 41, 59, 0.15);
+  --control-font: 600 0.9rem/1.2 var(--font-sans);
 
   /* Type — Mona Sans for body text, Hubot Sans for titles/headings.
      Both are GitHub's variable fonts loaded from Google Fonts in each
@@ -343,37 +356,162 @@ header.dashboard-header h1 {
 .control-group { display: flex; align-items: center; gap: 0.5rem; }
 .control-group label { font-weight: 500; font-size: 0.9rem; color: var(--fg-muted); }
 
-/* Task dropdown — the "what to plot" selector. */
-#task-select {
-  padding: 0.3rem 0.2rem; font-family: var(--font-sans); font-size: 0.9rem;
-  border: 1px solid var(--border); border-radius: 6px;
-  background: var(--surface); color: var(--fg); outline: none;
-  field-sizing: content;
-  max-width: 100%;
-}
-#task-select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
+/* ──── Controls — drawn by the stylesheet, so they look the same on
+   every system ────
+   The look follows the figure dropdowns on davidsamuel.no: a white pill
+   with a thin muted border, a soft drop shadow and a small chevron;
+   hover, focus and the open state tint it with the accent. The same
+   chrome is shared by the segmented button groups, the small module
+   buttons and the checkboxes (further down). */
 
-/* Shot toggle — segmented 0/1/5-shot button group. */
-.shot-toggle { display: flex; gap: 0; }
-.shot-btn, .ci-btn {
-  padding: 0.3rem 0.6rem; border: 1px solid var(--border); background: var(--surface);
-  cursor: pointer; font-family: var(--font-sans); font-size: 0.9rem;
-  color: var(--fg-muted); transition: all 0.15s;
+/* Dropdown (shared/dropdown.js). The native <select> — #task-select and
+   the .control-select's — stays in the DOM as the state holder but is
+   never shown; .ui-select is the control the user sees, sized by its
+   current label. */
+select.ui-select-native { display: none !important; }
+
+.ui-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  height: var(--control-h);
+  padding: 0 1.4rem 0 0.6rem;
+  font: var(--control-font);
+  color: var(--fg);
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  border: 1px solid var(--control-border);
+  border-radius: var(--control-radius);
+  background-color: var(--surface);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M1 1l4 4 4-4" fill="none" stroke="%2364748b" stroke-width="1.5" stroke-linecap="round"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 0.45rem center;
+  box-shadow: var(--control-shadow);
+  cursor: pointer;
+  outline: none;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
 }
-.shot-btn:first-child, .ci-btn:first-child { border-radius: 6px 0 0 6px; }
-.shot-btn:last-child, .ci-btn:last-child { border-radius: 0 6px 6px 0; }
+.ui-select-label { overflow: hidden; text-overflow: ellipsis; }
+.ui-select:hover,
+.ui-select:focus-visible,
+.ui-select[aria-expanded="true"] {
+  color: var(--accent);
+  border-color: var(--control-border-hover);
+  background-color: var(--accent-light);
+}
+.ui-select:focus-visible { box-shadow: var(--control-shadow), 0 0 0 2px var(--accent-light); }
+.ui-select.disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* The open list: appended to <body> and positioned by dropdown.js, so it
+   escapes the controls bar's clip-path. Regular weight, the current
+   choice bold, the highlighted row in the accent tint. */
+.ui-select-options {
+  position: fixed;
+  z-index: 500;            /* above the chart overlays (100), below the tooltip (1000) */
+  max-width: min(80vw, 36rem);
+  max-height: 60vh;        /* long task lists scroll */
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.25rem 0;
+  list-style: none;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--fg);
+  border: 1px solid var(--control-border);
+  border-radius: var(--control-radius);
+  background: var(--surface);
+  box-shadow: var(--control-popup-shadow);
+}
+.ui-select-options[hidden] { display: none; }
+.ui-select-options li[role="option"] {
+  padding: 0.25rem 1.4rem 0.25rem 0.6rem; /* the closed control's inset */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.ui-select-options li.ui-select-grouped { padding-left: 1.2rem; }
+.ui-select-options li[aria-selected="true"] { font-weight: 600; }
+.ui-select-options li.active { color: var(--accent); background: var(--accent-light); }
+.ui-select-options li[aria-disabled="true"] { color: var(--fg-muted); opacity: 0.6; cursor: default; }
+.ui-select-group {
+  padding: 0.5rem 0.6rem 0.15rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  cursor: default;
+}
+
+/* Segmented button groups (shots, error bands): one pill, the active
+   segment filled with the accent. The shadow sits on the group so the
+   segments don't shade each other. */
+.shot-toggle {
+  display: inline-flex;
+  border-radius: var(--control-radius);
+  box-shadow: var(--control-shadow);
+}
+.shot-btn, .ci-btn {
+  height: var(--control-h);
+  padding: 0 0.7rem;
+  border: 1px solid var(--control-border);
+  background: var(--surface);
+  cursor: pointer;
+  font: var(--control-font);
+  color: var(--fg-muted);
+  outline: none;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+.shot-btn:first-child, .ci-btn:first-child { border-radius: var(--control-radius) 0 0 var(--control-radius); }
+.shot-btn:last-child, .ci-btn:last-child { border-radius: 0 var(--control-radius) var(--control-radius) 0; }
 .shot-btn:not(:first-child), .ci-btn:not(:first-child) { border-left: none; }
-.shot-btn:hover, .ci-btn:hover { background: var(--accent-light); color: var(--accent); }
+.shot-btn:hover, .ci-btn:hover,
+.shot-btn:focus-visible, .ci-btn:focus-visible { background: var(--accent-light); color: var(--accent); }
 .shot-btn.active, .ci-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
 
-/* Generic small select (prompt aggregation, normalization, metric). */
-.control-select {
-  padding: 0.3rem 0.2rem; font-family: var(--font-sans); font-size: 0.9rem;
-  border: 1px solid var(--border); border-radius: 6px; background: var(--surface);
-  color: var(--fg); outline: none;
-  field-sizing: content;
+/* Checkboxes (task and model grids, the fully-open toggle): a drawn box
+   in the controls' chrome; checked and indeterminate fill with the accent. */
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+  margin: 0;
+  vertical-align: -0.15em;
+  border: 1px solid var(--control-border);
+  border-radius: 0.2rem;
+  background: var(--surface) center / 72% no-repeat;
+  box-shadow: 0 1px 3px rgba(30, 41, 59, 0.08);
+  cursor: pointer;
+  transition: border-color 0.12s, background-color 0.12s;
 }
-.control-select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
+input[type="checkbox"]:not(:checked):not(:indeterminate):not(:disabled):hover {
+  border-color: var(--control-border-hover);
+  background-color: var(--accent-light);
+}
+input[type="checkbox"]:checked,
+input[type="checkbox"]:indeterminate {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+input[type="checkbox"]:checked {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8"><path d="M1.5 4l2.5 2.5 4.5-5" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+}
+input[type="checkbox"]:indeterminate {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8"><path d="M2 4h6" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>');
+}
+input[type="checkbox"]:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* Help anchor — dotted underline + help cursor on elements that carry a
    hover tooltip (applied by attachHelpTooltip in shared/ui.js). The cursor
@@ -442,7 +580,6 @@ header.dashboard-header h1 {
   cursor: pointer; user-select: none; white-space: nowrap;
   font-size: 0.9rem; font-weight: 500; color: var(--fg-muted);
 }
-.fully-open-label input[type="checkbox"] { accent-color: var(--accent); cursor: pointer; }
 
 /* ────────────────────────────────────────────────────────────
    Chart canvas — extends 5 rem to the LEFT of the band-inner
@@ -606,13 +743,19 @@ header.dashboard-header h1 {
   gap: 0.4rem;
 }
 
+/* Same chrome as the chart controls (see the Controls block), one size down. */
 .small-btn {
-  padding: 0.2rem 0.65rem; font-family: var(--font-sans); font-size: 0.78rem;
-  font-weight: 500; border: 1px solid var(--border); border-radius: 5px;
+  height: 1.65rem; padding: 0 0.65rem;
+  font: 600 0.78rem/1.2 var(--font-sans);
+  border: 1px solid var(--control-border); border-radius: var(--control-radius);
   background: var(--surface); color: var(--fg-muted); cursor: pointer;
-  transition: all 0.15s;
+  box-shadow: 0 1px 6px rgba(30, 41, 59, 0.1);
+  outline: none;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
 }
-.small-btn:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+.small-btn:hover, .small-btn:focus-visible {
+  background: var(--accent-light); color: var(--accent); border-color: var(--control-border-hover);
+}
 
 /* ──── Task checkbox grid — used in the "Tasks" module ────
    Outer grid (.checkbox-grid) → category columns
@@ -627,17 +770,12 @@ header.dashboard-header h1 {
   display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem;
   padding-bottom: 0.2rem; border-bottom: 1px solid var(--border); cursor: pointer;
 }
-.checkbox-category-header input[type="checkbox"] {
-  accent-color: var(--accent); cursor: pointer; flex-shrink: 0;
-}
 .checkbox-category h4 {
   margin: 0;
   font-family: var(--font-sans);
   font-size: 0.9rem; font-weight: 700; color: #000;
 }
-.checkbox-category input[type="checkbox"] {
-  margin-right: 0.25rem; accent-color: var(--accent);
-}
+.checkbox-category input[type="checkbox"] { margin-right: 0.25rem; }
 
 /* Each task is a <details> with the checkbox + name in <summary>; clicking
    the name expands the description inline below. The checkbox stops click
@@ -703,16 +841,12 @@ header.dashboard-header h1 {
   display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem;
   padding-bottom: 0.2rem; border-bottom: 1px solid var(--border); cursor: pointer;
 }
-.model-org-header input[type="checkbox"] {
-  accent-color: var(--accent); cursor: pointer; flex-shrink: 0;
-}
 .model-org-group h4 {
   margin: 0;
   font-family: var(--font-sans);
   font-size: 0.9rem; font-weight: 700; color: #000;
 }
 .model-org-group { display: grid; grid-template-columns: 1fr; gap: 0; }
-.model-checkbox-grid input[type="checkbox"] { accent-color: var(--accent); }
 
 /* Each model is a <details>; same pattern as task-item. */
 .model-checkbox-grid details.model-item { display: block; }

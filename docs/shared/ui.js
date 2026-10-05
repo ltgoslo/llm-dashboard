@@ -1,10 +1,12 @@
-// Shared UI helpers — tooltip + task-checkbox grid + metric selector.
+// Shared UI helpers — tooltip + task-checkbox grid + metric selector, and
+// the bootstrap of the custom dropdowns (see the end of the file).
 
 import { state } from "./state.js";
 import {
   METRIC_DISPLAY, METRIC_SCALES, getBaseMetric, llNormBase, hasLLNormVariants, taskBaseMetric,
   isAggregateSelection, getEffectiveMetric, taskTypeMatches,
 } from "./core.js";
+import { enhanceSelects } from "./dropdown.js";
 
 // ─────────────────────────────────────────────────────────────
 // App-ready toggle — flips body.app-ready, which the stylesheet
@@ -542,4 +544,22 @@ export function syncTaskCheckboxStates(filterSourceFn) {
     gcb.checked = allChecked;
     gcb.indeterminate = !allChecked && someChecked;
   });
+}
+
+// ─────────────────────────────────────────────────────────────
+// Custom dropdowns — every <select> on the page is replaced by the
+// dashboards' own dropdown (dropdown.js) so the controls look the same
+// on every system. The native select stays as the state holder, so the
+// code above keeps populating it and reading its value as before. An
+// option's `title` is shown with the page tooltip. Module scripts run
+// once the document is parsed, so the selects exist by now; the
+// DOMContentLoaded branch covers an unusual loading order.
+// ─────────────────────────────────────────────────────────────
+
+const enhancePageSelects = () =>
+  enhanceSelects({ tooltip: { attach: attachTooltip, hide: hideTooltip } });
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", enhancePageSelects);
+} else {
+  enhancePageSelects();
 }
