@@ -297,6 +297,7 @@ header.dashboard-header h1 {
 .chart-signal { cursor: help; }
 .chart-signal-label::after { content: " "; }
 .chart-signal-value { font-weight: 600; color: var(--fg); font-variant-numeric: tabular-nums; }
+.chart-signal-formula { margin-left: 0.35rem; color: var(--fg-muted); font-variant-numeric: tabular-nums; }
 
 /* ──── Controls bar — two flex rows of inline controls ────
    Layout: each row is a .controls-bar; items inside are

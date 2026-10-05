@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NorPrelude dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="../shared/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hubot+Sans:wght@200..900&family=Mona+Sans:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/style.css">
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+            onload="renderMathInElement(document.body, { delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$',  right: '$',  display: false}
+            ]});"></script>
+</head>
+<body>
+
+    <div class="band band-white">
+        <div class="band-inner">
+            <header class="dashboard-header">
+                <div class="header-titles">
+                    <h1>NorPrelude dashboard</h1>
+                </div>
+            </header>
+        </div>
+        <div class="flag-line" aria-hidden="true"></div>
+    </div>
+
+    <div class="band band-white">
+        <div class="band-inner">
+            <section class="chart-section">
+                <div class="chart-zone">
+                    <div class="chart-title-block">
+                        <span class="chart-title" id="chart-title">&nbsp;</span>
+                    </div>
+                    <div class="controls-bar">
+                        <div class="control-group">
+                            <label for="task-select">Task:</label>
+                            <select id="task-select">
+                                <option value="__all_macro__" selected title="Scores averaged within categories, then averaged across categories">All (category average)</option>
+                                <option value="__all__" title="Simple average across all tasks">All (task average)</option>
+                                <option value="__custom_macro__" hidden>Custom (category average)</option>
+                                <option value="__custom__" hidden>Custom (task average)</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label>Shots:</label>
+                            <div class="shot-toggle">
+                                <button class="shot-btn" data-shot="0">0-shot</button>
+                                <button class="shot-btn" data-shot="1">1-shot</button>
+                                <button class="shot-btn active" data-shot="5">5-shot</button>
+                            </div>
+                        </div>
+
+                        <div class="control-group" id="task-type-control">
+                            <label for="task-type-select">Task type:</label>
+                            <select id="task-type-select" class="control-select">
+                                <option value="all" selected>generative &amp; classification</option>
+                                <option value="generation">only generative</option>
+                                <option value="classification">only classification</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" id="metric-mode-control" style="display:none;">
+                            <label for="metric-mode-select">Metric type:</label>
+                            <select id="metric-mode-select" class="control-select">
+                                <option value="hard">hard</option>
+                                <option value="soft" selected>soft</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" id="decoding-control" style="display:none;">
+                            <label for="decoding-select">Decoding:</label>
+                            <select id="decoding-select" class="control-select">
+                                <option value="sampling" selected>random sampling</option>
+                                <option value="greedy">greedy</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="prompt-agg-select">Prompts:</label>
+                            <select id="prompt-agg-select" class="control-select">
+                                <option value="single">single prompt</option>
+                                <option value="mean" selected>all (mean)</option>
+                                <option value="max">all (max)</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" id="formulation-control" style="display:none;">
+                            <label for="formulation-select">Formulation:</label>
+                            <select id="formulation-select" class="control-select">
+                                <!-- Options populated by app.js from the formulations present -->
+                            </select>
+                        </div>
+
+                        <div class="control-group" id="acc-norm-control" style="display:none;">
+                            <label for="acc-norm-select">Loglikelihood normalization:</label>
+                            <select id="acc-norm-select" class="control-select">
+                                <option value="max" selected>max</option>
+                                <option value="none">none</option>
+                                <option value="norm">character length</option>
+                                <option value="mutual_info">PMI</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label for="norm-select">Normalization:</label>
+                            <select id="norm-select" class="control-select">
+                                <option value="baseline" selected>random baseline</option>
+                                <option value="zscore">z-score</option>
+                                <option value="minmax">min-max</option>
+                                <option value="none">none</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" id="metric-control" style="display:none;">
+                            <label for="metric-select">Metric:</label>
+                            <select id="metric-select" class="control-select"></select>
+                        </div>
+
+                        <div class="control-group">
+                            <label>Error bands:</label>
+                            <div class="shot-toggle">
+                                <button class="ci-btn" data-ci="1">shown</button>
+                                <button class="ci-btn active" data-ci="0">hidden</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="chart"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="band band-tint">
+        <div class="band-inner">
+            <section class="modules-section">
+                <div id="task-checkboxes" class="module">
+                    <div class="module-header">
+                        <h3>Tasks included in aggregation</h3>
+                        <div class="module-actions">
+                            <button id="select-all-btn" class="small-btn">Select all</button>
+                            <button id="select-none-btn" class="small-btn">Select none</button>
+                        </div>
+                    </div>
+                    <div id="checkbox-grid" class="checkbox-grid"></div>
+                </div>
+            </section>
+            <footer class="dashboard-footer">
+                <p>Made by <a href="https://www.mn.uio.no/ifi/english/research/groups/ltg/">Language Technology Group</a>, University of Oslo</p>
+            </footer>
+        </div>
+    </div>
+
+    <div id="custom-tooltip" class="custom-tooltip">
+        <div class="tooltip-title" id="tooltip-title"></div>
+        <div class="tooltip-meta" id="tooltip-meta"></div>
+        <div class="tooltip-body" id="tooltip-body"></div>
+        <div class="tooltip-footer" id="tooltip-footer"></div>
+    </div>
+
+    <div class="app-loading" aria-hidden="true">
+        <div class="app-loading-spinner"></div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

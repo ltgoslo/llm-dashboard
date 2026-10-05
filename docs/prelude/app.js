@@ -20,7 +20,7 @@ import {
 import { renderProgressChart, updateProgressTitle } from "../shared/progress.js";
 import { computeSignals, renderSignals } from "../shared/signals.js";
 import {
-  setsEqual, getBenchmarksForSelection, autoSetNormalization,
+  setsEqual, getBenchmarksForSelection, autoSetNormalization, setSingleTaskNormalization,
   populateTaskDropdown, onTaskCheckboxChange, bindTaskControls,
   restoreCheckedTasksFromSelection, syncTaskControlsFromState,
 } from "../shared/selection.js";
@@ -30,7 +30,9 @@ import { UrlState } from "../shared/url-state.js";
 let tokensPerStep = 2048 * 4096;   // 8,388,608 tokens per training iteration
 let allShots = ["5"];
 
-const DEFAULT_SELECTION = "__all__";
+const DEFAULT_SELECTION = "__all_macro__";
+// Defaults of the selectors (the URL only records departures).
+const DEFAULTS = { metricMode: "soft", promptAgg: "mean", formulation: "mean", accNorm: "max", normalization: "baseline" };
 const MAIN_COLOR = "#2563eb";                                          // blue
 const RUN_COLORS = ["#dc2626", "#f97316", "#9333ea", "#0d9488", "#b45309"];
 
@@ -51,6 +53,7 @@ const plotlyConfig = makePlotlyConfig("prelude-chart", () => ({
       monotonicity: lastSignals.monotonicity,
       ranking_consistency: lastSignals.rankingConsistency,
       non_randomness: lastSignals.nonRandomness,
+      non_randomness_linear_fit: lastSignals.nonRandomnessFit,
     },
   }),
 }));
@@ -180,12 +183,12 @@ function syncVariantControlsFromState() {
     return select.value;
   };
   state.taskTypeFilter = setSelect("task-type-select", state.taskTypeFilter, "all");
-  state.metricMode = setSelect("metric-mode-select", state.metricMode, "hard");
+  state.metricMode = setSelect("metric-mode-select", state.metricMode, DEFAULTS.metricMode);
   state.currentDecoding = setSelect("decoding-select", state.currentDecoding, "sampling");
-  state.currentPromptAgg = setSelect("prompt-agg-select", state.currentPromptAgg, "max");
-  state.currentFormulation = setSelect("formulation-select", state.currentFormulation, "max");
-  state.currentAccNorm = setSelect("acc-norm-select", state.currentAccNorm, "max");
-  state.currentNormalization = setSelect("norm-select", state.currentNormalization, "baseline");
+  state.currentPromptAgg = setSelect("prompt-agg-select", state.currentPromptAgg, DEFAULTS.promptAgg);
+  state.currentFormulation = setSelect("formulation-select", state.currentFormulation, DEFAULTS.formulation);
+  state.currentAccNorm = setSelect("acc-norm-select", state.currentAccNorm, DEFAULTS.accNorm);
+  state.currentNormalization = setSelect("norm-select", state.currentNormalization, DEFAULTS.normalization);
   document.querySelectorAll(".ci-btn").forEach((b) =>
     b.classList.toggle("active", b.dataset.ci === (state.showCIBands ? "1" : "0")));
 }
@@ -234,11 +237,11 @@ function setupUrlState() {
       default: DEFAULT_SELECTION,
     },
     { key: "ttype", get: () => state.taskTypeFilter, set: (v) => state.taskTypeFilter = v, default: "all" },
-    { key: "mmode", get: () => state.metricMode, set: (v) => state.metricMode = v, default: "hard" },
+    { key: "mmode", get: () => state.metricMode, set: (v) => state.metricMode = v, default: DEFAULTS.metricMode },
     { key: "dec", get: () => state.currentDecoding, set: (v) => state.currentDecoding = v, default: "sampling" },
-    { key: "prompt", get: () => state.currentPromptAgg, set: (v) => state.currentPromptAgg = LEGACY_PROMPT_AGG[v] || v, default: "max" },
-    { key: "form", get: () => state.currentFormulation, set: (v) => state.currentFormulation = v, default: "max" },
-    { key: "anorm", get: () => state.currentAccNorm, set: (v) => state.currentAccNorm = LEGACY_LL_NORM[v] || v, default: "max" },
+    { key: "prompt", get: () => state.currentPromptAgg, set: (v) => state.currentPromptAgg = LEGACY_PROMPT_AGG[v] || v, default: DEFAULTS.promptAgg },
+    { key: "form", get: () => state.currentFormulation, set: (v) => state.currentFormulation = v, default: DEFAULTS.formulation },
+    { key: "anorm", get: () => state.currentAccNorm, set: (v) => state.currentAccNorm = LEGACY_LL_NORM[v] || v, default: DEFAULTS.accNorm },
     { key: "ci", get: () => state.showCIBands ? "1" : "0", set: (v) => state.showCIBands = v !== "0", default: "0" },
     {
       key: "metric",
@@ -250,7 +253,7 @@ function setupUrlState() {
       key: "norm",
       get: () => state.currentNormalization,
       set: (v) => state.currentNormalization = v === "percentile" ? "baseline" : v,
-      default: () => isAggregateSelection(state.currentTaskSelection) ? "baseline" : "none",
+      default: DEFAULTS.normalization,
     },
     {
       key: "tasks",
@@ -277,14 +280,16 @@ async function init() {
     state.metricsSetup = state.DATA.metrics_setup;
     state.checkedTasks = new Set(Object.keys(state.metricsSetup));
     tokensPerStep = state.DATA.tokens_per_step || tokensPerStep;
+    setSingleTaskNormalization(DEFAULTS.normalization);
     if (state.DATA.shots?.length) allShots = state.DATA.shots.map(String);
     chartConfig.allShots = allShots;
     state.currentTaskSelection = DEFAULT_SELECTION;
-    state.currentFormulation = "max";
+    state.currentPromptAgg = DEFAULTS.promptAgg;
+    state.currentFormulation = DEFAULTS.formulation;
     state.formulationCombine = true;
     state.currentAccNorm = "max";
     state.llNormScope = "all";
-    state.metricMode = "hard";
+    state.metricMode = DEFAULTS.metricMode;
     state.taskTypeFilter = "all";
     state.currentDecoding = "sampling";
     state.showCIBands = false;

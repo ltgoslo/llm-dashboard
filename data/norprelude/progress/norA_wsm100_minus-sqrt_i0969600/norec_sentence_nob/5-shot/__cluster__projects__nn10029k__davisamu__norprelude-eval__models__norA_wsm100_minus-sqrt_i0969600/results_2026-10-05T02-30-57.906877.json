@@ -1,0 +1,2754 @@
+{
+  "results": {
+    "norec_sentence_nob_cf_p0": {
+      "name": "norec_sentence_nob_cf_p0",
+      "alias": "norec_sentence_nob_cf_p0",
+      "sample_len": 583,
+      "acc,none": 0.8936535162950258,
+      "acc_stderr,none": 0.012778640704790702,
+      "prob_correct,none": 0.8417242725508113,
+      "prob_correct_stderr,none": 0.008990269418373218,
+      "loglikelihood_correct,none": -0.2649018952385786,
+      "loglikelihood_correct_stderr,none": 0.021296233162283424,
+      "acc_norm,none": 0.8936535162950258,
+      "acc_norm_stderr,none": 0.012778640704790702,
+      "prob_correct_norm,none": 0.5873966177509012,
+      "prob_correct_norm_stderr,none": 0.0025978683897497374,
+      "loglikelihood_correct_norm,none": -0.037843127891225514,
+      "loglikelihood_correct_norm_stderr,none": 0.0030423190231833462,
+      "acc_mutual_info,none": 0.8987993138936535,
+      "acc_mutual_info_stderr,none": 0.012501484945333659,
+      "prob_correct_mutual_info,none": 0.8403790070688579,
+      "prob_correct_mutual_info_stderr,none": 0.008821361319628608,
+      "loglikelihood_correct_mutual_info,none": 11.205424124362604,
+      "loglikelihood_correct_mutual_info_stderr,none": 0.02057966554622523,
+      "f1,none": 0.8708444101420689,
+      "f1_stderr,none": 0.0151259535203107,
+      "f1_stderr_stderr,none": "N/A",
+      "f1_norm,none": 0.8708444101420689,
+      "f1_norm_stderr,none": 0.0151259535203107,
+      "f1_norm_stderr_stderr,none": "N/A",
+      "f1_mutual_info,none": 0.8785609631237974,
+      "f1_mutual_info_stderr,none": 0.015110328423251475,
+      "f1_mutual_info_stderr_stderr,none": "N/A"
+    },
+    "norec_sentence_nob_cf_p1": {
+      "name": "norec_sentence_nob_cf_p1",
+      "alias": "norec_sentence_nob_cf_p1",
+      "sample_len": 583,
+      "acc,none": 0.8953687821612349,
+      "acc_stderr,none": 0.012687326664456221,
+      "prob_correct,none": 0.8316138901050752,
+      "prob_correct_stderr,none": 0.008806025012416337,
+      "loglikelihood_correct,none": -0.28260206767257245,
+      "loglikelihood_correct_stderr,none": 0.020111124378425535,
+      "acc_norm,none": 0.8953687821612349,
+      "acc_norm_stderr,none": 0.012687326664456221,
+      "prob_correct_norm,none": 0.5799066312666435,
+      "prob_correct_norm_stderr,none": 0.0023853695635720463,
+      "loglikelihood_correct_norm,none": -0.040371723953224636,
+      "loglikelihood_correct_norm_stderr,none": 0.0028730177683465043,
+      "acc_mutual_info,none": 0.8987993138936535,
+      "acc_mutual_info_stderr,none": 0.012501484945333659,
+      "prob_correct_mutual_info,none": 0.8284532847424028,
+      "prob_correct_mutual_info_stderr,none": 0.008753977904277685,
+      "loglikelihood_correct_mutual_info,none": 11.18772395192861,
+      "loglikelihood_correct_mutual_info_stderr,none": 0.019794241361742904,
+      "f1,none": 0.8772474828537208,
+      "f1_stderr,none": 0.013972696531915007,
+      "f1_stderr_stderr,none": "N/A",
+      "f1_norm,none": 0.8772474828537208,
+      "f1_norm_stderr,none": 0.013972696531915007,
+      "f1_norm_stderr_stderr,none": "N/A",
+      "f1_mutual_info,none": 0.8819955470017737,
+      "f1_mutual_info_stderr,none": 0.013708498704638025,
+      "f1_mutual_info_stderr_stderr,none": "N/A"
+    },
+    "norec_sentence_nob_cf_p2": {
+      "name": "norec_sentence_nob_cf_p2",
+      "alias": "norec_sentence_nob_cf_p2",
+      "sample_len": 583,
+      "acc,none": 0.8610634648370498,
+      "acc_stderr,none": 0.014337199252478342,
+      "prob_correct,none": 0.7963396440585362,
+      "prob_correct_stderr,none": 0.00992620820903754,
+      "loglikelihood_correct,none": -0.36081810799582287,
+      "loglikelihood_correct_stderr,none": 0.024224670235240973,
+      "acc_norm,none": 0.8610634648370498,
+      "acc_norm_stderr,none": 0.014337199252478342,
+      "prob_correct_norm,none": 0.5715799227805161,
+      "prob_correct_norm_stderr,none": 0.0026142065099353825,
+      "loglikelihood_correct_norm,none": -0.051545443999403265,
+      "loglikelihood_correct_norm_stderr,none": 0.003460667176462996,
+      "acc_mutual_info,none": 0.8747855917667239,
+      "acc_mutual_info_stderr,none": 0.013718810937778323,
+      "prob_correct_mutual_info,none": 0.7962854175920003,
+      "prob_correct_mutual_info_stderr,none": 0.0096176024991926,
+      "loglikelihood_correct_mutual_info,none": 11.10950791160536,
+      "loglikelihood_correct_mutual_info_stderr,none": 0.022932604602713725,
+      "f1,none": 0.8201747872279659,
+      "f1_stderr,none": 0.01815820862435783,
+      "f1_stderr_stderr,none": "N/A",
+      "f1_norm,none": 0.8201747872279659,
+      "f1_norm_stderr,none": 0.01815820862435783,
+      "f1_norm_stderr_stderr,none": "N/A",
+      "f1_mutual_info,none": 0.840596429066366,
+      "f1_mutual_info_stderr,none": 0.017309388543251553,
+      "f1_mutual_info_stderr_stderr,none": "N/A"
+    },
+    "norec_sentence_nob_cf_p3": {
+      "name": "norec_sentence_nob_cf_p3",
+      "alias": "norec_sentence_nob_cf_p3",
+      "sample_len": 583,
+      "acc,none": 0.8902229845626072,
+      "acc_stderr,none": 0.012958168377358132,
+      "prob_correct,none": 0.8060241677244427,
+      "prob_correct_stderr,none": 0.008844732915289042,
+      "loglikelihood_correct,none": -0.3073504396081674,
+      "loglikelihood_correct_stderr,none": 0.019717686416512784,
+      "acc_norm,none": 0.8902229845626072,
+      "acc_norm_stderr,none": 0.012958168377358132,
+      "prob_correct_norm,none": 0.5690167808849055,
+      "prob_correct_norm_stderr,none": 0.002239806575084867,
+      "loglikelihood_correct_norm,none": -0.04390720565830962,
+      "loglikelihood_correct_norm_stderr,none": 0.002816812345216112,
+      "acc_mutual_info,none": 0.9005145797598628,
+      "acc_mutual_info_stderr,none": 0.01240690912990413,
+      "prob_correct_mutual_info,none": 0.8038178477236583,
+      "prob_correct_mutual_info_stderr,none": 0.008630125614964351,
+      "loglikelihood_correct_mutual_info,none": 11.162975579993017,
+      "loglikelihood_correct_mutual_info_stderr,none": 0.018830633087637664,
+      "f1,none": 0.8652451532749704,
+      "f1_stderr,none": 0.015669029203503465,
+      "f1_stderr_stderr,none": "N/A",
+      "f1_norm,none": 0.8652451532749704,
+      "f1_norm_stderr,none": 0.015669029203503465,
+      "f1_norm_stderr_stderr,none": "N/A",
+      "f1_mutual_info,none": 0.8795969235151688,
+      "f1_mutual_info_stderr,none": 0.014794402268220486,
+      "f1_mutual_info_stderr_stderr,none": "N/A"
+    },
+    "norec_sentence_nob_cf_p4": {
+      "name": "norec_sentence_nob_cf_p4",
+      "alias": "norec_sentence_nob_cf_p4",
+      "sample_len": 583,
+      "acc,none": 0.9073756432246999,
+      "acc_stderr,none": 0.012016961474137172,
+      "prob_correct,none": 0.8307257865533513,
+      "prob_correct_stderr,none": 0.008537065565801657,
+      "loglikelihood_correct,none": -0.27973725681878486,
+      "loglikelihood_correct_stderr,none": 0.019280727728722604,
+      "acc_norm,none": 0.9073756432246999,
+      "acc_norm_stderr,none": 0.012016961474137172,
+      "prob_correct_norm,none": 0.5780825667274079,
+      "prob_correct_norm_stderr,none": 0.0022984258609135906,
+      "loglikelihood_correct_norm,none": -0.039962465259826406,
+      "loglikelihood_correct_norm_stderr,none": 0.002754389675531801,
+      "acc_mutual_info,none": 0.9073756432246999,
+      "acc_mutual_info_stderr,none": 0.012016961474137172,
+      "prob_correct_mutual_info,none": 0.8273064303816234,
+      "prob_correct_mutual_info_stderr,none": 0.008509564639065026,
+      "loglikelihood_correct_mutual_info,none": 11.190588762782399,
+      "loglikelihood_correct_mutual_info_stderr,none": 0.019011800347678166,
+      "f1,none": 0.8918322750886452,
+      "f1_stderr,none": 0.013316691848473805,
+      "f1_stderr_stderr,none": "N/A",
+      "f1_norm,none": 0.8918322750886452,
+      "f1_norm_stderr,none": 0.013316691848473805,
+      "f1_norm_stderr_stderr,none": "N/A",
+      "f1_mutual_info,none": 0.8924795081967213,
+      "f1_mutual_info_stderr,none": 0.01364812057630075,
+      "f1_mutual_info_stderr_stderr,none": "N/A"
+    },
+    "norec_sentence_nob_hybrid_p0": {
+      "name": "norec_sentence_nob_hybrid_p0",
+      "alias": "norec_sentence_nob_hybrid_p0",
+      "sample_len": 583,
+      "acc,none": 0.9108061749571184,
+      "acc_stderr,none": 0.01181459626517593,
+      "prob_correct,none": 0.8445071607358601,
+      "prob_correct_stderr,none": 0.008440725358704979,
+      "loglikelihood_correct,none": -0.2484305598765075,
+      "loglikelihood_correct_stderr,none": 0.019015515678194213,
+      "acc_norm,none": 0.9108061749571184,
+      "acc_norm_stderr,none": 0.01181459626517593,
+      "prob_correct_norm,none": 0.5845720612053776,
+      "prob_correct_norm_stderr,none": 0.002387450454085792,
+      "loglikelihood_correct_norm,none": -0.035490079982358216,
+      "loglikelihood_correct_norm_stderr,none": 0.0027165022397420305,
+      "acc_mutual_info,none": 0.9090909090909091,
+      "acc_mutual_info_stderr,none": 0.011916420570297187,
+      "prob_correct_mutual_info,none": 0.842546255545492,
+      "prob_correct_mutual_info_stderr,none": 0.008361837058127677,
+      "loglikelihood_correct_mutual_info,none": 11.221895459724676,
+      "loglikelihood_correct_mutual_info_stderr,none": 0.01853949621454816,
+      "f1,none": 0.8945339678828866,
+      "f1_stderr,none": 0.013776715432004026,
+      "f1_stderr_stderr,none": "N/A",
+      "f1_norm,none": 0.8945339678828866,
+      "f1_norm_stderr,none": 0.013776715432004026,
+      "f1_norm_stderr_stderr,none": "N/A",
+      "f1_mutual_info,none": 0.8933461736270033,
+      "f1_mutual_info_stderr,none": 0.013758733045435024,
+      "f1_mutual_info_stderr_stderr,none": "N/A"
+    },
+    "norec_sentence_nob_hybrid_p1": {
+      "name": "norec_sentence_nob_hybrid_p1",
+      "alias": "norec_sentence_nob_hybrid_p1",
+      "sample_len": 583,
+      "acc,none": 0.8919382504288165,
+      "acc_stderr,none": 0.012868914025559732,
+      "prob_correct,none": 0.8371889736053968,
+      "prob_correct_stderr,none": 0.009857268298447805,
+      "loglikelihood_correct,none": -0.2865836021946072,
+      "loglikelihood_correct_stderr,none": 0.02334075774956409,
+      "acc_norm,none": 0.8919382504288165,
+      "acc_norm_stderr,none": 0.012868914025559732,
+      "prob_correct_norm,none": 0.5953451100627584,
+      "prob_correct_norm_stderr,none": 0.0030717206020567126,
+      "loglikelihood_correct_norm,none": -0.0409405145992296,
+      "loglikelihood_correct_norm_stderr,none": 0.0033343939642234417,
+      "acc_mutual_info,none": 0.888507718696398,
+      "acc_mutual_info_stderr,none": 0.013046424673383995,
+      "prob_correct_mutual_info,none": 0.8382570364896671,
+      "prob_correct_mutual_info_stderr,none": 0.009621665145315284,
+      "loglikelihood_correct_mutual_info,none": 11.183742417406577,
+      "loglikelihood_correct_mutual_info_stderr,none": 0.02231686387148138,
+      "f1,none": 0.8666209105467856,
+      "f1_stderr,none": 0.015921147720731367,
+      "f1_stderr_stderr,none": "N/A",
+      "f1_norm,none": 0.8666209105467856,
+      "f1_norm_stderr,none": 0.015921147720731367,
+      "f1_norm_stderr_stderr,none": "N/A",
+      "f1_mutual_info,none": 0.8633867961599053,
+      "f1_mutual_info_stderr,none": 0.015949372826089738,
+      "f1_mutual_info_stderr_stderr,none": "N/A"
+    },
+    "norec_sentence_nob_hybrid_p2": {
+      "name": "norec_sentence_nob_hybrid_p2",
+      "alias": "norec_sentence_nob_hybrid_p2",
+      "sample_len": 583,
+      "acc,none": 0.8765008576329331,
+      "acc_stderr,none": 0.01363787329371302,
+      "prob_correct,none": 0.8094595949869635,
+      "prob_correct_stderr,none": 0.009692661181994567,
+      "loglikelihood_correct,none": -0.3129971047634128,
+      "loglikelihood_correct_stderr,none": 0.02144594180813036,
+      "acc_norm,none": 0.8765008576329331,
+      "acc_norm_stderr,none": 0.01363787329371302,
+      "prob_correct_norm,none": 0.5787935666739455,
+      "prob_correct_norm_stderr,none": 0.0027300073143936253,
+      "loglikelihood_correct_norm,none": -0.04471387210905897,
+      "loglikelihood_correct_norm_stderr,none": 0.0030637059725900514,
+      "acc_mutual_info,none": 0.8833619210977701,
+      "acc_mutual_info_stderr,none": 0.013305402711938131,
+      "prob_correct_mutual_info,none": 0.8105547804341585,
+      "prob_correct_mutual_info_stderr,none": 0.009362830249605079,
+      "loglikelihood_correct_mutual_info,none": 11.157328914837771,
+      "loglikelihood_correct_mutual_info_stderr,none": 0.020132087778307727,
+      "f1,none": 0.8418148929755803,
+      "f1_stderr,none": 0.017384666696525695,
+      "f1_stderr_stderr,none": "N/A",
+      "f1_norm,none": 0.8418148929755803,
+      "f1_norm_stderr,none": 0.017384666696525695,
+      "f1_norm_stderr_stderr,none": "N/A",
+      "f1_mutual_info,none": 0.851813641936545,
+      "f1_mutual_info_stderr,none": 0.016998176597223563,
+      "f1_mutual_info_stderr_stderr,none": "N/A"
+    },
+    "norec_sentence_nob_hybrid_p3": {
+      "name": "norec_sentence_nob_hybrid_p3",
+      "alias": "norec_sentence_nob_hybrid_p3",
+      "sample_len": 583,
+      "acc,none": 0.8336192109777015,
+      "acc_stderr,none": 0.01543739279588336,
+      "prob_correct,none": 0.7953217224791584,
+      "prob_correct_stderr,none": 0.010938798709773394,
+      "loglikelihood_correct,none": -0.35761419877747,
+      "loglikelihood_correct_stderr,none": 0.024964199653449107,
+      "acc_norm,none": 0.8336192109777015,
+      "acc_norm_stderr,none": 0.01543739279588336,
+      "prob_correct_norm,none": 0.5774259017685393,
+      "prob_correct_norm_stderr,none": 0.002906238395082291,
+      "loglikelihood_correct_norm,none": -0.05108774268249572,
+      "loglikelihood_correct_norm_stderr,none": 0.003566314236207015,
+      "acc_mutual_info,none": 0.8507718696397941,
+      "acc_mutual_info_stderr,none": 0.014769657264832658,
+      "prob_correct_mutual_info,none": 0.7974968429695544,
+      "prob_correct_mutual_info_stderr,none": 0.010519094765027655,
+      "loglikelihood_correct_mutual_info,none": 11.112711820823714,
+      "loglikelihood_correct_mutual_info_stderr,none": 0.023277729398228864,
+      "f1,none": 0.7680330121539528,
+      "f1_stderr,none": 0.020947518914855297,
+      "f1_stderr_stderr,none": "N/A",
+      "f1_norm,none": 0.7680330121539528,
+      "f1_norm_stderr,none": 0.020947518914855297,
+      "f1_norm_stderr_stderr,none": "N/A",
+      "f1_mutual_info,none": 0.7970258794904939,
+      "f1_mutual_info_stderr,none": 0.01981368677405358,
+      "f1_mutual_info_stderr_stderr,none": "N/A"
+    },
+    "norec_sentence_nob_hybrid_p4": {
+      "name": "norec_sentence_nob_hybrid_p4",
+      "alias": "norec_sentence_nob_hybrid_p4",
+      "sample_len": 583,
+      "acc,none": 0.8953687821612349,
+      "acc_stderr,none": 0.012687326664456221,
+      "prob_correct,none": 0.8402201456511551,
+      "prob_correct_stderr,none": 0.009673157626806208,
+      "loglikelihood_correct,none": -0.277747852300249,
+      "loglikelihood_correct_stderr,none": 0.022922806112311227,
+      "acc_norm,none": 0.8953687821612349,
+      "acc_norm_stderr,none": 0.012687326664456221,
+      "prob_correct_norm,none": 0.5944728163305216,
+      "prob_correct_norm_stderr,none": 0.002986321495108522,
+      "loglikelihood_correct_norm,none": -0.039678264614321286,
+      "loglikelihood_correct_norm_stderr,none": 0.003274686587473032,
+      "acc_mutual_info,none": 0.8953687821612349,
+      "acc_mutual_info_stderr,none": 0.012687326664456221,
+      "prob_correct_mutual_info,none": 0.8410632247599846,
+      "prob_correct_mutual_info_stderr,none": 0.00944674118668468,
+      "loglikelihood_correct_mutual_info,none": 11.192578167300935,
+      "loglikelihood_correct_mutual_info_stderr,none": 0.02193793420680742,
+      "f1,none": 0.8708551673548242,
+      "f1_stderr,none": 0.0155844339119334,
+      "f1_stderr_stderr,none": "N/A",
+      "f1_norm,none": 0.8708551673548242,
+      "f1_norm_stderr,none": 0.0155844339119334,
+      "f1_norm_stderr_stderr,none": "N/A",
+      "f1_mutual_info,none": 0.8717937625500651,
+      "f1_mutual_info_stderr,none": 0.0155915270399682,
+      "f1_mutual_info_stderr_stderr,none": "N/A"
+    },
+    "norec_sentence_nob_mcf_p0": {
+      "name": "norec_sentence_nob_mcf_p0",
+      "alias": "norec_sentence_nob_mcf_p0",
+      "sample_len": 583,
+      "acc,none": 0.8919382504288165,
+      "acc_stderr,none": 0.012868914025559732,
+      "prob_correct,none": 0.847914177691301,
+      "prob_correct_stderr,none": 0.009562271129587695,
+      "loglikelihood_correct,none": -0.25570019213426826,
+      "loglikelihood_correct_stderr,none": 0.023117574625885897,
+      "acc_norm,none": 0.8919382504288165,
+      "acc_norm_stderr,none": 0.012868914025559732,
+      "prob_correct_norm,none": 0.847914177691301,
+      "prob_correct_norm_stderr,none": 0.009562271129587695,
+      "loglikelihood_correct_norm,none": -0.25570019213426826,
+      "loglikelihood_correct_norm_stderr,none": 0.023117574625885897,
+      "acc_mutual_info,none": 0.8662092624356775,
+      "acc_mutual_info_stderr,none": 0.014111167381057277,
+      "prob_correct_mutual_info,none": 0.8371309928626556,
+      "prob_correct_mutual_info_stderr,none": 0.01073113814413416,
+      "loglikelihood_correct_mutual_info,none": 6.646993430382867,
+      "loglikelihood_correct_mutual_info_stderr,none": 0.029896511689811625,
+      "f1,none": 0.8656215128510015,
+      "f1_stderr,none": 0.015906313427353713,
+      "f1_stderr_stderr,none": "N/A",
+      "f1_norm,none": 0.8656215128510015,
+      "f1_norm_stderr,none": 0.015906313427353713,
+      "f1_norm_stderr_stderr,none": "N/A",
+      "f1_mutual_info,none": 0.8249653579676675,
+      "f1_mutual_info_stderr,none": 0.0181124996582318,
+      "f1_mutual_info_stderr_stderr,none": "N/A"
+    },
+    "norec_sentence_nob_mcf_p1": {
+      "name": "norec_sentence_nob_mcf_p1",
+      "alias": "norec_sentence_nob_mcf_p1",
+      "sample_len": 583,
+      "acc,none": 0.888507718696398,
+      "acc_stderr,none": 0.013046424673383995,
+      "prob_correct,none": 0.821425393487151,
+      "prob_correct_stderr,none": 0.009140904707238995,
+      "loglikelihood_correct,none": -0.27526183386922753,
+      "loglikelihood_correct_stderr,none": 0.02033898944481252,
+      "acc_norm,none": 0.888507718696398,
+      "acc_norm_stderr,none": 0.013046424673383995,
+      "prob_correct_norm,none": 0.821425393487151,
+      "prob_correct_norm_stderr,none": 0.009140904707238995,
+      "loglikelihood_correct_norm,none": -0.27526183386922753,
+      "loglikelihood_correct_norm_stderr,none": 0.02033898944481252,
+      "acc_mutual_info,none": 0.869639794168096,
+      "acc_mutual_info_stderr,none": 0.013956635255014909,
+      "prob_correct_mutual_info,none": 0.8195184156488184,
+      "prob_correct_mutual_info_stderr,none": 0.010262259543726381,
+      "loglikelihood_correct_mutual_info,none": 6.627431788647908,
+      "loglikelihood_correct_mutual_info_stderr,none": 0.026615774132955003,
+      "f1,none": 0.8643569707881578,
+      "f1_stderr,none": 0.01577042273304138,
+      "f1_stderr_stderr,none": "N/A",
+      "f1_norm,none": 0.8643569707881578,
+      "f1_norm_stderr,none": 0.01577042273304138,
+      "f1_norm_stderr_stderr,none": "N/A",
+      "f1_mutual_info,none": 0.8316309469524243,
+      "f1_mutual_info_stderr,none": 0.017326454108028657,
+      "f1_mutual_info_stderr_stderr,none": "N/A"
+    },
+    "norec_sentence_nob_mcf_p2": {
+      "name": "norec_sentence_nob_mcf_p2",
+      "alias": "norec_sentence_nob_mcf_p2",
+      "sample_len": 583,
+      "acc,none": 0.8816466552315609,
+      "acc_stderr,none": 0.013389860665577423,
+      "prob_correct,none": 0.8157259773296545,
+      "prob_correct_stderr,none": 0.009452157540917914,
+      "loglikelihood_correct,none": -0.2887206436047014,
+      "loglikelihood_correct_stderr,none": 0.02140238393985446,
+      "acc_norm,none": 0.8816466552315609,
+      "acc_norm_stderr,none": 0.013389860665577423,
+      "prob_correct_norm,none": 0.8157259773296545,
+      "prob_correct_norm_stderr,none": 0.009452157540917914,
+      "loglikelihood_correct_norm,none": -0.2887206436047014,
+      "loglikelihood_correct_norm_stderr,none": 0.02140238393985446,
+      "acc_mutual_info,none": 0.8404802744425386,
+      "acc_mutual_info_stderr,none": 0.015177822417120946,
+      "prob_correct_mutual_info,none": 0.8049437049836877,
+      "prob_correct_mutual_info_stderr,none": 0.011067422312431515,
+      "loglikelihood_correct_mutual_info,none": 6.613972978912434,
+      "loglikelihood_correct_mutual_info_stderr,none": 0.02901976045560382,
+      "f1,none": 0.8487166469227732,
+      "f1_stderr,none": 0.017045679257007475,
+      "f1_stderr_stderr,none": "N/A",
+      "f1_norm,none": 0.8487166469227732,
+      "f1_norm_stderr,none": 0.017045679257007475,
+      "f1_norm_stderr_stderr,none": "N/A",
+      "f1_mutual_info,none": 0.7809094325441563,
+      "f1_mutual_info_stderr,none": 0.020602545741038918,
+      "f1_mutual_info_stderr_stderr,none": "N/A"
+    },
+    "norec_sentence_nob_mcf_p3": {
+      "name": "norec_sentence_nob_mcf_p3",
+      "alias": "norec_sentence_nob_mcf_p3",
+      "sample_len": 583,
+      "acc,none": 0.8456260720411664,
+      "acc_stderr,none": 0.014976649541433892,
+      "prob_correct,none": 0.7931322664918872,
+      "prob_correct_stderr,none": 0.010226176813342766,
+      "loglikelihood_correct,none": -0.33333148680608177,
+      "loglikelihood_correct_stderr,none": 0.023314850659643973,
+      "acc_norm,none": 0.8456260720411664,
+      "acc_norm_stderr,none": 0.014976649541433892,
+      "prob_correct_norm,none": 0.7931322664918872,
+      "prob_correct_norm_stderr,none": 0.010226176813342766,
+      "loglikelihood_correct_norm,none": -0.33333148680608177,
+      "loglikelihood_correct_norm_stderr,none": 0.023314850659643973,
+      "acc_mutual_info,none": 0.8044596912521441,
+      "acc_mutual_info_stderr,none": 0.01644026448158554,
+      "prob_correct_mutual_info,none": 0.7825850278500821,
+      "prob_correct_mutual_info_stderr,none": 0.01202941045965144,
+      "loglikelihood_correct_mutual_info,none": 6.569362135711054,
+      "loglikelihood_correct_mutual_info_stderr,none": 0.03166784137370408,
+      "f1,none": 0.7905288876113825,
+      "f1_stderr,none": 0.019857466043366308,
+      "f1_stderr_stderr,none": "N/A",
+      "f1_norm,none": 0.7905288876113825,
+      "f1_norm_stderr,none": 0.019857466043366308,
+      "f1_norm_stderr_stderr,none": "N/A",
+      "f1_mutual_info,none": 0.7147063873626374,
+      "f1_mutual_info_stderr,none": 0.021914432846274513,
+      "f1_mutual_info_stderr_stderr,none": "N/A"
+    },
+    "norec_sentence_nob_mcf_p4": {
+      "name": "norec_sentence_nob_mcf_p4",
+      "alias": "norec_sentence_nob_mcf_p4",
+      "sample_len": 583,
+      "acc,none": 0.888507718696398,
+      "acc_stderr,none": 0.013046424673383995,
+      "prob_correct,none": 0.821425393487151,
+      "prob_correct_stderr,none": 0.009140904707238995,
+      "loglikelihood_correct,none": -0.27526183386922753,
+      "loglikelihood_correct_stderr,none": 0.02033898944481252,
+      "acc_norm,none": 0.888507718696398,
+      "acc_norm_stderr,none": 0.013046424673383995,
+      "prob_correct_norm,none": 0.821425393487151,
+      "prob_correct_norm_stderr,none": 0.009140904707238995,
+      "loglikelihood_correct_norm,none": -0.27526183386922753,
+      "loglikelihood_correct_norm_stderr,none": 0.02033898944481252,
+      "acc_mutual_info,none": 0.869639794168096,
+      "acc_mutual_info_stderr,none": 0.013956635255014909,
+      "prob_correct_mutual_info,none": 0.8195184156488184,
+      "prob_correct_mutual_info_stderr,none": 0.010262259543726381,
+      "loglikelihood_correct_mutual_info,none": 6.627431788647908,
+      "loglikelihood_correct_mutual_info_stderr,none": 0.026615774132955003,
+      "f1,none": 0.8643569707881578,
+      "f1_stderr,none": 0.01577042273304138,
+      "f1_stderr_stderr,none": "N/A",
+      "f1_norm,none": 0.8643569707881578,
+      "f1_norm_stderr,none": 0.01577042273304138,
+      "f1_norm_stderr_stderr,none": "N/A",
+      "f1_mutual_info,none": 0.8316309469524243,
+      "f1_mutual_info_stderr,none": 0.017326454108028657,
+      "f1_mutual_info_stderr_stderr,none": "N/A"
+    }
+  },
+  "group_subtasks": {},
+  "configs": {
+    "norec_sentence_nob_cf_p0": {
+      "task": "norec_sentence_nob_cf_p0",
+      "dataset_path": "ltg/norec_sentence",
+      "dataset_name": "binary",
+      "training_split": "train",
+      "test_split": "test",
+      "doc_to_text": "Tekst: {{review}}\nSentiment:",
+      "doc_to_target": "sentiment",
+      "unsafe_code": false,
+      "doc_to_choice": "def choices_negativ_positiv(doc):\n    return [\"negativ\", \"positiv\"]\n",
+      "process_results": "    def process_results(doc, results):\n        metrics, predictions = score_choices(\n            results, choices(doc), gold_indices(doc), expect_mutual_info\n        )\n        if postprocess is not None:\n            postprocess(metrics, predictions, doc)\n        return metrics\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Tekst: {{review}}\nSentiment:",
+        "doc_to_choice": "<function choices_negativ_positiv at 0x4001571d6200>",
+        "doc_to_target": "sentiment",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "f1",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_norm",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_mutual_info",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_norm_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_mutual_info_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "f1",
+        "random_baseline": 0.4815172167,
+        "category": "language_understanding",
+        "language": "nob",
+        "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/norec_sentence/nob/norec_sentence_nob_cf_p0.yaml"
+      }
+    },
+    "norec_sentence_nob_cf_p1": {
+      "task": "norec_sentence_nob_cf_p1",
+      "dataset_path": "ltg/norec_sentence",
+      "dataset_name": "binary",
+      "training_split": "train",
+      "test_split": "test",
+      "doc_to_text": "{{review}}\nHva er sentimentet i denne setningen?\nSvar:",
+      "doc_to_target": "sentiment",
+      "unsafe_code": false,
+      "doc_to_choice": "def choices_negativ_positiv(doc):\n    return [\"negativ\", \"positiv\"]\n",
+      "process_results": "    def process_results(doc, results):\n        metrics, predictions = score_choices(\n            results, choices(doc), gold_indices(doc), expect_mutual_info\n        )\n        if postprocess is not None:\n            postprocess(metrics, predictions, doc)\n        return metrics\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{review}}\nHva er sentimentet i denne setningen?\nSvar:",
+        "doc_to_choice": "<function choices_negativ_positiv at 0x4001571d6200>",
+        "doc_to_target": "sentiment",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "f1",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_norm",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_mutual_info",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_norm_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_mutual_info_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "f1",
+        "random_baseline": 0.4815172167,
+        "category": "language_understanding",
+        "language": "nob",
+        "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/norec_sentence/nob/norec_sentence_nob_cf_p1.yaml"
+      }
+    },
+    "norec_sentence_nob_cf_p2": {
+      "task": "norec_sentence_nob_cf_p2",
+      "dataset_path": "ltg/norec_sentence",
+      "dataset_name": "binary",
+      "training_split": "train",
+      "test_split": "test",
+      "doc_to_text": "{{review}}\nHva slags sentiment uttrykker anmelderen?",
+      "doc_to_target": "sentiment",
+      "unsafe_code": false,
+      "doc_to_choice": "def choices_negativ_positiv(doc):\n    return [\"negativ\", \"positiv\"]\n",
+      "process_results": "    def process_results(doc, results):\n        metrics, predictions = score_choices(\n            results, choices(doc), gold_indices(doc), expect_mutual_info\n        )\n        if postprocess is not None:\n            postprocess(metrics, predictions, doc)\n        return metrics\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{review}}\nHva slags sentiment uttrykker anmelderen?",
+        "doc_to_choice": "<function choices_negativ_positiv at 0x4001571d6200>",
+        "doc_to_target": "sentiment",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "f1",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_norm",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_mutual_info",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_norm_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_mutual_info_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "f1",
+        "random_baseline": 0.4815172167,
+        "category": "language_understanding",
+        "language": "nob",
+        "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/norec_sentence/nob/norec_sentence_nob_cf_p2.yaml"
+      }
+    },
+    "norec_sentence_nob_cf_p3": {
+      "task": "norec_sentence_nob_cf_p3",
+      "dataset_path": "ltg/norec_sentence",
+      "dataset_name": "binary",
+      "training_split": "train",
+      "test_split": "test",
+      "doc_to_text": "{{review}}\nHva er sentimentet i anmeldelsen?\nSvar:",
+      "doc_to_target": "sentiment",
+      "unsafe_code": false,
+      "doc_to_choice": "def choices_negativ_positiv(doc):\n    return [\"negativ\", \"positiv\"]\n",
+      "process_results": "    def process_results(doc, results):\n        metrics, predictions = score_choices(\n            results, choices(doc), gold_indices(doc), expect_mutual_info\n        )\n        if postprocess is not None:\n            postprocess(metrics, predictions, doc)\n        return metrics\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{review}}\nHva er sentimentet i anmeldelsen?\nSvar:",
+        "doc_to_choice": "<function choices_negativ_positiv at 0x4001571d6200>",
+        "doc_to_target": "sentiment",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "f1",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_norm",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_mutual_info",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_norm_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_mutual_info_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "f1",
+        "random_baseline": 0.4815172167,
+        "category": "language_understanding",
+        "language": "nob",
+        "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/norec_sentence/nob/norec_sentence_nob_cf_p3.yaml"
+      }
+    },
+    "norec_sentence_nob_cf_p4": {
+      "task": "norec_sentence_nob_cf_p4",
+      "dataset_path": "ltg/norec_sentence",
+      "dataset_name": "binary",
+      "training_split": "train",
+      "test_split": "test",
+      "doc_to_text": "{{review}}\nHva slags sentiment har denne setningen?\nSvar:",
+      "doc_to_target": "sentiment",
+      "unsafe_code": false,
+      "doc_to_choice": "def choices_negativ_positiv(doc):\n    return [\"negativ\", \"positiv\"]\n",
+      "process_results": "    def process_results(doc, results):\n        metrics, predictions = score_choices(\n            results, choices(doc), gold_indices(doc), expect_mutual_info\n        )\n        if postprocess is not None:\n            postprocess(metrics, predictions, doc)\n        return metrics\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{review}}\nHva slags sentiment har denne setningen?\nSvar:",
+        "doc_to_choice": "<function choices_negativ_positiv at 0x4001571d6200>",
+        "doc_to_target": "sentiment",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "f1",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_norm",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_mutual_info",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_norm_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_mutual_info_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "f1",
+        "random_baseline": 0.4815172167,
+        "category": "language_understanding",
+        "language": "nob",
+        "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/norec_sentence/nob/norec_sentence_nob_cf_p4.yaml"
+      }
+    },
+    "norec_sentence_nob_hybrid_p0": {
+      "task": "norec_sentence_nob_hybrid_p0",
+      "dataset_path": "ltg/norec_sentence",
+      "dataset_name": "binary",
+      "training_split": "train",
+      "test_split": "test",
+      "doc_to_text": "Tekst: {{review}}\nEr sentimentet \"negativ\" eller \"positiv\"?\nSentiment:",
+      "doc_to_target": "sentiment",
+      "unsafe_code": false,
+      "doc_to_choice": "def choices_negativ_positiv(doc):\n    return [\"negativ\", \"positiv\"]\n",
+      "process_results": "    def process_results(doc, results):\n        metrics, predictions = score_choices(\n            results, choices(doc), gold_indices(doc), expect_mutual_info\n        )\n        if postprocess is not None:\n            postprocess(metrics, predictions, doc)\n        return metrics\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Tekst: {{review}}\nEr sentimentet \"negativ\" eller \"positiv\"?\nSentiment:",
+        "doc_to_choice": "<function choices_negativ_positiv at 0x4001571d6200>",
+        "doc_to_target": "sentiment",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "f1",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_norm",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_mutual_info",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_norm_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_mutual_info_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "f1",
+        "random_baseline": 0.4815172167,
+        "category": "language_understanding",
+        "language": "nob",
+        "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/norec_sentence/nob/norec_sentence_nob_hybrid_p0.yaml"
+      }
+    },
+    "norec_sentence_nob_hybrid_p1": {
+      "task": "norec_sentence_nob_hybrid_p1",
+      "dataset_path": "ltg/norec_sentence",
+      "dataset_name": "binary",
+      "training_split": "train",
+      "test_split": "test",
+      "doc_to_text": "{{review}}\nEr denne setningen \"positiv\" eller \"negativ\"?",
+      "doc_to_target": "sentiment",
+      "unsafe_code": false,
+      "doc_to_choice": "def choices_negativ_positiv(doc):\n    return [\"negativ\", \"positiv\"]\n",
+      "process_results": "    def process_results(doc, results):\n        metrics, predictions = score_choices(\n            results, choices(doc), gold_indices(doc), expect_mutual_info\n        )\n        if postprocess is not None:\n            postprocess(metrics, predictions, doc)\n        return metrics\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{review}}\nEr denne setningen \"positiv\" eller \"negativ\"?",
+        "doc_to_choice": "<function choices_negativ_positiv at 0x4001571d6200>",
+        "doc_to_target": "sentiment",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "f1",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_norm",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_mutual_info",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_norm_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_mutual_info_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "f1",
+        "random_baseline": 0.4815172167,
+        "category": "language_understanding",
+        "language": "nob",
+        "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/norec_sentence/nob/norec_sentence_nob_hybrid_p1.yaml"
+      }
+    },
+    "norec_sentence_nob_hybrid_p2": {
+      "task": "norec_sentence_nob_hybrid_p2",
+      "dataset_path": "ltg/norec_sentence",
+      "dataset_name": "binary",
+      "training_split": "train",
+      "test_split": "test",
+      "doc_to_text": "{{review}}\nHva slags sentiment uttrykker anmelderen, \"negativ\" eller \"positiv\"?",
+      "doc_to_target": "sentiment",
+      "unsafe_code": false,
+      "doc_to_choice": "def choices_negativ_positiv(doc):\n    return [\"negativ\", \"positiv\"]\n",
+      "process_results": "    def process_results(doc, results):\n        metrics, predictions = score_choices(\n            results, choices(doc), gold_indices(doc), expect_mutual_info\n        )\n        if postprocess is not None:\n            postprocess(metrics, predictions, doc)\n        return metrics\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{review}}\nHva slags sentiment uttrykker anmelderen, \"negativ\" eller \"positiv\"?",
+        "doc_to_choice": "<function choices_negativ_positiv at 0x4001571d6200>",
+        "doc_to_target": "sentiment",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "f1",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_norm",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_mutual_info",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_norm_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_mutual_info_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "f1",
+        "random_baseline": 0.4815172167,
+        "category": "language_understanding",
+        "language": "nob",
+        "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/norec_sentence/nob/norec_sentence_nob_hybrid_p2.yaml"
+      }
+    },
+    "norec_sentence_nob_hybrid_p3": {
+      "task": "norec_sentence_nob_hybrid_p3",
+      "dataset_path": "ltg/norec_sentence",
+      "dataset_name": "binary",
+      "training_split": "train",
+      "test_split": "test",
+      "doc_to_text": "{{review}}\nEr anmeldelsen \"positiv\" eller \"negativ\"?",
+      "doc_to_target": "sentiment",
+      "unsafe_code": false,
+      "doc_to_choice": "def choices_negativ_positiv(doc):\n    return [\"negativ\", \"positiv\"]\n",
+      "process_results": "    def process_results(doc, results):\n        metrics, predictions = score_choices(\n            results, choices(doc), gold_indices(doc), expect_mutual_info\n        )\n        if postprocess is not None:\n            postprocess(metrics, predictions, doc)\n        return metrics\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{review}}\nEr anmeldelsen \"positiv\" eller \"negativ\"?",
+        "doc_to_choice": "<function choices_negativ_positiv at 0x4001571d6200>",
+        "doc_to_target": "sentiment",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "f1",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_norm",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_mutual_info",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_norm_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_mutual_info_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "f1",
+        "random_baseline": 0.4815172167,
+        "category": "language_understanding",
+        "language": "nob",
+        "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/norec_sentence/nob/norec_sentence_nob_hybrid_p3.yaml"
+      }
+    },
+    "norec_sentence_nob_hybrid_p4": {
+      "task": "norec_sentence_nob_hybrid_p4",
+      "dataset_path": "ltg/norec_sentence",
+      "dataset_name": "binary",
+      "training_split": "train",
+      "test_split": "test",
+      "doc_to_text": "{{review}}\nEr denne setningen positiv eller negativ?",
+      "doc_to_target": "sentiment",
+      "unsafe_code": false,
+      "doc_to_choice": "def choices_negativ_positiv(doc):\n    return [\"negativ\", \"positiv\"]\n",
+      "process_results": "    def process_results(doc, results):\n        metrics, predictions = score_choices(\n            results, choices(doc), gold_indices(doc), expect_mutual_info\n        )\n        if postprocess is not None:\n            postprocess(metrics, predictions, doc)\n        return metrics\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{review}}\nEr denne setningen positiv eller negativ?",
+        "doc_to_choice": "<function choices_negativ_positiv at 0x4001571d6200>",
+        "doc_to_target": "sentiment",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "f1",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_norm",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_mutual_info",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_norm_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_mutual_info_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "f1",
+        "random_baseline": 0.4815172167,
+        "category": "language_understanding",
+        "language": "nob",
+        "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/norec_sentence/nob/norec_sentence_nob_hybrid_p4.yaml"
+      }
+    },
+    "norec_sentence_nob_mcf_p0": {
+      "task": "norec_sentence_nob_mcf_p0",
+      "dataset_path": "ltg/norec_sentence",
+      "dataset_name": "binary",
+      "training_split": "train",
+      "test_split": "test",
+      "doc_to_text": "Tekst: {{review}}\nEr sentimentet A. negativ eller B. positiv?\nSvar:",
+      "doc_to_target": "sentiment",
+      "unsafe_code": false,
+      "doc_to_choice": "def choices_letters(doc):\n    return [\"A\", \"B\"]\n",
+      "process_results": "    def process_results(doc, results):\n        metrics, predictions = score_choices(\n            results, choices(doc), gold_indices(doc), expect_mutual_info\n        )\n        if postprocess is not None:\n            postprocess(metrics, predictions, doc)\n        return metrics\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Tekst: {{review}}\nEr sentimentet A. negativ eller B. positiv?\nSvar:",
+        "doc_to_choice": "<function choices_letters at 0x4001571d7ec0>",
+        "doc_to_target": "sentiment",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "f1",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_norm",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_mutual_info",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_norm_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_mutual_info_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "f1",
+        "random_baseline": 0.4815172167,
+        "category": "language_understanding",
+        "language": "nob",
+        "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/norec_sentence/nob/norec_sentence_nob_mcf_p0.yaml"
+      }
+    },
+    "norec_sentence_nob_mcf_p1": {
+      "task": "norec_sentence_nob_mcf_p1",
+      "dataset_path": "ltg/norec_sentence",
+      "dataset_name": "binary",
+      "training_split": "train",
+      "test_split": "test",
+      "doc_to_text": "{{review}}\nEr denne setningen A. negativ eller B. positiv?\nSvar:",
+      "doc_to_target": "sentiment",
+      "unsafe_code": false,
+      "doc_to_choice": "def choices_letters(doc):\n    return [\"A\", \"B\"]\n",
+      "process_results": "    def process_results(doc, results):\n        metrics, predictions = score_choices(\n            results, choices(doc), gold_indices(doc), expect_mutual_info\n        )\n        if postprocess is not None:\n            postprocess(metrics, predictions, doc)\n        return metrics\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{review}}\nEr denne setningen A. negativ eller B. positiv?\nSvar:",
+        "doc_to_choice": "<function choices_letters at 0x4001571d7ec0>",
+        "doc_to_target": "sentiment",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "f1",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_norm",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_mutual_info",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_norm_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_mutual_info_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "f1",
+        "random_baseline": 0.4815172167,
+        "category": "language_understanding",
+        "language": "nob",
+        "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/norec_sentence/nob/norec_sentence_nob_mcf_p1.yaml"
+      }
+    },
+    "norec_sentence_nob_mcf_p2": {
+      "task": "norec_sentence_nob_mcf_p2",
+      "dataset_path": "ltg/norec_sentence",
+      "dataset_name": "binary",
+      "training_split": "train",
+      "test_split": "test",
+      "doc_to_text": "{{review}}\nHva slags sentiment uttrykker anmelderen, A. negativ eller B. positiv?\nSvar:",
+      "doc_to_target": "sentiment",
+      "unsafe_code": false,
+      "doc_to_choice": "def choices_letters(doc):\n    return [\"A\", \"B\"]\n",
+      "process_results": "    def process_results(doc, results):\n        metrics, predictions = score_choices(\n            results, choices(doc), gold_indices(doc), expect_mutual_info\n        )\n        if postprocess is not None:\n            postprocess(metrics, predictions, doc)\n        return metrics\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{review}}\nHva slags sentiment uttrykker anmelderen, A. negativ eller B. positiv?\nSvar:",
+        "doc_to_choice": "<function choices_letters at 0x4001571d7ec0>",
+        "doc_to_target": "sentiment",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "f1",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_norm",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_mutual_info",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_norm_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_mutual_info_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "f1",
+        "random_baseline": 0.4815172167,
+        "category": "language_understanding",
+        "language": "nob",
+        "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/norec_sentence/nob/norec_sentence_nob_mcf_p2.yaml"
+      }
+    },
+    "norec_sentence_nob_mcf_p3": {
+      "task": "norec_sentence_nob_mcf_p3",
+      "dataset_path": "ltg/norec_sentence",
+      "dataset_name": "binary",
+      "training_split": "train",
+      "test_split": "test",
+      "doc_to_text": "{{review}}\nEr anmeldelsen A. negativ eller B. positiv?\nSvar:",
+      "doc_to_target": "sentiment",
+      "unsafe_code": false,
+      "doc_to_choice": "def choices_letters(doc):\n    return [\"A\", \"B\"]\n",
+      "process_results": "    def process_results(doc, results):\n        metrics, predictions = score_choices(\n            results, choices(doc), gold_indices(doc), expect_mutual_info\n        )\n        if postprocess is not None:\n            postprocess(metrics, predictions, doc)\n        return metrics\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{review}}\nEr anmeldelsen A. negativ eller B. positiv?\nSvar:",
+        "doc_to_choice": "<function choices_letters at 0x4001571d7ec0>",
+        "doc_to_target": "sentiment",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "f1",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_norm",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_mutual_info",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_norm_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_mutual_info_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "f1",
+        "random_baseline": 0.4815172167,
+        "category": "language_understanding",
+        "language": "nob",
+        "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/norec_sentence/nob/norec_sentence_nob_mcf_p3.yaml"
+      }
+    },
+    "norec_sentence_nob_mcf_p4": {
+      "task": "norec_sentence_nob_mcf_p4",
+      "dataset_path": "ltg/norec_sentence",
+      "dataset_name": "binary",
+      "training_split": "train",
+      "test_split": "test",
+      "doc_to_text": "{{review}}\nEr denne setningen A. negativ eller B. positiv?\nSvar:",
+      "doc_to_target": "sentiment",
+      "unsafe_code": false,
+      "doc_to_choice": "def choices_letters(doc):\n    return [\"A\", \"B\"]\n",
+      "process_results": "    def process_results(doc, results):\n        metrics, predictions = score_choices(\n            results, choices(doc), gold_indices(doc), expect_mutual_info\n        )\n        if postprocess is not None:\n            postprocess(metrics, predictions, doc)\n        return metrics\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{review}}\nEr denne setningen A. negativ eller B. positiv?\nSvar:",
+        "doc_to_choice": "<function choices_letters at 0x4001571d7ec0>",
+        "doc_to_target": "sentiment",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "f1",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_norm",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_mutual_info",
+          "aggregation": "def multi_f1(items):\n    \"\"\"Macro-average F1 over (prediction, gold) pairs.\n\n    zero_division=0 makes degenerate bootstrap replicates (all predictions in\n    one class) silent; sklearn's default computes the same value but warns.\n    \"\"\"\n    preds, golds = zip(*items)\n    return sklearn.metrics.f1_score(\n        np.array(golds), np.array(preds), average=\"macro\", zero_division=0\n    )\n",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "acc_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "prob_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_norm",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "loglikelihood_correct_mutual_info",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "f1_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_norm_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        },
+        {
+          "metric": "f1_mutual_info_stderr",
+          "aggregation": "def multi_f1_stderr(items):\n    \"\"\"Bootstrap standard error of the macro-F1: the (prediction, gold) pairs\n    are resampled with replacement and `multi_f1` is recomputed on each\n    replicate.\"\"\"\n    rng = random.Random(BOOTSTRAP_SEED)\n    pairs = list(items)\n    n = len(pairs)\n    replicates = [\n        multi_f1([pairs[rng.randrange(n)] for _ in range(n)])\n        for _ in range(BOOTSTRAP_ITERS)\n    ]\n    return statistics.stdev(replicates)\n",
+          "higher_is_better": false
+        }
+      ],
+      "output_type": "multiple_choice",
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "f1",
+        "random_baseline": 0.4815172167,
+        "category": "language_understanding",
+        "language": "nob",
+        "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/norec_sentence/nob/norec_sentence_nob_mcf_p4.yaml"
+      }
+    }
+  },
+  "versions": {
+    "norec_sentence_nob_cf_p0": 1.2,
+    "norec_sentence_nob_cf_p1": 1.2,
+    "norec_sentence_nob_cf_p2": 1.2,
+    "norec_sentence_nob_cf_p3": 1.2,
+    "norec_sentence_nob_cf_p4": 1.2,
+    "norec_sentence_nob_hybrid_p0": 1.2,
+    "norec_sentence_nob_hybrid_p1": 1.2,
+    "norec_sentence_nob_hybrid_p2": 1.2,
+    "norec_sentence_nob_hybrid_p3": 1.2,
+    "norec_sentence_nob_hybrid_p4": 1.2,
+    "norec_sentence_nob_mcf_p0": 1.2,
+    "norec_sentence_nob_mcf_p1": 1.2,
+    "norec_sentence_nob_mcf_p2": 1.2,
+    "norec_sentence_nob_mcf_p3": 1.2,
+    "norec_sentence_nob_mcf_p4": 1.2
+  },
+  "n-shot": {
+    "norec_sentence_nob_cf_p0": 5,
+    "norec_sentence_nob_cf_p1": 5,
+    "norec_sentence_nob_cf_p2": 5,
+    "norec_sentence_nob_cf_p3": 5,
+    "norec_sentence_nob_cf_p4": 5,
+    "norec_sentence_nob_hybrid_p0": 5,
+    "norec_sentence_nob_hybrid_p1": 5,
+    "norec_sentence_nob_hybrid_p2": 5,
+    "norec_sentence_nob_hybrid_p3": 5,
+    "norec_sentence_nob_hybrid_p4": 5,
+    "norec_sentence_nob_mcf_p0": 5,
+    "norec_sentence_nob_mcf_p1": 5,
+    "norec_sentence_nob_mcf_p2": 5,
+    "norec_sentence_nob_mcf_p3": 5,
+    "norec_sentence_nob_mcf_p4": 5
+  },
+  "higher_is_better": {
+    "norec_sentence_nob_cf_p0": {
+      "f1": true,
+      "f1_norm": true,
+      "f1_mutual_info": true,
+      "acc": true,
+      "acc_norm": true,
+      "acc_mutual_info": true,
+      "prob_correct": true,
+      "prob_correct_norm": true,
+      "prob_correct_mutual_info": true,
+      "loglikelihood_correct": true,
+      "loglikelihood_correct_norm": true,
+      "loglikelihood_correct_mutual_info": true,
+      "f1_stderr": false,
+      "f1_norm_stderr": false,
+      "f1_mutual_info_stderr": false
+    },
+    "norec_sentence_nob_cf_p1": {
+      "f1": true,
+      "f1_norm": true,
+      "f1_mutual_info": true,
+      "acc": true,
+      "acc_norm": true,
+      "acc_mutual_info": true,
+      "prob_correct": true,
+      "prob_correct_norm": true,
+      "prob_correct_mutual_info": true,
+      "loglikelihood_correct": true,
+      "loglikelihood_correct_norm": true,
+      "loglikelihood_correct_mutual_info": true,
+      "f1_stderr": false,
+      "f1_norm_stderr": false,
+      "f1_mutual_info_stderr": false
+    },
+    "norec_sentence_nob_cf_p2": {
+      "f1": true,
+      "f1_norm": true,
+      "f1_mutual_info": true,
+      "acc": true,
+      "acc_norm": true,
+      "acc_mutual_info": true,
+      "prob_correct": true,
+      "prob_correct_norm": true,
+      "prob_correct_mutual_info": true,
+      "loglikelihood_correct": true,
+      "loglikelihood_correct_norm": true,
+      "loglikelihood_correct_mutual_info": true,
+      "f1_stderr": false,
+      "f1_norm_stderr": false,
+      "f1_mutual_info_stderr": false
+    },
+    "norec_sentence_nob_cf_p3": {
+      "f1": true,
+      "f1_norm": true,
+      "f1_mutual_info": true,
+      "acc": true,
+      "acc_norm": true,
+      "acc_mutual_info": true,
+      "prob_correct": true,
+      "prob_correct_norm": true,
+      "prob_correct_mutual_info": true,
+      "loglikelihood_correct": true,
+      "loglikelihood_correct_norm": true,
+      "loglikelihood_correct_mutual_info": true,
+      "f1_stderr": false,
+      "f1_norm_stderr": false,
+      "f1_mutual_info_stderr": false
+    },
+    "norec_sentence_nob_cf_p4": {
+      "f1": true,
+      "f1_norm": true,
+      "f1_mutual_info": true,
+      "acc": true,
+      "acc_norm": true,
+      "acc_mutual_info": true,
+      "prob_correct": true,
+      "prob_correct_norm": true,
+      "prob_correct_mutual_info": true,
+      "loglikelihood_correct": true,
+      "loglikelihood_correct_norm": true,
+      "loglikelihood_correct_mutual_info": true,
+      "f1_stderr": false,
+      "f1_norm_stderr": false,
+      "f1_mutual_info_stderr": false
+    },
+    "norec_sentence_nob_hybrid_p0": {
+      "f1": true,
+      "f1_norm": true,
+      "f1_mutual_info": true,
+      "acc": true,
+      "acc_norm": true,
+      "acc_mutual_info": true,
+      "prob_correct": true,
+      "prob_correct_norm": true,
+      "prob_correct_mutual_info": true,
+      "loglikelihood_correct": true,
+      "loglikelihood_correct_norm": true,
+      "loglikelihood_correct_mutual_info": true,
+      "f1_stderr": false,
+      "f1_norm_stderr": false,
+      "f1_mutual_info_stderr": false
+    },
+    "norec_sentence_nob_hybrid_p1": {
+      "f1": true,
+      "f1_norm": true,
+      "f1_mutual_info": true,
+      "acc": true,
+      "acc_norm": true,
+      "acc_mutual_info": true,
+      "prob_correct": true,
+      "prob_correct_norm": true,
+      "prob_correct_mutual_info": true,
+      "loglikelihood_correct": true,
+      "loglikelihood_correct_norm": true,
+      "loglikelihood_correct_mutual_info": true,
+      "f1_stderr": false,
+      "f1_norm_stderr": false,
+      "f1_mutual_info_stderr": false
+    },
+    "norec_sentence_nob_hybrid_p2": {
+      "f1": true,
+      "f1_norm": true,
+      "f1_mutual_info": true,
+      "acc": true,
+      "acc_norm": true,
+      "acc_mutual_info": true,
+      "prob_correct": true,
+      "prob_correct_norm": true,
+      "prob_correct_mutual_info": true,
+      "loglikelihood_correct": true,
+      "loglikelihood_correct_norm": true,
+      "loglikelihood_correct_mutual_info": true,
+      "f1_stderr": false,
+      "f1_norm_stderr": false,
+      "f1_mutual_info_stderr": false
+    },
+    "norec_sentence_nob_hybrid_p3": {
+      "f1": true,
+      "f1_norm": true,
+      "f1_mutual_info": true,
+      "acc": true,
+      "acc_norm": true,
+      "acc_mutual_info": true,
+      "prob_correct": true,
+      "prob_correct_norm": true,
+      "prob_correct_mutual_info": true,
+      "loglikelihood_correct": true,
+      "loglikelihood_correct_norm": true,
+      "loglikelihood_correct_mutual_info": true,
+      "f1_stderr": false,
+      "f1_norm_stderr": false,
+      "f1_mutual_info_stderr": false
+    },
+    "norec_sentence_nob_hybrid_p4": {
+      "f1": true,
+      "f1_norm": true,
+      "f1_mutual_info": true,
+      "acc": true,
+      "acc_norm": true,
+      "acc_mutual_info": true,
+      "prob_correct": true,
+      "prob_correct_norm": true,
+      "prob_correct_mutual_info": true,
+      "loglikelihood_correct": true,
+      "loglikelihood_correct_norm": true,
+      "loglikelihood_correct_mutual_info": true,
+      "f1_stderr": false,
+      "f1_norm_stderr": false,
+      "f1_mutual_info_stderr": false
+    },
+    "norec_sentence_nob_mcf_p0": {
+      "f1": true,
+      "f1_norm": true,
+      "f1_mutual_info": true,
+      "acc": true,
+      "acc_norm": true,
+      "acc_mutual_info": true,
+      "prob_correct": true,
+      "prob_correct_norm": true,
+      "prob_correct_mutual_info": true,
+      "loglikelihood_correct": true,
+      "loglikelihood_correct_norm": true,
+      "loglikelihood_correct_mutual_info": true,
+      "f1_stderr": false,
+      "f1_norm_stderr": false,
+      "f1_mutual_info_stderr": false
+    },
+    "norec_sentence_nob_mcf_p1": {
+      "f1": true,
+      "f1_norm": true,
+      "f1_mutual_info": true,
+      "acc": true,
+      "acc_norm": true,
+      "acc_mutual_info": true,
+      "prob_correct": true,
+      "prob_correct_norm": true,
+      "prob_correct_mutual_info": true,
+      "loglikelihood_correct": true,
+      "loglikelihood_correct_norm": true,
+      "loglikelihood_correct_mutual_info": true,
+      "f1_stderr": false,
+      "f1_norm_stderr": false,
+      "f1_mutual_info_stderr": false
+    },
+    "norec_sentence_nob_mcf_p2": {
+      "f1": true,
+      "f1_norm": true,
+      "f1_mutual_info": true,
+      "acc": true,
+      "acc_norm": true,
+      "acc_mutual_info": true,
+      "prob_correct": true,
+      "prob_correct_norm": true,
+      "prob_correct_mutual_info": true,
+      "loglikelihood_correct": true,
+      "loglikelihood_correct_norm": true,
+      "loglikelihood_correct_mutual_info": true,
+      "f1_stderr": false,
+      "f1_norm_stderr": false,
+      "f1_mutual_info_stderr": false
+    },
+    "norec_sentence_nob_mcf_p3": {
+      "f1": true,
+      "f1_norm": true,
+      "f1_mutual_info": true,
+      "acc": true,
+      "acc_norm": true,
+      "acc_mutual_info": true,
+      "prob_correct": true,
+      "prob_correct_norm": true,
+      "prob_correct_mutual_info": true,
+      "loglikelihood_correct": true,
+      "loglikelihood_correct_norm": true,
+      "loglikelihood_correct_mutual_info": true,
+      "f1_stderr": false,
+      "f1_norm_stderr": false,
+      "f1_mutual_info_stderr": false
+    },
+    "norec_sentence_nob_mcf_p4": {
+      "f1": true,
+      "f1_norm": true,
+      "f1_mutual_info": true,
+      "acc": true,
+      "acc_norm": true,
+      "acc_mutual_info": true,
+      "prob_correct": true,
+      "prob_correct_norm": true,
+      "prob_correct_mutual_info": true,
+      "loglikelihood_correct": true,
+      "loglikelihood_correct_norm": true,
+      "loglikelihood_correct_mutual_info": true,
+      "f1_stderr": false,
+      "f1_norm_stderr": false,
+      "f1_mutual_info_stderr": false
+    }
+  },
+  "n-samples": {
+    "norec_sentence_nob_cf_p0": {
+      "original": 583,
+      "effective": 583
+    },
+    "norec_sentence_nob_cf_p1": {
+      "original": 583,
+      "effective": 583
+    },
+    "norec_sentence_nob_cf_p2": {
+      "original": 583,
+      "effective": 583
+    },
+    "norec_sentence_nob_cf_p3": {
+      "original": 583,
+      "effective": 583
+    },
+    "norec_sentence_nob_cf_p4": {
+      "original": 583,
+      "effective": 583
+    },
+    "norec_sentence_nob_hybrid_p0": {
+      "original": 583,
+      "effective": 583
+    },
+    "norec_sentence_nob_hybrid_p1": {
+      "original": 583,
+      "effective": 583
+    },
+    "norec_sentence_nob_hybrid_p2": {
+      "original": 583,
+      "effective": 583
+    },
+    "norec_sentence_nob_hybrid_p3": {
+      "original": 583,
+      "effective": 583
+    },
+    "norec_sentence_nob_hybrid_p4": {
+      "original": 583,
+      "effective": 583
+    },
+    "norec_sentence_nob_mcf_p0": {
+      "original": 583,
+      "effective": 583
+    },
+    "norec_sentence_nob_mcf_p1": {
+      "original": 583,
+      "effective": 583
+    },
+    "norec_sentence_nob_mcf_p2": {
+      "original": 583,
+      "effective": 583
+    },
+    "norec_sentence_nob_mcf_p3": {
+      "original": 583,
+      "effective": 583
+    },
+    "norec_sentence_nob_mcf_p4": {
+      "original": 583,
+      "effective": 583
+    }
+  },
+  "config": {
+    "model": "vllm",
+    "model_args": {
+      "pretrained": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+      "tensor_parallel_size": 1,
+      "dtype": "bfloat16",
+      "gpu_memory_utilization": 0.8,
+      "tokenizer_mode": "auto",
+      "max_model_len": 4096,
+      "trust_remote_code": true
+    },
+    "batch_size": "auto",
+    "batch_sizes": [],
+    "device": "cuda:0",
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {},
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": null,
+  "date": 1791159973.9369624,
+  "pretty_env_info": "PyTorch version: 2.12.0a0+5aff3928d8.nv26.05\nIs debug build: False\nCUDA used to build PyTorch: 13.2\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 24.04.4 LTS (aarch64)\nGCC version: Could not collect\nClang version: Could not collect\nCMake version: version 3.31.6\nLibc version: glibc-2.39\n\nPython version: 3.12.3 (main, Mar 23 2026, 19:04:32) [GCC 13.3.0] (64-bit runtime)\nPython platform: Linux-6.4.0-150700.53.31-64kb-aarch64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: 13.2.78\nCUDA_MODULE_LOADING set to: \nGPU models and configuration: GPU 0: NVIDIA GH200 120GB\nNvidia driver version: 580.65.06\ncuDNN version: Probably one of the following:\n/usr/lib/aarch64-linux-gnu/libcudnn.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_adv.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_cnn.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_runtime_compiled.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_tensor_ir.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_ext.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_graph.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_heuristic.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_ops.so.9.22.0\nIs XPU available: False\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\nCaching allocator config: N/A\n\nCPU:\nArchitecture:                            aarch64\nCPU op-mode(s):                          64-bit\nByte Order:                              Little Endian\nCPU(s):                                  288\nOn-line CPU(s) list:                     0-287\nVendor ID:                               ARM\nModel name:                              Neoverse-V2\nModel:                                   0\nThread(s) per core:                      1\nCore(s) per socket:                      72\nSocket(s):                               4\nStepping:                                r0p0\nFrequency boost:                         disabled\nCPU(s) scaling MHz:                      100%\nCPU max MHz:                             3447.0000\nCPU min MHz:                             81.0000\nBogoMIPS:                                2000.00\nFlags:                                   fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 sve asimdfhm dit uscat ilrcpc flagm sb paca pacg dcpodp sve2 sveaes svepmull svebitperm svesha3 svesm4 flagm2 frint svei8mm svebf16 i8mm bf16 dgh bti\nL1d cache:                               18 MiB (288 instances)\nL1i cache:                               18 MiB (288 instances)\nL2 cache:                                288 MiB (288 instances)\nL3 cache:                                456 MiB (4 instances)\nNUMA node(s):                            36\nNUMA node0 CPU(s):                       0-71\nNUMA node1 CPU(s):                       72-143\nNUMA node2 CPU(s):                       144-215\nNUMA node3 CPU(s):                       216-287\nNUMA node4 CPU(s):                       \nNUMA node5 CPU(s):                       \nNUMA node6 CPU(s):                       \nNUMA node7 CPU(s):                       \nNUMA node8 CPU(s):                       \nNUMA node9 CPU(s):                       \nNUMA node10 CPU(s):                      \nNUMA node11 CPU(s):                      \nNUMA node12 CPU(s):                      \nNUMA node13 CPU(s):                      \nNUMA node14 CPU(s):                      \nNUMA node15 CPU(s):                      \nNUMA node16 CPU(s):                      \nNUMA node17 CPU(s):                      \nNUMA node18 CPU(s):                      \nNUMA node19 CPU(s):                      \nNUMA node20 CPU(s):                      \nNUMA node21 CPU(s):                      \nNUMA node22 CPU(s):                      \nNUMA node23 CPU(s):                      \nNUMA node24 CPU(s):                      \nNUMA node25 CPU(s):                      \nNUMA node26 CPU(s):                      \nNUMA node27 CPU(s):                      \nNUMA node28 CPU(s):                      \nNUMA node29 CPU(s):                      \nNUMA node30 CPU(s):                      \nNUMA node31 CPU(s):                      \nNUMA node32 CPU(s):                      \nNUMA node33 CPU(s):                      \nNUMA node34 CPU(s):                      \nNUMA node35 CPU(s):                      \nVulnerability Gather data sampling:      Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; CSV2, BHB\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected\n\nVersions of relevant libraries:\n[pip3] numpy==2.1.0\n[pip3] nvidia-cudnn-frontend==1.18.0\n[pip3] torch==2.12.0a0+5aff3928d8.nv26.5.50603568\n[pip3] torch_c_dlpack_ext==0.1.5\n[pip3] torchvision==0.27.0a0+6214cb20.nv26.5.50603568\n[pip3] triton==3.6.0+git5d72932fc5.nv26.3\n[conda] Could not collect",
+  "transformers_version": "5.6.0",
+  "lm_eval_version": "0.4.12",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<pad>",
+    "262144"
+  ],
+  "tokenizer_eos_token": [
+    "<eos>",
+    "2"
+  ],
+  "tokenizer_bos_token": [
+    "<bos>",
+    "1"
+  ],
+  "eot_token_id": 2,
+  "max_length": 4096,
+  "task_hashes": {
+    "norec_sentence_nob_cf_p0": "1d947e6c74001618a7762bf54f5d7325e917e48e81527c82aeaca686e5186aef",
+    "norec_sentence_nob_cf_p1": "aaee39b2c8c2ea1b9d004a18bce2953ba3ce7088e152eeb5cdca5e1a1f758f56",
+    "norec_sentence_nob_cf_p2": "dc6ec3d5b26cc3c5af5c7ed3c57be4cdac01b71dbf23548734982b6197566fe7",
+    "norec_sentence_nob_cf_p3": "5827471d3db908eddb5fa7ac707311e03cd0e01727f151fb10fb052a7abe0b38",
+    "norec_sentence_nob_cf_p4": "0cf3595d76fd2aa57837e8cfaafd54c5b32e7310be1136cd151b11b7c6b6f7bf",
+    "norec_sentence_nob_hybrid_p0": "f12bae92d73d1ac6fb92ded1b3d5578a0ca37df491a70d892af89051e0b9575d",
+    "norec_sentence_nob_hybrid_p1": "951c1305d06d02853d5fcbb6e49add9f0db1f3162559cfbf6287ce901b913e6c",
+    "norec_sentence_nob_hybrid_p2": "d3ab8e08bbd95acbe953f4adda1d2e4c5f8c337502b78a477b380ae6bc410a90",
+    "norec_sentence_nob_hybrid_p3": "c994cb4015e025422f9aae9075072e714693e5a6d47d58973f1a67b86765b244",
+    "norec_sentence_nob_hybrid_p4": "77f90df12ab4d31e333352af7621816d7fecb3d4de237786b758b80bbfcdfd22",
+    "norec_sentence_nob_mcf_p0": "5691384d1c5657ec0aee91d553a55b4f134dc765e4e32e743cf55d748f5e6257",
+    "norec_sentence_nob_mcf_p1": "ae194a59669e3167b512009e506a013d9babf14e92c14a3193875f303b13055e",
+    "norec_sentence_nob_mcf_p2": "ab65c2061b0fbf96beb4439523d2bd05b9d559579bfd471f3bce8bff3e4c3d6d",
+    "norec_sentence_nob_mcf_p3": "8b2d76b42ac7957e1f3b40ce78103ad409e941863c8f6b9c51792d5e9cf049dc",
+    "norec_sentence_nob_mcf_p4": "ae194a59669e3167b512009e506a013d9babf14e92c14a3193875f303b13055e"
+  },
+  "model_source": "vllm",
+  "model_name": "/cluster/projects/nn10029k/davisamu/norprelude-eval/models/norA_wsm100_minus-sqrt_i0969600",
+  "model_name_sanitized": "__cluster__projects__nn10029k__davisamu__norprelude-eval__models__norA_wsm100_minus-sqrt_i0969600",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": null,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "total_evaluation_time_seconds": "289.891497500008"
+}

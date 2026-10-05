@@ -198,12 +198,12 @@ function legendRefFor(config, traj) {
   return traj.legendColumn === 0 ? "legend" : "legend" + (traj.legendColumn + 1);
 }
 
-/** With config.xRangeTight, pin the x-axis to the exact first/last
- *  checkpoint (token units) across all trajectories, removing Plotly's
- *  autorange padding so the data spans the full plot width. Line-mode's
- *  horizontally-open clip lets the edge markers overflow the plot sides
- *  instead of being half-clipped. Returns undefined when disabled or
- *  degenerate (single x value). */
+/** With config.xRangeTight, pin the x-axis to the first/last checkpoint
+ *  (token units) across all trajectories plus a small margin (3% of the
+ *  span on either side, config.xRangePad to change), replacing Plotly's
+ *  larger autorange padding so the data spans almost the full plot width
+ *  while the edge markers and the outermost tick label still fit. Returns
+ *  undefined when disabled or degenerate (single x value). */
 function tightXRange(config, trajectories) {
   if (!config.xRangeTight) return undefined;
   let min = Infinity, max = -Infinity;
@@ -214,7 +214,9 @@ function tightXRange(config, trajectories) {
       if (t > max) max = t;
     }
   }
-  return min < max ? [min, max] : undefined;
+  if (!(min < max)) return undefined;
+  const pad = (max - min) * (config.xRangePad ?? 0.03);
+  return [min - pad, max + pad];
 }
 
 /** Resolve titlePrefix (string or function-returning-string). Returns "X – " or "". */
@@ -293,8 +295,16 @@ function makeRefScores(config, trajectories) {
     const key = scope + "|" + bench + "|" + shot + "|" + (metric || "");
     if (cache.has(key)) return cache.get(key);
     const vals = [];
+    // A side run starts with the main line's fork checkpoint (the very same
+    // score block), which must not count twice in the reference set.
+    const seen = new Set();
     for (const t of config.normAcrossTrajectories ? trajectories : [traj]) {
       for (const x of t.checkpoints()) {
+        const block = t.dataSource[String(x)]?.[bench]?.[shot];
+        if (block && typeof block === "object") {
+          if (seen.has(block)) continue;
+          seen.add(block);
+        }
         const v = getScore(t.dataSource, String(x), bench, shot, metric);
         if (v !== undefined) vals.push(v);
       }

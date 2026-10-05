@@ -31,7 +31,9 @@ import { computeSignals, renderSignals } from "../shared/signals.js";
 import { UrlState } from "../shared/url-state.js";
 
 const ALL_SHOTS = ["0", "5"];
-const DEFAULT_SELECTION = "__all__";
+const DEFAULT_SELECTION = "__all_macro__";
+// Defaults of the selectors (the URL only records departures).
+const DEFAULTS = { metricMode: "soft", promptAgg: "mean", formulation: "mean", accNorm: "max", normalization: "baseline" };
 const DEFAULT_LANGUAGE = "Norwegian";   // falls back to the first language in data.json
 
 const plotlyConfig = makePlotlyConfig("multisynt-chart", () => ({
@@ -52,6 +54,7 @@ const plotlyConfig = makePlotlyConfig("multisynt-chart", () => ({
       monotonicity: lastSignals.monotonicity,
       ranking_consistency: lastSignals.rankingConsistency,
       non_randomness: lastSignals.nonRandomness,
+      non_randomness_linear_fit: lastSignals.nonRandomnessFit,
     },
   }),
 }));
@@ -353,11 +356,11 @@ function setupUrlState() {
       default: DEFAULT_SELECTION,
     },
     { key: "ttype", get: () => state.taskTypeFilter, set: (v) => state.taskTypeFilter = v, default: "all" },
-    { key: "mmode", get: () => state.metricMode, set: (v) => state.metricMode = v, default: "hard" },
+    { key: "mmode", get: () => state.metricMode, set: (v) => state.metricMode = v, default: DEFAULTS.metricMode },
     { key: "dec", get: () => state.currentDecoding, set: (v) => state.currentDecoding = v, default: "sampling" },
-    { key: "pagg", get: () => state.currentPromptAgg, set: (v) => state.currentPromptAgg = LEGACY_PROMPT_AGG[v] || v, default: "max" },
-    { key: "form", get: () => state.currentFormulation, set: (v) => state.currentFormulation = v, default: "max" },
-    { key: "anorm", get: () => state.currentAccNorm, set: (v) => state.currentAccNorm = LEGACY_LL_NORM[v] || v, default: "max" },
+    { key: "pagg", get: () => state.currentPromptAgg, set: (v) => state.currentPromptAgg = LEGACY_PROMPT_AGG[v] || v, default: DEFAULTS.promptAgg },
+    { key: "form", get: () => state.currentFormulation, set: (v) => state.currentFormulation = v, default: DEFAULTS.formulation },
+    { key: "anorm", get: () => state.currentAccNorm, set: (v) => state.currentAccNorm = LEGACY_LL_NORM[v] || v, default: DEFAULTS.accNorm },
     { key: "ci", get: () => state.showCIBands ? "1" : "0", set: (v) => state.showCIBands = v !== "0", default: "0" },
     { key: "norm", get: () => state.currentNormalization, set: (v) => state.currentNormalization = v === "percentile" ? "baseline" : v, default: "baseline" },
     { key: "metric", get: () => state.currentMetric || "", set: (v) => state.currentMetric = v, default: "" },
@@ -376,12 +379,12 @@ function syncControlsFromState() {
   };
   setSelect("task-select", state.currentTaskSelection, DEFAULT_SELECTION);
   state.taskTypeFilter = setSelect("task-type-select", state.taskTypeFilter, "all");
-  state.metricMode = setSelect("metric-mode-select", state.metricMode, "hard");
+  state.metricMode = setSelect("metric-mode-select", state.metricMode, DEFAULTS.metricMode);
   state.currentDecoding = setSelect("decoding-select", state.currentDecoding, "sampling");
-  state.currentPromptAgg = setSelect("prompt-agg-select", state.currentPromptAgg, "max");
-  state.currentFormulation = setSelect("formulation-select", state.currentFormulation, "max");
-  state.currentAccNorm = setSelect("acc-norm-select", state.currentAccNorm, "max");
-  state.currentNormalization = setSelect("norm-select", state.currentNormalization, "baseline");
+  state.currentPromptAgg = setSelect("prompt-agg-select", state.currentPromptAgg, DEFAULTS.promptAgg);
+  state.currentFormulation = setSelect("formulation-select", state.currentFormulation, DEFAULTS.formulation);
+  state.currentAccNorm = setSelect("acc-norm-select", state.currentAccNorm, DEFAULTS.accNorm);
+  state.currentNormalization = setSelect("norm-select", state.currentNormalization, DEFAULTS.normalization);
   document.querySelectorAll(".shot-btn").forEach((b) =>
     b.classList.toggle("active", b.dataset.shot === state.currentShot));
   document.querySelectorAll(".ci-btn").forEach((b) =>
@@ -404,11 +407,12 @@ async function init() {
     currentLang = languages.includes(DEFAULT_LANGUAGE) ? DEFAULT_LANGUAGE : languages[0];
     state.currentTaskSelection = DEFAULT_SELECTION;
     state.showCIBands = false;
-    state.currentFormulation = "max";
+    state.currentPromptAgg = DEFAULTS.promptAgg;
+    state.currentFormulation = DEFAULTS.formulation;
     state.formulationCombine = true;
     state.currentAccNorm = "max";
     state.llNormScope = "all";
-    state.metricMode = "hard";
+    state.metricMode = DEFAULTS.metricMode;
     state.taskTypeFilter = "all";
     state.currentDecoding = "sampling";
     setupUrlState();

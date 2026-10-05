@@ -52,10 +52,21 @@ export function findDropdownValueForBench(bench) {
   return state.metricsSetup[bench] ? bench : null;
 }
 
+// Default normalization of an individual-task view ("none": the raw metric;
+// a dashboard may prefer "baseline" everywhere, see setSingleTaskNormalization).
+let singleTaskNormalization = "none";
+
+/** Set the default normalization applied when an individual task is
+ *  selected (aggregate views always default to the random baseline). */
+export function setSingleTaskNormalization(norm) {
+  singleTaskNormalization = norm;
+}
+
 /** Apply the selection-dependent default normalization (baseline for
- *  aggregate views, none for individual tasks) and sync the <select>. */
+ *  aggregate views, singleTaskNormalization for individual tasks) and sync
+ *  the <select>. */
 export function autoSetNormalization() {
-  state.currentNormalization = isAggregateSelection(state.currentTaskSelection) ? "baseline" : "none";
+  state.currentNormalization = isAggregateSelection(state.currentTaskSelection) ? "baseline" : singleTaskNormalization;
   document.getElementById("norm-select").value = state.currentNormalization;
 }
 

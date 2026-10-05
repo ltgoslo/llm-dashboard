@@ -11,6 +11,7 @@ Outputs:
     docs/norolmo/data.json        — NorOLMo progression + ablations
     docs/multisynt/data.json      — multilingual progression
     docs/prelude/data.json        — OpenEuroLLM Prelude progression (NorEval 1.2)
+    docs/norprelude/data.json     — NorPrelude: Prelude annealed on Scandinavian mixtures (NorEval 1.2)
 
 NorEval-side code (noreval, noreval-gen, norolmo) shares prompt-aggregation
 and metric-extraction logic in `noreval_lib`. MultiSynt is in its own block
@@ -50,6 +51,7 @@ NOREVAL_GEN_RESULTS = BASE_DIR / "data" / "noreval-gen" / "results"
 NOROLMO_PROGRESS = BASE_DIR / "data" / "norolmo" / "progress"
 MULTISYNT_RESULTS = BASE_DIR / "data" / "multisynt" / "results"
 PRELUDE_PROGRESS = BASE_DIR / "data" / "prelude" / "progress"
+NORPRELUDE_PROGRESS = BASE_DIR / "data" / "norprelude" / "progress"
 
 # Output paths
 NOREVAL_OUT = BASE_DIR / "docs" / "noreval" / "data.json"
@@ -57,6 +59,7 @@ NOREVAL_GEN_OUT = BASE_DIR / "docs" / "noreval-gen" / "data.json"
 NOROLMO_OUT = BASE_DIR / "docs" / "norolmo" / "data.json"
 MULTISYNT_OUT = BASE_DIR / "docs" / "multisynt" / "data.json"
 PRELUDE_OUT = BASE_DIR / "docs" / "prelude" / "data.json"
+NORPRELUDE_OUT = BASE_DIR / "docs" / "norprelude" / "data.json"
 
 SHOT_SETTINGS = ["0", "1", "5"]
 SHOT_DIRS = {"0": "0-shot", "1": "1-shot", "5": "5-shot"}
@@ -92,6 +95,23 @@ PRELUDE_TOKENS_PER_STEP = 2048 * 4096
 # Display names for Prelude side runs (checkpoint dirs `<run>_iter_<N>`).
 PRELUDE_RUN_NAME_MAP = {
     "anneal300b": "300B-token anneal",
+}
+
+# NorPrelude: Prelude checkpoints annealed on Scandinavian data mixtures,
+# evaluated on NorEval 1.2. Checkpoint dirs are `<run>_i<iteration>`; the
+# `prelude_*` run is the main line (the last Prelude checkpoints before the
+# anneal) and every other run is drawn as a side run forking off it. The
+# iteration counter continues Prelude's, so tokens use Prelude's batch.
+NORPRELUDE_MAIN_RUN = "prelude_wsm100_minus-sqrt"
+NORPRELUDE_MAIN_DISPLAY_NAME = "Prelude 9B"
+# Anneal runs: the share of Scandinavian data in the annealing mixture.
+NORPRELUDE_RUN_NAME_MAP = {
+    "norA_wsm100_minus-sqrt": "88% Scandinavian",
+    "norB_wsm100_minus-sqrt": "50% Scandinavian",
+}
+NORPRELUDE_RUN_COLOR_MAP = {
+    "norA_wsm100_minus-sqrt": "#dc2626",   # red
+    "norB_wsm100_minus-sqrt": "#2563eb",   # blue
 }
 
 # NorOLMo ablation display names and colors.
@@ -1394,24 +1414,45 @@ def build_noreval12_lang_lists(setup):
     return nno, sme, nob_nno, shared
 
 
-def build_prelude_data(setup):
-    """Walk data/prelude/progress/ and build the prelude data.json."""
+def noreval12_extract_task_dir(task_path, task, config):
+    """{shot: {metric: entry}} of one task dir. The dir holds either the
+    results files directly (prelude: one file per task, the shot recorded
+    inside) or one `<N>-shot/` subdir per shot setting (the NorOLMo-style
+    layout NorPrelude uses), in which case each subdir is extracted on its
+    own — their files repeat the same result keys, so merging them would
+    keep only one shot."""
+    shot_dirs = [d for d in SHOT_DIRS.values() if (task_path / d).is_dir()]
+    if not shot_dirs:
+        return noreval12_extract_task(noreval12_load_task_dir(str(task_path)), task, config)
+    per_shot = {}
+    for d in shot_dirs:
+        per_shot.update(
+            noreval12_extract_task(noreval12_load_task_dir(str(task_path / d)), task, config)
+        )
+    return per_shot
+
+
+def build_noreval12_progress_data(progress_dir, setup, parse_ckpt, run_names,
+                                  tokens_per_step):
+    """Build a NorEval-1.2 training-progress data.json (prelude, norprelude)
+    from `progress_dir/<ckpt>/<task>/...`. `parse_ckpt(dir_name)` returns
+    (run, step) — run None for a main-line checkpoint — or None to skip."""
     progress = {}
     runs = {}
     discovered = {}
     discovered_forms = {}
     shots = set()
 
-    if PRELUDE_PROGRESS.is_dir():
-        for ckpt_dir in sorted(os.listdir(PRELUDE_PROGRESS)):
-            ckpt_path = PRELUDE_PROGRESS / ckpt_dir
+    if progress_dir.is_dir():
+        for ckpt_dir in sorted(os.listdir(progress_dir)):
+            ckpt_path = progress_dir / ckpt_dir
             if not ckpt_path.is_dir() or ckpt_dir.startswith("."):
                 continue
-            m = PRELUDE_CKPT_RE.match(ckpt_dir)
-            if not m:
+            parsed = parse_ckpt(ckpt_dir)
+            if parsed is None:
                 print(f"  WARNING: cannot parse checkpoint dir '{ckpt_dir}', skipping")
                 continue
-            step, run = int(m.group("step")), m.group("run")
+            run, step = parsed
             print(f"  {'Checkpoint' if run is None else 'Run ' + run}: iteration {step}")
             scores = {}
             for task in sorted(os.listdir(ckpt_path)):
@@ -1422,9 +1463,7 @@ def build_prelude_data(setup):
                 if config is None:
                     print(f"  WARNING: no config for task '{task}', skipping")
                     continue
-                per_shot = noreval12_extract_task(
-                    noreval12_load_task_dir(str(task_path)), task, config
-                )
+                per_shot = noreval12_extract_task_dir(task_path, task, config)
                 if not per_shot:
                     continue
                 scores[task] = per_shot
@@ -1455,13 +1494,46 @@ def build_prelude_data(setup):
         "nob_nno_translation_benchmarks": nob_nno,
         "shared_language_benchmarks": shared,
         "shots": sorted(shots, key=int),
-        "tokens_per_step": PRELUDE_TOKENS_PER_STEP,
+        "tokens_per_step": tokens_per_step,
         "progress": progress,
         "runs": runs,
         "run_display_names": {
-            r: PRELUDE_RUN_NAME_MAP.get(r, r.replace("_", " ")) for r in runs
+            r: run_names.get(r, r.replace("_", " ")) for r in runs
         },
     }
+
+
+def build_prelude_data(setup):
+    """Walk data/prelude/progress/ (checkpoint dirs `[<run>_]iter_<N>`) and
+    build the prelude data.json."""
+    def parse(name):
+        m = PRELUDE_CKPT_RE.match(name)
+        return (m.group("run"), int(m.group("step"))) if m else None
+
+    return build_noreval12_progress_data(
+        PRELUDE_PROGRESS, setup, parse, PRELUDE_RUN_NAME_MAP, PRELUDE_TOKENS_PER_STEP
+    )
+
+
+NORPRELUDE_CKPT_RE = re.compile(r"^(?P<run>.+?)_i(?P<step>\d+)$")
+
+
+def build_norprelude_data(setup):
+    """Walk data/norprelude/progress/ (checkpoint dirs `<run>_i<N>`, see
+    NORPRELUDE_MAIN_RUN) and build the norprelude data.json."""
+    def parse(name):
+        m = NORPRELUDE_CKPT_RE.match(name)
+        if not m:
+            return None
+        run = m.group("run")
+        return (None if run == NORPRELUDE_MAIN_RUN else run), int(m.group("step"))
+
+    data = build_noreval12_progress_data(
+        NORPRELUDE_PROGRESS, setup, parse, NORPRELUDE_RUN_NAME_MAP, PRELUDE_TOKENS_PER_STEP
+    )
+    data["main_display_name"] = NORPRELUDE_MAIN_DISPLAY_NAME
+    data["run_colors"] = {r: NORPRELUDE_RUN_COLOR_MAP.get(r, "") for r in data["runs"]}
+    return data
 
 # ─────────────────────────────────────────────────────────────
 # Driver
@@ -1511,6 +1583,13 @@ def main():
     print(f"  Checkpoints: {len(prelude['progress'])}, tasks: {len(prelude['metrics_setup'])}")
     if prelude["runs"]:
         print(f"  Side runs: {list(prelude['runs'])}")
+
+    print("\n=== Building docs/norprelude/data.json (NorPrelude anneals, NorEval 1.2) ===")
+    norprelude = build_norprelude_data(load_yaml(NOREVAL12_SETUP_YAML))
+    write_data(NORPRELUDE_OUT, norprelude)
+    print(f"  Checkpoints: {len(norprelude['progress'])}, tasks: {len(norprelude['metrics_setup'])}")
+    if norprelude["runs"]:
+        print(f"  Anneal runs: {list(norprelude['runs'])}")
 
     print("\nDone.")
 

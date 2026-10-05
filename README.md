@@ -4,7 +4,7 @@ Interactive evaluation dashboards for language models, maintained by the
 [Language Technology Group](https://www.mn.uio.no/ifi/english/research/groups/ltg/)
 at the University of Oslo.
 
-Five independent dashboards live under one repository:
+Six independent dashboards live under one repository:
 
 | URL | Source data | Purpose |
 | --- | --- | --- |
@@ -13,6 +13,7 @@ Five independent dashboards live under one repository:
 | [`/norolmo`](https://ltgoslo.github.io/llm-dashboard/norolmo/) | `data/norolmo/` | NorOLMo 13B training-progress + ablations |
 | [`/multisynt`](https://ltgoslo.github.io/llm-dashboard/multisynt/) | `data/multisynt/` | Multilingual training progress (Spanish, French, Finnish, Norwegian) |
 | [`/prelude`](https://ltgoslo.github.io/llm-dashboard/prelude/) | `data/prelude/` | OpenEuroLLM Prelude 9B training progress on NorEval 1.2 |
+| [`/norprelude`](https://ltgoslo.github.io/llm-dashboard/norprelude/) | `data/norprelude/` | NorPrelude: Prelude annealed on Scandinavian mixtures, on NorEval 1.2 |
 
 Each dashboard has its own URL and its own `data.json`. The shared JavaScript /
 CSS library lives in `docs/shared/` — score access, normalization, the chart
@@ -24,13 +25,13 @@ each dashboard via ES modules.
 ```
 llm-dashboard/
 ├── README.md
-├── build_data.py                 ← single script, builds all 5 data.json files
+├── build_data.py                 ← single script, builds all 6 data.json files
 ├── metrics_setup.yaml            ← NorEval benchmark configs (used by 3 dashboards)
 ├── models_setup.yaml             ← NorEval base-model metadata
 ├── models_instruct_setup.yaml    ← NorEval instruct-model metadata
 ├── multisynt_tasks.yaml          ← MultiSynt task configs
 ├── multisynt_models.yaml         ← MultiSynt model display names + colors
-├── noreval12_setup.yaml          ← NorEval 1.2 benchmark configs (prelude dashboard)
+├── noreval12_setup.yaml          ← NorEval 1.2 benchmark configs (prelude + norprelude dashboards)
 ├── check_missing.py              ← validates that every model has every benchmark
 ├── check_corrupt.py              ← finds corrupt result JSON files
 ├── merge_errant_scores.py        ← merges external ERRANT scores into ask_gec results
@@ -40,7 +41,8 @@ llm-dashboard/
 │   ├── noreval-gen/results/<model>/<bench>/<N-shot>/.../results_*.json
 │   ├── norolmo/progress/NorOLMo-step-<N>/<bench>/<N-shot>/.../results_*.json
 │   ├── multisynt/results/<Lang>/<model>_<N>shot_checkpoints/<ckpt>/<bench>/p<N>/results.json
-│   └── prelude/progress/<branch>/<bench>/results_*.json  (+ prelude/checkpoints.json)
+│   ├── prelude/progress/<branch>/<bench>/results_*.json  (+ prelude/checkpoints.json)
+│   └── norprelude/progress/<run>_i<iteration>/<bench>/<N-shot>/.../results_*.json
 └── docs/                         ← GitHub Pages root (served as static site)
     ├── index.html                ← redirects to /noreval/
     ├── shared/
@@ -58,14 +60,15 @@ llm-dashboard/
     ├── noreval-gen/{index.html, app.js, data.json}
     ├── norolmo/{index.html, app.js, data.json}
     ├── multisynt/{index.html, app.js, data.json}
-    └── prelude/{index.html, app.js, data.json}
+    ├── prelude/{index.html, app.js, data.json}
+    └── norprelude/{index.html, app.js, data.json}
 ```
 
 ## Building locally
 
 ```bash
 pip install pyyaml scipy
-python3 build_data.py             # regenerates all five data.json files
+python3 build_data.py             # regenerates all six data.json files
 python3 -m http.server 8000 -d docs   # serves at http://localhost:8000/noreval/
 ```
 
@@ -143,6 +146,19 @@ the dashboards' "single prompt" setting.
 2. A task not yet in `noreval12_setup.yaml` needs a `<task>:` entry there
    (same fields as `metrics_setup.yaml`, plus the optional `soft_metric` /
    `soft_random_baseline` described under the MultiSynt tasks)
+3. Run `build_data.py` and commit
+
+### … NorPrelude checkpoint (NorEval 1.2)
+
+1. Drop the lm-eval output under
+   `data/norprelude/progress/<run>_i<iteration>/<task>/<N>-shot/.../results_*.json`
+   (one file per task and shot setting, holding all of the task's prompt /
+   formulation variants). `<run>` is `prelude_wsm100_minus-sqrt` for the
+   main line (the last Prelude checkpoints before the anneal) or an anneal
+   run such as `norA_wsm100_minus-sqrt`, which is drawn forking off the
+   main line; its display name is set in `NORPRELUDE_RUN_NAME_MAP` in
+   `build_data.py`
+2. Tasks are configured in `noreval12_setup.yaml`, as for Prelude
 3. Run `build_data.py` and commit
 
 ### … new MultiSynt model
