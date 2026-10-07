@@ -167,6 +167,11 @@ PRELUDE_RUN_NAME_MAP = {
 # iteration counter continues Prelude's, so tokens use Prelude's batch.
 NORPRELUDE_MAIN_RUN = "prelude_wsm100_minus-sqrt"
 NORPRELUDE_MAIN_DISPLAY_NAME = "Prelude 9B"
+# The iteration at which the anneal runs branch off the Prelude main line
+# (owner, 2026-10-08): the dashboard's x-axis counts tokens from it, so the
+# last Prelude checkpoint before it (952800) sits slightly below zero and
+# the first anneal checkpoints (955200) above.
+NORPRELUDE_ANNEAL_START_STEP = 953312
 # Anneal runs: the share of Scandinavian data in the annealing mixture.
 NORPRELUDE_RUN_NAME_MAP = {
     "norA_wsm100_minus-sqrt": "88% Scandinavian",
@@ -1578,6 +1583,7 @@ def build_norprelude_data(setup):
         NORPRELUDE_PROGRESS, setup, parse, NORPRELUDE_RUN_NAME_MAP, PRELUDE_TOKENS_PER_STEP
     )
     data["main_display_name"] = NORPRELUDE_MAIN_DISPLAY_NAME
+    data["anneal_start_step"] = NORPRELUDE_ANNEAL_START_STEP
     data["run_colors"] = {r: NORPRELUDE_RUN_COLOR_MAP.get(r, "") for r in data["runs"]}
     return data
 

@@ -30,8 +30,10 @@ let allShots = ["5"];
 const DEFAULT_SELECTION = "__all_macro__";
 // Defaults of this instance's selectors (the URL only records departures).
 const DEFAULTS = { classificationMetric: "prob_correct", promptAgg: "mean", formulation: "mean", accNorm: "max", normalization: "baseline" };
-// The x-axis is measured from the last Prelude checkpoint (the fork of the
-// anneals): tokens before it are negative. Set in init() from the data.
+// The x-axis is measured from the iteration at which the anneals branch
+// off the Prelude main line (`anneal_start_step` in data.json, 953,312 —
+// between the last Prelude checkpoint and the first anneal checkpoint):
+// tokens before it are negative. Set in init() from the data.
 let originStep = 0;
 const MAIN_COLOR = "#6b7280";                                          // grey
 const RUN_COLORS = ["#dc2626", "#2563eb", "#f97316", "#9333ea", "#0d9488"];  // fallback when data.json names no color
@@ -61,9 +63,10 @@ function sortedSteps(data) {
 }
 
 /** The main line first, then each side run (checkpoint dirs named
- *  `<run>_iter_<N>`). A side run is prepended with the last main-line
- *  checkpoint at or before its first iteration, so the fork is drawn as a
- *  connected line rather than a gap. */
+ *  `<run>_i<N>`). A side run is prepended with the last main-line
+ *  checkpoint at or before its first iteration (the last Prelude checkpoint
+ *  before the anneal started), so the fork is drawn as a connected line
+ *  rather than a gap. */
 function getTrajectories() {
   const progress = state.DATA.progress;
   const mainSteps = sortedSteps(progress);
@@ -90,7 +93,7 @@ function getTrajectories() {
   return trajectories;
 }
 
-/** "+20.1B", "−201B", "0" — signed, relative to the last Prelude checkpoint. */
+/** "+20.1B", "−201B", "0" — signed, relative to the start of the anneal. */
 function formatTokens(tokens) {
   const abs = Math.abs(tokens);
   if (abs < 5e7) return "0";
@@ -107,7 +110,7 @@ function formatTokens(tokens) {
 const chartConfig = {
   getTrajectories,
   xToTokens: (step) => (step - originStep) * tokensPerStep,
-  xAxisLabel: "tokens relative to the last Prelude checkpoint",
+  xAxisLabel: "tokens relative to the start of the anneal",
   allShots,            // replaced in init() once data.json is loaded
   // Always fully zoomed: the y-axis fits the plotted points (and bands) of
   // the displayed shot on every render.
@@ -270,7 +273,7 @@ async function init() {
     state.metricsSetup = state.DATA.metrics_setup;
     state.checkedTasks = new Set(Object.keys(state.metricsSetup));
     tokensPerStep = state.DATA.tokens_per_step || tokensPerStep;
-    originStep = Math.max(0, ...sortedSteps(state.DATA.progress));
+    originStep = state.DATA.anneal_start_step ?? Math.max(0, ...sortedSteps(state.DATA.progress));
     setSingleTaskNormalization(DEFAULTS.normalization);
     if (state.DATA.shots?.length) allShots = state.DATA.shots.map(String);
     chartConfig.allShots = allShots;
