@@ -20,7 +20,7 @@ export const state = {
   // Multisynt-only: see resolvePoint() / taskBaseMetric() / getAggregatedTasks() in core.js.
   llNormScope: "acc",         // "acc": the LL-norm selector only redirects a main "acc" metric; "all": any base metric
   formulationCombine: false,  // true: "max"/"mean" formulation values aggregate across the per-formulation scores
-  metricMode: "hard",         // "hard" (main_metric) | "soft" (soft_metric where a task has one)
+  classificationMetric: null, // "acc" | "likelihood_correct" | "prob_correct": the "Classification metric" selector of the aggregate views (multisynt, prelude, norprelude); null = every task's main metric
   taskTypeFilter: "all",      // "all" | "classification" | "generation" — mask over checkedTasks in aggregate views
   checkedTasks: new Set(),
 };

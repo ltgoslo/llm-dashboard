@@ -4,8 +4,9 @@
 // language tab re-binds state.metricsSetup and rebuilds the dropdown/checkbox grid.
 //
 // Besides the controls shared with the other progress dashboards, multisynt
-// has: a task-type mask (classification / generative) and a hard/soft metric
-// switch for aggregate views, a "Prompts" selector that folds the prompt
+// has: a task-type mask (classification / generative) and a classification-
+// metric selector (accuracy / answer probability / conditional answer
+// probability) for aggregate views, a "Prompts" selector that folds the prompt
 // aggregation together with a single random prompt, a formulation selector
 // that also aggregates across formulations, a decoding selector, and a
 // log-likelihood normalization selector that is orthogonal to the metric
@@ -33,7 +34,7 @@ import { UrlState } from "../shared/url-state.js";
 const ALL_SHOTS = ["0", "5"];
 const DEFAULT_SELECTION = "__all_macro__";
 // Defaults of the selectors (the URL only records departures).
-const DEFAULTS = { metricMode: "soft", promptAgg: "mean", formulation: "mean", accNorm: "max", normalization: "baseline" };
+const DEFAULTS = { classificationMetric: "prob_correct", promptAgg: "mean", formulation: "mean", accNorm: "max", normalization: "baseline" };
 const DEFAULT_LANGUAGE = "Norwegian";   // falls back to the first language in data.json
 
 const plotlyConfig = makePlotlyConfig("multisynt-chart", () => ({
@@ -41,7 +42,7 @@ const plotlyConfig = makePlotlyConfig("multisynt-chart", () => ({
   shot: state.currentShot + "-shot",
   task_selection: state.currentTaskSelection,
   task_type: state.taskTypeFilter,
-  metric_type: state.metricMode,
+  classification_metric: state.classificationMetric,
   decoding: state.currentDecoding,
   prompts: state.currentPromptAgg,
   formulation: state.currentFormulation,
@@ -236,7 +237,7 @@ function bindEventListeners() {
   });
 
   bindSelect("task-type-select", (v) => state.taskTypeFilter = v);
-  bindSelect("metric-mode-select", (v) => state.metricMode = v);
+  bindSelect("classification-metric-select", (v) => state.classificationMetric = v);
   bindSelect("decoding-select", (v) => state.currentDecoding = v);
   bindSelect("prompt-agg-select", (v) => state.currentPromptAgg = v);
   bindSelect("formulation-select", (v) => state.currentFormulation = v);
@@ -335,6 +336,8 @@ function render() {
 // current selectors so old links keep working.
 const LEGACY_PROMPT_AGG = { median: "max", min: "max", first: "max", stdev: "max" };
 const LEGACY_LL_NORM = { acc: "none", acc_norm: "norm", acc_mutual_info: "mutual_info" };
+// The former hard/soft "Metric type" selector (URL key `mmode`).
+const LEGACY_METRIC_MODE = { hard: "acc", soft: "prob_correct" };
 
 function setupUrlState() {
   urlState = new UrlState([
@@ -356,7 +359,8 @@ function setupUrlState() {
       default: DEFAULT_SELECTION,
     },
     { key: "ttype", get: () => state.taskTypeFilter, set: (v) => state.taskTypeFilter = v, default: "all" },
-    { key: "mmode", get: () => state.metricMode, set: (v) => state.metricMode = v, default: DEFAULTS.metricMode },
+    { key: "mmode", get: () => "", set: (v) => { if (LEGACY_METRIC_MODE[v]) state.classificationMetric = LEGACY_METRIC_MODE[v]; }, default: "" },
+    { key: "cmetric", get: () => state.classificationMetric, set: (v) => state.classificationMetric = v, default: DEFAULTS.classificationMetric },
     { key: "dec", get: () => state.currentDecoding, set: (v) => state.currentDecoding = v, default: "sampling" },
     { key: "pagg", get: () => state.currentPromptAgg, set: (v) => state.currentPromptAgg = LEGACY_PROMPT_AGG[v] || v, default: DEFAULTS.promptAgg },
     { key: "form", get: () => state.currentFormulation, set: (v) => state.currentFormulation = v, default: DEFAULTS.formulation },
@@ -379,7 +383,7 @@ function syncControlsFromState() {
   };
   setSelect("task-select", state.currentTaskSelection, DEFAULT_SELECTION);
   state.taskTypeFilter = setSelect("task-type-select", state.taskTypeFilter, "all");
-  state.metricMode = setSelect("metric-mode-select", state.metricMode, DEFAULTS.metricMode);
+  state.classificationMetric = setSelect("classification-metric-select", state.classificationMetric, DEFAULTS.classificationMetric);
   state.currentDecoding = setSelect("decoding-select", state.currentDecoding, "sampling");
   state.currentPromptAgg = setSelect("prompt-agg-select", state.currentPromptAgg, DEFAULTS.promptAgg);
   state.currentFormulation = setSelect("formulation-select", state.currentFormulation, DEFAULTS.formulation);
@@ -412,7 +416,7 @@ async function init() {
     state.formulationCombine = true;
     state.currentAccNorm = "max";
     state.llNormScope = "all";
-    state.metricMode = DEFAULTS.metricMode;
+    state.classificationMetric = DEFAULTS.classificationMetric;
     state.taskTypeFilter = "all";
     state.currentDecoding = "sampling";
     setupUrlState();

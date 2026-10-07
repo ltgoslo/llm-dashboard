@@ -4,7 +4,7 @@
 import { state } from "./state.js";
 import {
   METRIC_DISPLAY, METRIC_SCALES, getBaseMetric, llNormBase, hasLLNormVariants, taskBaseMetric,
-  isAggregateSelection, getEffectiveMetric, taskTypeMatches,
+  isAggregateSelection, getEffectiveMetric, taskTypeMatches, CLASSIFICATION_METRICS,
 } from "./core.js";
 import { enhanceSelects } from "./dropdown.js";
 import { enhanceSegmentedControls } from "./segmented.js";
@@ -151,9 +151,9 @@ const CONTROL_TOOLTIPS = [
     body: "Restrict the aggregate to classification tasks (answers ranked by log-likelihood) or to generative tasks (free-form generation scored against references). Excluded tasks stay checked below but are greyed out.",
   },
   {
-    anchor: "#metric-mode-select",
-    title: "Metric type",
-    body: "Hard metrics score discrete predictions (accuracy, F1, …). Soft metrics score the conditional probability of the correct answer — the probability mass on it among the choices (soft accuracy); tasks without a soft metric contribute their hard one. For NoReC the hard metric is macro-F1 and the soft one the soft accuracy.",
+    anchor: "#classification-metric-select",
+    title: "Classification metric",
+    body: "Which score the classification tasks contribute to the aggregate. 'Accuracy': whether the top-ranked choice is the correct one (also for tasks whose main metric is macro-F1). 'Answer probability': the probability the model assigns to the correct answer text, not normalized over the choices — it has no chance level, so the random-baseline rescaling leaves it unchanged. 'Conditional answer probability': the probability mass on the correct answer after normalizing the answer likelihoods over the choices (soft accuracy). Tasks without the chosen metric contribute their accuracy.",
   },
   {
     anchor: "#size-slider-container",
@@ -438,10 +438,11 @@ export function setTaskExcludedStates(excludedFn) {
 
 // ─────────────────────────────────────────────────────────────
 // Variant controls — shared by the dashboards that evaluate NorEval-1.2-
-// style data (multisynt, prelude): task type / metric type / formulation /
-// loglikelihood normalization. Each page carries the same control ids
-// (#task-type-control, #metric-mode-control, #formulation-control,
-// #acc-norm-control); see resolvePoint() in core.js for the semantics.
+// style data (multisynt, prelude, norprelude): task type / classification
+// metric / formulation / loglikelihood normalization. Each page carries the
+// same control ids (#task-type-control, #classification-metric-control,
+// #formulation-control, #acc-norm-control); see resolvePoint() and
+// taskBaseMetric() in core.js for the semantics.
 // ─────────────────────────────────────────────────────────────
 
 /** Formulation options in display order; "mean" / "max" aggregate across
@@ -490,8 +491,9 @@ export function populateFormulationOptions() {
 }
 
 /** Show each variant control only where it has an effect: the task-type and
- *  metric-type selectors in aggregate views (the latter only when some task
- *  has a soft metric), the formulation / decoding selectors when the shown
+ *  classification-metric selectors in aggregate views (the latter only when
+ *  some classification task carries a probability metric besides its
+ *  accuracy, i.e. NorEval 1.2 data), the formulation / decoding selectors when the shown
  *  task(s) have formulations / both decoding runs, and the loglikelihood-
  *  normalization selector when the shown metric comes in the three
  *  normalization variants. Call after the chart render, which populates the
@@ -502,8 +504,9 @@ export function updateVariantControlVisibility() {
   const aggregate = isAggregateSelection(sel);
   const single = !aggregate && ms[sel] ? sel : null;
   setControlVisible("task-type-control", aggregate);
-  setControlVisible("metric-mode-control",
-    aggregate && Object.values(ms).some((info) => info.soft_metric));
+  setControlVisible("classification-metric-control",
+    aggregate && Object.values(ms).some((info) => info.evaluation_type === "classification"
+      && CLASSIFICATION_METRICS.some((m) => m !== "acc" && (info.available_metrics || []).includes(m))));
   const hasForms = (b) => (ms[b].formulations || []).length > 0;
   setControlVisible("formulation-control",
     single ? hasForms(single) : Object.keys(ms).some(hasForms));

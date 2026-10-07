@@ -220,25 +220,34 @@ export function hasLLNormVariants(metrics, base) {
   return set.has(plain) && variants.some((m) => set.has(m));
 }
 
-/** A task's metric under the hard/soft selector: the configured
- *  `soft_metric` (e.g. the probability of the correct answer) when the
- *  multisynt "Metric type" is soft and the task has one, else `main_metric`. */
+/** The base metrics the "Classification metric" selector of the aggregate
+ *  views (multisynt, prelude, norprelude) chooses between: accuracy, the
+ *  probability of the correct answer text and its conditional probability
+ *  among the choices (NorEval 1.2's `likelihood_correct` / `prob_correct`). */
+export const CLASSIFICATION_METRICS = ["acc", "likelihood_correct", "prob_correct"];
+
+/** A task's metric under the classification-metric selector: the selected
+ *  metric where a classification task has it, else its accuracy (a task
+ *  without the probability metrics, or whose main metric is macro-F1 or
+ *  MCC), else — as on the dashboards without the selector — its main
+ *  metric. */
 export function taskBaseMetric(benchmark) {
   const info = state.metricsSetup[benchmark];
   if (!info) return undefined;
-  return state.metricMode === "soft" && info.soft_metric ? info.soft_metric : info.main_metric;
+  const wanted = state.classificationMetric;
+  if (!wanted || info.evaluation_type !== "classification") return info.main_metric;
+  const has = (m) => (info.available_metrics || []).includes(m);
+  return has(wanted) ? wanted : has("acc") ? "acc" : info.main_metric;
 }
 
-/** Random baseline of a task for `metric`: the soft metric's own baseline
- *  when it has one (`soft_random_baseline`), else the task's. */
+/** Random baseline of a task for `metric`: the metric's own where the task
+ *  declares one (`random_baselines`: NoReC's accuracy and conditional answer
+ *  probability next to its macro-F1 main metric), else the task's. */
 export function taskRandomBaseline(benchmark, metric) {
   const info = state.metricsSetup[benchmark];
   metric = metric || taskBaseMetric(benchmark);
-  if (metric && info.soft_metric && llNormBase(metric) === info.soft_metric
-      && info.soft_random_baseline != null) {
-    return info.soft_random_baseline;
-  }
-  return info.random_baseline;
+  const own = metric ? info.random_baselines?.[llNormBase(getBaseMetric(metric))] : undefined;
+  return own != null ? own : info.random_baseline;
 }
 
 /** Whether a task is kept by the multisynt task-type selector (null/"all"
@@ -623,7 +632,8 @@ export function isAggregateSelection(sel) {
 }
 
 /** Effective metric for an individual/group view: the currentMetric
- *  override, else the task's metric under the hard/soft selector. */
+ *  override, else the task's metric under the classification-metric
+ *  selector (taskBaseMetric). */
 export function getEffectiveMetric(benchmark) {
   return state.currentMetric || taskBaseMetric(benchmark);
 }

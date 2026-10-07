@@ -33,6 +33,7 @@ import {
   aggregateScores, isAggregateSelection, isMacroSelection, getAggregatedTasks,
   getEffectiveMetric, formatTitleWithShot, capitalize, taskTitleDescription,
   wantCI, normNeedsAllValues, scoreDecimals, isRawScaleMetric, taskRandomBaseline, hasRandomBaseline,
+  taskBaseMetric,
 } from "./core.js";
 import {
   getPlotlyLayout, plotChart,
@@ -384,10 +385,11 @@ function renderAggregateProgress(config) {
     return aggregateScores(tasks, (bench) => {
       const raw = getScore(traj.dataSource, x, bench, shot);
       if (raw === undefined) return undefined;
+      const metric = taskBaseMetric(bench);
       const allRaw = needAll ? refScores(traj, bench, shot) : null;
-      const score = applyNorm(raw, bench, allRaw);
+      const score = applyNorm(raw, bench, allRaw, metric);
       const ci = withCI
-        ? scaleCIDistances(getCombinedCI(traj.dataSource, x, bench, shot), bench, undefined, allRaw)
+        ? scaleCIDistances(getCombinedCI(traj.dataSource, x, bench, shot), bench, metric, allRaw)
         : undefined;
       return { score, ci };
     }, macro);
@@ -395,12 +397,16 @@ function renderAggregateProgress(config) {
 
   /** Where a chance-level model would be plotted at this checkpoint: each
    *  task's random baseline sent through the same normalization, aggregated
-   *  over the same tasks that have a score here. */
+   *  over the same tasks that have a score here. The probability of the
+   *  answer text has no chance level; a chance-level model assigns the
+   *  exact answer (next to) no probability, so such a task enters at 0. */
   function baselineAt(traj, x, shot) {
     const r = aggregateScores(tasks, (bench) => {
       if (getScore(traj.dataSource, x, bench, shot) === undefined) return undefined;
+      const metric = taskBaseMetric(bench);
       const allRaw = needAll ? refScores(traj, bench, shot) : null;
-      return { score: applyNorm(taskRandomBaseline(bench), bench, allRaw) };
+      const chance = hasRandomBaseline(metric) ? taskRandomBaseline(bench, metric) : 0;
+      return { score: applyNorm(chance, bench, allRaw, metric) };
     }, macro);
     return r ? r.score : null;
   }

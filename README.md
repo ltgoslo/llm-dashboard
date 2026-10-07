@@ -110,12 +110,14 @@ For an instruction-tuned model, swap `data/noreval-gen/results/` and
    `path:` field if the result files live under a sub-directory
    (e.g. `path: noropenbookqa/noropenbookqa_no_fact_nob`). `category` drives
    the category average and `evaluation_type` (`classification` /
-   `generation`) the dashboard's task-type selector. A task whose results
-   carry a soft counterpart of its main metric (NorEval 1.2's `prob_correct`,
-   the conditional probability of the correct answer among the choices) can
-   declare it as
-   `soft_metric`, plus `soft_random_baseline` when the main metric's random
-   baseline doesn't transfer (NoReC: macro-F1 vs. 0.5). A task without a
+   `generation`) the dashboard's task-type selector. The dashboard's
+   "Classification metric" selector shows every classification task's
+   accuracy, answer probability (NorEval 1.2's `likelihood_correct`) or
+   conditional answer probability (`prob_correct`) straight from the
+   results; a task whose main metric isn't accuracy declares the random
+   baselines of those metrics under `random_baselines:` (NoReC:
+   `{acc: 0.5, prob_correct: 0.5}` next to its macro-F1 baseline; EsCoLA:
+   `{acc: 0.5}` next to its MCC baseline). A task without a
    prompt (two candidate sentences only: NCB, NoCoLA, MultiBLiMP) is marked
    `empty_prompt: true`: its 0-shot PMI-normalized accuracy is undefined
    (every item ties and the tie-break always picks the correct sentence),
@@ -151,8 +153,8 @@ the dashboards' "single prompt" setting.
    branches (`iter_<N>`) form the Prelude trajectory; `<run>_iter_<N>`
    branches are drawn as side runs forking off it.
 2. A task not yet in `noreval12_setup.yaml` needs a `<task>:` entry there
-   (same fields as `metrics_setup.yaml`, plus the optional `soft_metric` /
-   `soft_random_baseline` described under the MultiSynt tasks)
+   (same fields as `metrics_setup.yaml`, plus the optional
+   `random_baselines` described under the MultiSynt tasks)
 3. Run `build_data.py` and commit
 
 ### … NorPrelude checkpoint (NorEval 1.2)

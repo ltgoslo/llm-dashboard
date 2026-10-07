@@ -61,6 +61,8 @@ escola:
   metric_scale: unit
   pretty_name: EsCoLA
   random_baseline: 0.0
+  random_baselines:
+    acc: 0.5
 finbench_analogies_fbv2:
   category: linguistic knowledge
   evaluation_type: classification
@@ -290,7 +292,6 @@ ncb_nob:
   metric_scale: unit
   pretty_name: NCB (Norwegian Cloze)
   random_baseline: 0.5
-  soft_metric: prob_correct
 nocola:
   category: linguistic knowledge
   evaluation_type: classification
@@ -308,7 +309,6 @@ nocola_nob:
   metric_scale: unit
   pretty_name: NoCoLA
   random_baseline: 0.5
-  soft_metric: prob_correct
 norbelebele:
   category: language understanding
   evaluation_type: classification
@@ -325,7 +325,6 @@ norbelebele_nob:
   metric_scale: unit
   pretty_name: Belebele (Norwegian)
   random_baseline: 0.25
-  soft_metric: prob_correct
 norcommonsenseqa_nno:
   category: world knowledge & reasoning
   evaluation_type: classification
@@ -334,7 +333,6 @@ norcommonsenseqa_nno:
   metric_scale: unit
   pretty_name: CommonsenseQA (Nynorsk)
   random_baseline: 0.2
-  soft_metric: prob_correct
 norcommonsenseqa_nob:
   category: world knowledge & reasoning
   evaluation_type: classification
@@ -343,7 +341,6 @@ norcommonsenseqa_nob:
   metric_scale: unit
   pretty_name: CommonsenseQA (Bokmål)
   random_baseline: 0.2
-  soft_metric: prob_correct
 norec_document:
   category: language understanding
   evaluation_type: classification
@@ -360,8 +357,9 @@ norec_document_nob:
   metric_scale: unit
   pretty_name: NoReC Document Sentiment
   random_baseline: 0.485071
-  soft_metric: prob_correct
-  soft_random_baseline: 0.5
+  random_baselines:
+    acc: 0.5
+    prob_correct: 0.5
 norec_sentence:
   category: language understanding
   evaluation_type: classification
@@ -378,8 +376,9 @@ norec_sentence_nob:
   metric_scale: unit
   pretty_name: NoReC Sentence Sentiment
   random_baseline: 0.481517
-  soft_metric: prob_correct
-  soft_random_baseline: 0.5
+  random_baselines:
+    acc: 0.5
+    prob_correct: 0.5
 noreval_multiblimp:
   aggregator: multiblimp
   category: linguistic knowledge
@@ -416,7 +415,6 @@ noropenbookqa_nno:
   path: noropenbookqa/noropenbookqa_nno
   pretty_name: OpenBookQA (Nynorsk)
   random_baseline: 0.25
-  soft_metric: prob_correct
 noropenbookqa_no_fact_nno:
   category: world knowledge & reasoning
   evaluation_type: classification
@@ -426,7 +424,6 @@ noropenbookqa_no_fact_nno:
   path: noropenbookqa/noropenbookqa_no_fact_nno
   pretty_name: OpenBookQA No-Fact (Nynorsk)
   random_baseline: 0.25
-  soft_metric: prob_correct
 noropenbookqa_no_fact_nob:
   category: world knowledge & reasoning
   evaluation_type: classification
@@ -436,7 +433,6 @@ noropenbookqa_no_fact_nob:
   path: noropenbookqa/noropenbookqa_no_fact_nob
   pretty_name: OpenBookQA No-Fact (Bokmål)
   random_baseline: 0.25
-  soft_metric: prob_correct
 noropenbookqa_nob:
   category: language understanding
   evaluation_type: classification
@@ -446,7 +442,6 @@ noropenbookqa_nob:
   path: noropenbookqa/noropenbookqa_nob
   pretty_name: OpenBookQA (Bokmål)
   random_baseline: 0.25
-  soft_metric: prob_correct
 norquad:
   category: language understanding
   evaluation_type: generation
@@ -542,7 +537,6 @@ nortruthfulqa_mc_nno:
   metric_scale: unit
   pretty_name: TruthfulQA MC (Nynorsk)
   random_baseline: 0.233118
-  soft_metric: prob_correct
 nortruthfulqa_mc_nob:
   category: world knowledge & reasoning
   evaluation_type: classification
@@ -551,7 +545,6 @@ nortruthfulqa_mc_nob:
   metric_scale: unit
   pretty_name: TruthfulQA MC (Bokmål)
   random_baseline: 0.231703
-  soft_metric: prob_correct
 nrk_quiz_qa_nno:
   category: world knowledge & reasoning
   evaluation_type: classification
@@ -560,7 +553,6 @@ nrk_quiz_qa_nno:
   metric_scale: unit
   pretty_name: NRK Quiz QA (Nynorsk)
   random_baseline: 0.278847
-  soft_metric: prob_correct
 nrk_quiz_qa_nob:
   category: world knowledge & reasoning
   evaluation_type: classification
@@ -569,7 +561,6 @@ nrk_quiz_qa_nob:
   metric_scale: unit
   pretty_name: NRK Quiz QA (Bokmål)
   random_baseline: 0.28363
-  soft_metric: prob_correct
 ogx_truthfulqax_gen_fi_fbv2:
   category: world knowledge
   evaluation_type: generation
@@ -648,7 +639,6 @@ slide_nob_nno_swe_dan:
   metric_scale: unit
   pretty_name: SLIDE (Scandinavian LID)
   random_baseline: 0.212892
-  soft_metric: prob_correct
 spabelebele:
   category: language understanding
   evaluation_type: classification

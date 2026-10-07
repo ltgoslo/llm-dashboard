@@ -111,6 +111,27 @@ def force_degenerate_pmi(metrics, config, shot):
     return out
 
 
+def other_random_baselines(config, discovered, task):
+    """The task's `random_baselines` ({metric: chance score}) for the
+    metrics besides the main one that the dashboards can show — the
+    "Classification metric" selector of the training-progress dashboards
+    (accuracy / answer probability / conditional answer probability)
+    where the main metric's baseline doesn't transfer: NoReC's macro-F1
+    vs. 1/2 for its accuracy and the conditional probability of the
+    correct answer, EsCoLA's MCC vs. accuracy. Returned as a dict to
+    splice into the task's metrics-setup entry (empty when none);
+    metrics missing from the results are dropped with a warning."""
+    baselines = config.get("random_baselines") or {}
+    out = {}
+    for metric, value in baselines.items():
+        if metric in discovered:
+            out[metric] = value
+        else:
+            print(f"  WARNING: random baseline of '{metric}' declared for "
+                  f"'{task}' but the metric is not in its results, ignoring")
+    return {"random_baselines": out} if out else {}
+
+
 # Per-benchmark metric exclusions. ask_gec's `exact_match` is the lm-eval
 # placeholder; the real metric is ERRANT F0.5 (`errant`/`errant_f05`).
 EXCLUDED_METRICS_PER_BENCHMARK = {
@@ -614,17 +635,7 @@ def build_noreval_metrics_info(metrics_setup, discovered_metrics):
             "url": config.get("url", ""),
             "available_metrics": available,
         }
-        # Optional soft counterpart of the main metric (see the multisynt
-        # builder for the semantics); only NorEval 1.2 configs declare one.
-        soft_metric = config.get("soft_metric")
-        if soft_metric:
-            if soft_metric in disc:
-                entry["soft_metric"] = soft_metric
-                if "soft_random_baseline" in config:
-                    entry["soft_random_baseline"] = config["soft_random_baseline"]
-            else:
-                print(f"  WARNING: soft metric '{soft_metric}' of '{benchmark}' "
-                      "not found in results, ignoring")
+        entry.update(other_random_baselines(config, disc, benchmark))
         if config.get("subtasks"):
             entry["subtasks"] = {
                 code: {
@@ -1297,20 +1308,6 @@ def build_multisynt_data():
             )
             forms = discovered_forms.get(task, set())
             decodings = discovered_decodings.get(task, set())
-            # The optional "soft" counterpart of the main ("hard") metric —
-            # e.g. the probability mass on the correct answer instead of
-            # accuracy / F1 — with its own random baseline when the hard
-            # metric's doesn't transfer (macro-F1 vs. 1/k for NoReC).
-            soft = {}
-            soft_metric = config.get("soft_metric")
-            if soft_metric:
-                if soft_metric in disc:
-                    soft["soft_metric"] = soft_metric
-                    if "soft_random_baseline" in config:
-                        soft["soft_random_baseline"] = config["soft_random_baseline"]
-                else:
-                    print(f"  WARNING: soft metric '{soft_metric}' of '{task}' "
-                          "not found in results, ignoring")
             metrics_setup_out[task] = {
                 "pretty_name": config["pretty_name"],
                 "main_metric": main_metric,
@@ -1320,7 +1317,7 @@ def build_multisynt_data():
                 "evaluation_type": config.get("evaluation_type", "classification"),
                 "metric_scale": config.get("metric_scale", "unit"),
                 "available_metrics": available,
-                **soft,
+                **other_random_baselines(config, disc, task),
                 **({"formulations": [f for f in MULTISYNT_FORMULATIONS if f in forms]}
                    if forms else {}),
                 # The sampling run is the entry itself; the greedy run its

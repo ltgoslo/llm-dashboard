@@ -67,11 +67,12 @@
                             </select>
                         </div>
 
-                        <div class="control-group" id="metric-mode-control" style="display:none;">
-                            <label for="metric-mode-select">Metric type:</label>
-                            <select id="metric-mode-select" class="control-select">
-                                <option value="hard">hard</option>
-                                <option value="soft" selected>soft</option>
+                        <div class="control-group" id="classification-metric-control" style="display:none;">
+                            <label for="classification-metric-select">Classification metric:</label>
+                            <select id="classification-metric-select" class="control-select">
+                                <option value="acc" title="Proportion of items where the correct answer is the top-ranked choice.">accuracy</option>
+                                <option value="likelihood_correct" title="Probability the model assigns to the correct answer text, not normalized over the choices; it has no chance level.">answer probability</option>
+                                <option value="prob_correct" selected title="Probability mass on the correct answer after normalizing the answer likelihoods over the choices (soft accuracy).">conditional answer probability</option>
                             </select>
                         </div>
 
