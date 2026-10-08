@@ -176,10 +176,22 @@ NORPRELUDE_ANNEAL_START_STEP = 953312
 NORPRELUDE_RUN_NAME_MAP = {
     "norA_wsm100_minus-sqrt": "88% Scandinavian",
     "norB_wsm100_minus-sqrt": "50% Scandinavian",
+    "annealM1D1": "baseline m1d1 anneal",
 }
 NORPRELUDE_RUN_COLOR_MAP = {
     "norA_wsm100_minus-sqrt": "#dc2626",   # red
     "norB_wsm100_minus-sqrt": "#2563eb",   # blue
+    "annealM1D1": "#9ca3af",               # light grey (the main line is grey)
+}
+# Runs drawn on their own instead of forking off the Prelude main line.
+NORPRELUDE_STANDALONE_RUNS = {"annealM1D1"}
+# Reference models, evaluated once (checkpoint dir without an `_i<N>`
+# suffix): drawn as a horizontal line across the chart.
+NORPRELUDE_REFERENCE_NAME_MAP = {
+    "normistral-11b-long": "NorMistral 11B",
+}
+NORPRELUDE_REFERENCE_COLOR_MAP = {
+    "normistral-11b-long": "#111827",      # near-black, dashed
 }
 
 # NorOLMo ablation display names and colors.
@@ -1484,12 +1496,14 @@ def noreval12_extract_task_dir(task_path, task, config):
 
 
 def build_noreval12_progress_data(progress_dir, setup, parse_ckpt, run_names,
-                                  tokens_per_step):
+                                  tokens_per_step, reference_names=None):
     """Build a NorEval-1.2 training-progress data.json (prelude, norprelude)
     from `progress_dir/<ckpt>/<task>/...`. `parse_ckpt(dir_name)` returns
-    (run, step) — run None for a main-line checkpoint — or None to skip."""
+    (run, step) — run None for a main-line checkpoint, step None for a
+    reference model evaluated once (norprelude) — or None to skip."""
     progress = {}
     runs = {}
+    references = {}
     discovered = {}
     discovered_forms = {}
     shots = set()
@@ -1504,7 +1518,10 @@ def build_noreval12_progress_data(progress_dir, setup, parse_ckpt, run_names,
                 print(f"  WARNING: cannot parse checkpoint dir '{ckpt_dir}', skipping")
                 continue
             run, step = parsed
-            print(f"  {'Checkpoint' if run is None else 'Run ' + run}: iteration {step}")
+            if step is None:
+                print(f"  Reference model: {run}")
+            else:
+                print(f"  {'Checkpoint' if run is None else 'Run ' + run}: iteration {step}")
             scores = {}
             for task in sorted(os.listdir(ckpt_path)):
                 task_path = ckpt_path / task
@@ -1526,7 +1543,12 @@ def build_noreval12_progress_data(progress_dir, setup, parse_ckpt, run_names,
                             entry.get("by_form", ())
                         )
             if scores:
-                (progress if run is None else runs.setdefault(run, {}))[step] = scores
+                if step is None:
+                    references[run] = scores
+                elif run is None:
+                    progress[step] = scores
+                else:
+                    runs.setdefault(run, {})[step] = scores
 
     # Only tasks with results make it into the dashboard.
     present = {b: cfg for b, cfg in setup.items() if b in discovered}
@@ -1551,6 +1573,13 @@ def build_noreval12_progress_data(progress_dir, setup, parse_ckpt, run_names,
         "run_display_names": {
             r: run_names.get(r, r.replace("_", " ")) for r in runs
         },
+        # Reference models (same per-task layout as one checkpoint's scores).
+        **({
+            "references": references,
+            "reference_display_names": {
+                r: (reference_names or {}).get(r, r) for r in references
+            },
+        } if references else {}),
     }
 
 
@@ -1575,16 +1604,21 @@ def build_norprelude_data(setup):
     def parse(name):
         m = NORPRELUDE_CKPT_RE.match(name)
         if not m:
-            return None
+            return name, None   # no iteration: a reference model
         run = m.group("run")
         return (None if run == NORPRELUDE_MAIN_RUN else run), int(m.group("step"))
 
     data = build_noreval12_progress_data(
-        NORPRELUDE_PROGRESS, setup, parse, NORPRELUDE_RUN_NAME_MAP, PRELUDE_TOKENS_PER_STEP
+        NORPRELUDE_PROGRESS, setup, parse, NORPRELUDE_RUN_NAME_MAP, PRELUDE_TOKENS_PER_STEP,
+        reference_names=NORPRELUDE_REFERENCE_NAME_MAP,
     )
     data["main_display_name"] = NORPRELUDE_MAIN_DISPLAY_NAME
     data["anneal_start_step"] = NORPRELUDE_ANNEAL_START_STEP
     data["run_colors"] = {r: NORPRELUDE_RUN_COLOR_MAP.get(r, "") for r in data["runs"]}
+    data["standalone_runs"] = sorted(r for r in data["runs"] if r in NORPRELUDE_STANDALONE_RUNS)
+    data["reference_colors"] = {
+        r: NORPRELUDE_REFERENCE_COLOR_MAP.get(r, "") for r in data.get("references", {})
+    }
     return data
 
 # ─────────────────────────────────────────────────────────────

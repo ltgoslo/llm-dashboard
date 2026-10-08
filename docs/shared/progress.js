@@ -209,6 +209,7 @@ function tightXRange(config, trajectories) {
   if (!config.xRangeTight) return undefined;
   let min = Infinity, max = -Infinity;
   for (const traj of trajectories) {
+    if (traj.reference) continue;
     for (const x of traj.checkpoints()) {
       const t = config.xToTokens(x);
       if (t < min) min = t;
@@ -248,6 +249,22 @@ function forEachRangeSlice(config, trajectories, fn) {
   }
 }
 
+// Reference models — a trajectory flagged `reference`, with one result
+// under a single pseudo-checkpoint (e.g. NorMistral 11B on norprelude) —
+// are drawn as a dashed horizontal line across the chart, sampled at the
+// checkpoint columns of the runs so they hover like a run; they are left
+// out of the x-range and of the signal measures.
+
+/** X positions (token units) of every checkpoint of the plotted runs. */
+function runCheckpointXs(config, trajectories) {
+  const xs = new Set();
+  for (const traj of trajectories) {
+    if (traj.reference) continue;
+    for (const x of traj.checkpoints()) xs.add(config.xToTokens(x));
+  }
+  return [...xs].sort((a, b) => a - b);
+}
+
 /** Append one plotted run to the trace lists: its CI band (into `traces`,
  *  which paints below all lines) when `cis` is non-null, and its line trace
  *  (into `lineTraces`). */
@@ -262,12 +279,14 @@ function pushRunTraces(traces, lineTraces, config, traj, { xs, ys, cis, name, co
     }
   }
   lineTraces.push({
-    x: xs, y: ys, mode: "lines+markers", name,
+    x: xs, y: ys, mode: traj.reference ? "lines" : "lines+markers", name,
     legendgroup: lgroup,
     ...(lref && { legend: lref }),
     ...(traj.zorder != null && { zorder: traj.zorder }),
-    line: { color, width: emph.baseW }, marker: { size: emph.baseS, symbol: emph.symbol },
+    line: { color, width: emph.baseW, ...(traj.reference && { dash: "dash" }) },
+    marker: { size: emph.baseS, symbol: emph.symbol },
     _emph: emph,
+    _reference: !!traj.reference,
     customdata,
     hoverinfo: "none",
   });
@@ -406,9 +425,11 @@ function makeHoverHandler(config) {
       body = "Score: " + scoreStr + ciStr;
     }
 
-    const title = config.hoverXFormat
-      ? config.hoverXFormat(pt.x, pt.data.name)
-      : `${pt.data.name || ""} — ${pt.x}${config.xAxisLabel ? " " + config.xAxisLabel.replace(/^\w/, "") : ""}`;
+    const title = pt.data._reference
+      ? pt.data.name
+      : config.hoverXFormat
+        ? config.hoverXFormat(pt.x, pt.data.name)
+        : `${pt.data.name || ""} — ${pt.x}${config.xAxisLabel ? " " + config.xAxisLabel.replace(/^\w/, "") : ""}`;
 
     showTooltip(data.event, title, body, "", "");
   };
@@ -473,8 +494,11 @@ function renderAggregateProgress(config) {
   for (const traj of trajectories) {
     const xValues = traj.checkpoints();
     if (!xValues.length) continue;
-    const aggResults = xValues.map((x) => aggregateAt(traj, x, state.currentShot, useCI));
-    const xs = xValues.map(config.xToTokens);
+    const refXs = traj.reference ? runCheckpointXs(config, trajectories) : null;
+    const aggResults = refXs
+      ? Array(refXs.length).fill(aggregateAt(traj, xValues[0], state.currentShot, useCI))
+      : xValues.map((x) => aggregateAt(traj, x, state.currentShot, useCI));
+    const xs = refXs || xValues.map(config.xToTokens);
     const ys = aggResults.map((r) => r ? r.score : null);
     const cis = useCI ? aggResults.map((r) => r ? r.ci : null) : null;
     collectFitValues(fitValues, ys, cis);
@@ -488,7 +512,7 @@ function renderAggregateProgress(config) {
       lgroup: traj.key || traj.name,
       customdata: aggResults.map((r) => r ? { count: r.count, ci: r.ci } : null),
     });
-    if (config.onSeries) {
+    if (config.onSeries && !traj.reference) {
       series.push({
         name: traj.name, key: traj.key || traj.name, xs, ys,
         baselines: xValues.map((x) => baselineAt(traj, x, state.currentShot)),
@@ -530,10 +554,12 @@ function renderSingleProgress(config, benchmark) {
   const series = [];
   const fitValues = [];
   for (const traj of trajectories) {
-    const xValues = traj.checkpoints();
+    let xValues = traj.checkpoints();
     if (!xValues.length) continue;
+    const refXs = traj.reference ? runCheckpointXs(config, trajectories) : null;
+    if (refXs) xValues = refXs.map(() => xValues[0]);
     const allRaw = refFor(traj, state.currentShot);
-    const xs = xValues.map(config.xToTokens);
+    const xs = refXs || xValues.map(config.xToTokens);
     const ys = xValues.map((x) => {
       const raw = getScore(traj.dataSource, x, benchmark, state.currentShot, metric);
       return raw == null ? null : applyNorm(raw, benchmark, allRaw, metric);
@@ -550,7 +576,7 @@ function renderSingleProgress(config, benchmark) {
       lgroup: traj.key || traj.name,
       customdata: (cis || ys.map(() => null)).map((c) => c ? { ci: c } : null),
     });
-    if (config.onSeries) {
+    if (config.onSeries && !traj.reference) {
       // A raw log-likelihood or the probability of the answer text has no
       // chance level to plot.
       const baseline = hasRandomBaseline(metric) ? applyNorm(taskRandomBaseline(benchmark, metric), benchmark, allRaw, metric) : null;

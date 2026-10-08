@@ -3,7 +3,8 @@
 //
 // Same page as the Prelude dashboard (docs/prelude/app.js) minus the signal
 // measures: the main line is the last Prelude checkpoints before the anneal
-// and each anneal run is drawn as a side run forking off it, like the
+// and each anneal run is drawn as a side run forking off it (or on its own,
+// for the baseline anneal), with reference models as horizontal lines, like the
 // NorOLMo ablations. Run names and colors come from data.json
 // (`run_display_names`, `run_colors`, set in build_data.py).
 
@@ -37,6 +38,7 @@ const DEFAULTS = { classificationMetric: "prob_correct", promptAgg: "mean", form
 let originStep = 0;
 const MAIN_COLOR = "#6b7280";                                          // grey
 const RUN_COLORS = ["#dc2626", "#2563eb", "#f97316", "#9333ea", "#0d9488"];  // fallback when data.json names no color
+const REFERENCE_COLOR = "#111827";                                     // fallback for reference models
 
 const plotlyConfig = makePlotlyConfig("norprelude-chart", () => ({
   shot: state.currentShot + "-shot",
@@ -62,11 +64,15 @@ function sortedSteps(data) {
   return Object.keys(data || {}).map(Number).sort((a, b) => a - b);
 }
 
-/** The main line first, then each side run (checkpoint dirs named
- *  `<run>_i<N>`). A side run is prepended with the last main-line
- *  checkpoint at or before its first iteration (the last Prelude checkpoint
- *  before the anneal started), so the fork is drawn as a connected line
- *  rather than a gap. */
+/** The main line first, then each run (checkpoint dirs named
+ *  `<run>_i<N>`), then the reference models. A run forking off the main
+ *  line is prepended with the last main-line checkpoint at or before its
+ *  first iteration (the last Prelude checkpoint before the anneal started),
+ *  so the fork is drawn as a connected line rather than a gap; a run listed
+ *  in `standalone_runs` (the baseline anneal) is drawn on its own. A
+ *  reference model, evaluated once, becomes a trajectory flagged
+ *  `reference` with a single pseudo-checkpoint, which progress.js draws as
+ *  a horizontal line across the chart. */
 function getTrajectories() {
   const progress = state.DATA.progress;
   const mainSteps = sortedSteps(progress);
@@ -75,12 +81,17 @@ function getTrajectories() {
     dataSource: progress, checkpoints: () => mainSteps, zorder: 1,
   }];
   const runs = state.DATA.runs || {};
-  Object.keys(runs).sort().forEach((run, i) => {
+  const standalone = new Set(state.DATA.standalone_runs || []);
+  // Forking runs before standalone ones, alphabetically within each group.
+  const runOrder = (a, b) => (standalone.has(a) - standalone.has(b)) || a.localeCompare(b);
+  Object.keys(runs).sort(runOrder).forEach((run, i) => {
     let data = runs[run];
     const first = sortedSteps(data)[0];
     if (first === undefined) return;
-    const fork = mainSteps.filter((s) => s <= first).pop();
-    if (fork !== undefined && !(fork in data)) data = { [fork]: progress[fork], ...data };
+    if (!standalone.has(run)) {
+      const fork = mainSteps.filter((s) => s <= first).pop();
+      if (fork !== undefined && !(fork in data)) data = { [fork]: progress[fork], ...data };
+    }
     const steps = sortedSteps(data);
     trajectories.push({
       name: state.DATA.run_display_names?.[run] || run,
@@ -88,6 +99,17 @@ function getTrajectories() {
       color: state.DATA.run_colors?.[run] || RUN_COLORS[i % RUN_COLORS.length],
       dataSource: data,
       checkpoints: () => steps,
+    });
+  });
+  const references = state.DATA.references || {};
+  Object.keys(references).sort().forEach((ref) => {
+    trajectories.push({
+      name: state.DATA.reference_display_names?.[ref] || ref,
+      key: "reference:" + ref,
+      color: state.DATA.reference_colors?.[ref] || REFERENCE_COLOR,
+      dataSource: { reference: references[ref] },
+      checkpoints: () => ["reference"],
+      reference: true,
     });
   });
   return trajectories;
@@ -122,6 +144,10 @@ const chartConfig = {
     return `${traceName} — ${formatTokens(xTokens)} tokens (iteration ${iteration.toLocaleString()})`;
   },
   titlePrefix: "NorPrelude",
+  // The runs rise from bottom-left to top-right while the baseline anneal
+  // and the reference line occupy the lower right, so the legend goes
+  // top-left (as on multisynt).
+  legendPosition: "top-left",
   // z-score / min-max reference the checkpoints of the main line and the
   // side runs together, so a run forked off the main line stays comparable.
   normAcrossTrajectories: true,

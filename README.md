@@ -166,8 +166,13 @@ the dashboards' "single prompt" setting.
    main line (the last Prelude checkpoints before the anneal) or an anneal
    run such as `norA_wsm100_minus-sqrt`, which is drawn forking off the
    main line; its display name is set in `NORPRELUDE_RUN_NAME_MAP` in
-   `build_data.py`. The x-axis counts tokens from the iteration at which
-   the anneals branch off (`NORPRELUDE_ANNEAL_START_STEP`)
+   `build_data.py`. A run listed in `NORPRELUDE_STANDALONE_RUNS` (the
+   baseline anneal `annealM1D1`) is drawn on its own instead. A model
+   evaluated once, as a reference (`normistral-11b-long`: NorMistral 11B),
+   goes in a dir without the `_i<iteration>` suffix and is drawn as a
+   horizontal line (`NORPRELUDE_REFERENCE_NAME_MAP`). The x-axis counts
+   tokens from the iteration at which the anneals branch off
+   (`NORPRELUDE_ANNEAL_START_STEP`)
 2. Tasks are configured in `noreval12_setup.yaml`, as for Prelude
 3. Run `build_data.py` and commit
 
