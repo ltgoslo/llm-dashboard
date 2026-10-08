@@ -334,16 +334,62 @@ function formatCIStr(value, ci, fmt) {
   return ` (95% CI: ${Number(lo).toFixed(fmt)} – ${Number(hi).toFixed(fmt)})`;
 }
 
+// Plotly re-runs its hover picking after every restyle and re-emits
+// plotly_unhover + plotly_hover for the pointer's current position —
+// synchronously from inside the restyle, or deferred by its hover throttle.
+// The emphasis restyle enlarges the hovered run's markers, and Plotly's
+// closest-point rule prefers the smaller of two markers the cursor is
+// inside, so where two runs share a point (the fork of a side run) the
+// replay hands the hover to the other run; reacting with another restyle
+// hands it back, and so on — a stack overflow when synchronous, a flicker
+// when deferred. Two rules keep the emphasis still: a hover landing on a
+// point that coincides with one of the emphasised run's points keeps that
+// run (and shows its point), and an unhover only clears the emphasis when
+// no hover follows it in the same turn.
+
+let unhoverTimer = null;
+
+/** Index of the emphasised trace's point drawn under the hovered point
+ *  `pt` — close enough for the cursor to be inside both markers — or -1. */
+function coincidentPoint(chartEl, pt, emphasized) {
+  const tr = chartEl.data[emphasized];
+  if (!tr || !pt.xaxis || !pt.yaxis) return -1;
+  const eA = tr._emph || emphasisFor(null);
+  const eB = chartEl.data[pt.curveNumber]?._emph || emphasisFor(null);
+  const reach = (eA.hoverS + eB.baseS) / 2 + 1;
+  const px = pt.xaxis.d2p(pt.x), py = pt.yaxis.d2p(pt.y);
+  for (let i = 0; i < tr.x.length; i++) {
+    if (tr.y[i] == null) continue;
+    if (Math.hypot(pt.xaxis.d2p(tr.x[i]) - px, pt.yaxis.d2p(tr.y[i]) - py) <= reach) return i;
+  }
+  return -1;
+}
+
 function onProgressUnhover() {
-  setTraceEmphasis(null);
-  hideTooltip();
+  clearTimeout(unhoverTimer);
+  unhoverTimer = setTimeout(() => {
+    unhoverTimer = null;
+    setTraceEmphasis(null);
+    hideTooltip();
+  }, 0);
 }
 
 function makeHoverHandler(config) {
   return function onHover(data) {
     if (!data.points || !data.points.length) return;
-    const pt = data.points[0];
+    let pt = data.points[0];
     if (pt.y == null) return;
+    clearTimeout(unhoverTimer);
+    unhoverTimer = null;
+    const chartEl = document.getElementById("chart");
+    const emphasized = chartEl?._emphasizedTrace ?? null;
+    if (emphasized != null && emphasized !== pt.curveNumber) {
+      const j = coincidentPoint(chartEl, pt, emphasized);
+      if (j >= 0) {
+        const tr = chartEl.data[emphasized];
+        pt = { x: tr.x[j], y: tr.y[j], customdata: tr.customdata?.[j], data: tr, curveNumber: emphasized, pointNumber: j };
+      }
+    }
     setTraceEmphasis(pt.curveNumber);
     const fmt = scoreDecimals();
     const scoreStr = Number(pt.y).toFixed(fmt);
