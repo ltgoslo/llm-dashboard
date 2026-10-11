@@ -451,55 +451,80 @@ select.ui-select-native { display: none !important; }
   cursor: default;
 }
 
-/* Segmented button groups (shots, error bands): a sliding segmented
-   control. The group is a tinted track in the controls' chrome; every
-   option is set in the normal ink (muted grey would read as disabled);
-   the selected one sits on a white raised thumb — the ::before below,
-   positioned by shared/segmented.js through --thumb-left / --thumb-width
-   — and takes the accent. Hovering another option lifts it on a
-   translucent white and colours its text, previewing the thumb. */
+/* Segmented button groups (Shots, Error bands, NorPrelude's WSM window):
+   .shot-toggle is the track, a tinted pill in the controls' chrome; the
+   buttons are its options, set in the normal ink (muted grey would read
+   as disabled). The selected one sits on a white raised thumb, the
+   ::before below, positioned by shared/segmented.js through --thumb-left
+   / --thumb-width, and takes the accent. Hovering (or keyboard-focusing)
+   another option tints the track under it — the ::after, placed the same
+   way through --hover-left / --hover-width — and colours its text. The
+   tint is solid and the very colour of the thumb's 1px border, and the
+   thumb casts no shadow beyond that border, so where the two meet they
+   merge without a seam. Thumb and tint are concentric with the track:
+   their radius is the track's minus its padding and border. */
 .shot-toggle {
+  --segment-pad: 2px;
+  --segment-radius: 0.45rem;   /* 7.2px: a touch rounder than the pills, so the thumb keeps a visible radius */
+  --segment-inner-radius: calc(var(--segment-radius) - var(--segment-pad) - 1px);
+  --segment-edge: var(--border);   /* the thumb's border and the hover tint */
   position: relative;
+  isolation: isolate;          /* the thumb's and tint's z-indices stay inside the group */
   display: inline-flex;
   height: var(--control-h);
-  padding: 3px;
+  padding: var(--segment-pad);
   border: 1px solid var(--control-border);
-  border-radius: var(--control-radius);
+  border-radius: var(--segment-radius);
   background: var(--bg-tint);
   box-shadow: inset 0 1px 2px rgba(30, 41, 59, 0.06);
 }
-.shot-toggle::before {
+.shot-toggle::before, .shot-toggle::after {
   content: "";
   position: absolute;
-  top: 3px;
-  bottom: 3px;
-  left: var(--thumb-left, 3px);
+  top: var(--segment-pad);
+  bottom: var(--segment-pad);
+  border-radius: var(--segment-inner-radius);
+}
+.shot-toggle::after {                         /* hover tint: the thumb's footprint, border included */
+  top: calc(var(--segment-pad) - 1px);
+  bottom: calc(var(--segment-pad) - 1px);
+  left: calc(var(--hover-left, 0) - 1px);
+  width: calc(var(--hover-width, 0) + 2px);
+  border-radius: calc(var(--segment-inner-radius) + 1px);
+  background: var(--segment-edge);
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 0;
+}
+.shot-toggle.segmented-hover::after { opacity: 1; }
+.shot-toggle::before {                        /* thumb */
+  left: var(--thumb-left, var(--segment-pad));
   width: var(--thumb-width, 0);
-  border-radius: calc(var(--control-radius) - 2px);
   background: var(--surface);
-  box-shadow: 0 1px 4px rgba(30, 41, 59, 0.16), 0 0 0 1px rgba(100, 116, 139, 0.18);
+  box-shadow: 0 0 0 1px var(--segment-edge);
+  z-index: 1;
 }
 .shot-toggle.segmented-ready::before { transition: left 0.2s ease, width 0.2s ease; }
 .shot-btn, .ci-btn, .wsm-btn {
-  position: relative;      /* above the thumb */
-  z-index: 1;
+  position: relative;      /* above the thumb and the tint */
+  z-index: 2;
   display: inline-flex;    /* centre the text ourselves, like .ui-select, */
   align-items: center;     /* rather than by each browser's button rules */
   justify-content: center;
   height: 100%;
   padding: 0 0.7rem;
   border: none;
-  border-radius: calc(var(--control-radius) - 2px);
+  border-radius: var(--segment-inner-radius);
   background: transparent;
   cursor: pointer;
   font: var(--control-font);
   color: var(--fg);
   outline: none;
-  transition: color 0.15s, background-color 0.15s;
+  transition: color 0.15s;
 }
 .shot-btn:hover, .ci-btn:hover, .wsm-btn:hover,
-.shot-btn:focus-visible, .ci-btn:focus-visible, .wsm-btn:focus-visible { color: var(--accent); background: rgba(255, 255, 255, 0.6); }
-.shot-btn.active, .ci-btn.active, .wsm-btn.active { color: var(--accent); background: transparent; cursor: default; }
+.shot-btn:focus-visible, .ci-btn:focus-visible, .wsm-btn:focus-visible { color: var(--accent); }
+.shot-btn.active, .ci-btn.active, .wsm-btn.active { color: var(--accent); cursor: default; }
 
 /* Checkboxes (task and model grids, the fully-open toggle): a drawn box
    in the controls' chrome; checked and indeterminate fill with the accent. */
@@ -623,6 +648,18 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
   margin-left: -5.5rem;
   width: calc(100% + 5.5rem);
   height: 500px;
+}
+
+/* The legend card of the progress charts that keep it top-left (multisynt,
+   norprelude; the chart carries `legend-card`, set in progress.js): Plotly
+   draws it as rect.bg, which gets the controls' corner radius (rx/ry are
+   CSS geometry properties on SVG rects) and shadow. A drop-shadow's blur
+   is a standard deviation, about half of --control-shadow's 10px
+   box-shadow blur radius. */
+#chart.legend-card .legend .bg {
+  rx: var(--control-radius);
+  ry: var(--control-radius);
+  filter: drop-shadow(0 2px 5px rgba(30, 41, 59, 0.12));
 }
 
 /* Allow the bar/logo hover effects to extend past the plot edges instead of

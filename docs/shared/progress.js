@@ -49,10 +49,21 @@ const PROGRESS_LEGEND = {
   x: 0.98, y: 0.02, xanchor: "right", yanchor: "bottom",
   bgcolor: "rgba(255,255,255,0.7)", borderwidth: 0,
 };
+// A card inset from the plot's top-left corner (clear of the y-axis
+// labels), solid white, bordered like the controls (the stylesheet's
+// --control-border, read in legendFor); style.css gives its background
+// rect the controls' corner radius and drop shadow through the chart's
+// `legend-card` class (set in progressLayout).
 const TOP_LEFT_LEGEND = {
-  x: 0.0, y: 0.99, xanchor: "left", yanchor: "top",
-  bgcolor: "rgba(255,255,255,0.8)", bordercolor: "#e2e8f0", borderwidth: 1,
+  x: 0.015, y: 0.98, xanchor: "left", yanchor: "top",
+  bgcolor: "#ffffff", borderwidth: 1,
 };
+
+/** The controls' border colour from the stylesheet (--control-border). */
+function controlBorderColor() {
+  return getComputedStyle(document.documentElement).getPropertyValue("--control-border").trim()
+    || "rgba(100, 116, 139, 0.4)";
+}
 
 // Line/marker sizing — base values used when building traces, hover values
 // applied to the whole hovered run via setTraceEmphasis().
@@ -168,7 +179,9 @@ export function renderProgressChart(config) {
 }
 
 function legendFor(config) {
-  return config.legendPosition === "top-left" ? TOP_LEFT_LEGEND : PROGRESS_LEGEND;
+  return config.legendPosition === "top-left"
+    ? { ...TOP_LEFT_LEGEND, bordercolor: controlBorderColor() }
+    : PROGRESS_LEGEND;
 }
 
 /** Layout fragment for the legend(s). With config.legendColumns
@@ -295,6 +308,8 @@ function pushRunTraces(traces, lineTraces, config, traj, { xs, ys, cis, name, co
 /** Shared layout for the progress charts. */
 function progressLayout(config, trajectories, yRange, showlegend) {
   const xRange = tightXRange(config, trajectories);
+  document.getElementById("chart")?.classList.toggle(
+    "legend-card", !config.legendColumns && config.legendPosition === "top-left");
   return getPlotlyLayout({
     margin: { l: 105, r: 4, t: 8, b: 50 },
     xaxis: { automargin: false, title: config.xAxisLabel, ...(xRange && { range: xRange }) },
