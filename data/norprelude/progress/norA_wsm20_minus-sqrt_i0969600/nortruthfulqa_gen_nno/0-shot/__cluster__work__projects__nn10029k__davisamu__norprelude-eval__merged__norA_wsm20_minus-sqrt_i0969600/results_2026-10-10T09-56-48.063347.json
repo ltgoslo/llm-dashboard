@@ -1,0 +1,953 @@
+{
+  "results": {
+    "nortruthfulqa_gen_nno_p0": {
+      "name": "nortruthfulqa_gen_nno_p0",
+      "alias": "nortruthfulqa_gen_nno_p0",
+      "sample_len": 125,
+      "bleu_max,sampling": 1.101209961169098,
+      "bleu_max_stderr,sampling": 0.039214492977014064,
+      "bleu_acc,sampling": 0.188,
+      "bleu_acc_stderr,sampling": 0.012862603647032164,
+      "bleu_diff,sampling": -0.00647098502303797,
+      "bleu_diff_stderr,sampling": 0.0257054475816858,
+      "rouge1_max,sampling": 5.768167984994227,
+      "rouge1_max_stderr,sampling": 0.23224987826480964,
+      "rouge1_acc,sampling": 0.232,
+      "rouge1_acc_stderr,sampling": 0.014035094262873403,
+      "rouge1_diff,sampling": 0.19616908868319247,
+      "rouge1_diff_stderr,sampling": 0.2015584630341016,
+      "rouge2_max,sampling": 0.7438522265578781,
+      "rouge2_max_stderr,sampling": 0.06471900465391943,
+      "rouge2_acc,sampling": 0.05575,
+      "rouge2_acc_stderr,sampling": 0.005295977627620614,
+      "rouge2_diff,sampling": -0.035677437416840846,
+      "rouge2_diff_stderr,sampling": 0.05187269474048949,
+      "rougeL_max,sampling": 4.900883360488628,
+      "rougeL_max_stderr,sampling": 0.1938503202969428,
+      "rougeL_acc,sampling": 0.219,
+      "rougeL_acc_stderr,sampling": 0.013584487713992491,
+      "rougeL_diff,sampling": 0.13856732866334676,
+      "rougeL_diff_stderr,sampling": 0.16342407870519374
+    },
+    "nortruthfulqa_gen_nno_p1": {
+      "name": "nortruthfulqa_gen_nno_p1",
+      "alias": "nortruthfulqa_gen_nno_p1",
+      "sample_len": 125,
+      "bleu_max,sampling": 3.2435467081295686,
+      "bleu_max_stderr,sampling": 0.251435510415915,
+      "bleu_acc,sampling": 0.27275,
+      "bleu_acc_stderr,sampling": 0.017561011158336692,
+      "bleu_diff,sampling": -0.10524500346506703,
+      "bleu_diff_stderr,sampling": 0.1574510869834868,
+      "rouge1_max,sampling": 13.980220247009619,
+      "rouge1_max_stderr,sampling": 0.7245643577484172,
+      "rouge1_acc,sampling": 0.33575,
+      "rouge1_acc_stderr,sampling": 0.01889028167962256,
+      "rouge1_diff,sampling": -2.0998088141233127,
+      "rouge1_diff_stderr,sampling": 0.7225471835710706,
+      "rouge2_max,sampling": 3.634984129947805,
+      "rouge2_max_stderr,sampling": 0.39794861084199185,
+      "rouge2_acc,sampling": 0.1405,
+      "rouge2_acc_stderr,sampling": 0.013417084078192636,
+      "rouge2_diff,sampling": -0.9062478928072474,
+      "rouge2_diff_stderr,sampling": 0.47823643298388957,
+      "rougeL_max,sampling": 12.326561786321633,
+      "rougeL_max_stderr,sampling": 0.6629611712017206,
+      "rougeL_acc,sampling": 0.322,
+      "rougeL_acc_stderr,sampling": 0.017474145648043348,
+      "rougeL_diff,sampling": -2.1895265527486014,
+      "rougeL_diff_stderr,sampling": 0.6949139897620545
+    },
+    "nortruthfulqa_gen_nno_p2": {
+      "name": "nortruthfulqa_gen_nno_p2",
+      "alias": "nortruthfulqa_gen_nno_p2",
+      "sample_len": 125,
+      "bleu_max,sampling": 2.6760711290053014,
+      "bleu_max_stderr,sampling": 0.17367255650286284,
+      "bleu_acc,sampling": 0.185,
+      "bleu_acc_stderr,sampling": 0.010635075867603268,
+      "bleu_diff,sampling": -0.2875556797035085,
+      "bleu_diff_stderr,sampling": 0.12403733420917137,
+      "rouge1_max,sampling": 10.746516437365933,
+      "rouge1_max_stderr,sampling": 0.6362738381545769,
+      "rouge1_acc,sampling": 0.23925,
+      "rouge1_acc_stderr,sampling": 0.013605842554318464,
+      "rouge1_diff,sampling": -1.9563527241469376,
+      "rouge1_diff_stderr,sampling": 0.515566675841883,
+      "rouge2_max,sampling": 3.2702811551572357,
+      "rouge2_max_stderr,sampling": 0.42071150466150203,
+      "rouge2_acc,sampling": 0.09025,
+      "rouge2_acc_stderr,sampling": 0.008356774825485665,
+      "rouge2_diff,sampling": -0.6188695537856581,
+      "rouge2_diff_stderr,sampling": 0.3880752347897473,
+      "rougeL_max,sampling": 9.592431419131543,
+      "rougeL_max_stderr,sampling": 0.5845423686202332,
+      "rougeL_acc,sampling": 0.233,
+      "rougeL_acc_stderr,sampling": 0.012806248474865696,
+      "rougeL_diff,sampling": -2.071332181164025,
+      "rougeL_diff_stderr,sampling": 0.4942259708858566
+    },
+    "nortruthfulqa_gen_nno_p3": {
+      "name": "nortruthfulqa_gen_nno_p3",
+      "alias": "nortruthfulqa_gen_nno_p3",
+      "sample_len": 125,
+      "bleu_max,sampling": 2.501812990749775,
+      "bleu_max_stderr,sampling": 0.14274583666195992,
+      "bleu_acc,sampling": 0.197,
+      "bleu_acc_stderr,sampling": 0.01219498839423326,
+      "bleu_diff,sampling": -0.1371243381914178,
+      "bleu_diff_stderr,sampling": 0.07654516585722862,
+      "rouge1_max,sampling": 10.42106777780542,
+      "rouge1_max_stderr,sampling": 0.5540016211691805,
+      "rouge1_acc,sampling": 0.24475,
+      "rouge1_acc_stderr,sampling": 0.01360413836467276,
+      "rouge1_diff,sampling": -0.939936554635663,
+      "rouge1_diff_stderr,sampling": 0.3811678615592936,
+      "rouge2_max,sampling": 2.8448506283472907,
+      "rouge2_max_stderr,sampling": 0.32601228692961787,
+      "rouge2_acc,sampling": 0.0895,
+      "rouge2_acc_stderr,sampling": 0.00872652380630085,
+      "rouge2_diff,sampling": -0.260397050858124,
+      "rouge2_diff_stderr,sampling": 0.21145768734991952,
+      "rougeL_max,sampling": 9.281898325877352,
+      "rougeL_max_stderr,sampling": 0.4997967148252099,
+      "rougeL_acc,sampling": 0.23475,
+      "rougeL_acc_stderr,sampling": 0.012668302455213729,
+      "rougeL_diff,sampling": -1.0954615323352301,
+      "rougeL_diff_stderr,sampling": 0.35893351987029437
+    },
+    "nortruthfulqa_gen_nno_p4": {
+      "name": "nortruthfulqa_gen_nno_p4",
+      "alias": "nortruthfulqa_gen_nno_p4",
+      "sample_len": 125,
+      "bleu_max,sampling": 2.4744019120477474,
+      "bleu_max_stderr,sampling": 0.1281215847065503,
+      "bleu_acc,sampling": 0.2205,
+      "bleu_acc_stderr,sampling": 0.012711437572567876,
+      "bleu_diff,sampling": -0.21403293535585582,
+      "bleu_diff_stderr,sampling": 0.07786749225802911,
+      "rouge1_max,sampling": 11.130992489085026,
+      "rouge1_max_stderr,sampling": 0.6103591936181256,
+      "rouge1_acc,sampling": 0.2755,
+      "rouge1_acc_stderr,sampling": 0.014957028502109072,
+      "rouge1_diff,sampling": -2.306481126401862,
+      "rouge1_diff_stderr,sampling": 0.5877550506637138,
+      "rouge2_max,sampling": 2.393029026877388,
+      "rouge2_max_stderr,sampling": 0.3444565699408509,
+      "rouge2_acc,sampling": 0.0905,
+      "rouge2_acc_stderr,sampling": 0.008473630824790438,
+      "rouge2_diff,sampling": -0.5173332097546048,
+      "rouge2_diff_stderr,sampling": 0.2994665446745726,
+      "rougeL_max,sampling": 9.851098324143905,
+      "rougeL_max_stderr,sampling": 0.5358231594608988,
+      "rougeL_acc,sampling": 0.26725,
+      "rougeL_acc_stderr,sampling": 0.013936853557986975,
+      "rougeL_diff,sampling": -2.3708590128335394,
+      "rougeL_diff_stderr,sampling": 0.558889709137771
+    }
+  },
+  "group_subtasks": {},
+  "configs": {
+    "nortruthfulqa_gen_nno_p0": {
+      "task": "nortruthfulqa_gen_nno_p0",
+      "dataset_path": "ltg/nortruthfulqa_gen",
+      "dataset_name": "nn",
+      "validation_split": "validation",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    return dataset.map(preprocess_function)\n",
+      "doc_to_text": "question",
+      "doc_to_target": "best_answer",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    # results[0] holds the K sampled generations; average their scores\n    scored = [_score_one(doc, completion) for completion in results[0]]\n    return {key: sum(s[key] for s in scored) / len(scored) for key in scored[0]}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x400174cbaf20>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "question",
+        "doc_to_choice": null,
+        "doc_to_target": "best_answer",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": true,
+        "temperature": 1.0,
+        "top_p": 1.0,
+        "top_k": 0,
+        "max_new_tokens": 64
+      },
+      "repeats": 32,
+      "filter_list": [
+        {
+          "name": "sampling",
+          "filter": [
+            {
+              "function": "take_first_k",
+              "k": 32
+            }
+          ]
+        }
+      ],
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "rougeL_max",
+        "random_baseline": 0.0,
+        "category": "world_knowledge_and_reasoning",
+        "language": "nno",
+        "pretrained": "/cluster/work/projects/nn10029k/davisamu/norprelude-eval/merged/norA_wsm20_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/nortruthfulqa_gen/nno/nortruthfulqa_gen_nno_p0.yaml"
+      }
+    },
+    "nortruthfulqa_gen_nno_p1": {
+      "task": "nortruthfulqa_gen_nno_p1",
+      "dataset_path": "ltg/nortruthfulqa_gen",
+      "dataset_name": "nn",
+      "validation_split": "validation",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    return dataset.map(preprocess_function)\n",
+      "doc_to_text": "Spørsmål: {{question}}\nSvar:",
+      "doc_to_target": "best_answer",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    # results[0] holds the K sampled generations; average their scores\n    scored = [_score_one(doc, completion) for completion in results[0]]\n    return {key: sum(s[key] for s in scored) / len(scored) for key in scored[0]}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x400174cbaf20>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Spørsmål: {{question}}\nSvar:",
+        "doc_to_choice": null,
+        "doc_to_target": "best_answer",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": true,
+        "temperature": 1.0,
+        "top_p": 1.0,
+        "top_k": 0,
+        "max_new_tokens": 64
+      },
+      "repeats": 32,
+      "filter_list": [
+        {
+          "name": "sampling",
+          "filter": [
+            {
+              "function": "take_first_k",
+              "k": 32
+            }
+          ]
+        }
+      ],
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "rougeL_max",
+        "random_baseline": 0.0,
+        "category": "world_knowledge_and_reasoning",
+        "language": "nno",
+        "pretrained": "/cluster/work/projects/nn10029k/davisamu/norprelude-eval/merged/norA_wsm20_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/nortruthfulqa_gen/nno/nortruthfulqa_gen_nno_p1.yaml"
+      }
+    },
+    "nortruthfulqa_gen_nno_p2": {
+      "task": "nortruthfulqa_gen_nno_p2",
+      "dataset_path": "ltg/nortruthfulqa_gen",
+      "dataset_name": "nn",
+      "validation_split": "validation",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    return dataset.map(preprocess_function)\n",
+      "doc_to_text": "Skriv svaret på følgande spørsmål: {{question}}\nSvar:",
+      "doc_to_target": "best_answer",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    # results[0] holds the K sampled generations; average their scores\n    scored = [_score_one(doc, completion) for completion in results[0]]\n    return {key: sum(s[key] for s in scored) / len(scored) for key in scored[0]}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x400174cbaf20>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Skriv svaret på følgande spørsmål: {{question}}\nSvar:",
+        "doc_to_choice": null,
+        "doc_to_target": "best_answer",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": true,
+        "temperature": 1.0,
+        "top_p": 1.0,
+        "top_k": 0,
+        "max_new_tokens": 64
+      },
+      "repeats": 32,
+      "filter_list": [
+        {
+          "name": "sampling",
+          "filter": [
+            {
+              "function": "take_first_k",
+              "k": 32
+            }
+          ]
+        }
+      ],
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "rougeL_max",
+        "random_baseline": 0.0,
+        "category": "world_knowledge_and_reasoning",
+        "language": "nno",
+        "pretrained": "/cluster/work/projects/nn10029k/davisamu/norprelude-eval/merged/norA_wsm20_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/nortruthfulqa_gen/nno/nortruthfulqa_gen_nno_p2.yaml"
+      }
+    },
+    "nortruthfulqa_gen_nno_p3": {
+      "task": "nortruthfulqa_gen_nno_p3",
+      "dataset_path": "ltg/nortruthfulqa_gen",
+      "dataset_name": "nn",
+      "validation_split": "validation",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    return dataset.map(preprocess_function)\n",
+      "doc_to_text": "{{question}}\nKva er rett svar på spørsmålet?\nSvar:",
+      "doc_to_target": "best_answer",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    # results[0] holds the K sampled generations; average their scores\n    scored = [_score_one(doc, completion) for completion in results[0]]\n    return {key: sum(s[key] for s in scored) / len(scored) for key in scored[0]}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x400174cbaf20>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{question}}\nKva er rett svar på spørsmålet?\nSvar:",
+        "doc_to_choice": null,
+        "doc_to_target": "best_answer",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": true,
+        "temperature": 1.0,
+        "top_p": 1.0,
+        "top_k": 0,
+        "max_new_tokens": 64
+      },
+      "repeats": 32,
+      "filter_list": [
+        {
+          "name": "sampling",
+          "filter": [
+            {
+              "function": "take_first_k",
+              "k": 32
+            }
+          ]
+        }
+      ],
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "rougeL_max",
+        "random_baseline": 0.0,
+        "category": "world_knowledge_and_reasoning",
+        "language": "nno",
+        "pretrained": "/cluster/work/projects/nn10029k/davisamu/norprelude-eval/merged/norA_wsm20_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/nortruthfulqa_gen/nno/nortruthfulqa_gen_nno_p3.yaml"
+      }
+    },
+    "nortruthfulqa_gen_nno_p4": {
+      "task": "nortruthfulqa_gen_nno_p4",
+      "dataset_path": "ltg/nortruthfulqa_gen",
+      "dataset_name": "nn",
+      "validation_split": "validation",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    return dataset.map(preprocess_function)\n",
+      "doc_to_text": "Svar sant på følgande: {{question}}\nSvar:",
+      "doc_to_target": "best_answer",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    # results[0] holds the K sampled generations; average their scores\n    scored = [_score_one(doc, completion) for completion in results[0]]\n    return {key: sum(s[key] for s in scored) / len(scored) for key in scored[0]}\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x400174cbaf20>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Svar sant på følgande: {{question}}\nSvar:",
+        "doc_to_choice": null,
+        "doc_to_target": "best_answer",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": true,
+        "temperature": 1.0,
+        "top_p": 1.0,
+        "top_k": 0,
+        "max_new_tokens": 64
+      },
+      "repeats": 32,
+      "filter_list": [
+        {
+          "name": "sampling",
+          "filter": [
+            {
+              "function": "take_first_k",
+              "k": 32
+            }
+          ]
+        }
+      ],
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.2,
+        "primary_metric": "rougeL_max",
+        "random_baseline": 0.0,
+        "category": "world_knowledge_and_reasoning",
+        "language": "nno",
+        "pretrained": "/cluster/work/projects/nn10029k/davisamu/norprelude-eval/merged/norA_wsm20_minus-sqrt_i0969600",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.2/nortruthfulqa_gen/nno/nortruthfulqa_gen_nno_p4.yaml"
+      }
+    }
+  },
+  "versions": {
+    "nortruthfulqa_gen_nno_p0": 1.2,
+    "nortruthfulqa_gen_nno_p1": 1.2,
+    "nortruthfulqa_gen_nno_p2": 1.2,
+    "nortruthfulqa_gen_nno_p3": 1.2,
+    "nortruthfulqa_gen_nno_p4": 1.2
+  },
+  "n-shot": {
+    "nortruthfulqa_gen_nno_p0": 0,
+    "nortruthfulqa_gen_nno_p1": 0,
+    "nortruthfulqa_gen_nno_p2": 0,
+    "nortruthfulqa_gen_nno_p3": 0,
+    "nortruthfulqa_gen_nno_p4": 0
+  },
+  "higher_is_better": {
+    "nortruthfulqa_gen_nno_p0": {
+      "rougeL_max": true,
+      "bleu_max": true,
+      "bleu_acc": true,
+      "bleu_diff": true,
+      "rouge1_max": true,
+      "rouge1_acc": true,
+      "rouge1_diff": true,
+      "rouge2_max": true,
+      "rouge2_acc": true,
+      "rouge2_diff": true,
+      "rougeL_acc": true,
+      "rougeL_diff": true
+    },
+    "nortruthfulqa_gen_nno_p1": {
+      "rougeL_max": true,
+      "bleu_max": true,
+      "bleu_acc": true,
+      "bleu_diff": true,
+      "rouge1_max": true,
+      "rouge1_acc": true,
+      "rouge1_diff": true,
+      "rouge2_max": true,
+      "rouge2_acc": true,
+      "rouge2_diff": true,
+      "rougeL_acc": true,
+      "rougeL_diff": true
+    },
+    "nortruthfulqa_gen_nno_p2": {
+      "rougeL_max": true,
+      "bleu_max": true,
+      "bleu_acc": true,
+      "bleu_diff": true,
+      "rouge1_max": true,
+      "rouge1_acc": true,
+      "rouge1_diff": true,
+      "rouge2_max": true,
+      "rouge2_acc": true,
+      "rouge2_diff": true,
+      "rougeL_acc": true,
+      "rougeL_diff": true
+    },
+    "nortruthfulqa_gen_nno_p3": {
+      "rougeL_max": true,
+      "bleu_max": true,
+      "bleu_acc": true,
+      "bleu_diff": true,
+      "rouge1_max": true,
+      "rouge1_acc": true,
+      "rouge1_diff": true,
+      "rouge2_max": true,
+      "rouge2_acc": true,
+      "rouge2_diff": true,
+      "rougeL_acc": true,
+      "rougeL_diff": true
+    },
+    "nortruthfulqa_gen_nno_p4": {
+      "rougeL_max": true,
+      "bleu_max": true,
+      "bleu_acc": true,
+      "bleu_diff": true,
+      "rouge1_max": true,
+      "rouge1_acc": true,
+      "rouge1_diff": true,
+      "rouge2_max": true,
+      "rouge2_acc": true,
+      "rouge2_diff": true,
+      "rougeL_acc": true,
+      "rougeL_diff": true
+    }
+  },
+  "n-samples": {
+    "nortruthfulqa_gen_nno_p0": {
+      "original": 125,
+      "effective": 125
+    },
+    "nortruthfulqa_gen_nno_p1": {
+      "original": 125,
+      "effective": 125
+    },
+    "nortruthfulqa_gen_nno_p2": {
+      "original": 125,
+      "effective": 125
+    },
+    "nortruthfulqa_gen_nno_p3": {
+      "original": 125,
+      "effective": 125
+    },
+    "nortruthfulqa_gen_nno_p4": {
+      "original": 125,
+      "effective": 125
+    }
+  },
+  "config": {
+    "model": "vllm",
+    "model_args": {
+      "pretrained": "/cluster/work/projects/nn10029k/davisamu/norprelude-eval/merged/norA_wsm20_minus-sqrt_i0969600",
+      "tensor_parallel_size": 1,
+      "dtype": "bfloat16",
+      "gpu_memory_utilization": 0.8,
+      "tokenizer_mode": "auto",
+      "max_model_len": 4096,
+      "trust_remote_code": true
+    },
+    "batch_size": "auto",
+    "batch_sizes": [],
+    "device": "cuda:0",
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {},
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": null,
+  "date": 1791618918.7210011,
+  "pretty_env_info": "PyTorch version: 2.12.0a0+5aff3928d8.nv26.05\nIs debug build: False\nCUDA used to build PyTorch: 13.2\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 24.04.4 LTS (aarch64)\nGCC version: (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nClang version: Could not collect\nCMake version: version 3.31.6\nLibc version: glibc-2.39\n\nPython version: 3.12.3 (main, Mar 23 2026, 19:04:32) [GCC 13.3.0] (64-bit runtime)\nPython platform: Linux-6.4.0-150700.53.31-64kb-aarch64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: 13.2.78\nCUDA_MODULE_LOADING set to: \nGPU models and configuration: GPU 0: NVIDIA GH200 120GB\nNvidia driver version: 580.65.06\ncuDNN version: Probably one of the following:\n/usr/lib/aarch64-linux-gnu/libcudnn.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_adv.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_cnn.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_runtime_compiled.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_tensor_ir.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_ext.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_graph.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_heuristic.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_ops.so.9.22.0\nIs XPU available: False\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\nCaching allocator config: N/A\n\nCPU:\nArchitecture:                            aarch64\nCPU op-mode(s):                          64-bit\nByte Order:                              Little Endian\nCPU(s):                                  288\nOn-line CPU(s) list:                     0-287\nVendor ID:                               ARM\nModel name:                              Neoverse-V2\nModel:                                   0\nThread(s) per core:                      1\nCore(s) per socket:                      72\nSocket(s):                               4\nStepping:                                r0p0\nFrequency boost:                         disabled\nCPU(s) scaling MHz:                      100%\nCPU max MHz:                             3411.0000\nCPU min MHz:                             81.0000\nBogoMIPS:                                2000.00\nFlags:                                   fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 sve asimdfhm dit uscat ilrcpc flagm sb paca pacg dcpodp sve2 sveaes svepmull svebitperm svesha3 svesm4 flagm2 frint svei8mm svebf16 i8mm bf16 dgh bti\nL1d cache:                               18 MiB (288 instances)\nL1i cache:                               18 MiB (288 instances)\nL2 cache:                                288 MiB (288 instances)\nL3 cache:                                456 MiB (4 instances)\nNUMA node(s):                            36\nNUMA node0 CPU(s):                       0-71\nNUMA node1 CPU(s):                       72-143\nNUMA node2 CPU(s):                       144-215\nNUMA node3 CPU(s):                       216-287\nNUMA node4 CPU(s):                       \nNUMA node5 CPU(s):                       \nNUMA node6 CPU(s):                       \nNUMA node7 CPU(s):                       \nNUMA node8 CPU(s):                       \nNUMA node9 CPU(s):                       \nNUMA node10 CPU(s):                      \nNUMA node11 CPU(s):                      \nNUMA node12 CPU(s):                      \nNUMA node13 CPU(s):                      \nNUMA node14 CPU(s):                      \nNUMA node15 CPU(s):                      \nNUMA node16 CPU(s):                      \nNUMA node17 CPU(s):                      \nNUMA node18 CPU(s):                      \nNUMA node19 CPU(s):                      \nNUMA node20 CPU(s):                      \nNUMA node21 CPU(s):                      \nNUMA node22 CPU(s):                      \nNUMA node23 CPU(s):                      \nNUMA node24 CPU(s):                      \nNUMA node25 CPU(s):                      \nNUMA node26 CPU(s):                      \nNUMA node27 CPU(s):                      \nNUMA node28 CPU(s):                      \nNUMA node29 CPU(s):                      \nNUMA node30 CPU(s):                      \nNUMA node31 CPU(s):                      \nNUMA node32 CPU(s):                      \nNUMA node33 CPU(s):                      \nNUMA node34 CPU(s):                      \nNUMA node35 CPU(s):                      \nVulnerability Gather data sampling:      Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; CSV2, BHB\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected\n\nVersions of relevant libraries:\n[pip3] numpy==2.1.0\n[pip3] nvidia-cudnn-frontend==1.18.0\n[pip3] torch==2.12.0a0+5aff3928d8.nv26.5.50603568\n[pip3] torch_c_dlpack_ext==0.1.5\n[pip3] torchvision==0.27.0a0+6214cb20.nv26.5.50603568\n[pip3] triton==3.6.0+git5d72932fc5.nv26.3\n[conda] Could not collect",
+  "transformers_version": "5.6.0",
+  "lm_eval_version": "0.4.12",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<pad>",
+    "262144"
+  ],
+  "tokenizer_eos_token": [
+    "<eos>",
+    "2"
+  ],
+  "tokenizer_bos_token": [
+    "<bos>",
+    "1"
+  ],
+  "eot_token_id": 2,
+  "max_length": 4096,
+  "task_hashes": {},
+  "model_source": "vllm",
+  "model_name": "/cluster/work/projects/nn10029k/davisamu/norprelude-eval/merged/norA_wsm20_minus-sqrt_i0969600",
+  "model_name_sanitized": "__cluster__work__projects__nn10029k__davisamu__norprelude-eval__merged__norA_wsm20_minus-sqrt_i0969600",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": null,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "total_evaluation_time_seconds": "95.15799289097777"
+}

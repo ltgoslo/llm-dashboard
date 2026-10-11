@@ -166,7 +166,12 @@ the dashboards' "single prompt" setting.
    main line (the last Prelude checkpoints before the anneal) or an anneal
    run such as `norA_wsm100_minus-sqrt`, which is drawn forking off the
    main line; its display name is set in `NORPRELUDE_RUN_NAME_MAP` in
-   `build_data.py`. A run listed in `NORPRELUDE_STANDALONE_RUNS` (the
+   `build_data.py`, keyed by the run's family with the WSM window removed
+   (`norA_minus-sqrt`). The `_wsm<W>_` part names the warmup-stable-merge
+   window in billions of tokens: the main line and the Scandinavian runs
+   exist once per window and the dashboard's "WSM window" selector
+   switches between them (`NORPRELUDE_DEFAULT_WINDOW`); a run without a
+   window shows under every window. A run listed in `NORPRELUDE_STANDALONE_RUNS` (the
    baseline anneal `annealM1D1`) is drawn on its own instead. A model
    evaluated once, as a reference (`normistral-11b-long`: NorMistral 11B),
    goes in a dir without the `_i<iteration>` suffix and is drawn as a

@@ -165,7 +165,18 @@ PRELUDE_RUN_NAME_MAP = {
 # `prelude_*` run is the main line (the last Prelude checkpoints before the
 # anneal) and every other run is drawn as a side run forking off it. The
 # iteration counter continues Prelude's, so tokens use Prelude's batch.
-NORPRELUDE_MAIN_RUN = "prelude_wsm100_minus-sqrt"
+# The Prelude main line and the Scandinavian anneals are WSM models
+# (warmup-stable-merge: the checkpoints within a trailing window of W
+# billion training tokens merged into the evaluated model), one run per
+# window: `<family>_wsm<W>_<rest>`, e.g. `norA_wsm20_minus-sqrt` is the
+# `norA_minus-sqrt` family under a 20B-token window. The dashboard's "WSM
+# window" selector switches between the windows (default below); runs
+# without a window (the baseline anneal) show under every window. Names,
+# colors and the standalone flag below are keyed by family.
+NORPRELUDE_WINDOW_RE = re.compile(r"^(?P<prefix>.+?)_wsm(?P<window>\d+)(?P<suffix>.*)$")
+NORPRELUDE_DEFAULT_WINDOW = "100"
+NORPRELUDE_WINDOW_DISPLAY_NAME = "{}B tokens"
+NORPRELUDE_MAIN_FAMILY = "prelude_minus-sqrt"
 NORPRELUDE_MAIN_DISPLAY_NAME = "Prelude 9B"
 # The iteration at which the anneal runs branch off the Prelude main line
 # (owner, 2026-10-08): the dashboard's x-axis counts tokens from it, so the
@@ -174,14 +185,14 @@ NORPRELUDE_MAIN_DISPLAY_NAME = "Prelude 9B"
 NORPRELUDE_ANNEAL_START_STEP = 953312
 # Anneal runs: the share of Scandinavian data in the annealing mixture.
 NORPRELUDE_RUN_NAME_MAP = {
-    "norA_wsm100_minus-sqrt": "88% Scandinavian",
-    "norB_wsm100_minus-sqrt": "50% Scandinavian",
+    "norA_minus-sqrt": "88% Scandinavian",
+    "norB_minus-sqrt": "50% Scandinavian",
     "annealM1D1": "baseline m1d1 anneal",
 }
 NORPRELUDE_RUN_COLOR_MAP = {
-    "norA_wsm100_minus-sqrt": "#dc2626",   # red
-    "norB_wsm100_minus-sqrt": "#2563eb",   # blue
-    "annealM1D1": "#9ca3af",               # light grey (the main line is grey)
+    "norA_minus-sqrt": "#dc2626",   # red
+    "norB_minus-sqrt": "#2563eb",   # blue
+    "annealM1D1": "#9ca3af",        # light grey (the main line is grey)
 }
 # Runs drawn on their own instead of forking off the Prelude main line.
 NORPRELUDE_STANDALONE_RUNS = {"annealM1D1"}
@@ -1598,24 +1609,56 @@ def build_prelude_data(setup):
 NORPRELUDE_CKPT_RE = re.compile(r"^(?P<run>.+?)_i(?P<step>\d+)$")
 
 
+def norprelude_run_family(run):
+    """(family, window) of a NorPrelude run id: `norA_wsm20_minus-sqrt` →
+    ("norA_minus-sqrt", "20"); a run without a WSM window → (run, None)."""
+    m = NORPRELUDE_WINDOW_RE.match(run)
+    if not m:
+        return run, None
+    return m.group("prefix") + m.group("suffix"), m.group("window")
+
+
 def build_norprelude_data(setup):
-    """Walk data/norprelude/progress/ (checkpoint dirs `<run>_i<N>`, see
-    NORPRELUDE_MAIN_RUN) and build the norprelude data.json."""
+    """Walk data/norprelude/progress/ (checkpoint dirs `<run>_i<N>`; the
+    main-family run of the default WSM window is the main line, see
+    NORPRELUDE_MAIN_FAMILY) and build the norprelude data.json."""
     def parse(name):
         m = NORPRELUDE_CKPT_RE.match(name)
         if not m:
             return name, None   # no iteration: a reference model
         run = m.group("run")
-        return (None if run == NORPRELUDE_MAIN_RUN else run), int(m.group("step"))
+        family, window = norprelude_run_family(run)
+        is_main = family == NORPRELUDE_MAIN_FAMILY and window == NORPRELUDE_DEFAULT_WINDOW
+        return (None if is_main else run), int(m.group("step"))
 
     data = build_noreval12_progress_data(
-        NORPRELUDE_PROGRESS, setup, parse, NORPRELUDE_RUN_NAME_MAP, PRELUDE_TOKENS_PER_STEP,
+        NORPRELUDE_PROGRESS, setup, parse, {}, PRELUDE_TOKENS_PER_STEP,
         reference_names=NORPRELUDE_REFERENCE_NAME_MAP,
     )
+    families = {r: norprelude_run_family(r) for r in data["runs"]}
     data["main_display_name"] = NORPRELUDE_MAIN_DISPLAY_NAME
     data["anneal_start_step"] = NORPRELUDE_ANNEAL_START_STEP
-    data["run_colors"] = {r: NORPRELUDE_RUN_COLOR_MAP.get(r, "") for r in data["runs"]}
-    data["standalone_runs"] = sorted(r for r in data["runs"] if r in NORPRELUDE_STANDALONE_RUNS)
+    data["run_display_names"] = {
+        r: NORPRELUDE_RUN_NAME_MAP.get(f, f.replace("_", " ")) for r, (f, _) in families.items()
+    }
+    data["run_colors"] = {r: NORPRELUDE_RUN_COLOR_MAP.get(f, "") for r, (f, _) in families.items()}
+    data["standalone_runs"] = sorted(
+        r for r, (f, _) in families.items() if f in NORPRELUDE_STANDALONE_RUNS
+    )
+    # WSM windows, shortest first (the order of the selector's buttons; the
+    # default window need not come first). The default window's main line
+    # is `progress`; another window's is the run named in `window_main_runs`.
+    # `run_windows` lists the window of every windowed run.
+    windows = {NORPRELUDE_DEFAULT_WINDOW} | {w for _, w in families.values() if w}
+    data["windows"] = sorted(windows, key=int)
+    data["default_window"] = NORPRELUDE_DEFAULT_WINDOW
+    data["window_display_names"] = {
+        w: NORPRELUDE_WINDOW_DISPLAY_NAME.format(w) for w in data["windows"]
+    }
+    data["run_windows"] = {r: w for r, (_, w) in families.items() if w}
+    data["window_main_runs"] = {
+        w: r for r, (f, w) in families.items() if f == NORPRELUDE_MAIN_FAMILY and w
+    }
     data["reference_colors"] = {
         r: NORPRELUDE_REFERENCE_COLOR_MAP.get(r, "") for r in data.get("references", {})
     }

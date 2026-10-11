@@ -156,6 +156,11 @@ const CONTROL_TOOLTIPS = [
     body: "Which score the classification tasks contribute to the aggregate. 'Accuracy': whether the top-ranked choice is the correct one (also for tasks whose main metric is macro-F1). 'Answer probability': the probability the model assigns to the correct answer text, not normalized over the choices — it has no chance level, so the random-baseline rescaling leaves it unchanged. 'Conditional answer probability': the probability mass on the correct answer after normalizing the answer likelihoods over the choices (soft accuracy). Tasks without the chosen metric contribute their accuracy.",
   },
   {
+    anchor: "#wsm-window-control",
+    title: "WSM window",
+    body: "The Prelude line and the Scandinavian anneals are warmup-stable-merge (WSM) models: instead of decaying the learning rate, the checkpoints within a trailing window of training tokens are merged into the model that is evaluated. Pick the window — 100B or 20B tokens — of the merged models to show. The baseline anneal and the reference model do not depend on it.",
+  },
+  {
     anchor: "#size-slider-container",
     title: "Model size",
     body: "Restrict the chart to models whose parameter count (in billions) falls within this range. Models outside the range are excluded from the chart and from any aggregate scores.",

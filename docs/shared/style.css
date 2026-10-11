@@ -480,7 +480,7 @@ select.ui-select-native { display: none !important; }
   box-shadow: 0 1px 4px rgba(30, 41, 59, 0.16), 0 0 0 1px rgba(100, 116, 139, 0.18);
 }
 .shot-toggle.segmented-ready::before { transition: left 0.2s ease, width 0.2s ease; }
-.shot-btn, .ci-btn {
+.shot-btn, .ci-btn, .wsm-btn {
   position: relative;      /* above the thumb */
   z-index: 1;
   display: inline-flex;    /* centre the text ourselves, like .ui-select, */
@@ -497,9 +497,9 @@ select.ui-select-native { display: none !important; }
   outline: none;
   transition: color 0.15s, background-color 0.15s;
 }
-.shot-btn:hover, .ci-btn:hover,
-.shot-btn:focus-visible, .ci-btn:focus-visible { color: var(--accent); background: rgba(255, 255, 255, 0.6); }
-.shot-btn.active, .ci-btn.active { color: var(--accent); background: transparent; cursor: default; }
+.shot-btn:hover, .ci-btn:hover, .wsm-btn:hover,
+.shot-btn:focus-visible, .ci-btn:focus-visible, .wsm-btn:focus-visible { color: var(--accent); background: rgba(255, 255, 255, 0.6); }
+.shot-btn.active, .ci-btn.active, .wsm-btn.active { color: var(--accent); background: transparent; cursor: default; }
 
 /* Checkboxes (task and model grids, the fully-open toggle): a drawn box
    in the controls' chrome; checked and indeterminate fill with the accent. */

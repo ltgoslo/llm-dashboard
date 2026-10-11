@@ -6,7 +6,10 @@
 // and each anneal run is drawn as a side run forking off it (or on its own,
 // for the baseline anneal), with reference models as horizontal lines, like the
 // NorOLMo ablations. Run names and colors come from data.json
-// (`run_display_names`, `run_colors`, set in build_data.py).
+// (`run_display_names`, `run_colors`, set in build_data.py). The Prelude
+// line and the Scandinavian anneals exist once per WSM (warmup-stable-
+// merge) window; the "WSM window" selector picks which window's models
+// are shown (`windows`, `run_windows`, `window_main_runs` in data.json).
 
 import { state } from "../shared/state.js";
 import { isAggregateSelection } from "../shared/core.js";
@@ -36,12 +39,17 @@ const DEFAULTS = { classificationMetric: "prob_correct", promptAgg: "mean", form
 // between the last Prelude checkpoint and the first anneal checkpoint):
 // tokens before it are negative. Set in init() from the data.
 let originStep = 0;
+// WSM window of the models shown (a key of data.json `windows`); set in
+// init() to the data's default. Runs without a window (the baseline
+// anneal) and the reference models show under every window.
+let currentWindow = null;
 const MAIN_COLOR = "#6b7280";                                          // grey
 const RUN_COLORS = ["#dc2626", "#2563eb", "#f97316", "#9333ea", "#0d9488"];  // fallback when data.json names no color
 const REFERENCE_COLOR = "#111827";                                     // fallback for reference models
 
 const plotlyConfig = makePlotlyConfig("norprelude-chart", () => ({
   shot: state.currentShot + "-shot",
+  wsm_window: currentWindow,
   task_selection: state.currentTaskSelection,
   task_type: state.taskTypeFilter,
   classification_metric: state.classificationMetric,
@@ -74,17 +82,25 @@ function sortedSteps(data) {
  *  `reference` with a single pseudo-checkpoint, which progress.js draws as
  *  a horizontal line across the chart. */
 function getTrajectories() {
-  const progress = state.DATA.progress;
+  const D = state.DATA;
+  const runs = D.runs || {};
+  // The main line of the shown window: `progress` for the default window,
+  // else the run data.json names for it (falling back to `progress`).
+  const windowMain = currentWindow !== (D.default_window ?? null) ? D.window_main_runs?.[currentWindow] : undefined;
+  const progress = (windowMain && runs[windowMain]) || D.progress;
   const mainSteps = sortedSteps(progress);
   const trajectories = [{
-    name: state.DATA.main_display_name || "Prelude 9B", key: "main", color: MAIN_COLOR,
+    name: D.main_display_name || "Prelude 9B", key: "main", color: MAIN_COLOR,
     dataSource: progress, checkpoints: () => mainSteps, zorder: 1,
   }];
-  const runs = state.DATA.runs || {};
-  const standalone = new Set(state.DATA.standalone_runs || []);
+  const runWindows = D.run_windows || {};
+  const windowMains = new Set(Object.values(D.window_main_runs || {}));
+  const shown = (run) => !windowMains.has(run)
+    && (runWindows[run] == null || runWindows[run] === currentWindow);
+  const standalone = new Set(D.standalone_runs || []);
   // Forking runs before standalone ones, alphabetically within each group.
   const runOrder = (a, b) => (standalone.has(a) - standalone.has(b)) || a.localeCompare(b);
-  Object.keys(runs).sort(runOrder).forEach((run, i) => {
+  Object.keys(runs).filter(shown).sort(runOrder).forEach((run, i) => {
     let data = runs[run];
     const first = sortedSteps(data)[0];
     if (first === undefined) return;
@@ -94,19 +110,19 @@ function getTrajectories() {
     }
     const steps = sortedSteps(data);
     trajectories.push({
-      name: state.DATA.run_display_names?.[run] || run,
+      name: D.run_display_names?.[run] || run,
       key: run,
-      color: state.DATA.run_colors?.[run] || RUN_COLORS[i % RUN_COLORS.length],
+      color: D.run_colors?.[run] || RUN_COLORS[i % RUN_COLORS.length],
       dataSource: data,
       checkpoints: () => steps,
     });
   });
-  const references = state.DATA.references || {};
+  const references = D.references || {};
   Object.keys(references).sort().forEach((ref) => {
     trajectories.push({
-      name: state.DATA.reference_display_names?.[ref] || ref,
+      name: D.reference_display_names?.[ref] || ref,
       key: "reference:" + ref,
-      color: state.DATA.reference_colors?.[ref] || REFERENCE_COLOR,
+      color: D.reference_colors?.[ref] || REFERENCE_COLOR,
       dataSource: { reference: references[ref] },
       checkpoints: () => ["reference"],
       reference: true,
@@ -166,6 +182,41 @@ function updateShotButtons() {
   for (const b of buttons) b.classList.toggle("active", b.dataset.shot === state.currentShot);
 }
 
+/** Build the WSM-window buttons from data.json — a segmented group like
+ *  Shots and Error bands (segmented.js re-measures its thumb as the
+ *  buttons appear); the control hides with a single window. */
+function populateWindowButtons() {
+  const group = document.getElementById("wsm-window-toggle");
+  const windows = state.DATA.windows || [];
+  group.innerHTML = "";
+  for (const w of windows) {
+    const btn = document.createElement("button");
+    btn.className = "wsm-btn";
+    btn.dataset.window = w;
+    btn.textContent = state.DATA.window_display_names?.[w] || w;
+    btn.addEventListener("click", () => {
+      if (currentWindow === w) return;
+      currentWindow = w;
+      syncWindowButtons();
+      render();
+    });
+    group.appendChild(btn);
+  }
+  document.getElementById("wsm-window-control").style.display = windows.length > 1 ? "" : "none";
+  syncWindowButtons();
+}
+
+/** Mark the shown window's button active; an unknown window (an old URL)
+ *  falls back to the data's default. */
+function syncWindowButtons() {
+  const windows = state.DATA.windows || [];
+  if (windows.length && !windows.includes(currentWindow)) {
+    currentWindow = state.DATA.default_window ?? windows[0];
+  }
+  document.querySelectorAll(".wsm-btn").forEach((b) =>
+    b.classList.toggle("active", b.dataset.window === currentWindow));
+}
+
 function bindVariantControls() {
   const bind = (id, apply) => {
     document.getElementById(id).addEventListener("change", (e) => {
@@ -198,6 +249,7 @@ function syncVariantControlsFromState() {
     if (select.value !== value) select.value = fallback;
     return select.value;
   };
+  syncWindowButtons();
   state.taskTypeFilter = setSelect("task-type-select", state.taskTypeFilter, "all");
   state.classificationMetric = setSelect("classification-metric-select", state.classificationMetric, DEFAULTS.classificationMetric);
   state.currentDecoding = setSelect("decoding-select", state.currentDecoding, "sampling");
@@ -237,6 +289,7 @@ const LEGACY_METRIC_MODE = { hard: "acc", soft: "prob_correct" };
 function setupUrlState() {
   urlState = new UrlState([
     { key: "shot", get: () => state.currentShot, set: (v) => state.currentShot = v, default: "5" },
+    { key: "wsm", get: () => currentWindow ?? "", set: (v) => currentWindow = v, default: () => state.DATA.default_window ?? "" },
     {
       key: "task",
       get: () => state.currentTaskSelection,
@@ -300,6 +353,8 @@ async function init() {
     state.checkedTasks = new Set(Object.keys(state.metricsSetup));
     tokensPerStep = state.DATA.tokens_per_step || tokensPerStep;
     originStep = state.DATA.anneal_start_step ?? Math.max(0, ...sortedSteps(state.DATA.progress));
+    currentWindow = state.DATA.default_window ?? (state.DATA.windows || [])[0] ?? null;
+    populateWindowButtons();
     setSingleTaskNormalization(DEFAULTS.normalization);
     if (state.DATA.shots?.length) allShots = state.DATA.shots.map(String);
     chartConfig.allShots = allShots;
