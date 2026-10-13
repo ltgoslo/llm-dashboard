@@ -33,7 +33,7 @@ let allShots = ["5"];
 
 const DEFAULT_SELECTION = "__all_macro__";
 // Defaults of this instance's selectors (the URL only records departures).
-const DEFAULTS = { classificationMetric: "prob_correct", promptAgg: "mean", formulation: "mean", accNorm: "max", normalization: "baseline" };
+const DEFAULTS = { classificationMetric: "likelihood_correct", promptAgg: "max", formulation: "max", accNorm: "max", normalization: "baseline" };
 // The x-axis is measured from the iteration at which the anneals branch
 // off the Prelude main line (`anneal_start_step` in data.json, 953,312 —
 // between the last Prelude checkpoint and the first anneal checkpoint):

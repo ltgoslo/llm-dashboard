@@ -32,7 +32,7 @@ let allShots = ["5"];
 
 const DEFAULT_SELECTION = "__all_macro__";
 // Defaults of the selectors (the URL only records departures).
-const DEFAULTS = { classificationMetric: "prob_correct", promptAgg: "mean", formulation: "mean", accNorm: "max", normalization: "baseline" };
+const DEFAULTS = { classificationMetric: "likelihood_correct", promptAgg: "max", formulation: "max", accNorm: "max", normalization: "baseline" };
 const MAIN_COLOR = "#2563eb";                                          // blue
 const RUN_COLORS = ["#dc2626", "#f97316", "#9333ea", "#0d9488", "#b45309"];
 

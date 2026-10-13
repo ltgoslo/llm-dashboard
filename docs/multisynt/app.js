@@ -34,7 +34,7 @@ import { UrlState } from "../shared/url-state.js";
 const ALL_SHOTS = ["0", "5"];
 const DEFAULT_SELECTION = "__all_macro__";
 // Defaults of the selectors (the URL only records departures).
-const DEFAULTS = { classificationMetric: "prob_correct", promptAgg: "mean", formulation: "mean", accNorm: "max", normalization: "baseline" };
+const DEFAULTS = { classificationMetric: "likelihood_correct", promptAgg: "max", formulation: "max", accNorm: "max", normalization: "baseline" };
 const DEFAULT_LANGUAGE = "Norwegian";   // falls back to the first language in data.json
 
 const plotlyConfig = makePlotlyConfig("multisynt-chart", () => ({
