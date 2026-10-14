@@ -67,7 +67,12 @@ SHOT_DIRS = {"0": "0-shot", "1": "1-shot", "5": "5-shot"}
 # Metrics excluded globally from the metric selector.
 # `bypass` is the lm-eval placeholder used when a task ran without
 # computing a metric — the real value is patched in later.
-EXCLUDED_METRICS = {"bleu_diff", "rouge1_diff", "rouge2_diff", "rougeL_diff", "bypass"}
+# `loglikelihood_correct_mutual_info` (NorEval 1.2) is the PMI of the correct
+# answer: a log-likelihood ratio on an unbounded scale with no chance level,
+# not comparable to any other metric (PMI-normalized accuracy and conditional
+# probability stay available via their `_mutual_info` variants).
+EXCLUDED_METRICS = {"bleu_diff", "rouge1_diff", "rouge2_diff", "rougeL_diff", "bypass",
+                    "loglikelihood_correct_mutual_info"}
 
 # NorEval 1.2 reports the mean log-likelihood of the correct answer
 # (`loglikelihood_correct`, plus its character-length and PMI variants). The
@@ -75,15 +80,12 @@ EXCLUDED_METRICS = {"bleu_diff", "rouge1_diff", "rouge2_diff", "rougeL_diff", "b
 # the (geometric-mean) probability of the correct answer text, resp. per
 # character: `likelihood_correct`, `likelihood_correct_norm` — with the
 # standard error carried over by the delta method (se' = e^v · se). The PMI
-# variant is a log-likelihood *ratio* (answer given the prompt vs. without
-# it) whose exponential is unbounded, so it stays in log space as its own
-# raw-scale metric, `pmi_correct`. Not to be confused with `prob_correct`,
-# the probability of the correct answer conditional on the choice set (the
-# answer likelihoods normalized over the choices).
+# variant is excluded (see EXCLUDED_METRICS). Not to be confused with
+# `prob_correct`, the probability of the correct answer conditional on the
+# choice set (the answer likelihoods normalized over the choices).
 LOGLIKELIHOOD_METRIC_RENAMES = {
     "loglikelihood_correct": ("likelihood_correct", True),
     "loglikelihood_correct_norm": ("likelihood_correct_norm", True),
-    "loglikelihood_correct_mutual_info": ("pmi_correct", False),
 }
 
 # Tasks flagged `empty_prompt: true` in their YAML (NCB, NoCoLA, MultiBLiMP:

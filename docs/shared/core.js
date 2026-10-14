@@ -25,7 +25,6 @@ export const METRIC_DISPLAY = {
   prob_correct_mutual_info: "conditional probability of correct (PMI norm)",
   likelihood_correct: "probability of correct",
   likelihood_correct_norm: "probability of correct (character norm)",
-  pmi_correct: "PMI of correct answer",
   f1: "F1",
   f1_norm: "F1 (character norm)",
   f1_mutual_info: "F1 (PMI norm)",
@@ -74,7 +73,6 @@ export const METRIC_SCALES = {
   // "raw": shown on its native scale (no ×100), may be negative, and is
   // exempt from the random-baseline normalization and the y ≥ 0 axis floor.
   norm_loglikelihood_corr: "raw",
-  pmi_correct: "raw",
 };
 
 /** Whether a metric is displayed on its own raw (possibly negative) scale. */
@@ -85,7 +83,7 @@ export function isRawScaleMetric(metric) {
 // Base metrics without a chance level: a task's random baseline is defined
 // for its main metric (and its soft metric); the probability of generating
 // the correct answer text, like a raw log-likelihood, has none.
-const NO_BASELINE_METRICS = new Set(["likelihood_correct", "pmi_correct"]);
+const NO_BASELINE_METRICS = new Set(["likelihood_correct"]);
 
 /** Whether the task's random baseline applies to `metric` — false for the
  *  raw-scale metrics and the probability of the correct answer, which are
@@ -101,7 +99,6 @@ export const METRIC_DESCRIPTIONS = {
   acc_mutual_info: "Accuracy after normalizing answer log-likelihoods by their unconditional (PMI) likelihood.",
   prob_correct: "Conditional probability of the correct answer: the probability mass on it after normalizing the answer likelihoods over the choices (soft accuracy).",
   likelihood_correct: "Probability of the correct answer text: the exponentiated mean log-likelihood the model assigns to it, not normalized over the choices. Under the character-length normalization this is a per-character probability.",
-  pmi_correct: "Pointwise mutual information of the correct answer text and the prompt: its log-likelihood given the prompt minus its log-likelihood without it. Raw (log) scale; higher is better.",
   f1: "Harmonic mean of precision and recall.",
   em: "Proportion of predictions that exactly match the reference.",
   em_first: "Exact match accuracy of the first generated word against the correct completion word.",
@@ -321,9 +318,9 @@ function llVariantsInBlock(shotBlock, bench, metric) {
 /** The variant of `metric` the selector resolves to: the chosen one, or for
  *  "max" whichever scores highest under the current prompt aggregation
  *  (within `form` when a formulation is selected). The variants of a
- *  likelihood (a probability, a per-character probability and a likelihood
- *  ratio) or of a raw log-likelihood live on different scales, so "max"
- *  keeps the plain one there. */
+ *  likelihood (a probability and a per-character probability) or of a raw
+ *  log-likelihood live on different scales, so "max" keeps the plain one
+ *  there. */
 function chooseVariant(shotBlock, bench, metric, form) {
   const vs = llVariantsInBlock(shotBlock, bench, metric);
   if (vs.length === 1) return vs[0];
