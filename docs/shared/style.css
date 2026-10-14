@@ -219,18 +219,25 @@ header.dashboard-header h1 {
    ──────────────────────────────────────────────────────────── */
 
 .tab-nav {
-  display: flex; gap: 0;
-  margin: 0 0 1rem;
+  display: flex; gap: 1.75rem;
+  margin: 0 0 0.5rem;
   border-bottom: 1px solid var(--border);
 }
+/* The tabs sit flush with the content column's left edge (no horizontal
+   padding — the gap above spaces them), so they line up with the title
+   above and the chart title and controls below; the active underline is
+   exactly as wide as the label. */
 .tab-btn {
-  padding: 0.6rem 1.25rem; border: none; background: none; cursor: pointer;
-  font-family: var(--font-sans); font-size: 0.9rem; font-weight: 500;
+  padding: 0.75rem 0 0.6rem; border: none; background: none; cursor: pointer;
+  font-family: var(--font-sans); font-size: 0.92rem; font-weight: 600;
   color: var(--fg-muted); border-bottom: 2px solid transparent;
   transition: color 0.15s, border-color 0.15s; margin-bottom: -1px;
 }
-.tab-btn:hover { color: var(--fg); }
-.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-btn:hover, .tab-btn:focus-visible { color: var(--fg); border-bottom-color: var(--border); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); cursor: default; }
+/* A tab strip directly above the chart section needs less air than a
+   page that starts with the chart. */
+.tab-nav + .chart-section { padding-top: 1rem; }
 
 /* ════════════════════════════════════════════════════════════
    Chart section — full-width white band.
