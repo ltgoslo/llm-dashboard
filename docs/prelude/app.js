@@ -53,7 +53,6 @@ const plotlyConfig = makePlotlyConfig("prelude-chart", () => ({
       monotonicity: lastSignals.monotonicity,
       ranking_consistency: lastSignals.rankingConsistency,
       non_randomness: lastSignals.nonRandomness,
-      non_randomness_linear_fit: lastSignals.nonRandomnessFit,
     },
   }),
 }));
@@ -131,8 +130,8 @@ const chartConfig = {
   // FineWeb2 signal measures of exactly what is plotted, shown under the
   // title. Ranking consistency needs several runs, so it is blank until a
   // side run is drawn next to the main line.
-  onSeries: (series) => {
-    lastSignals = computeSignals(series);
+  onSeries: (series, baseline) => {
+    lastSignals = computeSignals(series, baseline);
     renderSignals(document.getElementById("chart-signals"), lastSignals);
   },
 };

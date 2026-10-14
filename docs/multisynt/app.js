@@ -55,7 +55,6 @@ const plotlyConfig = makePlotlyConfig("multisynt-chart", () => ({
       monotonicity: lastSignals.monotonicity,
       ranking_consistency: lastSignals.rankingConsistency,
       non_randomness: lastSignals.nonRandomness,
-      non_randomness_linear_fit: lastSignals.nonRandomnessFit,
     },
   }),
 }));
@@ -116,8 +115,8 @@ const chartConfig = {
   // the displayed shot on every render.
   yRangeFit: true,
   // FineWeb2 signal measures of exactly what is plotted, shown under the title.
-  onSeries: (series) => {
-    lastSignals = computeSignals(series);
+  onSeries: (series, baseline) => {
+    lastSignals = computeSignals(series, baseline);
     renderSignals(document.getElementById("chart-signals"), lastSignals);
   },
 };

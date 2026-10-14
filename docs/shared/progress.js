@@ -22,10 +22,12 @@
 //     fully zoomed, no floor at 0 (multisynt). Without it the range is
 //     computed up front by forEachRangeSlice: over every shot for stable
 //     axes when switching shots, or tightly with yRangeSkipFirst.
-//   - onSeries(series): optional, called after each render with the plotted
-//     series — [{name, key, xs, ys, baselines}] per trajectory (tokens,
-//     displayed scores, and where a chance-level model would be plotted) —
-//     e.g. for the FineWeb2 signal measures
+//   - onSeries(series, baseline): optional, called after each render with
+//     the plotted series — [{name, key, xs, ys}] per trajectory (tokens and
+//     displayed scores) — and where a chance-level model would be plotted
+//     (each task's chance level through the same rescaling, aggregated like
+//     the scores over the tasks that have one; 0 when none has), for the
+//     signal measures
 
 import { state } from "./state.js";
 import {
@@ -477,20 +479,20 @@ function renderAggregateProgress(config) {
     }, macro);
   }
 
-  /** Where a chance-level model would be plotted at this checkpoint: each
-   *  task's random baseline sent through the same normalization, aggregated
-   *  over the same tasks that have a score here. The probability of the
-   *  answer text has no chance level; a chance-level model assigns the
-   *  exact answer (next to) no probability, so such a task enters at 0. */
-  function baselineAt(traj, x, shot) {
+  /** Where a chance-level model would be plotted: each task's random
+   *  baseline sent through the same normalization, aggregated like the
+   *  scores over the tasks that have one (0 when none has) — the floor of
+   *  the non-randomness measure, as multisynt-eval-conditions'
+   *  random_baseline_from_per_task. A raw log-likelihood or the probability
+   *  of the answer text has no chance level, so such a task is left out. */
+  function chanceBaseline(traj, shot) {
     const r = aggregateScores(tasks, (bench) => {
-      if (getScore(traj.dataSource, x, bench, shot) === undefined) return undefined;
       const metric = taskBaseMetric(bench);
+      if (!hasRandomBaseline(metric)) return undefined;
       const allRaw = needAll ? refScores(traj, bench, shot) : null;
-      const chance = hasRandomBaseline(metric) ? taskRandomBaseline(bench, metric) : 0;
-      return { score: applyNorm(chance, bench, allRaw, metric) };
+      return { score: applyNorm(taskRandomBaseline(bench, metric), bench, allRaw, metric) };
     }, macro);
-    return r ? r.score : null;
+    return r ? r.score : 0;
   }
 
   const allYValues = [];
@@ -505,6 +507,7 @@ function renderAggregateProgress(config) {
   const traces = [];
   const lineTraces = [];
   const series = [];
+  let baseline = null;
   const fitValues = [];
   for (const traj of trajectories) {
     const xValues = traj.checkpoints();
@@ -528,10 +531,8 @@ function renderAggregateProgress(config) {
       customdata: aggResults.map((r) => r ? { count: r.count, ci: r.ci } : null),
     });
     if (config.onSeries && !traj.reference) {
-      series.push({
-        name: traj.name, key: traj.key || traj.name, xs, ys,
-        baselines: xValues.map((x) => baselineAt(traj, x, state.currentShot)),
-      });
+      if (baseline == null) baseline = chanceBaseline(traj, state.currentShot);
+      series.push({ name: traj.name, key: traj.key || traj.name, xs, ys });
     }
   }
   traces.push(...lineTraces);
@@ -541,7 +542,7 @@ function renderAggregateProgress(config) {
     : computeYRange(allYValues, !!config.yRangeSkipFirst, config.yMaxHeadroom || 0);
   const layout = progressLayout(config, trajectories, yRange, trajectories.length > 1);
   plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), onProgressUnhover);
-  if (config.onSeries) config.onSeries(series);
+  if (config.onSeries) config.onSeries(series, baseline ?? 0);
 }
 
 function renderSingleProgress(config, benchmark) {
@@ -567,6 +568,7 @@ function renderSingleProgress(config, benchmark) {
   const traces = [];
   const lineTraces = [];
   const series = [];
+  let baseline = null;
   const fitValues = [];
   for (const traj of trajectories) {
     let xValues = traj.checkpoints();
@@ -593,12 +595,12 @@ function renderSingleProgress(config, benchmark) {
     });
     if (config.onSeries && !traj.reference) {
       // A raw log-likelihood or the probability of the answer text has no
-      // chance level to plot.
-      const baseline = hasRandomBaseline(metric) ? applyNorm(taskRandomBaseline(benchmark, metric), benchmark, allRaw, metric) : null;
-      series.push({
-        name: traj.name, key: traj.key || traj.name, xs, ys,
-        baselines: ys.map((y) => (y == null ? null : baseline)),
-      });
+      // chance level: the floor is then 0, as in multisynt-eval-conditions.
+      if (baseline == null) {
+        baseline = hasRandomBaseline(metric)
+          ? applyNorm(taskRandomBaseline(benchmark, metric), benchmark, allRaw, metric) : 0;
+      }
+      series.push({ name: traj.name, key: traj.key || traj.name, xs, ys });
     }
   }
   traces.push(...lineTraces);
@@ -610,7 +612,7 @@ function renderSingleProgress(config, benchmark) {
       : [0, computeYMax(allYVals)];
   const layout = progressLayout(config, trajectories, yRange, trajectories.length > 1);
   plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), onProgressUnhover);
-  if (config.onSeries) config.onSeries(series);
+  if (config.onSeries) config.onSeries(series, baseline ?? 0);
 }
 
 // ─────────────────────────────────────────────────────────────
