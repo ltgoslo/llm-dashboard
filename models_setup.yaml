@@ -407,6 +407,18 @@ EuroLLM-22B-2512:
   default: true
   color: "#5f9ea0"
 
+prelude-base:
+  display_name: "Prelude 9B"
+  category: multilingual
+  organization: OpenEuroLLM
+  parameters: 9.1
+  license: "Apache 2.0"
+  fully_open: true
+  description: "Multilingual base model by OpenEuroLLM, a dense decoder closely following the Qwen3 architecture, trained on about 10T tokens (roughly 80% English, code and math, 20% covering 36 European target languages)."
+  huggingface_url: https://huggingface.co/openeurollm/prelude-base
+  default: true
+  color: "#53bef7"
+
 gemma-3-1b-pt:
   display_name: "Gemma3 1B"
   category: multilingual

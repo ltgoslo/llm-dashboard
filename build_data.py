@@ -141,15 +141,26 @@ EXCLUDED_METRICS_PER_BENCHMARK = {
     "noreval_multiblimp": {"acc_norm"},
 }
 
+# Further exclusions for the NorEval 1.1 dashboards only (noreval_extract).
+# BERTScore isn't one of NorEval 1.1's summarization metrics; Prelude's 0-shot
+# norsumm_nob run reports it anyway, and keeping it would add a metric only
+# one model has. (NorEval 1.2's norsumm tasks do report it, see multisynt.)
+NOREVAL11_EXCLUDED_METRICS_PER_BENCHMARK = {
+    "norsumm_nob": {"bertscore_f1_avg", "bertscore_f1_max"},
+    "norsumm_nno": {"bertscore_f1_avg", "bertscore_f1_max"},
+}
+
 # A MultiSynt language may carry a sibling `<Lang>_greedy` results tree with
 # greedy-decoding runs of its generative tasks (old-layout dirs named by the
 # task's `greedy_path`). They are attached to the sampling-decoding entries as
 # `by_decoding.greedy` sub-aggregates — the dashboards' "Decoding" selector —
 # and never form a language tab of their own.
 MULTISYNT_DECODING_SUFFIX = "_greedy"
-# Metric names that differ between the greedy (pre-NorEval-1.2) files and the
-# sampling ones; the greedy side is renamed to the sampling side's name.
-GREEDY_METRIC_ALIASES = {"errant": "errant_f05"}
+# Metric names that some result files use for a metric the task setup knows
+# under another name; they are renamed on extraction. ERRANT F0.5 appears as
+# `errant` in MultiSynt's greedy (pre-NorEval-1.2) files and in some NorEval
+# 1.1 ask_gec runs (Prelude), as `errant_f05` everywhere else.
+METRIC_ALIASES = {"errant": "errant_f05"}
 
 # NorOLMo training: 8M tokens per step (8192 × 1024).
 NOROLMO_TOKENS_PER_STEP = 8192 * 1024
@@ -544,15 +555,17 @@ def collect_prompt_metrics(task_results, n_samples, exclusions, metric_scale,
                            metric_values, rename=None):
     """Append a (value, se, n) triple to `metric_values` for every
     `<metric>,none` entry in one task's results. `rename` optionally maps the
-    metric name (used to build "metric: subtask" virtual names)."""
+    metric name (used to build "metric: subtask" virtual names); aliased
+    names (METRIC_ALIASES) are mapped first."""
     for key, val in task_results.items():
         if not key.endswith(",none") or "_stderr,none" in key:
             continue
-        metric_name = key[: -len(",none")]
-        if metric_name in exclusions:
+        raw_name = key[: -len(",none")]
+        if raw_name in exclusions:
             continue
+        metric_name = METRIC_ALIASES.get(raw_name, raw_name)
         if isinstance(val, (int, float)):
-            harness_se = task_results.get(f"{metric_name}_stderr,none")
+            harness_se = task_results.get(f"{raw_name}_stderr,none")
             se = resolve_se(metric_name, val, harness_se, n_samples, metric_scale)
             name = rename(metric_name) if rename else metric_name
             metric_values.setdefault(name, []).append((val, se, n_samples))
@@ -577,8 +590,10 @@ def noreval_extract(results_json_path, benchmark_name, subtasks, metrics_setup_e
 
     results = data.get("results", {})
     n_samples_dict = data.get("n-samples", {})
-    bench_exclusions = EXCLUDED_METRICS | EXCLUDED_METRICS_PER_BENCHMARK.get(
-        benchmark_name, set()
+    bench_exclusions = (
+        EXCLUDED_METRICS
+        | EXCLUDED_METRICS_PER_BENCHMARK.get(benchmark_name, set())
+        | NOREVAL11_EXCLUDED_METRICS_PER_BENCHMARK.get(benchmark_name, set())
     )
     metric_scale = (
         metrics_setup_entry.get("metric_scale", "unit")
@@ -1033,7 +1048,7 @@ def multisynt_greedy_partitions(greedy_ckpt_path, benchmark, config):
     """(None, {metric: (val, se, n)}) per prompt of the task's greedy-decoding
     run under the sibling `<Lang>_greedy` checkpoint dir (old nested layout:
     `<greedy_path>/p<N>/` subdirs, or a bare dir for a single prompt).
-    Greedy-only metric names are mapped through GREEDY_METRIC_ALIASES."""
+    Greedy-only metric names are mapped through METRIC_ALIASES."""
     if greedy_ckpt_path is None or not config.get("greedy_path"):
         return []
     src_dir = os.path.join(greedy_ckpt_path, config["greedy_path"])
@@ -1050,7 +1065,7 @@ def multisynt_greedy_partitions(greedy_ckpt_path, benchmark, config):
         metrics = (multisynt_extract(results_file, benchmark, config, match_name)
                    or multisynt_extract(results_file, benchmark, config, benchmark))
         if metrics:
-            out.append((None, {GREEDY_METRIC_ALIASES.get(m, m): t for m, t in metrics.items()}))
+            out.append((None, {METRIC_ALIASES.get(m, m): t for m, t in metrics.items()}))
     return out
 
 
