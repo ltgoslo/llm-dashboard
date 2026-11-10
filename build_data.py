@@ -98,6 +98,10 @@ LOGLIKELIHOOD_METRIC_RENAMES = {
 PMI_DEGENERATE_METRICS = ("acc_mutual_info",)
 
 
+def task_aliases(setup):
+    return {old: key for key, cfg in setup.items() for old in cfg.get("aliases", ())}
+
+
 def force_degenerate_pmi(metrics, config, shot):
     """Return `metrics` ({name: (value, se, n)}) with the 0-shot PMI
     accuracies of an `empty_prompt` task forced to its random baseline.
@@ -1083,12 +1087,12 @@ def multisynt_process_checkpoint(ckpt_path, task_configs, shot, greedy_ckpt_path
             # name as prefix (NorEval-1.2 flat layout).
             bench_path = os.path.join(ckpt_path, config.get("path", benchmark))
             parent = bench_path if os.path.isdir(bench_path) else ckpt_path
-            sub_entries = [
-                (os.path.join(parent, d), d)
-                for d in sorted(os.listdir(parent))
-                if d.startswith(f"{benchmark}_")
-                and os.path.isdir(os.path.join(parent, d))
-            ]
+            by_phenomenon = {}
+            for name in (*config.get("aliases", ()), benchmark):
+                for d in sorted(os.listdir(parent)):
+                    if d.startswith(f"{name}_") and os.path.isdir(os.path.join(parent, d)):
+                        by_phenomenon[d[len(name) + 1:]] = (os.path.join(parent, d), d)
+            sub_entries = [by_phenomenon[p] for p in sorted(by_phenomenon)]
             agg_metrics = force_degenerate_pmi(multisynt_process_multiblimp(
                 sub_entries, EXCLUDED_METRICS_PER_BENCHMARK.get(benchmark, set())
             ), config, shot)
@@ -1212,7 +1216,9 @@ def multisynt_discover_language_tasks(lang_dir, task_configs):
     known_tops = {p.split("/", 1)[0] for p in configured_paths}
     flat_bases = {os.path.basename(p): key for p, key in configured_paths.items()}
     aggregator_prefixes = {
-        f"{key}_": key for key, cfg in task_configs.items() if cfg.get("aggregator")
+        f"{name}_": key
+        for key, cfg in task_configs.items() if cfg.get("aggregator")
+        for name in (key, *cfg.get("aliases", ()))
     }
 
     for model_dir in os.listdir(lang_dir):
@@ -1392,7 +1398,7 @@ PRELUDE_CKPT_RE = re.compile(r"^(?:(?P<run>.+?)_)?iter_(?P<step>\d+)$")
 NOREVAL12_VARIANT_SUFFIX = r"(?:_(%s))?(?:_p\d+)?" % "|".join(MULTISYNT_FORMULATIONS)
 
 
-def noreval12_load_task_dir(task_dir):
+def noreval12_load_task_dir(task_dir, rename=None):
     """Merge every results JSON under one task dir into a single
     {"results", "n-samples", "n-shot"} dict. A task's prompt variants may
     have been evaluated in separate lm-eval runs (one file each), so the
@@ -1412,6 +1418,11 @@ def noreval12_load_task_dir(task_dir):
             continue
         for section in merged:
             merged[section].update(data.get(section) or {})
+    if rename is not None:
+        old, new = rename
+        for section in merged.values():
+            for key in [k for k in section if k == old or k.startswith(f"{old}_")]:
+                section[new + key[len(old):]] = section.pop(key)
     return merged
 
 
@@ -1487,7 +1498,7 @@ def build_noreval12_lang_lists(setup):
     """Language-membership lists for NorEval-1.2 task names, whose language
     codes are `_`-separated name parts: `translation_nob_nno` (both
     Norwegian varieties), `slide_nob_nno_swe_dan` (shared by all),
-    `multiblimp_ltg_sme` (Northern Sámi). Same four lists the NorEval
+    `multiblimp_noreval_sme` (Northern Sámi). Same four lists the NorEval
     dashboards' language aggregates read (see selection.js)."""
     def parts(b):
         return set(b.split("_"))
@@ -1505,7 +1516,7 @@ def build_noreval12_lang_lists(setup):
     return nno, sme, nob_nno, shared
 
 
-def noreval12_extract_task_dir(task_path, task, config):
+def noreval12_extract_task_dir(task_path, task, config, rename=None):
     """{shot: {metric: entry}} of one task dir. The dir holds either the
     results files directly (prelude: one file per task, the shot recorded
     inside) or one `<N>-shot/` subdir per shot setting (the NorOLMo-style
@@ -1514,11 +1525,15 @@ def noreval12_extract_task_dir(task_path, task, config):
     keep only one shot."""
     shot_dirs = [d for d in SHOT_DIRS.values() if (task_path / d).is_dir()]
     if not shot_dirs:
-        return noreval12_extract_task(noreval12_load_task_dir(str(task_path)), task, config)
+        return noreval12_extract_task(
+            noreval12_load_task_dir(str(task_path), rename), task, config
+        )
     per_shot = {}
     for d in shot_dirs:
         per_shot.update(
-            noreval12_extract_task(noreval12_load_task_dir(str(task_path / d)), task, config)
+            noreval12_extract_task(
+                noreval12_load_task_dir(str(task_path / d), rename), task, config
+            )
         )
     return per_shot
 
@@ -1535,6 +1550,7 @@ def build_noreval12_progress_data(progress_dir, setup, parse_ckpt, run_names,
     discovered = {}
     discovered_forms = {}
     shots = set()
+    aliases = task_aliases(setup)
 
     if progress_dir.is_dir():
         for ckpt_dir in sorted(os.listdir(progress_dir)):
@@ -1551,15 +1567,21 @@ def build_noreval12_progress_data(progress_dir, setup, parse_ckpt, run_names,
             else:
                 print(f"  {'Checkpoint' if run is None else 'Run ' + run}: iteration {step}")
             scores = {}
-            for task in sorted(os.listdir(ckpt_path)):
-                task_path = ckpt_path / task
-                if not task_path.is_dir() or task.startswith("."):
+            for task_dir in sorted(os.listdir(ckpt_path)):
+                task_path = ckpt_path / task_dir
+                if not task_path.is_dir() or task_dir.startswith("."):
                     continue
+                task = aliases.get(task_dir, task_dir)
                 config = setup.get(task)
                 if config is None:
-                    print(f"  WARNING: no config for task '{task}', skipping")
+                    print(f"  WARNING: no config for task '{task_dir}', skipping")
                     continue
-                per_shot = noreval12_extract_task_dir(task_path, task, config)
+                rename = None
+                if task != task_dir:
+                    if (ckpt_path / task).is_dir():
+                        continue
+                    rename = (task_dir, task)
+                per_shot = noreval12_extract_task_dir(task_path, task, config, rename)
                 if not per_shot:
                     continue
                 scores[task] = per_shot

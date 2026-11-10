@@ -265,8 +265,10 @@ mgsm_direct_es:
   metric_scale: unit
   pretty_name: MGSM Direct (Spanish)
   random_baseline: 0.0
-multiblimp_ltg_sme:
+multiblimp_noreval_sme:
   aggregator: multiblimp
+  aliases:
+  - multiblimp_ltg_sme
   category: linguistic knowledge
   empty_prompt: true
   evaluation_type: classification

@@ -11,7 +11,8 @@ ask_gec_nob:
   evaluation_type: generation
   metric_scale: unit
   url: https://huggingface.co/datasets/ltg/ask-gec
-multiblimp_ltg_sme:
+multiblimp_noreval_sme:
+  aliases: [multiblimp_ltg_sme]
   pretty_name: linguistic acceptability (multiblimp)
   description: "Linguistic-acceptability test for Northern Sámi based on the MultiBLiMP dataset, a multilingual benchmark of minimal pairs. For Northern Sámi, it tests subject-verb and subject-participle agreement for person (1st/2nd/3rd) and number (singular/dual/plural). The agreement is tested on finite verbs, auxiliaries, and participles. The model must assign higher probability to the grammatical sentence in each minimal pair. The main metric is micro-averaged accuracy across all subtasks, with a random baseline of 0.5."
   main_metric: acc
