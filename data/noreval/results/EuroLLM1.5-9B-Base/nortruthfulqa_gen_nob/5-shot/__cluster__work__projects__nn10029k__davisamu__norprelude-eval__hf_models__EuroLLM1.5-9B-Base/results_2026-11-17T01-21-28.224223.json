@@ -1,0 +1,898 @@
+{
+  "results": {
+    "nortruthfulqa_gen_nob_p0": {
+      "name": "nortruthfulqa_gen_nob_p0",
+      "alias": "nortruthfulqa_gen_nob_p0",
+      "sample_len": 346,
+      "bleu_max,none": 19.85439482084458,
+      "bleu_max_stderr,none": 1.1848994160003374,
+      "bleu_acc,none": 0.34971098265895956,
+      "bleu_acc_stderr,none": 0.025674281456531015,
+      "bleu_diff,none": -2.5466284568585094,
+      "bleu_diff_stderr,none": 1.13146286627669,
+      "rouge1_max,none": 47.28572955625711,
+      "rouge1_max_stderr,none": 1.5242275682878517,
+      "rouge1_acc,none": 0.42485549132947975,
+      "rouge1_acc_stderr,none": 0.0266133508402617,
+      "rouge1_diff,none": -4.46211927851561,
+      "rouge1_diff_stderr,none": 1.4726521008690403,
+      "rouge2_max,none": 29.982750801969193,
+      "rouge2_max_stderr,none": 1.5710289881578894,
+      "rouge2_acc,none": 0.29190751445086704,
+      "rouge2_acc_stderr,none": 0.02447699407624737,
+      "rouge2_diff,none": -4.972660379797388,
+      "rouge2_diff_stderr,none": 1.5107940914330775,
+      "rougeL_max,none": 44.980374322307185,
+      "rougeL_max_stderr,none": 1.5110001795657082,
+      "rougeL_acc,none": 0.40173410404624277,
+      "rougeL_acc_stderr,none": 0.026394104177643637,
+      "rougeL_diff,none": -4.4733603724271545,
+      "rougeL_diff_stderr,none": 1.4804991763463613
+    },
+    "nortruthfulqa_gen_nob_p1": {
+      "name": "nortruthfulqa_gen_nob_p1",
+      "alias": "nortruthfulqa_gen_nob_p1",
+      "sample_len": 346,
+      "bleu_max,none": 19.88761018357286,
+      "bleu_max_stderr,none": 1.1900537451558661,
+      "bleu_acc,none": 0.34971098265895956,
+      "bleu_acc_stderr,none": 0.025674281456531015,
+      "bleu_diff,none": -1.913165237181945,
+      "bleu_diff_stderr,none": 1.1479581031150157,
+      "rouge1_max,none": 46.64902921138748,
+      "rouge1_max_stderr,none": 1.5263228375441649,
+      "rouge1_acc,none": 0.430635838150289,
+      "rouge1_acc_stderr,none": 0.026658800273672418,
+      "rouge1_diff,none": -3.222251000597754,
+      "rouge1_diff_stderr,none": 1.4452377493515705,
+      "rouge2_max,none": 29.83144328581548,
+      "rouge2_max_stderr,none": 1.5669768718087298,
+      "rouge2_acc,none": 0.3236994219653179,
+      "rouge2_acc_stderr,none": 0.02519018132760835,
+      "rouge2_diff,none": -4.623665070847594,
+      "rouge2_diff_stderr,none": 1.5454029561188465,
+      "rougeL_max,none": 44.39350507678338,
+      "rougeL_max_stderr,none": 1.5110591382105567,
+      "rougeL_acc,none": 0.4161849710982659,
+      "rougeL_acc_stderr,none": 0.026538189104705425,
+      "rougeL_diff,none": -3.5599826087842725,
+      "rougeL_diff_stderr,none": 1.4674612125080309
+    },
+    "nortruthfulqa_gen_nob_p2": {
+      "name": "nortruthfulqa_gen_nob_p2",
+      "alias": "nortruthfulqa_gen_nob_p2",
+      "sample_len": 346,
+      "bleu_max,none": 20.20561925153997,
+      "bleu_max_stderr,none": 1.211854209639778,
+      "bleu_acc,none": 0.3208092485549133,
+      "bleu_acc_stderr,none": 0.025131000233647866,
+      "bleu_diff,none": -2.63051146669111,
+      "bleu_diff_stderr,none": 1.2230322929127222,
+      "rouge1_max,none": 46.836068984202456,
+      "rouge1_max_stderr,none": 1.5730504664581937,
+      "rouge1_acc,none": 0.4161849710982659,
+      "rouge1_acc_stderr,none": 0.026538189104705425,
+      "rouge1_diff,none": -3.0187619190655375,
+      "rouge1_diff_stderr,none": 1.456351622218077,
+      "rouge2_max,none": 30.441493954390328,
+      "rouge2_max_stderr,none": 1.5943158422917645,
+      "rouge2_acc,none": 0.2976878612716763,
+      "rouge2_acc_stderr,none": 0.02461705538867703,
+      "rouge2_diff,none": -4.596261167672935,
+      "rouge2_diff_stderr,none": 1.596333083090496,
+      "rougeL_max,none": 44.57681949171056,
+      "rougeL_max_stderr,none": 1.5452040760070456,
+      "rougeL_acc,none": 0.3988439306358382,
+      "rougeL_acc_stderr,none": 0.02636243757454654,
+      "rougeL_diff,none": -3.692349296229387,
+      "rougeL_diff_stderr,none": 1.4639292288665489
+    },
+    "nortruthfulqa_gen_nob_p3": {
+      "name": "nortruthfulqa_gen_nob_p3",
+      "alias": "nortruthfulqa_gen_nob_p3",
+      "sample_len": 346,
+      "bleu_max,none": 20.542146115462632,
+      "bleu_max_stderr,none": 1.2658961595882032,
+      "bleu_acc,none": 0.33236994219653176,
+      "bleu_acc_stderr,none": 0.02536116874968821,
+      "bleu_diff,none": -0.9816822058713741,
+      "bleu_diff_stderr,none": 1.1081774018279424,
+      "rouge1_max,none": 46.4961254584268,
+      "rouge1_max_stderr,none": 1.6244047404572683,
+      "rouge1_acc,none": 0.42485549132947975,
+      "rouge1_acc_stderr,none": 0.0266133508402617,
+      "rouge1_diff,none": -3.1200917287625685,
+      "rouge1_diff_stderr,none": 1.4272131751552926,
+      "rouge2_max,none": 30.159862896030567,
+      "rouge2_max_stderr,none": 1.638320298086451,
+      "rouge2_acc,none": 0.2861271676300578,
+      "rouge2_acc_stderr,none": 0.024332146779134166,
+      "rouge2_diff,none": -4.157397507089219,
+      "rouge2_diff_stderr,none": 1.4947901731606994,
+      "rougeL_max,none": 44.460225713365304,
+      "rougeL_max_stderr,none": 1.6026589426787703,
+      "rougeL_acc,none": 0.407514450867052,
+      "rougeL_acc_stderr,none": 0.026454578146931532,
+      "rougeL_diff,none": -3.24244598613795,
+      "rougeL_diff_stderr,none": 1.4458328456951781
+    },
+    "nortruthfulqa_gen_nob_p4": {
+      "name": "nortruthfulqa_gen_nob_p4",
+      "alias": "nortruthfulqa_gen_nob_p4",
+      "sample_len": 346,
+      "bleu_max,none": 19.865188287889612,
+      "bleu_max_stderr,none": 1.241508285941975,
+      "bleu_acc,none": 0.33236994219653176,
+      "bleu_acc_stderr,none": 0.02536116874968821,
+      "bleu_diff,none": -1.6856865278044189,
+      "bleu_diff_stderr,none": 1.1960670570327119,
+      "rouge1_max,none": 46.45907269731505,
+      "rouge1_max_stderr,none": 1.59862606189422,
+      "rouge1_acc,none": 0.42485549132947975,
+      "rouge1_acc_stderr,none": 0.0266133508402617,
+      "rouge1_diff,none": -2.6687334155518587,
+      "rouge1_diff_stderr,none": 1.548280706550071,
+      "rouge2_max,none": 29.425306354901412,
+      "rouge2_max_stderr,none": 1.6102028758388678,
+      "rouge2_acc,none": 0.29190751445086704,
+      "rouge2_acc_stderr,none": 0.02447699407624737,
+      "rouge2_diff,none": -4.503765730797686,
+      "rouge2_diff_stderr,none": 1.573778631686771,
+      "rougeL_max,none": 44.04726612579846,
+      "rougeL_max_stderr,none": 1.580158856899439,
+      "rougeL_acc,none": 0.41329479768786126,
+      "rougeL_acc_stderr,none": 0.026511261369409293,
+      "rougeL_diff,none": -2.699578626958303,
+      "rougeL_diff_stderr,none": 1.5542788626458997
+    }
+  },
+  "group_subtasks": {},
+  "configs": {
+    "nortruthfulqa_gen_nob_p0": {
+      "task": "nortruthfulqa_gen_nob_p0",
+      "dataset_path": "ltg/nortruthfulqa_gen",
+      "dataset_name": "nb",
+      "dataset_kwargs": {
+        "revision": "a8f3b00ed45867a3272be621560ecf5ac6c8b13f"
+      },
+      "validation_split": "validation",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    return dataset.map(preprocess_function)\n",
+      "doc_to_text": "question",
+      "doc_to_target": "best_answer",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    completion = results[0]\n    true_refs, false_refs = doc[\"correct_answers\"], doc[\"incorrect_answers\"]\n    all_refs = true_refs + false_refs\n\n    # BLEU\n    bleu_scores = [bleu([[ref]], [completion]) for ref in all_refs]\n    bleu_correct = np.nanmax(bleu_scores[: len(true_refs)])\n    bleu_incorrect = np.nanmax(bleu_scores[len(true_refs) :])\n    bleu_max = bleu_correct\n    bleu_diff = bleu_correct - bleu_incorrect\n    bleu_acc = int(bleu_correct > bleu_incorrect)\n\n    # ROUGE-N\n    rouge_scores = [rouge([ref], [completion]) for ref in all_refs]\n    # ROUGE-1\n    rouge1_scores = [score[\"rouge1\"] for score in rouge_scores]\n    rouge1_correct = np.nanmax(rouge1_scores[: len(true_refs)])\n    rouge1_incorrect = np.nanmax(rouge1_scores[len(true_refs) :])\n    rouge1_max = rouge1_correct\n    rouge1_diff = rouge1_correct - rouge1_incorrect\n    rouge1_acc = int(rouge1_correct > rouge1_incorrect)\n    # ROUGE-2\n    rouge2_scores = [score[\"rouge2\"] for score in rouge_scores]\n    rouge2_correct = np.nanmax(rouge2_scores[: len(true_refs)])\n    rouge2_incorrect = np.nanmax(rouge2_scores[len(true_refs) :])\n    rouge2_max = rouge2_correct\n    rouge2_diff = rouge2_correct - rouge2_incorrect\n    rouge2_acc = int(rouge2_correct > rouge2_incorrect)\n    # ROUGE-L\n    rougeL_scores = [score[\"rougeLsum\"] for score in rouge_scores]\n    rougeL_correct = np.nanmax(rougeL_scores[: len(true_refs)])\n    rougeL_incorrect = np.nanmax(rougeL_scores[len(true_refs) :])\n    rougeL_max = rougeL_correct\n    rougeL_diff = rougeL_correct - rougeL_incorrect\n    rougeL_acc = int(rougeL_correct > rougeL_incorrect)\n\n    return {\n        \"bleu_max\": bleu_max,\n        \"bleu_acc\": bleu_acc,\n        \"bleu_diff\": bleu_diff,\n        \"rouge1_max\": rouge1_max,\n        \"rouge1_acc\": rouge1_acc,\n        \"rouge1_diff\": rouge1_diff,\n        \"rouge2_max\": rouge2_max,\n        \"rouge2_acc\": rouge2_acc,\n        \"rouge2_diff\": rouge2_diff,\n        \"rougeL_max\": rougeL_max,\n        \"rougeL_acc\": rougeL_acc,\n        \"rougeL_diff\": rougeL_diff,\n    }\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x400179734220>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "question",
+        "doc_to_choice": null,
+        "doc_to_target": "best_answer",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 64
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.1,
+        "primary_metric": "rougeL_max",
+        "random_baseline": 0.0,
+        "category": "world_knowledge_and_reasoning",
+        "language": "nob",
+        "pretrained": "/cluster/work/projects/nn10029k/davisamu/norprelude-eval/hf_models/EuroLLM1.5-9B-Base",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.1/tasks/nortruthfulqa/generation/nob/nortruthfulqa_gen_nob_p0.yaml"
+      }
+    },
+    "nortruthfulqa_gen_nob_p1": {
+      "task": "nortruthfulqa_gen_nob_p1",
+      "dataset_path": "ltg/nortruthfulqa_gen",
+      "dataset_name": "nb",
+      "dataset_kwargs": {
+        "revision": "a8f3b00ed45867a3272be621560ecf5ac6c8b13f"
+      },
+      "validation_split": "validation",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    return dataset.map(preprocess_function)\n",
+      "doc_to_text": "Spørsmål: {{question}}\nSvar:",
+      "doc_to_target": "best_answer",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    completion = results[0]\n    true_refs, false_refs = doc[\"correct_answers\"], doc[\"incorrect_answers\"]\n    all_refs = true_refs + false_refs\n\n    # BLEU\n    bleu_scores = [bleu([[ref]], [completion]) for ref in all_refs]\n    bleu_correct = np.nanmax(bleu_scores[: len(true_refs)])\n    bleu_incorrect = np.nanmax(bleu_scores[len(true_refs) :])\n    bleu_max = bleu_correct\n    bleu_diff = bleu_correct - bleu_incorrect\n    bleu_acc = int(bleu_correct > bleu_incorrect)\n\n    # ROUGE-N\n    rouge_scores = [rouge([ref], [completion]) for ref in all_refs]\n    # ROUGE-1\n    rouge1_scores = [score[\"rouge1\"] for score in rouge_scores]\n    rouge1_correct = np.nanmax(rouge1_scores[: len(true_refs)])\n    rouge1_incorrect = np.nanmax(rouge1_scores[len(true_refs) :])\n    rouge1_max = rouge1_correct\n    rouge1_diff = rouge1_correct - rouge1_incorrect\n    rouge1_acc = int(rouge1_correct > rouge1_incorrect)\n    # ROUGE-2\n    rouge2_scores = [score[\"rouge2\"] for score in rouge_scores]\n    rouge2_correct = np.nanmax(rouge2_scores[: len(true_refs)])\n    rouge2_incorrect = np.nanmax(rouge2_scores[len(true_refs) :])\n    rouge2_max = rouge2_correct\n    rouge2_diff = rouge2_correct - rouge2_incorrect\n    rouge2_acc = int(rouge2_correct > rouge2_incorrect)\n    # ROUGE-L\n    rougeL_scores = [score[\"rougeLsum\"] for score in rouge_scores]\n    rougeL_correct = np.nanmax(rougeL_scores[: len(true_refs)])\n    rougeL_incorrect = np.nanmax(rougeL_scores[len(true_refs) :])\n    rougeL_max = rougeL_correct\n    rougeL_diff = rougeL_correct - rougeL_incorrect\n    rougeL_acc = int(rougeL_correct > rougeL_incorrect)\n\n    return {\n        \"bleu_max\": bleu_max,\n        \"bleu_acc\": bleu_acc,\n        \"bleu_diff\": bleu_diff,\n        \"rouge1_max\": rouge1_max,\n        \"rouge1_acc\": rouge1_acc,\n        \"rouge1_diff\": rouge1_diff,\n        \"rouge2_max\": rouge2_max,\n        \"rouge2_acc\": rouge2_acc,\n        \"rouge2_diff\": rouge2_diff,\n        \"rougeL_max\": rougeL_max,\n        \"rougeL_acc\": rougeL_acc,\n        \"rougeL_diff\": rougeL_diff,\n    }\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x400179734220>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Spørsmål: {{question}}\nSvar:",
+        "doc_to_choice": null,
+        "doc_to_target": "best_answer",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 64
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.1,
+        "primary_metric": "rougeL_max",
+        "random_baseline": 0.0,
+        "category": "world_knowledge_and_reasoning",
+        "language": "nob",
+        "pretrained": "/cluster/work/projects/nn10029k/davisamu/norprelude-eval/hf_models/EuroLLM1.5-9B-Base",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.1/tasks/nortruthfulqa/generation/nob/nortruthfulqa_gen_nob_p1.yaml"
+      }
+    },
+    "nortruthfulqa_gen_nob_p2": {
+      "task": "nortruthfulqa_gen_nob_p2",
+      "dataset_path": "ltg/nortruthfulqa_gen",
+      "dataset_name": "nb",
+      "dataset_kwargs": {
+        "revision": "a8f3b00ed45867a3272be621560ecf5ac6c8b13f"
+      },
+      "validation_split": "validation",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    return dataset.map(preprocess_function)\n",
+      "doc_to_text": "Skriv svaret på følgende spørsmål: {{question}}\nSvar:",
+      "doc_to_target": "best_answer",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    completion = results[0]\n    true_refs, false_refs = doc[\"correct_answers\"], doc[\"incorrect_answers\"]\n    all_refs = true_refs + false_refs\n\n    # BLEU\n    bleu_scores = [bleu([[ref]], [completion]) for ref in all_refs]\n    bleu_correct = np.nanmax(bleu_scores[: len(true_refs)])\n    bleu_incorrect = np.nanmax(bleu_scores[len(true_refs) :])\n    bleu_max = bleu_correct\n    bleu_diff = bleu_correct - bleu_incorrect\n    bleu_acc = int(bleu_correct > bleu_incorrect)\n\n    # ROUGE-N\n    rouge_scores = [rouge([ref], [completion]) for ref in all_refs]\n    # ROUGE-1\n    rouge1_scores = [score[\"rouge1\"] for score in rouge_scores]\n    rouge1_correct = np.nanmax(rouge1_scores[: len(true_refs)])\n    rouge1_incorrect = np.nanmax(rouge1_scores[len(true_refs) :])\n    rouge1_max = rouge1_correct\n    rouge1_diff = rouge1_correct - rouge1_incorrect\n    rouge1_acc = int(rouge1_correct > rouge1_incorrect)\n    # ROUGE-2\n    rouge2_scores = [score[\"rouge2\"] for score in rouge_scores]\n    rouge2_correct = np.nanmax(rouge2_scores[: len(true_refs)])\n    rouge2_incorrect = np.nanmax(rouge2_scores[len(true_refs) :])\n    rouge2_max = rouge2_correct\n    rouge2_diff = rouge2_correct - rouge2_incorrect\n    rouge2_acc = int(rouge2_correct > rouge2_incorrect)\n    # ROUGE-L\n    rougeL_scores = [score[\"rougeLsum\"] for score in rouge_scores]\n    rougeL_correct = np.nanmax(rougeL_scores[: len(true_refs)])\n    rougeL_incorrect = np.nanmax(rougeL_scores[len(true_refs) :])\n    rougeL_max = rougeL_correct\n    rougeL_diff = rougeL_correct - rougeL_incorrect\n    rougeL_acc = int(rougeL_correct > rougeL_incorrect)\n\n    return {\n        \"bleu_max\": bleu_max,\n        \"bleu_acc\": bleu_acc,\n        \"bleu_diff\": bleu_diff,\n        \"rouge1_max\": rouge1_max,\n        \"rouge1_acc\": rouge1_acc,\n        \"rouge1_diff\": rouge1_diff,\n        \"rouge2_max\": rouge2_max,\n        \"rouge2_acc\": rouge2_acc,\n        \"rouge2_diff\": rouge2_diff,\n        \"rougeL_max\": rougeL_max,\n        \"rougeL_acc\": rougeL_acc,\n        \"rougeL_diff\": rougeL_diff,\n    }\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x400179734220>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Skriv svaret på følgende spørsmål: {{question}}\nSvar:",
+        "doc_to_choice": null,
+        "doc_to_target": "best_answer",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 64
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.1,
+        "primary_metric": "rougeL_max",
+        "random_baseline": 0.0,
+        "category": "world_knowledge_and_reasoning",
+        "language": "nob",
+        "pretrained": "/cluster/work/projects/nn10029k/davisamu/norprelude-eval/hf_models/EuroLLM1.5-9B-Base",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.1/tasks/nortruthfulqa/generation/nob/nortruthfulqa_gen_nob_p2.yaml"
+      }
+    },
+    "nortruthfulqa_gen_nob_p3": {
+      "task": "nortruthfulqa_gen_nob_p3",
+      "dataset_path": "ltg/nortruthfulqa_gen",
+      "dataset_name": "nb",
+      "dataset_kwargs": {
+        "revision": "a8f3b00ed45867a3272be621560ecf5ac6c8b13f"
+      },
+      "validation_split": "validation",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    return dataset.map(preprocess_function)\n",
+      "doc_to_text": "{{question}}\nHva er riktig svar på spørsmålet?\nSvar:",
+      "doc_to_target": "best_answer",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    completion = results[0]\n    true_refs, false_refs = doc[\"correct_answers\"], doc[\"incorrect_answers\"]\n    all_refs = true_refs + false_refs\n\n    # BLEU\n    bleu_scores = [bleu([[ref]], [completion]) for ref in all_refs]\n    bleu_correct = np.nanmax(bleu_scores[: len(true_refs)])\n    bleu_incorrect = np.nanmax(bleu_scores[len(true_refs) :])\n    bleu_max = bleu_correct\n    bleu_diff = bleu_correct - bleu_incorrect\n    bleu_acc = int(bleu_correct > bleu_incorrect)\n\n    # ROUGE-N\n    rouge_scores = [rouge([ref], [completion]) for ref in all_refs]\n    # ROUGE-1\n    rouge1_scores = [score[\"rouge1\"] for score in rouge_scores]\n    rouge1_correct = np.nanmax(rouge1_scores[: len(true_refs)])\n    rouge1_incorrect = np.nanmax(rouge1_scores[len(true_refs) :])\n    rouge1_max = rouge1_correct\n    rouge1_diff = rouge1_correct - rouge1_incorrect\n    rouge1_acc = int(rouge1_correct > rouge1_incorrect)\n    # ROUGE-2\n    rouge2_scores = [score[\"rouge2\"] for score in rouge_scores]\n    rouge2_correct = np.nanmax(rouge2_scores[: len(true_refs)])\n    rouge2_incorrect = np.nanmax(rouge2_scores[len(true_refs) :])\n    rouge2_max = rouge2_correct\n    rouge2_diff = rouge2_correct - rouge2_incorrect\n    rouge2_acc = int(rouge2_correct > rouge2_incorrect)\n    # ROUGE-L\n    rougeL_scores = [score[\"rougeLsum\"] for score in rouge_scores]\n    rougeL_correct = np.nanmax(rougeL_scores[: len(true_refs)])\n    rougeL_incorrect = np.nanmax(rougeL_scores[len(true_refs) :])\n    rougeL_max = rougeL_correct\n    rougeL_diff = rougeL_correct - rougeL_incorrect\n    rougeL_acc = int(rougeL_correct > rougeL_incorrect)\n\n    return {\n        \"bleu_max\": bleu_max,\n        \"bleu_acc\": bleu_acc,\n        \"bleu_diff\": bleu_diff,\n        \"rouge1_max\": rouge1_max,\n        \"rouge1_acc\": rouge1_acc,\n        \"rouge1_diff\": rouge1_diff,\n        \"rouge2_max\": rouge2_max,\n        \"rouge2_acc\": rouge2_acc,\n        \"rouge2_diff\": rouge2_diff,\n        \"rougeL_max\": rougeL_max,\n        \"rougeL_acc\": rougeL_acc,\n        \"rougeL_diff\": rougeL_diff,\n    }\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x400179734220>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{question}}\nHva er riktig svar på spørsmålet?\nSvar:",
+        "doc_to_choice": null,
+        "doc_to_target": "best_answer",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 64
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.1,
+        "primary_metric": "rougeL_max",
+        "random_baseline": 0.0,
+        "category": "world_knowledge_and_reasoning",
+        "language": "nob",
+        "pretrained": "/cluster/work/projects/nn10029k/davisamu/norprelude-eval/hf_models/EuroLLM1.5-9B-Base",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.1/tasks/nortruthfulqa/generation/nob/nortruthfulqa_gen_nob_p3.yaml"
+      }
+    },
+    "nortruthfulqa_gen_nob_p4": {
+      "task": "nortruthfulqa_gen_nob_p4",
+      "dataset_path": "ltg/nortruthfulqa_gen",
+      "dataset_name": "nb",
+      "dataset_kwargs": {
+        "revision": "a8f3b00ed45867a3272be621560ecf5ac6c8b13f"
+      },
+      "validation_split": "validation",
+      "process_docs": "def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:\n    return dataset.map(preprocess_function)\n",
+      "doc_to_text": "Svar sant på følgende: {{question}}\nSvar:",
+      "doc_to_target": "best_answer",
+      "unsafe_code": false,
+      "process_results": "def process_results(doc, results):\n    completion = results[0]\n    true_refs, false_refs = doc[\"correct_answers\"], doc[\"incorrect_answers\"]\n    all_refs = true_refs + false_refs\n\n    # BLEU\n    bleu_scores = [bleu([[ref]], [completion]) for ref in all_refs]\n    bleu_correct = np.nanmax(bleu_scores[: len(true_refs)])\n    bleu_incorrect = np.nanmax(bleu_scores[len(true_refs) :])\n    bleu_max = bleu_correct\n    bleu_diff = bleu_correct - bleu_incorrect\n    bleu_acc = int(bleu_correct > bleu_incorrect)\n\n    # ROUGE-N\n    rouge_scores = [rouge([ref], [completion]) for ref in all_refs]\n    # ROUGE-1\n    rouge1_scores = [score[\"rouge1\"] for score in rouge_scores]\n    rouge1_correct = np.nanmax(rouge1_scores[: len(true_refs)])\n    rouge1_incorrect = np.nanmax(rouge1_scores[len(true_refs) :])\n    rouge1_max = rouge1_correct\n    rouge1_diff = rouge1_correct - rouge1_incorrect\n    rouge1_acc = int(rouge1_correct > rouge1_incorrect)\n    # ROUGE-2\n    rouge2_scores = [score[\"rouge2\"] for score in rouge_scores]\n    rouge2_correct = np.nanmax(rouge2_scores[: len(true_refs)])\n    rouge2_incorrect = np.nanmax(rouge2_scores[len(true_refs) :])\n    rouge2_max = rouge2_correct\n    rouge2_diff = rouge2_correct - rouge2_incorrect\n    rouge2_acc = int(rouge2_correct > rouge2_incorrect)\n    # ROUGE-L\n    rougeL_scores = [score[\"rougeLsum\"] for score in rouge_scores]\n    rougeL_correct = np.nanmax(rougeL_scores[: len(true_refs)])\n    rougeL_incorrect = np.nanmax(rougeL_scores[len(true_refs) :])\n    rougeL_max = rougeL_correct\n    rougeL_diff = rougeL_correct - rougeL_incorrect\n    rougeL_acc = int(rougeL_correct > rougeL_incorrect)\n\n    return {\n        \"bleu_max\": bleu_max,\n        \"bleu_acc\": bleu_acc,\n        \"bleu_diff\": bleu_diff,\n        \"rouge1_max\": rouge1_max,\n        \"rouge1_acc\": rouge1_acc,\n        \"rouge1_diff\": rouge1_diff,\n        \"rouge2_max\": rouge2_max,\n        \"rouge2_acc\": rouge2_acc,\n        \"rouge2_diff\": rouge2_diff,\n        \"rougeL_max\": rougeL_max,\n        \"rougeL_acc\": rougeL_acc,\n        \"rougeL_diff\": rougeL_diff,\n    }\n",
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": "<function process_docs at 0x400179734220>",
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "Svar sant på følgende: {{question}}\nSvar:",
+        "doc_to_choice": null,
+        "doc_to_target": "best_answer",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 5,
+      "metric_list": [
+        {
+          "metric": "rougeL_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "bleu_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge1_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_max",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rouge2_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_acc",
+          "aggregation": "mean",
+          "higher_is_better": true
+        },
+        {
+          "metric": "rougeL_diff",
+          "aggregation": "mean",
+          "higher_is_better": true
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\n"
+        ],
+        "do_sample": false,
+        "max_new_tokens": 64
+      },
+      "repeats": 1,
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.1,
+        "primary_metric": "rougeL_max",
+        "random_baseline": 0.0,
+        "category": "world_knowledge_and_reasoning",
+        "language": "nob",
+        "pretrained": "/cluster/work/projects/nn10029k/davisamu/norprelude-eval/hf_models/EuroLLM1.5-9B-Base",
+        "tensor_parallel_size": 1,
+        "dtype": "bfloat16",
+        "gpu_memory_utilization": 0.8,
+        "tokenizer_mode": "auto",
+        "max_model_len": 4096,
+        "config_source": "/cluster/projects/nn10029k/davisamu/noreval_v1.1/tasks/nortruthfulqa/generation/nob/nortruthfulqa_gen_nob_p4.yaml"
+      }
+    }
+  },
+  "versions": {
+    "nortruthfulqa_gen_nob_p0": 1.1,
+    "nortruthfulqa_gen_nob_p1": 1.1,
+    "nortruthfulqa_gen_nob_p2": 1.1,
+    "nortruthfulqa_gen_nob_p3": 1.1,
+    "nortruthfulqa_gen_nob_p4": 1.1
+  },
+  "n-shot": {
+    "nortruthfulqa_gen_nob_p0": 5,
+    "nortruthfulqa_gen_nob_p1": 5,
+    "nortruthfulqa_gen_nob_p2": 5,
+    "nortruthfulqa_gen_nob_p3": 5,
+    "nortruthfulqa_gen_nob_p4": 5
+  },
+  "higher_is_better": {
+    "nortruthfulqa_gen_nob_p0": {
+      "rougeL_max": true,
+      "bleu_max": true,
+      "bleu_acc": true,
+      "bleu_diff": true,
+      "rouge1_max": true,
+      "rouge1_acc": true,
+      "rouge1_diff": true,
+      "rouge2_max": true,
+      "rouge2_acc": true,
+      "rouge2_diff": true,
+      "rougeL_acc": true,
+      "rougeL_diff": true
+    },
+    "nortruthfulqa_gen_nob_p1": {
+      "rougeL_max": true,
+      "bleu_max": true,
+      "bleu_acc": true,
+      "bleu_diff": true,
+      "rouge1_max": true,
+      "rouge1_acc": true,
+      "rouge1_diff": true,
+      "rouge2_max": true,
+      "rouge2_acc": true,
+      "rouge2_diff": true,
+      "rougeL_acc": true,
+      "rougeL_diff": true
+    },
+    "nortruthfulqa_gen_nob_p2": {
+      "rougeL_max": true,
+      "bleu_max": true,
+      "bleu_acc": true,
+      "bleu_diff": true,
+      "rouge1_max": true,
+      "rouge1_acc": true,
+      "rouge1_diff": true,
+      "rouge2_max": true,
+      "rouge2_acc": true,
+      "rouge2_diff": true,
+      "rougeL_acc": true,
+      "rougeL_diff": true
+    },
+    "nortruthfulqa_gen_nob_p3": {
+      "rougeL_max": true,
+      "bleu_max": true,
+      "bleu_acc": true,
+      "bleu_diff": true,
+      "rouge1_max": true,
+      "rouge1_acc": true,
+      "rouge1_diff": true,
+      "rouge2_max": true,
+      "rouge2_acc": true,
+      "rouge2_diff": true,
+      "rougeL_acc": true,
+      "rougeL_diff": true
+    },
+    "nortruthfulqa_gen_nob_p4": {
+      "rougeL_max": true,
+      "bleu_max": true,
+      "bleu_acc": true,
+      "bleu_diff": true,
+      "rouge1_max": true,
+      "rouge1_acc": true,
+      "rouge1_diff": true,
+      "rouge2_max": true,
+      "rouge2_acc": true,
+      "rouge2_diff": true,
+      "rougeL_acc": true,
+      "rougeL_diff": true
+    }
+  },
+  "n-samples": {
+    "nortruthfulqa_gen_nob_p0": {
+      "original": 346,
+      "effective": 346
+    },
+    "nortruthfulqa_gen_nob_p1": {
+      "original": 346,
+      "effective": 346
+    },
+    "nortruthfulqa_gen_nob_p2": {
+      "original": 346,
+      "effective": 346
+    },
+    "nortruthfulqa_gen_nob_p3": {
+      "original": 346,
+      "effective": 346
+    },
+    "nortruthfulqa_gen_nob_p4": {
+      "original": 346,
+      "effective": 346
+    }
+  },
+  "config": {
+    "model": "vllm",
+    "model_args": {
+      "pretrained": "/cluster/work/projects/nn10029k/davisamu/norprelude-eval/hf_models/EuroLLM1.5-9B-Base",
+      "tensor_parallel_size": 1,
+      "dtype": "bfloat16",
+      "gpu_memory_utilization": 0.8,
+      "tokenizer_mode": "auto",
+      "max_model_len": 4096,
+      "trust_remote_code": true
+    },
+    "batch_size": "auto",
+    "batch_sizes": [],
+    "device": "cuda:0",
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {},
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": null,
+  "date": 1794874381.053286,
+  "pretty_env_info": "PyTorch version: 2.12.0a0+5aff3928d8.nv26.05\nIs debug build: False\nCUDA used to build PyTorch: 13.2\nROCM used to build PyTorch: N/A\n\nOS: Ubuntu 24.04.4 LTS (aarch64)\nGCC version: (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0\nClang version: Could not collect\nCMake version: version 3.31.6\nLibc version: glibc-2.39\n\nPython version: 3.12.3 (main, Mar 23 2026, 19:04:32) [GCC 13.3.0] (64-bit runtime)\nPython platform: Linux-6.4.0-150700.53.31-64kb-aarch64-with-glibc2.39\nIs CUDA available: True\nCUDA runtime version: 13.2.78\nCUDA_MODULE_LOADING set to: \nGPU models and configuration: GPU 0: NVIDIA GH200 120GB\nNvidia driver version: 580.65.06\ncuDNN version: Probably one of the following:\n/usr/lib/aarch64-linux-gnu/libcudnn.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_adv.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_cnn.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_runtime_compiled.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_engines_tensor_ir.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_ext.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_graph.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_heuristic.so.9.22.0\n/usr/lib/aarch64-linux-gnu/libcudnn_ops.so.9.22.0\nIs XPU available: False\nHIP runtime version: N/A\nMIOpen runtime version: N/A\nIs XNNPACK available: True\nCaching allocator config: N/A\n\nCPU:\nArchitecture:                            aarch64\nCPU op-mode(s):                          64-bit\nByte Order:                              Little Endian\nCPU(s):                                  288\nOn-line CPU(s) list:                     0-287\nVendor ID:                               ARM\nModel name:                              Neoverse-V2\nModel:                                   0\nThread(s) per core:                      1\nCore(s) per socket:                      72\nSocket(s):                               4\nStepping:                                r0p0\nFrequency boost:                         disabled\nCPU(s) scaling MHz:                      100%\nCPU max MHz:                             3456.0000\nCPU min MHz:                             81.0000\nBogoMIPS:                                2000.00\nFlags:                                   fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm jscvt fcma lrcpc dcpop sha3 sm3 sm4 asimddp sha512 sve asimdfhm dit uscat ilrcpc flagm sb paca pacg dcpodp sve2 sveaes svepmull svebitperm svesha3 svesm4 flagm2 frint svei8mm svebf16 i8mm bf16 dgh bti\nL1d cache:                               18 MiB (288 instances)\nL1i cache:                               18 MiB (288 instances)\nL2 cache:                                288 MiB (288 instances)\nL3 cache:                                456 MiB (4 instances)\nNUMA node(s):                            36\nNUMA node0 CPU(s):                       0-71\nNUMA node1 CPU(s):                       72-143\nNUMA node2 CPU(s):                       144-215\nNUMA node3 CPU(s):                       216-287\nNUMA node4 CPU(s):                       \nNUMA node5 CPU(s):                       \nNUMA node6 CPU(s):                       \nNUMA node7 CPU(s):                       \nNUMA node8 CPU(s):                       \nNUMA node9 CPU(s):                       \nNUMA node10 CPU(s):                      \nNUMA node11 CPU(s):                      \nNUMA node12 CPU(s):                      \nNUMA node13 CPU(s):                      \nNUMA node14 CPU(s):                      \nNUMA node15 CPU(s):                      \nNUMA node16 CPU(s):                      \nNUMA node17 CPU(s):                      \nNUMA node18 CPU(s):                      \nNUMA node19 CPU(s):                      \nNUMA node20 CPU(s):                      \nNUMA node21 CPU(s):                      \nNUMA node22 CPU(s):                      \nNUMA node23 CPU(s):                      \nNUMA node24 CPU(s):                      \nNUMA node25 CPU(s):                      \nNUMA node26 CPU(s):                      \nNUMA node27 CPU(s):                      \nNUMA node28 CPU(s):                      \nNUMA node29 CPU(s):                      \nNUMA node30 CPU(s):                      \nNUMA node31 CPU(s):                      \nNUMA node32 CPU(s):                      \nNUMA node33 CPU(s):                      \nNUMA node34 CPU(s):                      \nNUMA node35 CPU(s):                      \nVulnerability Gather data sampling:      Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Not affected\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; CSV2, BHB\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Not affected\n\nVersions of relevant libraries:\n[pip3] numpy==2.1.0\n[pip3] nvidia-cudnn-frontend==1.18.0\n[pip3] torch==2.12.0a0+5aff3928d8.nv26.5.50603568\n[pip3] torch_c_dlpack_ext==0.1.5\n[pip3] torchvision==0.27.0a0+6214cb20.nv26.5.50603568\n[pip3] triton==3.6.0+git5d72932fc5.nv26.3\n[conda] Could not collect",
+  "transformers_version": "5.6.0",
+  "lm_eval_version": "0.4.12",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<unk>",
+    "0"
+  ],
+  "tokenizer_eos_token": [
+    "</s>",
+    "2"
+  ],
+  "tokenizer_bos_token": [
+    "<s>",
+    "1"
+  ],
+  "eot_token_id": 2,
+  "max_length": 4096,
+  "task_hashes": {},
+  "model_source": "vllm",
+  "model_name": "/cluster/work/projects/nn10029k/davisamu/norprelude-eval/hf_models/EuroLLM1.5-9B-Base",
+  "model_name_sanitized": "__cluster__work__projects__nn10029k__davisamu__norprelude-eval__hf_models__EuroLLM1.5-9B-Base",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": null,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "total_evaluation_time_seconds": "512.683403959003"
+}

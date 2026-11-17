@@ -407,6 +407,18 @@ EuroLLM-22B-2512:
   default: true
   color: "#5f9ea0"
 
+EuroLLM1.5-9B-Base:
+  display_name: "EuroLLM 1.5 9B"
+  category: multilingual
+  organization: EuroLLM
+  parameters: 9.2
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Base model of the EuroLLM 1.5 generation, the successor to EuroLLM 9B. Multilingual transformer covering 35 languages."
+  huggingface_url: https://huggingface.co/utter-project/EuroLLM1.5-9B-Base
+  default: true
+  color: "#5f9ea0"
+
 prelude-base:
   display_name: "Prelude 9B"
   category: multilingual
@@ -418,6 +430,30 @@ prelude-base:
   huggingface_url: https://huggingface.co/openeurollm/prelude-base
   default: true
   color: "#53bef7"
+
+marin-8b-base:
+  display_name: "Marin 8B"
+  category: multilingual
+  organization: Marin
+  parameters: 8.0
+  license: "Apache 2.0"
+  fully_open: true
+  description: "English base model from the Marin Project, a collaborative effort to develop open-source foundation models, started at Stanford CRFM. Llama architecture, trained on 12.7 trillion tokens with a 4k context length."
+  huggingface_url: https://huggingface.co/marin-community/marin-8b-base
+  default: true
+  color: "#222c35"
+
+marin-32b-base:
+  display_name: "Marin 32B"
+  category: multilingual
+  organization: Marin
+  parameters: 32.5
+  license: "Apache 2.0"
+  fully_open: true
+  description: "English base model from the Marin Project, a collaborative effort to develop open-source foundation models. Llama-style architecture with QK-norm attention (the Qwen3 32B backbone), trained on about 6.4 trillion tokens with a 4k context length."
+  huggingface_url: https://huggingface.co/marin-community/marin-32b-base
+  default: true
+  color: "#222c35"
 
 gemma-3-1b-pt:
   display_name: "Gemma3 1B"
