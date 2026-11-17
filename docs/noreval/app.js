@@ -9,7 +9,7 @@ initComparison({
   filenamePrefix: "noreval-chart",
   defaultShot: "5",
   defaultSizeMin: 6,
-  defaultSizeMax: 24,
+  defaultSizeMax: 20,
   sizeRangeMin: 1,
   sizeRangeMax: 700,
 });
