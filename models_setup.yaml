@@ -488,7 +488,7 @@ gemma-3-12b-pt:
   fully_open: false
   description: "Multimodal model from Google trained on 12 trillion tokens. Supports 140+ languages with text and image input."
   huggingface_url: https://huggingface.co/google/gemma-3-12b-pt
-  default: true
+  default: false
   color: "#3aab58"
 
 gemma-3-27b-pt:
@@ -524,6 +524,18 @@ gemma-4-E4B:
   fully_open: false
   description: "Lightweight multimodal model from Google's Gemma 4 family with 4.5B effective parameters (8B total). Features Per-Layer Embeddings for efficient on-device deployment with 128k context window."
   huggingface_url: https://huggingface.co/google/gemma-4-E4B
+  default: true
+  color: "#3aab58"
+
+gemma-4-12B:
+  display_name: "Gemma4 12B"
+  category: multilingual
+  organization: Google
+  parameters: 12.0
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Dense multimodal model from Google's Gemma 4 family with 12B parameters, with a unified architecture that takes text, image and audio input. Features 256k context window and is designed for consumer GPUs and workstations."
+  huggingface_url: https://huggingface.co/google/gemma-4-12B
   default: true
   color: "#3aab58"
 
