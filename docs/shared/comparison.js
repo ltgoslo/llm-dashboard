@@ -52,6 +52,7 @@ const ORG_LOGO = {
   "DFM": "dfm.png",
   "DeepSeek AI": "deepseek.png",
   "EuroLLM": "eurollm.png",
+  "Liquid AI": "liquid_ai.png",
   "LTG/UiO": "uio.png",
   "Marin": "marin.png",
   "Nasjonalbiblioteket": "nb.png",
@@ -136,6 +137,12 @@ function buildScatterOrgImages(modelDirs, xs, paperYs) {
   }).filter(Boolean);
 }
 
+// Scatter glyphs: disk diameter in px (what the former fixed 1B–1T axis drew
+// on a full-width desktop chart) and the logo's share of it.
+const SCATTER_DISK_PX = 24.4;
+const SCATTER_DISK_PX_NARROW = 20;
+const SCATTER_LOGO_SHARE = 0.643;
+
 /** SVG data URL for a colored disk with a white outline — the per-marker
  *  background that lives alongside each logo in layout.images. */
 function coloredDiskDataUrl(color) {
@@ -153,9 +160,15 @@ function coloredDiskDataUrl(color) {
  *  Returns { images, imageToModel } where imageToModel[i] is the model
  *  index that image i belongs to — needed at hover time so scaling
  *  affects only the hovered model's images, not nearby ones. */
-function buildScatterCompositeImages(modelDirs, xs, paperYs, colors) {
+function buildScatterCompositeImages(modelDirs, xs, paperYs, colors, glyph) {
   const images = [];
   const imageToModel = [];
+  // Glyph sizes are given in pixels (`glyph`: disk diameter, plot size,
+  // x-span in decades), so they don't change with the fitted x-range or
+  // shrink on a phone: xref "x" sizes are in log10 units, yref "paper" ones
+  // in fractions of the plot height.
+  const sizeX = (px) => px / glyph.plotW * glyph.xSpan;
+  const sizeY = (px) => px / glyph.plotH;
   for (let i = 0; i < modelDirs.length; i++) {
     const x = Math.log10(xs[i]);
     const y = paperYs[i];
@@ -163,7 +176,7 @@ function buildScatterCompositeImages(modelDirs, xs, paperYs, colors) {
       source: coloredDiskDataUrl(colors[i]),
       xref: "x", yref: "paper",
       x, y,
-      sizex: 0.07, sizey: 0.065,
+      sizex: sizeX(glyph.disk), sizey: sizeY(glyph.disk),
       xanchor: "center", yanchor: "middle",
       sizing: "contain",
       layer: "above",
@@ -177,7 +190,7 @@ function buildScatterCompositeImages(modelDirs, xs, paperYs, colors) {
         source: `../shared/logos/${filename}`,
         xref: "x", yref: "paper",
         x, y,
-        sizex: 0.045 * scale, sizey: 0.045 * scale,
+        sizex: sizeX(glyph.disk * SCATTER_LOGO_SHARE * scale), sizey: sizeY(glyph.disk * SCATTER_LOGO_SHARE * scale),
         xanchor: "center", yanchor: "middle",
         sizing: "contain",
         layer: "above",
@@ -203,6 +216,68 @@ const DEFAULT_SELECTION = "__all_macro__";
 export const checkedModels = new Set();
 
 // ─────────────────────────────────────────────────────────────
+// Results loading
+// ─────────────────────────────────────────────────────────────
+// A comparison data.json either carries every model's results under
+// `models`, or (build_data.py write_comparison_data) only the metadata and
+// `model_ids`, with each model's results in models/<id>.json. Those are
+// fetched when a view first shows the model (renderChart waits for them),
+// and the default models' are prefetched once the first chart is up.
+
+/** All models of the dashboard (loaded or not), in data order. */
+function allModelIds() {
+  return state.DATA.model_ids || Object.keys(state.DATA.models);
+}
+
+let knownModels = null;
+/** Whether `m` is one of the dashboard's models. */
+function isKnownModel(m) {
+  if (!knownModels) knownModels = new Set(allModelIds());
+  return knownModels.has(m);
+}
+
+// Model id → promise of its results being merged into state.DATA.models.
+const modelLoads = new Map();
+// Counts renderChart calls; a render waiting for results draws only if no
+// newer one came in meanwhile.
+let renderToken = 0;
+
+/** Resolve once the results of all `models` are in state.DATA.models,
+ *  fetching those that aren't. A file that fails to load counts as a model
+ *  without scores (logged), so one bad file can't block the chart. */
+function ensureModelsLoaded(models) {
+  const pending = [];
+  for (const m of models) {
+    if (Object.hasOwn(state.DATA.models, m)) continue;
+    if (!modelLoads.has(m)) {
+      const version = state.DATA.results_version ? "?v=" + state.DATA.results_version : "";
+      const url = "models/" + encodeURIComponent(m) + ".json" + version;
+      modelLoads.set(m, fetch(url)
+        .then((r) => { if (!r.ok) throw new Error(r.status + " " + r.statusText + " (" + url + ")"); return r.json(); })
+        .catch((err) => { console.error(`Could not load the results of ${m}:`, err); return {}; })
+        .then((results) => { state.DATA.models[m] = results; }));
+    }
+    pending.push(modelLoads.get(m));
+  }
+  return Promise.all(pending);
+}
+
+/** After the first chart: load the default models' results in the
+ *  background, so moving the size slider over them needs no wait. */
+function prefetchDefaultModels() {
+  if (!state.DATA.model_ids) return;
+  const run = () => ensureModelsLoaded((state.DATA.default_models || []).filter(isKnownModel));
+  if ("requestIdleCallback" in window) requestIdleCallback(run, { timeout: 4000 });
+  else setTimeout(run, 1500);
+}
+
+/** Dim the chart while a view waits for results (the class's CSS delays
+ *  the dimming, so quick loads don't flash). */
+function setChartLoading(on) {
+  document.getElementById("chart")?.classList.toggle("chart-loading", on);
+}
+
+// ─────────────────────────────────────────────────────────────
 // Public API
 // ─────────────────────────────────────────────────────────────
 
@@ -226,11 +301,15 @@ export async function initComparison(config) {
     maxBars: 40,
   }, config);
   plotlyConfig = makePlotlyConfig(CFG.filenamePrefix, exportMetadata);
+  // Scopes the comparison pages' phone layout in style.css.
+  document.body.classList.add("comparison-page");
 
   try {
     const response = await fetch("data.json");
     state.DATA = await response.json();
     state.metricsSetup = state.DATA.metrics_setup;
+    // Results in per-model files: none loaded yet (ensureModelsLoaded).
+    if (state.DATA.model_ids && !state.DATA.models) state.DATA.models = {};
 
     if (CFG.keepCategoryAverage) addCustomMacroOption();
     resetViewState();
@@ -246,6 +325,7 @@ export async function initComparison(config) {
       onChange: () => onTaskCheckboxChange(renderChart),
     });
     buildModelCheckboxes();
+    buildModelToolbar();
     bindModuleActionStopPropagation();
     attachControlTooltips();
 
@@ -258,12 +338,16 @@ export async function initComparison(config) {
 
     if (hasURL) syncControlsFromState();
 
+    // The first chart is drawn under the loading overlay, with its results.
+    await ensureModelsLoaded(getModelList());
     renderChart();
     markAppReady();
+    prefetchDefaultModels();
     // Opening a share link in a tab that already shows this dashboard only
     // changes the hash (no reload) — apply it. Our own URL updates use
     // history.replaceState, which fires no hashchange.
     window.addEventListener("hashchange", applyUrlFromHash);
+    bindNarrowScreenListeners();
   } catch (err) {
     console.error("init failed:", err);
     const el = document.getElementById("chart");
@@ -337,8 +421,8 @@ function resetViewState() {
 
 /** Check the data's default model set. */
 function addDefaultModels() {
-  for (const m of state.DATA.default_models || Object.keys(state.DATA.models)) {
-    if (Object.hasOwn(state.DATA.models, m)) checkedModels.add(m);
+  for (const m of state.DATA.default_models || allModelIds()) {
+    if (isKnownModel(m)) checkedModels.add(m);
   }
 }
 
@@ -401,7 +485,7 @@ function buildTaskAliasMaps() {
 
 const modelAlias = { _toAlias: Object.create(null), _toSel: Object.create(null) };
 function buildModelAliasMaps() {
-  for (const dir of Object.keys(state.DATA.models)) {
+  for (const dir of allModelIds()) {
     const a = slugify(getModelLabel(dir));
     modelAlias._toAlias[dir] = a;
     modelAlias._toSel[a] = dir;
@@ -502,8 +586,8 @@ function setupUrlState() {
     {
       key: "models",
       get: () => {
-        const all = new Set(Object.keys(state.DATA.models));
-        const defaults = new Set((state.DATA.default_models || Object.keys(state.DATA.models)).filter((m) => m in state.DATA.models));
+        const all = new Set(allModelIds());
+        const defaults = new Set((state.DATA.default_models || allModelIds()).filter(isKnownModel));
         if (setsEqual(checkedModels, defaults)) return "";
         if (setsEqual(checkedModels, all)) return "all";
         // An empty value would be dropped from the URL (= the default set).
@@ -511,14 +595,14 @@ function setupUrlState() {
         return [...checkedModels].map((d) => modelAlias._toAlias[d] || d).sort().join(",");
       },
       set: (v) => {
-        const all = new Set(Object.keys(state.DATA.models));
+        const all = new Set(allModelIds());
         checkedModels.clear();
         if (v === "all") {
           for (const m of all) checkedModels.add(m);
         } else if (v && v !== "none") {
           for (const a of v.split(",")) {
             const dir = modelAlias._toSel[a] || a;
-            if (Object.hasOwn(state.DATA.models, dir)) checkedModels.add(dir);
+            if (isKnownModel(dir)) checkedModels.add(dir);
           }
           // A list naming no known model (a stale link) keeps the default set.
           if (checkedModels.size === 0) addDefaultModels();
@@ -569,22 +653,21 @@ function bindEventListeners() {
     });
   }
 
+  // A panel's "Select all" / "Select none": while a model search is active,
+  // only the models it lists.
+  const panelModels = (cat) => allModelIds().filter((m) =>
+    (state.DATA.model_categories?.[m] || "multilingual") === cat
+    && (!modelSearchMatches || modelSearchMatches.has(m)));
   document.querySelectorAll(".model-select-all").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const cat = btn.dataset.category;
-      for (const m of Object.keys(state.DATA.models)) {
-        if ((state.DATA.model_categories?.[m] || "multilingual") === cat) checkedModels.add(m);
-      }
+      for (const m of panelModels(btn.dataset.category)) checkedModels.add(m);
       syncModelCheckboxStates();
       renderChart();
     });
   });
   document.querySelectorAll(".model-select-none").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const cat = btn.dataset.category;
-      for (const m of Object.keys(state.DATA.models)) {
-        if ((state.DATA.model_categories?.[m] || "multilingual") === cat) checkedModels.delete(m);
-      }
+      for (const m of panelModels(btn.dataset.category)) checkedModels.delete(m);
       syncModelCheckboxStates();
       renderChart();
     });
@@ -711,7 +794,7 @@ function getModelColor(modelDir) {
   if (explicit) return explicit;
   const assigned = new Set(Object.values(state.DATA.model_colors || {}));
   const available = MODEL_COLORS.filter((c) => !assigned.has(c));
-  const unassigned = Object.keys(state.DATA.models).filter((m) => !state.DATA.model_colors?.[m]);
+  const unassigned = allModelIds().filter((m) => !state.DATA.model_colors?.[m]);
   const idx = unassigned.indexOf(modelDir);
   return available[idx % available.length] || MODEL_COLORS[idx % MODEL_COLORS.length];
 }
@@ -776,9 +859,16 @@ function promptCount(m, bench, metric) {
 }
 
 /** The most prompt templates any model has on `bench` (current shot): a
- *  max / min / mean over fewer prompts is not directly comparable. */
+ *  max / min / mean over fewer prompts is not directly comparable. With
+ *  per-model results files, from the build's table over all models (the
+ *  loaded ones may not include the model with the most). */
 const maxPromptCache = new Map();
 function maxPromptCount(bench, metric) {
+  const table = state.DATA.max_prompts;
+  if (table) {
+    const n = table[bench]?.[state.currentShot]?.[metric];
+    return typeof n === "number" ? n : undefined;
+  }
   const key = bench + "\n" + state.currentShot + "\n" + metric;
   if (!maxPromptCache.has(key)) {
     let mx;
@@ -795,12 +885,14 @@ function maxPromptCount(bench, metric) {
  *  under the current macro/micro mode and normalization — plus, for the
  *  tooltip, the `tasksUsed` of `tasksTotal` selected tasks the model has a
  *  score on (models are otherwise silently compared on different task
- *  sets) and the tasks it was scored on with fewer prompts than others. */
+ *  sets), the tasks it was scored on with fewer prompts than others, and
+ *  its average per task category (categoryBreakdown). */
 function aggregateModelResult(m, modelNames) {
   const needAll = normNeedsAllValues();
   const useCI = wantCI();
   let tasksUsed = 0;
   const fewerPrompts = [];
+  const taskScores = [];
   const res = aggregateScores(state.checkedTasks, (bench) => {
     const raw = getScore(state.DATA.models, m, bench, state.currentShot);
     if (raw === undefined) return undefined;
@@ -813,9 +905,31 @@ function aggregateModelResult(m, modelNames) {
     const ci = useCI
       ? normCI(getCombinedCI(state.DATA.models, m, bench, state.currentShot), bench, undefined, allRaw)
       : undefined;
+    taskScores.push([bench, score]);
     return { score, ci };
   }, isMacroSelection());
-  return res && { ...res, tasksUsed, tasksTotal: selectedTasks().length, fewerPrompts };
+  return res && {
+    ...res, tasksUsed, tasksTotal: selectedTasks().length, fewerPrompts,
+    categories: categoryBreakdown(taskScores),
+  };
+}
+
+/** A model's average (rescaled) score per task category, from its
+ *  [bench, score] pairs — [{category, score, n}] in the task grid's
+ *  (alphabetical) order, or [] when the tasks span fewer than two
+ *  categories. Shown in the tooltips of aggregate views. */
+function categoryBreakdown(taskScores) {
+  const groups = new Map();
+  for (const [bench, score] of taskScores) {
+    const category = state.metricsSetup[bench]?.category;
+    if (score === undefined || Number.isNaN(score) || !category) continue;
+    const g = groups.get(category) || { sum: 0, n: 0 };
+    g.sum += score; g.n++;
+    groups.set(category, g);
+  }
+  if (groups.size < 2) return [];
+  return [...groups].sort(([a], [b]) => a.localeCompare(b))
+    .map(([category, g]) => ({ category, score: g.sum / g.n, n: g.n }));
 }
 
 function isModelInSizeRange(modelDir) {
@@ -833,7 +947,7 @@ function isModelInSizeRange(modelDir) {
 }
 
 function getModelList() {
-  return Object.keys(state.DATA.models)
+  return allModelIds()
     .filter((m) => checkedModels.has(m) && isModelInSizeRange(m))
     .sort((a, b) => {
       const orgA = state.DATA.model_organizations?.[a] || "";
@@ -858,10 +972,77 @@ function computeOrgXPositions(modelNames) {
 // Model checkbox panel
 // ─────────────────────────────────────────────────────────────
 
+// The models matching the model search (null: no search). While a search is
+// active, the panels' "Select all" / "Select none" act on these only.
+let modelSearchMatches = null;
+
+/** The search field and "Reset to default" button above the model panels. */
+function buildModelToolbar() {
+  const panels = document.getElementById("model-panels");
+  if (!panels || document.getElementById("model-search")) return;
+  const bar = document.createElement("div");
+  bar.className = "model-toolbar";
+
+  const search = document.createElement("input");
+  search.type = "search";
+  search.id = "model-search";
+  search.className = "model-search";
+  search.placeholder = "Search models";
+  search.setAttribute("aria-label", "Search models");
+  search.autocomplete = "off";
+  search.spellcheck = false;
+  search.addEventListener("input", () => applyModelSearch(search.value));
+
+  const reset = document.createElement("button");
+  reset.type = "button";
+  reset.className = "small-btn";
+  reset.textContent = "Reset to default";
+  reset.title = "Select the default set of models again";
+  reset.addEventListener("click", () => {
+    checkedModels.clear();
+    addDefaultModels();
+    syncModelCheckboxStates();
+    renderChart();
+  });
+
+  const empty = document.createElement("span");
+  empty.id = "model-search-empty";
+  empty.className = "model-search-empty";
+  empty.textContent = "No model matches the search.";
+  empty.hidden = true;
+
+  bar.append(search, reset, empty);
+  panels.prepend(bar);
+}
+
+/** List only the models whose name, organization or id contains every
+ *  word of `query` (all of them for an empty query), and hide the
+ *  organizations and panels left empty. */
+function applyModelSearch(query) {
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  modelSearchMatches = words.length ? new Set() : null;
+  for (const item of document.querySelectorAll(".model-checkbox-grid details.model-item")) {
+    const dir = item.dataset.model;
+    const text = [getModelLabel(dir), state.DATA.model_organizations?.[dir] || "", dir].join(" ").toLowerCase();
+    const match = words.every((w) => text.includes(w));
+    item.hidden = !match;
+    if (match && modelSearchMatches) modelSearchMatches.add(dir);
+  }
+  for (const group of document.querySelectorAll(".model-org-group")) {
+    group.hidden = !group.querySelector("details.model-item:not([hidden])");
+  }
+  let any = false;
+  for (const panel of document.querySelectorAll(".model-panel")) {
+    panel.hidden = !panel.querySelector("details.model-item:not([hidden])");
+    any = any || !panel.hidden;
+  }
+  const empty = document.getElementById("model-search-empty");
+  if (empty) empty.hidden = any;
+}
+
 function buildModelCheckboxes() {
-  const modelsData = state.DATA.models;
   const catModels = { norwegian: {}, multilingual: {} };
-  for (const dir of Object.keys(modelsData)) {
+  for (const dir of allModelIds()) {
     const cat = state.DATA.model_categories?.[dir] || "multilingual";
     const org = state.DATA.model_organizations?.[dir] || "Other";
     if (!catModels[cat]) catModels[cat] = {};
@@ -977,7 +1158,7 @@ function syncModelCheckboxStates() {
   document.querySelectorAll(".model-group-checkbox").forEach((gcb) => {
     const org = gcb.dataset.org;
     const cat = gcb.dataset.cat;
-    const models = Object.keys(state.DATA.models).filter(
+    const models = allModelIds().filter(
       (m) => (state.DATA.model_categories?.[m] || "multilingual") === cat
           && (state.DATA.model_organizations?.[m] || "Other") === org
     );
@@ -1051,10 +1232,15 @@ function onChartHover(data) {
   const modelDir = obj ? obj.modelDir : null;
   const info = modelDir ? state.DATA.model_info?.[modelDir] : null;
   const title = modelDir ? getModelLabel(modelDir) : String(pt.x);
+  // Aggregate views list the model's average per task category below the
+  // score, to show where its overall number comes from.
+  const rows = isAggregateSelection(sel)
+    ? (obj?.categories || []).map((c) => ({ label: capitalize(c.category), value: c.score.toFixed(fmt) }))
+    : [];
   if (info?.description) {
-    showTooltip(data.event, title, info.description, scoreBody, modelMetaLine(modelDir));
+    showTooltip(data.event, title, info.description, scoreBody, modelMetaLine(modelDir), rows);
   } else {
-    showTooltip(data.event, title, scoreBody, "", "");
+    showTooltip(data.event, title, scoreBody, "", "", rows);
   }
 }
 
@@ -1073,6 +1259,18 @@ function renderChart() {
   }
 
   updateChartTitle();
+
+  // Results in per-model files: when the view shows models whose results
+  // aren't loaded yet, fetch them and render then. Only the latest render
+  // request draws (an earlier one finishing loading later is dropped).
+  const token = ++renderToken;
+  const missing = getModelList().filter((m) => !Object.hasOwn(state.DATA.models, m));
+  if (missing.length) {
+    setChartLoading(true);
+    ensureModelsLoaded(missing).then(() => { if (token === renderToken) renderChart(); });
+    return;
+  }
+  setChartLoading(false);
 
   // When the user fully opens the size range, or more than CFG.maxBars
   // models are shown, the bar chart would squeeze them into illegible thin
@@ -1128,26 +1326,201 @@ function collectScatterPoints(modelNames, scoreFn) {
   return { xs, ys, dirs, colors, cis, extras };
 }
 
+/** Log-scale x-axis of the scatter plot, fitted to the plotted model sizes
+ *  (with room for the point glyphs at both ends) instead of a fixed
+ *  1B–1T span that left much of the plot empty. */
 function scatterXAxis(xs = []) {
-  // Wide enough for every plotted size (a model below 1B sits left of the
-  // 1B tick once the size slider is opened to its end).
-  const lo = Math.min(0.6, ...xs.map((x) => x / 1.5));
-  const hi = Math.max(1050, ...xs.map((x) => x * 1.5));
+  const sizes = xs.filter((x) => x > 0);
+  const lo = sizes.length ? Math.min(...sizes) / 1.5 : 0.6;
+  const hi = sizes.length ? Math.max(...sizes) * 1.5 : 1050;
+  const tickvals = sizeTicks(lo, hi);
   return {
     type: "log",
     range: [Math.log10(lo), Math.log10(hi)],
     automargin: false,
     title: { text: "Model size (B parameters)", font: { size: 13, color: "#64748b" }, standoff: 12 },
     showgrid: true, gridcolor: "#d8dce3",
-    tickvals: [1, 3, 10, 30, 100, 300, 1000],
-    ticktext: ["1B", "3B", "10B", "30B", "100B", "300B", "1T"],
+    tickvals,
+    ticktext: tickvals.map(formatModelSize),
   };
 }
 
+/** Tick values (billions of parameters) inside [lo, hi]: the 1–3–10
+ *  sequence, or 1–2–5, or every integer mantissa — the coarsest of these
+ *  that still puts at least three ticks in a narrow range. */
+function sizeTicks(lo, hi) {
+  const decades = [];
+  for (let e = Math.floor(Math.log10(lo)); e <= Math.ceil(Math.log10(hi)); e++) decades.push(10 ** e);
+  let vals = [];
+  for (const mantissas of [[1, 3], [1, 2, 5], [1, 2, 3, 4, 5, 6, 7, 8, 9]]) {
+    vals = decades.flatMap((d) => mantissas.map((m) => +(m * d).toPrecision(6)))
+      .filter((v) => v >= lo && v <= hi);
+    if (vals.length >= 3) break;
+  }
+  return vals;
+}
+
+/** "230M", "8B", "1T" for a size in billions of parameters. */
+function formatModelSize(b) {
+  if (b >= 1000) return +(b / 1000).toPrecision(3) + "T";
+  if (b < 1) return +(b * 1000).toPrecision(3) + "M";
+  return +b.toPrecision(3) + "B";
+}
+
+// Margins of the bar chart; the bottom and left ones grow to fit long model
+// names (barMargins).
+const BAR_MARGIN = { l: 105, r: 4, t: 8, b: 100 };
+const TICK_FONT_SIZE = 13;
+
+/** Rendered width (px) of each label in the chart's tick font. */
+function measureLabels(labels, fontSize = TICK_FONT_SIZE) {
+  try {
+    const ctx = measureLabels.ctx || (measureLabels.ctx = document.createElement("canvas").getContext("2d"));
+    ctx.font = `${fontSize}px 'Mona Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif`;
+    return labels.map((l) => ctx.measureText(l).width);
+  } catch (_) {
+    return labels.map((l) => l.length * fontSize * 0.55);
+  }
+}
+
+// Narrow screens (phones): the bar chart runs horizontally — one row per
+// model, its name on the left — so names stay readable and the chart grows
+// downwards instead of squeezing the bars side by side. Matches the
+// `max-width: 640px` block of style.css (full-width chart box).
+const NARROW_SCREEN = "(max-width: 640px)";
+const ROW_PX = 26;              // height of one model's row
+const ROW_LABEL_FONT = 12;      // model names on the left axis
+const ROW_VALUE_LABEL_PX = 40;  // room for a value label past a bar's end
+const H_MARGIN = { t: 26, r: 10, b: 6 };
+
+/** Value range of the horizontal bars: from 0 — or the lowest error-bar
+ *  end, when a value is negative — to the highest error-bar end, widened
+ *  on each side that has bars by the room their value labels need (in
+ *  pixels of the `plotWidth`), so no label runs into the model names or
+ *  off the chart. */
+function rowValueRange(values, ciValues, plotWidth) {
+  const ends = [];
+  values.forEach((v, i) => {
+    if (v == null) return;
+    ends.push([v - (ciValues?.[i]?.loDist ?? 0), v + (ciValues?.[i]?.hiDist ?? 0)]);
+  });
+  const negative = values.some((v) => v != null && v < 0);
+  const positive = !negative || values.some((v) => v != null && v >= 0);
+  const lo = negative ? Math.min(0, ...ends.map((e) => e[0])) : 0;
+  const hi = positive ? Math.max(0, ...ends.map((e) => e[1])) : 0;
+  const share = Math.min(0.3, ROW_VALUE_LABEL_PX / plotWidth);   // of the plot's width
+  const span = (hi - lo || 1) / (1 - (negative + positive) * share);
+  return [negative ? lo - share * span : lo, positive ? hi + share * span : hi];
+}
+
+/** Whether the bars are drawn horizontally (narrow screen). */
+function useHorizontalBars() {
+  return window.matchMedia(NARROW_SCREEN).matches;
+}
+
+/** Model names for the left axis: those wider than `maxPx` are broken onto
+ *  two lines at the space closest to their middle. */
+function wrapRowLabels(labels, maxPx) {
+  const widths = measureLabels(labels, ROW_LABEL_FONT);
+  return labels.map((label, i) => {
+    if (widths[i] <= maxPx || !label.includes(" ")) return label;
+    const mid = label.length / 2;
+    let at = -1;
+    for (let j = label.indexOf(" "); j !== -1; j = label.indexOf(" ", j + 1)) {
+      if (at === -1 || Math.abs(j - mid) < Math.abs(at - mid)) at = j;
+    }
+    return label.slice(0, at) + "<br>" + label.slice(at + 1);
+  });
+}
+
+/** Redraw when the screen crosses the narrow-screen breakpoint (a phone
+ *  turned sideways) and, in the horizontal layout — whose name wrapping and
+ *  logo sizes follow the chart's width — when the width changes (not on the
+ *  height-only resizes of a mobile browser's address bar). On touch
+ *  screens a tooltip has no mouse to leave from, so a tap closes it. */
+function bindNarrowScreenListeners() {
+  window.matchMedia(NARROW_SCREEN).addEventListener("change", () => renderChart());
+  let width = window.innerWidth, timer = null;
+  window.addEventListener("resize", () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      if (window.innerWidth === width) return;
+      width = window.innerWidth;
+      if (useHorizontalBars()) renderChart();
+    }, 200);
+  });
+  // A touch closes the tooltip wherever it lands (a tap on a bar reopens it
+  // for that bar, through plotly_click); a mouse press only outside the chart.
+  document.addEventListener("pointerdown", (e) => {
+    if (e.pointerType === "touch" || !document.getElementById("chart")?.contains(e.target)) hideTooltip();
+  });
+}
+
+/** Set the chart box to `px` tall; null restores the stylesheet's height. */
+function setChartHeight(px) {
+  const el = document.getElementById("chart");
+  if (el) el.style.height = px == null ? "" : px + "px";
+}
+
+/** Bar-chart margins that fit the model names at tick angle `angleDeg`
+ *  (0, or negative: rotated labels end at their tick and hang down-left).
+ *  The bottom margin covers the longest label's drop; the left one keeps
+ *  the first labels — whose ticks sit (0.6 + i) slots of `slotPx` right of
+ *  the plot's left edge — on the page, also when the chart box starts
+ *  `offscreen` px left of the screen (it reaches into the page's left
+ *  padding, which a tablet-width page doesn't have). */
+function barMargins(labels, angleDeg, slotPx, offscreen = 0) {
+  const rad = Math.abs(angleDeg) * Math.PI / 180;
+  const lineHeight = TICK_FONT_SIZE * 1.2;
+  const widths = measureLabels(labels);
+  const drop = Math.max(0, ...widths.map((w) => w * Math.sin(rad) + lineHeight * Math.cos(rad)));
+  const reach = widths.map((w, i) => (rad === 0 ? w / 2 : w * Math.cos(rad) + lineHeight / 2 * Math.sin(rad))
+    - (0.6 + i) * slotPx);
+  return {
+    ...BAR_MARGIN,
+    b: Math.max(BAR_MARGIN.b, Math.ceil(drop + 14)),
+    l: Math.max(BAR_MARGIN.l, Math.ceil(Math.max(0, ...reach) + 8 + offscreen)),
+  };
+}
+
+/** Make the chart box `extra` px taller than the stylesheet's height (room
+ *  for long model names below the bars, so the plot area keeps its size);
+ *  0 restores the stylesheet's height. */
+function setChartExtraHeight(extra) {
+  const el = document.getElementById("chart");
+  if (!el) return;
+  el.style.height = "";
+  if (extra > 0) el.style.height = el.clientHeight + extra + "px";
+}
+
+/** The bars ordered by performance: highest value first (every metric of
+ *  the comparison pages is higher-is-better, and every rescaling keeps the
+ *  order), models without a value last. Ties keep getModelList's order
+ *  (organization, size, name). Returns [modelNames, opts] reordered. */
+function orderByValue(modelNames, opts) {
+  const { values } = opts;
+  const valid = (v) => v != null && !Number.isNaN(v);
+  const order = modelNames.map((_, i) => i).sort((a, b) => {
+    if (!valid(values[a]) || !valid(values[b])) return valid(values[a]) ? -1 : valid(values[b]) ? 1 : 0;
+    return values[b] - values[a];
+  });
+  const pick = (arr) => arr && order.map((i) => arr[i]);
+  return [pick(modelNames), {
+    ...opts, values: pick(values), ciValues: pick(opts.ciValues), customdata: pick(opts.customdata),
+  }];
+}
+
 /** Render the standard one-bar-per-model chart used by the aggregate and
- *  single-benchmark views. `values` / `ciValues` / `customdata` are parallel
- *  to `modelNames`; `ciValues` is null when CIs are off. */
-function renderModelBars(modelNames, { values, ciValues, customdata, yRange }) {
+ *  single-benchmark views, best model first (orderByValue). `values` /
+ *  `ciValues` / `customdata` are parallel to `modelNames`; `ciValues` is
+ *  null when CIs are off. */
+function renderModelBars(modelNames, opts) {
+  [modelNames, opts] = orderByValue(modelNames, opts);
+  if (useHorizontalBars()) {
+    renderModelBarsHorizontal(modelNames, opts);
+    return;
+  }
+  const { values, ciValues, customdata, yRange } = opts;
   clearScatterHooks();
   const labels = modelNames.map(getModelLabel);
   const xPositions = computeOrgXPositions(modelNames);
@@ -1170,15 +1543,22 @@ function renderModelBars(modelNames, { values, ciValues, customdata, yRange }) {
     hoverinfo: "none",
     ...(ciValues && { error_y: makeErrorY(ciValues) }),
   };
+  const tickAngle = computeTickAngle(labels);
+  const chartEl = document.getElementById("chart");
+  const chartWidth = chartEl?.clientWidth || 1200;
+  const offscreen = Math.max(0, -(chartEl?.getBoundingClientRect().left ?? 0));
+  const margin = barMargins(labels, tickAngle,
+    (chartWidth - BAR_MARGIN.l - BAR_MARGIN.r) / (labels.length + 0.1), offscreen);
+  setChartExtraHeight(margin.b - BAR_MARGIN.b);
   const layout = getPlotlyLayout({
     yaxis: makeYAxis(yRange),
     xaxis: { automargin: false,
       range: xRange,
       tickvals: xPositions, ticktext: labels,
-      tickangle: computeTickAngle(labels), showgrid: false,
+      tickangle: tickAngle, showgrid: false,
     },
     showlegend: false,
-    margin: { l: 105, r: 4, t: 8, b: 100 },
+    margin,
     annotations: labels.map((label, i) => ({
       x: xPositions[i],
       y: below[i]
@@ -1198,6 +1578,90 @@ function renderModelBars(modelNames, { values, ciValues, customdata, yRange }) {
   plotChart([trace], layout, plotlyConfig, onChartHover, hideTooltip);
 }
 
+/** renderModelBars on a narrow screen: one row per model, best at the top,
+ *  its name on the left (on two lines if long), the bar
+ *  growing right from 0 (left for a negative value) with the organization's
+ *  logo at its start and the value after its error bar; the value scale on
+ *  top. The chart box grows to fit the rows. A tap anywhere on a row shows
+ *  the model's tooltip (hovermode "y"). */
+function renderModelBarsHorizontal(modelNames, { values, ciValues, customdata }) {
+  clearScatterHooks();
+  const labels = modelNames.map(getModelLabel);
+  const rows = modelNames.map((_, i) => i);
+  const width = document.getElementById("chart")?.clientWidth || 360;
+  const ticktext = wrapRowLabels(labels, width * 0.36);
+  const lineWidths = measureLabels(ticktext.flatMap((t) => t.split("<br>")), ROW_LABEL_FONT);
+  const margin = {
+    ...H_MARGIN,
+    l: Math.min(Math.ceil(Math.max(0, ...lineWidths)) + 10, Math.round(width * 0.45)),
+  };
+  setChartHeight(margin.t + margin.b + rows.length * ROW_PX);
+  const fmt = scoreDecimals();
+  const hiArr = ciValues ? ciValues.map((c) => c?.hiDist ?? 0) : null;
+  const loArr = ciValues ? ciValues.map((c) => c?.loDist ?? 0) : null;
+  const below = values.map((v) => v != null && v < 0);
+  const errorX = ciValues && { ...makeErrorY(ciValues), thickness: 1.6, width: 3 };
+  const trace = {
+    type: "bar", orientation: "h",
+    x: values, y: rows, width: 0.72,
+    marker: { color: modelNames.map(getModelColor), line: { width: 0 }, cornerradius: 4 },
+    customdata: customdata.map((d, i) => ({ ...d, value: values[i], label: labels[i] })),
+    hoverinfo: "none",
+    ...(errorX && { error_x: errorX }),
+  };
+  const plotWidth = Math.max(1, width - margin.l - margin.r);
+  const xRange = rowValueRange(values, ciValues, plotWidth);
+  const layout = getPlotlyLayout({
+    xaxis: { ...makeYAxis(xRange), side: "top", tickfont: { size: 11, color: "#64748b" } },
+    yaxis: {
+      range: [rows.length - 0.5, -0.5], tickvals: rows, ticktext,
+      showgrid: false, automargin: false, ticks: "", ticklen: 0,
+      tickfont: { size: ROW_LABEL_FONT, color: "#1e293b", weight: 500 },
+    },
+    hovermode: "y",
+    showlegend: false,
+    margin,
+    annotations: values.map((v, i) => ({
+      y: i,
+      x: below[i] ? v - (loArr ? (loArr[i] || 0) : 0) : (v || 0) + (hiArr ? (hiArr[i] || 0) : 0),
+      text: v != null ? v.toFixed(fmt) : "",
+      showarrow: false,
+      xanchor: below[i] ? "right" : "left", xshift: below[i] ? -4 : 4,
+      font: { size: 11, color: "#000", weight: 500 },
+    })),
+    images: buildRowLogos(modelNames, values, xRange, plotWidth),
+  });
+  layout._annAnim = values.map((v, i) => ({
+    score: v || 0,
+    se: below[i] ? -(loArr ? (loArr[i] || 0) : 0) : (hiArr ? (hiArr[i] || 0) : 0),
+  }));
+  plotChart([trace], layout, plotlyConfig, onChartHover, hideTooltip);
+}
+
+/** Logos of the horizontal bars: one per row (a blank one without a logo,
+ *  as in buildOrgImages), inside the bar just past the zero line, sized to
+ *  the row height. */
+function buildRowLogos(modelNames, values, xRange, plotWidth) {
+  const [lo, hi] = xRange;
+  const zero = lo < 0 && hi > lo ? Math.min(1, -lo / (hi - lo)) : 0;   // paper x of 0
+  const pad = 4 / plotWidth;
+  return modelNames.map((modelDir, i) => {
+    const org = state.DATA.model_organizations?.[modelDir];
+    const filename = org && ORG_LOGO[org];
+    const scale = (org && ORG_LOGO_SCALE[org]) || 1;
+    const side = ROW_PX * 0.56 * scale;   // px
+    const negative = values[i] != null && values[i] < 0;
+    return {
+      source: filename ? `../shared/logos/${filename}` : BLANK_IMAGE,
+      xref: "paper", yref: "y",
+      x: negative ? zero - pad : zero + pad, y: i,
+      sizex: side / plotWidth, sizey: (side / ROW_PX),
+      xanchor: negative ? "right" : "left", yanchor: "middle",
+      sizing: "contain", layer: "above",
+    };
+  });
+}
+
 /** Forget the composite-scatter hooks a scatter render leaves on the chart
  *  element (which outlives renders), so the scatter hover can't act on a
  *  later bar chart (see chart.js attachScatterHoverHighlight). */
@@ -1213,13 +1677,17 @@ function clearScatterHooks() {
  *  no task is selected. */
 function renderEmptyState(message) {
   clearScatterHooks();
+  setChartExtraHeight(0);
+  // A narrow screen gets the note on two lines (broken after its dash).
+  const narrow = useHorizontalBars();
   const layout = getPlotlyLayout({
     xaxis: { visible: false },
     yaxis: { visible: false },
     showlegend: false,
-    margin: { l: 105, r: 4, t: 8, b: 100 },
+    margin: narrow ? { l: 8, r: 8, t: 8, b: 8 } : { l: 105, r: 4, t: 8, b: 100 },
     annotations: [{
-      text: message, xref: "paper", yref: "paper", x: 0.5, y: 0.5,
+      text: narrow ? message.replace(/ – /, " –<br>") : message,
+      xref: "paper", yref: "paper", x: 0.5, y: 0.5,
       showarrow: false, font: { size: 15, color: "#64748b" },
     }],
   });
@@ -1236,6 +1704,7 @@ function renderAggregateBarChart() {
     customdata: results.map((r, i) => ({
       count: r ? r.count : 0, ci: r ? r.ci : null, modelDir: modelNames[i],
       tasksUsed: r?.tasksUsed, tasksTotal: r?.tasksTotal, fewerPrompts: r?.fewerPrompts,
+      categories: r?.categories,
     })),
     yRange: computeAggregateYRange(),
   });
@@ -1291,6 +1760,7 @@ function renderSingleBenchmarkScatter(benchmark) {
  *  overlaid via layout.images. Used by aggregate and single-benchmark
  *  scatter modes. */
 function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
+  setChartExtraHeight(0);
   const paperYs = ys.map((y) => paperFraction(y, yRange));
   const customdata = dirs.map((m, i) => Object.assign(
     { modelDir: m, ci: cis[i], value: ys[i], label: getModelLabel(m) },
@@ -1308,12 +1778,23 @@ function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
     ...(cis.some(Boolean) && { error_y: { ...makeErrorY(cis), visible: false } }),
   };
 
-  const composite = buildScatterCompositeImages(dirs, xs, paperYs, colors);
+  // The chart box reaches into the page's left padding (style.css),
+  // except on narrow screens, where it keeps to the column.
+  const narrow = useHorizontalBars();
+  const margin = { l: narrow ? 40 : 105, r: 20, t: 8, b: 60 };
+  const xaxis = scatterXAxis(xs);
+  const el = document.getElementById("chart");
+  const composite = buildScatterCompositeImages(dirs, xs, paperYs, colors, {
+    disk: narrow ? SCATTER_DISK_PX_NARROW : SCATTER_DISK_PX,
+    plotW: Math.max(1, (el?.clientWidth || 1200) - margin.l - margin.r),
+    plotH: Math.max(1, (el?.clientHeight || 500) - margin.t - margin.b),
+    xSpan: xaxis.range[1] - xaxis.range[0],
+  });
   const layout = getPlotlyLayout({
     yaxis: makeYAxis(yRange),
-    xaxis: scatterXAxis(xs),
+    xaxis,
     showlegend: false,
-    margin: { l: 105, r: 20, t: 8, b: 60 },
+    margin,
     images: composite.images,
   });
   // Stash the image→model mapping so the scatter hover handler (in chart.js)
@@ -1447,16 +1928,18 @@ function getAggregateDescription() {
   else if (sel === "__lang__nno") scope = count + " Nynorsk tasks";
   else if (sel === "__lang__sme") scope = count + " Northern Sámi tasks";
 
-  const avgDesc = macro
-    ? "Scores are first averaged within each task category, then averaged across categories. This gives equal weight to each category regardless of how many tasks it contains. "
-    : "";
+  // First how each task score is rescaled, then how the task scores are
+  // averaged (by category or over all tasks).
   const normDescs = {
-    none: "Scores are shown on their native metric scales without rescaling, then averaged.",
-    baseline: "Each task score is rescaled to a 0–100 scale where 0 = random baseline performance and 100 = perfect score, then averaged across tasks. This accounts for different chance levels across tasks (e.g. 25% for 4-choice QA vs. 50% for binary classification).",
-    minmax: "Each task score is rescaled to 0–100 using the minimum and maximum scores among the displayed models (those selected below and within the size and fully-open filters), then averaged. This shows relative performance within that set, so a model's value changes when other models are shown or hidden.",
-    zscore: "Each task score is converted to a z-score (number of standard deviations from the mean across the displayed models), then averaged. This gives equal weight to all tasks regardless of score spread.",
-    percentile: "Each task score is converted to a percentile rank among the displayed models (0 = worst, 100 = best), then averaged.",
+    none: "Scores are shown on their native metric scales, without rescaling.",
+    baseline: "Each task score is rescaled to a 0–100 scale where 0 = random baseline performance and 100 = perfect score. This accounts for different chance levels across tasks (e.g. 25% for 4-choice QA vs. 50% for binary classification).",
+    minmax: "Each task score is rescaled to 0–100 using the minimum and maximum scores among the displayed models (those selected below and within the size and fully-open filters). This shows relative performance within that set, so a model's value changes when other models are shown or hidden.",
+    zscore: "Each task score is converted to a z-score (number of standard deviations from the mean across the displayed models), which gives equal weight to all tasks regardless of score spread.",
+    percentile: "Each task score is converted to a percentile rank among the displayed models (0 = worst, 100 = best).",
   };
   const normDesc = normDescs[state.currentNormalization] || "";
-  return "Aggregate score across " + scope + ". " + avgDesc + normDesc;
+  const avgDesc = macro
+    ? " The task scores are then averaged within each category, and the category averages are averaged, which gives equal weight to each category regardless of how many tasks it contains."
+    : " The task scores are then averaged.";
+  return "Aggregate score across " + scope + ". " + normDesc + avgDesc;
 }

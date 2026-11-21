@@ -32,7 +32,10 @@ export function markAppReady() {
 
 let tooltipTimeout = null;
 
-export function showTooltip(event, title, body, footer, meta) {
+/** Show the tooltip at the pointer. `rows` (optional) is a list of
+ *  {label, value} drawn as a two-column table under the footer, e.g. a
+ *  model's average per task category in an aggregate view. */
+export function showTooltip(event, title, body, footer, meta, rows = []) {
   const tooltip = document.getElementById("custom-tooltip");
   const titleEl = document.getElementById("tooltip-title");
   const metaEl = document.getElementById("tooltip-meta");
@@ -42,8 +45,29 @@ export function showTooltip(event, title, body, footer, meta) {
   metaEl.textContent = meta || ""; metaEl.style.display = meta ? "" : "none";
   bodyEl.textContent = body || ""; bodyEl.style.display = body ? "" : "none";
   footerEl.textContent = footer || ""; footerEl.style.display = footer ? "" : "none";
+  renderTooltipRows(footerEl, rows);
   positionTooltip(tooltip, event);
   tooltip.classList.add("visible");
+}
+
+/** Fill (or hide) the tooltip's row table, created after the footer on
+ *  first use. Built from text nodes, so labels can't inject markup. */
+function renderTooltipRows(footerEl, rows) {
+  let table = document.getElementById("tooltip-rows");
+  if (!table) {
+    table = document.createElement("div");
+    table.id = "tooltip-rows";
+    table.className = "tooltip-rows";
+    footerEl.after(table);
+  }
+  table.replaceChildren(...(rows || []).flatMap(({ label, value }) => {
+    const l = document.createElement("span");
+    l.className = "tooltip-row-label"; l.textContent = label;
+    const v = document.createElement("span");
+    v.className = "tooltip-row-value"; v.textContent = value;
+    return [l, v];
+  }));
+  table.style.display = rows && rows.length ? "" : "none";
 }
 
 export function hideTooltip() {
@@ -56,9 +80,16 @@ function positionTooltip(tooltip, event) {
   tooltip.style.left = "0px"; tooltip.style.top = "0px";
   tooltip.classList.add("visible");
   const rect = tooltip.getBoundingClientRect();
-  let x = event.clientX + pad, y = event.clientY + pad;
-  if (x + rect.width > window.innerWidth - pad) x = event.clientX - rect.width - pad;
-  if (y + rect.height > window.innerHeight - pad) y = event.clientY - rect.height - pad;
+  // A touch event carries its position on its touches.
+  const px = event.clientX ?? event.touches?.[0]?.clientX ?? window.innerWidth / 2;
+  const py = event.clientY ?? event.touches?.[0]?.clientY ?? window.innerHeight / 2;
+  let x = px + pad, y = py + pad;
+  if (x + rect.width > window.innerWidth - pad) x = px - rect.width - pad;
+  if (y + rect.height > window.innerHeight - pad) y = py - rect.height - pad;
+  // On a narrow screen neither side of the pointer may have room: keep the
+  // tooltip on screen.
+  x = Math.max(pad, Math.min(x, window.innerWidth - rect.width - pad));
+  y = Math.max(pad, Math.min(y, window.innerHeight - rect.height - pad));
   tooltip.style.left = x + "px"; tooltip.style.top = y + "px";
 }
 

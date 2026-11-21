@@ -654,6 +654,15 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
   margin-left: -5.5rem;
   width: calc(100% + 5.5rem);
   height: 500px;
+  transition: opacity 0.15s;
+}
+/* A comparison view waiting for model results it hasn't loaded yet
+   (comparison.js setChartLoading): dim the previous chart — after a short
+   delay, so a quick load doesn't flash. */
+#chart.chart-loading {
+  opacity: 0.45;
+  transition: opacity 0.2s 0.15s;
+  pointer-events: none;
 }
 
 /* The legend card of the progress charts that keep it top-left (multisynt,
@@ -903,6 +912,32 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
    checkbox + colour dot + name; expanding shows .model-description-inline. */
 .model-panel + .model-panel { margin-top: 2.5rem; }
 
+/* Search field + "Reset to default" above the model panels (built in
+   comparison.js buildModelToolbar). The search hides non-matching models,
+   and organizations / panels left empty, with the `hidden` attribute —
+   which the display rules of these elements would otherwise override. */
+.model-toolbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem;
+  margin-bottom: 1.75rem;
+}
+.model-search {
+  flex: 0 1 20rem; min-width: 0;
+  height: 1.9rem; padding: 0 0.7rem 0 1.9rem;
+  font: 500 0.85rem/1.2 var(--font-sans); color: var(--fg);
+  border: 1px solid var(--control-border); border-radius: var(--control-radius);
+  background: var(--surface) no-repeat 0.6rem 50% / 0.85rem
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='m15.5 15.5 5 5'/%3E%3C/svg%3E");
+  box-shadow: 0 1px 6px rgba(30, 41, 59, 0.1);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.model-search::placeholder { color: var(--fg-muted); }
+.model-search:hover, .model-search:focus { border-color: var(--control-border-hover); }
+.model-search:focus { box-shadow: 0 0 0 3px var(--accent-light), 0 1px 6px rgba(30, 41, 59, 0.1); }
+.model-search-empty { font-size: 0.85rem; color: var(--fg-muted); }
+.model-panel[hidden], .model-org-group[hidden],
+.model-checkbox-grid details.model-item[hidden] { display: none; }
+
 .model-checkbox-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 0.75rem 1rem; align-items: start;
@@ -997,6 +1032,15 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 .tooltip-body { color: #475569; margin-bottom: 0.35rem; }
 .tooltip-footer { color: var(--accent); font-size: 0.75rem; word-break: break-all; }
+/* Optional label/value table under the footer (a model's average per task
+   category in aggregate views; see ui.js renderTooltipRows). */
+.tooltip-rows {
+  display: grid; grid-template-columns: 1fr auto; column-gap: 1.25rem;
+  margin-top: 0.45rem; padding-top: 0.4rem; border-top: 1px solid #e2e8f0;
+  font-size: 0.75rem; line-height: 1.55;
+}
+.tooltip-row-label { color: #64748b; }
+.tooltip-row-value { color: #1e293b; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
 
 /* ────────────────────────────────────────────────────────────
    Plotly modebar — the top-right cluster of icon buttons over
@@ -1089,4 +1133,24 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   .checkbox-grid { grid-template-columns: 1fr; }
   #chart { height: 380px; }
   .module-header h3 { font-size: 1rem; }
+}
+
+/* Phones (≤ 640px) on the comparison pages (body.comparison-page, set by
+   comparison.js): the chart box keeps to the column instead of reaching
+   into a left padding the narrow page doesn't have; the bar chart turns
+   horizontal and sets its own height (comparison.js useHorizontalBars —
+   same breakpoint); the size slider fills its row, and its thumbs grow,
+   with a 44px touch area; the tooltip fits the screen. */
+@media (max-width: 640px) {
+  .comparison-page #chart { margin-left: 0; width: 100%; height: 420px; }
+  .comparison-page .size-slider-container { flex: 1 1 100%; }
+  .comparison-page .range-slider { max-width: none; margin: 0 10px; }
+  .comparison-page .range-thumb { width: 20px; height: 20px; }
+  .comparison-page .range-thumb::before {
+    content: ""; position: absolute; inset: -12px; border-radius: 50%;
+  }
+  .comparison-page .custom-tooltip { max-width: calc(100vw - 24px); }
+  /* The export buttons would cover the scale above the bars; downloading
+     chart files isn't a phone task. */
+  .comparison-page .modebar-container { display: none; }
 }

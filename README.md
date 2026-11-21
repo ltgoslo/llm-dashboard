@@ -58,7 +58,7 @@ llm-dashboard/
     │   ├── url-state.js          ← URL hash/search save/restore
     │   ├── comparison.js         ← bar-chart logic shared by noreval + noreval-gen
     │   └── progress.js           ← line-chart logic shared by norolmo + multisynt
-    ├── noreval/{index.html, app.js, data.json}
+    ├── noreval/{index.html, app.js, data.json, models/}
     ├── noreval-gen/{index.html, app.js, data.json}
     ├── norolmo/{index.html, app.js, data.json}
     ├── multisynt/{index.html, app.js, data.json}
@@ -76,6 +76,12 @@ python3 -m http.server 8000 -d docs   # serves at http://localhost:8000/noreval/
 
 GitHub Actions rebuilds `docs/*/data.json` on every push that touches
 `data/`, the YAML configs, or `build_data.py`.
+
+The NorEval page loads lazily: its `data.json` holds only the model and task
+metadata, and each model's results are in `docs/noreval/models/<model>.json`,
+fetched when a view first shows the model (the default models are prefetched
+in the background after the first chart). The build writes and prunes these
+files; commit them together with `data.json`.
 
 ## Adding a new …
 

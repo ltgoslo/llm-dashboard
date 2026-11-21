@@ -34,6 +34,14 @@ export const JSON_DOWNLOAD_ICON = {
   path: "M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z",
 };
 
+// Vector graphics (a curve between two anchor points, as in a pen tool), so
+// the SVG download is told apart from the PNG one (camera) at a glance.
+export const SVG_DOWNLOAD_ICON = {
+  width: 24,
+  height: 24,
+  path: "M3 17h4v4H3zM17 3h4v4h-4zM6.2 17Q6.5 6.5 17 6.2v1.6Q8.1 8.1 7.8 17z",
+};
+
 /** Trigger a client-side download of `data` as a pretty-printed JSON file. */
 export function downloadJSON(data, filename) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -99,7 +107,7 @@ export function makePlotlyConfig(filenamePrefix, getJsonMetadata) {
         },
         {
           name: "Download plot as SVG",
-          icon: Plotly.Icons.camera,
+          icon: SVG_DOWNLOAD_ICON,
           click: (gd) => Plotly.downloadImage(gd, {
             format: "svg", width: 1600, height: 900, filename: filenamePrefix,
           }),
@@ -966,14 +974,32 @@ function attachScatterHoverHighlight(chartEl) {
     pointer.active = false;   // springs relax everything back to rest
     ensureLoop();
   });
+  // Touch screens send no mousemove (Plotly takes over the touch): a tap
+  // focuses the point under the finger as hovering does, and a tap
+  // elsewhere on the page lets the markers relax.
+  chartEl.addEventListener("pointerdown", (ev) => {
+    if (ev.pointerType !== "touch") return;
+    pointer.x = ev.clientX; pointer.y = ev.clientY; pointer.active = true;
+    ensureLoop();
+  });
+  document.addEventListener("pointerdown", (ev) => {
+    if (ev.pointerType !== "touch" || chartEl.contains(ev.target) || !pointer.active) return;
+    pointer.active = false;
+    ensureLoop();
+  });
 }
 
 /** Plotly.newPlot + register hover handlers. Bar traces animate from y=0
- *  to their target values on each render (debounced). */
+ *  to their target values on each render (debounced). Horizontal bars
+ *  (orientation "h", the comparison pages on narrow screens) grow along x
+ *  instead and skip the column hover effects, which assume vertical bars
+ *  (touch screens don't hover anyway). */
 export function plotChart(traces, layout, config, onHover, onUnhover) {
   const now = Date.now();
   const barIndices = [];
   traces.forEach((t, i) => { if (t.type === "bar") barIndices.push(i); });
+  const horizontal = barIndices.some((i) => traces[i].orientation === "h");
+  const vk = horizontal ? "x" : "y";   // the axis the bar values run along
   const shouldAnimate = barIndices.length > 0 && (now - lastPlotTime) > BAR_ANIM_DEBOUNCE;
   lastPlotTime = now;
   const animId = ++currentAnim;   // invalidate any in-flight animation
@@ -1015,7 +1041,7 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
       // Bars are at full height immediately (no grow-up). Capture their
       // natural geometry now so the hover handler has a stable cache from
       // the first mousemove.
-      if (barIndices.length) captureNaturalRects(chartEl);
+      if (barIndices.length && !horizontal) captureNaturalRects(chartEl);
     });
     liftBarsAndLogos(chartEl);
     applyLegendTitleGap(chartEl);
@@ -1039,10 +1065,15 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
       chartEl._scatterOnHover = onHover || null;
       chartEl._scatterOnUnhover = onUnhover || null;
     } else {
-      if (onHover) chartEl.on("plotly_hover", onHover);
+      if (onHover) {
+        chartEl.on("plotly_hover", onHover);
+        // A tap on a touch screen makes Plotly compute the hover point but
+        // emit only plotly_click (no hover): show the tooltip from that.
+        if (barIndices.length) chartEl.on("plotly_click", onHover);
+      }
       if (onUnhover) chartEl.on("plotly_unhover", onUnhover);
     }
-    if (barIndices.length) {
+    if (barIndices.length && !horizontal) {
       attachBarHoverHighlight(chartEl);
       recaptureOnRedraw(chartEl);
     }
@@ -1050,13 +1081,15 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
     return;
   }
 
-  // Build starting traces with y=0 (and zeroed error bars) for bar traces.
+  // Build starting traces with the values at 0 (and zeroed error bars) for
+  // bar traces.
+  const errKey = "error_" + vk;
   const startTraces = traces.map((t) => {
     if (t.type !== "bar") return t;
-    const start = Object.assign({}, t, { y: t.y.map(() => 0) });
-    if (t.error_y && t.error_y.array) {
-      start.error_y = Object.assign({}, t.error_y,
-        { array: t.error_y.array.map(() => 0) });
+    const start = Object.assign({}, t, { [vk]: t[vk].map(() => 0) });
+    if (t[errKey] && t[errKey].array) {
+      start[errKey] = Object.assign({}, t[errKey],
+        { array: t[errKey].array.map(() => 0) });
     }
     return start;
   });
@@ -1067,25 +1100,30 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
   const startLayout = Object.assign({}, plotLayout);
   if (annotationsTarget.length) {
     startLayout.annotations = annotationsTarget.map(
-      (a) => Object.assign({}, a, { y: 0, opacity: 0 }));
+      (a) => Object.assign({}, a, { [vk]: 0, opacity: 0 }));
   }
 
   Plotly.newPlot("chart", startTraces, startLayout, config).then(
     () => liftBarsAndLogos(chartEl));
   liftBarsAndLogos(chartEl);
-  if (onHover) chartEl.on("plotly_hover", onHover);
+  if (onHover) {
+    chartEl.on("plotly_hover", onHover);
+    chartEl.on("plotly_click", onHover);   // taps (see the static path)
+  }
   if (onUnhover) chartEl.on("plotly_unhover", onUnhover);
-  attachBarHoverHighlight(chartEl);
-  recaptureOnRedraw(chartEl);
+  if (!horizontal) {
+    attachBarHoverHighlight(chartEl);
+    recaptureOnRedraw(chartEl);
+  }
 
-  const barYTargets = barIndices.map((i) => traces[i].y);
+  const barYTargets = barIndices.map((i) => traces[i][vk]);
   // Indices (into barIndices) of bar traces that actually carry error bars,
   // along with the target arrays — precomputed for the phase-2 loop.
   const errBarIdx = [], errBarTargets = [];
   barIndices.forEach((traceIdx) => {
-    if (traces[traceIdx].error_y && traces[traceIdx].error_y.array) {
+    if (traces[traceIdx][errKey] && traces[traceIdx][errKey].array) {
       errBarIdx.push(traceIdx);
-      errBarTargets.push(traces[traceIdx].error_y.array);
+      errBarTargets.push(traces[traceIdx][errKey].array);
     }
   });
 
@@ -1120,12 +1158,12 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
     // arriving late (a long task, a hidden tab) would otherwise leave them
     // at the fraction the last on-time frame drew.
     if (!barsAtTarget) {
-      traceUpdate.y = barYTargets.map((arr) => arr.map((v) => v == null ? null : v * e1));
+      traceUpdate[vk] = barYTargets.map((arr) => arr.map((v) => v == null ? null : v * e1));
       traceIdx = barIndices;
       barsAtTarget = p1 >= 1;
     }
     if (hasErrBars && elapsed >= phase2StartOffset) {
-      traceUpdate["error_y.array"] = errBarTargets.map(
+      traceUpdate[errKey + ".array"] = errBarTargets.map(
         (arr) => arr.map((v) => v == null ? 0 : v * e2));
       if (traceIdx === null) traceIdx = errBarIdx;
     }
@@ -1135,10 +1173,10 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
     if (annotationsTarget.length) {
       const newAnnotations = annotationsTarget.map((a, i) => {
         const meta = annAnim && annAnim[i];
-        let y;
-        if (meta) y = meta.score * e1 + meta.se * e2;
-        else y = typeof a.y === "number" ? a.y * e1 : a.y;
-        return Object.assign({}, a, { y, opacity: p1 });
+        let pos;
+        if (meta) pos = meta.score * e1 + meta.se * e2;
+        else pos = typeof a[vk] === "number" ? a[vk] * e1 : a[vk];
+        return Object.assign({}, a, { [vk]: pos, opacity: p1 });
       });
       layoutUpdate = { annotations: newAnnotations };
     }
@@ -1162,7 +1200,7 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
       // briefly inside the capture function. After this point the hover
       // handler has a locked, correct cache.
       chartEl._barAnimating = false;
-      captureNaturalRects(chartEl);
+      if (!horizontal) captureNaturalRects(chartEl);
     }
   }
 

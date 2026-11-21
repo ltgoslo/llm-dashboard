@@ -6,7 +6,9 @@ JSONs from data/<dashboard>/{results,progress}/, and writes one consolidated
 data.json into each docs/<dashboard>/.
 
 Outputs:
-    docs/noreval/data.json        — base-model NorEval comparison
+    docs/noreval/data.json        — base-model NorEval comparison (metadata;
+        each model's results in docs/noreval/models/<model>.json, loaded
+        on demand by the page — see write_comparison_data)
     docs/noreval-gen/data.json    — instruction-tuned NorEval comparison
     docs/norolmo/data.json        — NorOLMo progression + ablations
     docs/multisynt/data.json      — multilingual progression
@@ -1729,6 +1731,82 @@ def write_data(out_path, data):
     print(f"  → wrote {out_path.relative_to(BASE_DIR)} ({size_kb:.1f} KB)")
 
 
+def max_prompt_counts(models):
+    """{bench: {shot: {metric: the most prompt templates any model has}}} —
+    what the comparison page's "fewer prompts than other models" notes
+    compare against, which with per-model results files it can't compute
+    from the models it has loaded."""
+    table = {}
+    for results in models.values():
+        for bench, shots in results.items():
+            for shot, metrics in shots.items():
+                for metric, point in metrics.items():
+                    n = point.get("n_prompts") if isinstance(point, dict) else None
+                    if isinstance(n, bool) or not isinstance(n, (int, float)) or not math.isfinite(n):
+                        continue
+                    cell = table.setdefault(bench, {}).setdefault(shot, {})
+                    if metric not in cell or n > cell[metric]:
+                        cell[metric] = n
+    return table
+
+
+# Fields of a stored score entry the comparison pages never read: their
+# prompt aggregations are max / mean / median / min only (no "first", no
+# "stdev" = prompt_sd), and nothing shows the best prompt's index. Dropped
+# from the per-model results files (a third of their size); a comparison
+# page that offers one of these must stop dropping it here.
+COMPARISON_UNUSED_FIELDS = ("first", "first_ci_lo", "first_ci_hi",
+                            "max_prompt_idx", "prompt_sd", "prompt_mad")
+
+
+def trim_comparison_results(results):
+    """One model's {bench: {shot: {metric: entry}}} without the entry fields
+    in COMPARISON_UNUSED_FIELDS."""
+    return {
+        bench: {
+            shot: {
+                metric: ({k: v for k, v in entry.items() if k not in COMPARISON_UNUSED_FIELDS}
+                         if isinstance(entry, dict) else entry)
+                for metric, entry in metrics.items()
+            }
+            for shot, metrics in shots.items()
+        }
+        for bench, shots in results.items()
+    }
+
+
+def write_comparison_data(out_path, data):
+    """Write a comparison dashboard with its results split per model, so the
+    page loads only the models a view shows (docs/shared/comparison.js
+    ensureModelsLoaded): data.json keeps everything but `models`, plus
+    `model_ids` (all models, in data order), `max_prompts`
+    (max_prompt_counts) and `results_version` (a hash of all results, which
+    the page appends to the results URLs so a browser never mixes files of
+    two builds); each model's results go to models/<model id>.json, minus
+    the fields the page never reads (COMPARISON_UNUSED_FIELDS). Files of
+    models that no longer exist are removed."""
+    models = data["models"]
+    models_dir = out_path.parent / "models"
+    models_dir.mkdir(parents=True, exist_ok=True)
+    blobs = {m: json.dumps(trim_comparison_results(r), ensure_ascii=False, separators=(",", ":"))
+             for m, r in models.items()}
+    for old in models_dir.glob("*.json"):
+        if old.stem not in blobs:
+            old.unlink()
+    digest = hashlib.sha1()
+    for m, blob in blobs.items():
+        with open(models_dir / f"{m}.json", "w") as f:
+            f.write(blob)
+        digest.update(f"{m}\t{blob}\n".encode())
+    core = {k: v for k, v in data.items() if k != "models"}
+    core["model_ids"] = list(models)
+    core["max_prompts"] = max_prompt_counts(models)
+    core["results_version"] = digest.hexdigest()[:12]
+    write_data(out_path, core)
+    total_kb = sum(len(b.encode()) for b in blobs.values()) / 1024
+    print(f"  → wrote {len(blobs)} files to {models_dir.relative_to(BASE_DIR)}/ ({total_kb:.1f} KB)")
+
+
 def main():
     metrics_setup = load_yaml(METRICS_SETUP_YAML)
 
@@ -1736,7 +1814,7 @@ def main():
     noreval = build_comparison_data(
         NOREVAL_RESULTS, MODELS_SETUP_YAML, metrics_setup
     )
-    write_data(NOREVAL_OUT, noreval)
+    write_comparison_data(NOREVAL_OUT, noreval)
     print(f"  Models: {len(noreval['models'])}")
 
     print("\n=== Building docs/noreval-gen/data.json (instruct models) ===")
