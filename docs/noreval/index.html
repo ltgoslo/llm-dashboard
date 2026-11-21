@@ -76,7 +76,8 @@
                             <div class="about-section">
                                 <h3>Dashboard features</h3>
                                 <ul>
-                                    <li><strong>Filter by size or openness.</strong> The bottom row of controls lets you restrict to a model-size range or limit to fully open models (open weights, training data and code).</li>
+                                    <li><strong>Filter by size or openness.</strong> The bottom row of controls lets you restrict to a model-size range or limit to fully open models (open weights, training data and code). With the size filter off, the chart becomes a scatter plot of score against model size, over all sizes.</li>
+                                    <li><strong>More models than fit.</strong> The bars are ranked by score; when they don't all fit, the chart shows the best ones and pans sideways to the rest &ndash; swipe sideways or Shift-scroll over the chart, drag it, or use its arrows. On a tablet or in a narrow window the bars go without names: tap or hover over a bar to see its model.</li>
                                     <li><strong>Choose tasks &amp; models.</strong> The two sections below the plot choose what each view covers; a task's Bokm&aring;l and Nynorsk variants (or its two translation directions) can be toggled separately. The model list shows the models that pass the size and openness filters &ndash; <em>Show more</em> lists the others, and the search finds any model. Hover over a task or model (or long-press it on a touch screen) for its description.</li>
                                     <li><strong>Metric selector.</strong> Individual task views offer a dropdown (top control row) to switch between all available metrics for that benchmark.</li>
                                     <li><strong>Chart export.</strong> Charts can be downloaded as PNG or SVG, and the underlying data exported as JSON, via the toolbar buttons.</li>
@@ -158,7 +159,10 @@
                     </div>
                     <div class="controls-bar">
                         <div class="control-group size-slider-container" id="size-slider-container">
-                            <label>Model size:</label>
+                            <label for="size-filter-toggle" class="size-filter-label">
+                                <input type="checkbox" id="size-filter-toggle" checked>
+                                <span>Filter by model size:</span>
+                            </label>
                             <div class="range-slider" id="range-slider">
                                 <div class="range-track" id="range-track"></div>
                                 <div class="range-fill" id="range-fill"></div>

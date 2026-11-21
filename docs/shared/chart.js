@@ -55,6 +55,9 @@ export function downloadJSON(data, filename) {
   URL.revokeObjectURL(url);
 }
 
+/** The y-axis's tick labels. */
+export const Y_TICK_FONT = { size: 13.6, color: "#64748b", weight: 500 };
+
 /** Export the current chart's data as JSON.
  *  `metadata` provides dashboard-specific fields to include in the export. */
 export function exportChartDataAsJSON(gd, metadata, filename) {
@@ -89,6 +92,13 @@ export function exportChartDataAsJSON(gd, metadata, filename) {
   downloadJSON(exportData, filename || "chart-data.json");
 }
 
+/** What an image export `width` px wide draws: the chart as shown, or the
+ *  figure its page hands over for it (gd._exportFigure — comparison.js, for
+ *  bars shown panned or without their names). */
+function exportFigure(gd, width) {
+  return gd._exportFigure?.(width) ?? gd;
+}
+
 /** Build a Plotly config with the standard PNG/SVG/JSON download buttons.
  *  `filenamePrefix` is used for downloaded chart files.
  *  `getJsonMetadata` is a callback that returns dashboard-specific export metadata. */
@@ -101,14 +111,14 @@ export function makePlotlyConfig(filenamePrefix, getJsonMetadata) {
         {
           name: "Download plot as PNG",
           icon: Plotly.Icons.camera,
-          click: (gd) => Plotly.downloadImage(gd, {
+          click: (gd) => Plotly.downloadImage(exportFigure(gd, 1600), {
             format: "png", width: 1600, height: 900, scale: 3, filename: filenamePrefix,
           }),
         },
         {
           name: "Download plot as SVG",
           icon: SVG_DOWNLOAD_ICON,
-          click: (gd) => Plotly.downloadImage(gd, {
+          click: (gd) => Plotly.downloadImage(exportFigure(gd, 1600), {
             format: "svg", width: 1600, height: 900, filename: filenamePrefix,
           }),
         },
@@ -144,9 +154,7 @@ export function getPlotlyLayout(overrides) {
   result.xaxis = Object.assign({ automargin: true }, axisDefaults, result.xaxis);
   // Y-axis tick labels match .control-group label styling in shared/style.css:
   // 0.85rem (≈13.6px), weight 500, --fg-muted colour (#64748b).
-  result.yaxis = Object.assign({
-    tickfont: { size: 13.6, color: "#64748b", weight: 500 },
-  }, axisDefaults, result.yaxis);
+  result.yaxis = Object.assign({ tickfont: { ...Y_TICK_FONT } }, axisDefaults, result.yaxis);
   return result;
 }
 
@@ -309,10 +317,14 @@ function captureNaturalRects(chartEl) {
 // Re-measure after every redraw that is not part of the grow-up animation:
 // a responsive resize relayouts the chart, and the hover would otherwise
 // hit-test against the old geometry (no bar magnifies or bolds under the
-// cursor). Registered after each newPlot, which purges the previous one.
+// cursor); then put the hover pose back on what the redraw rebuilt
+// (attachBarHoverHighlight). Registered after each newPlot, which purges the
+// previous one.
 function recaptureOnRedraw(chartEl) {
   chartEl.on("plotly_afterplot", () => {
-    if (!chartEl._barAnimating) captureNaturalRects(chartEl);
+    if (chartEl._barAnimating) return;
+    captureNaturalRects(chartEl);
+    chartEl._barHoverRedrawn?.();
   });
 }
 
@@ -427,6 +439,26 @@ function widenLineModeClip(chartEl) {
  *  they stay locked together and the damping is applied once per column.
  *  CSS transitions on these transforms are disabled (see style.css) so the
  *  JS EMA is the only smoothing. */
+/** The model column of an x-axis tick: its value (the bars sit at 0..N-1).
+ *  Plotly draws only the ticks and score labels inside the x-range — all of
+ *  them, unless the chart pans (comparison.js) — so these are matched to
+ *  their bar by their data, not by DOM order. */
+function tickColumn(el, i) {
+  const d = el.__data__;
+  return d && typeof d.x === "number" ? Math.round(d.x) : i;
+}
+/** The model column of a score label (`data-index`: its layout index). */
+function annotationColumn(el, j, annPerModel) {
+  const k = el.getAttribute("data-index");
+  return Math.floor((k == null ? j : +k) / annPerModel);
+}
+/** Score labels per model column: from the layout (the DOM holds only the
+ *  ones in view). */
+function annotationsPerModel(chartEl, N) {
+  const total = chartEl.layout?.annotations?.length ?? chartEl.querySelectorAll(".annotation").length;
+  return total ? Math.max(1, Math.round(total / N)) : 0;
+}
+
 function attachBarHoverHighlight(chartEl) {
   if (chartEl._barHoverBound) return;
   chartEl._barHoverBound = true;
@@ -530,18 +562,18 @@ function attachBarHoverHighlight(chartEl) {
       }
     });
     chartEl.querySelectorAll(".xtick").forEach((el, i) => {
-      if (i < N) el.style.translate = `${curShift[i]}px 0`;
+      const m = tickColumn(el, i);
+      if (m < N) el.style.translate = `${curShift[m]}px 0`;
     });
     chartEl.querySelectorAll(".barlayer .trace.bars").forEach((tr) => {
       tr.querySelectorAll(".errorbar").forEach((el, i) => {
         if (i < N) el.style.translate = `${curShift[i]}px 0`;
       });
     });
-    const anns = chartEl.querySelectorAll(".annotation");
-    const annPerModel = anns.length ? Math.max(1, Math.round(anns.length / N)) : 0;
+    const annPerModel = annotationsPerModel(chartEl, N);
     if (annPerModel > 0) {
-      anns.forEach((el, j) => {
-        const m = Math.floor(j / annPerModel);
+      chartEl.querySelectorAll(".annotation").forEach((el, j) => {
+        const m = annotationColumn(el, j, annPerModel);
         if (m < N) el.style.translate = `${curShift[m]}px 0`;
       });
     }
@@ -553,15 +585,15 @@ function attachBarHoverHighlight(chartEl) {
     chartEl.querySelectorAll(".bar-hover-bold").forEach((el) =>
       el.classList.remove("bar-hover-bold"));
     if (insideBar) {
-      const xt = chartEl.querySelectorAll(".xtick")[insideBar.modelIdx];
+      const xt = [...chartEl.querySelectorAll(".xtick")].find((el, i) => tickColumn(el, i) === insideBar.modelIdx);
       if (xt) xt.classList.add("bar-hover-bold");
-      const anns = chartEl.querySelectorAll(".annotation");
-      const annPerModel = anns.length ? Math.max(1, Math.round(anns.length / N)) : 0;
+      const annPerModel = annotationsPerModel(chartEl, N);
       if (annPerModel > 0) {
         const annIdx = annPerModel === 1
           ? insideBar.modelIdx
           : insideBar.modelIdx * annPerModel + Math.min(insideBar.traceIdx, annPerModel - 1);
-        const an = anns[annIdx];
+        const an = [...chartEl.querySelectorAll(".annotation")]
+          .find((el, j) => +(el.getAttribute("data-index") ?? j) === annIdx);
         if (an) an.classList.add("bar-hover-bold");
       }
     }
@@ -645,6 +677,21 @@ function attachBarHoverHighlight(chartEl) {
   }
 
   function ensureLoop() { if (rafId === null) rafId = requestAnimationFrame(frame); }
+
+  // A redraw — each step of a panning chart's pan (bar-pan.js) — rebuilds the
+  // score labels (and the ticks that come into view) without their inline
+  // transforms, and moves the bars under a cursor that may not move at all (a
+  // trackpad swipe sends no mousemove). Put the hover pose back on everything
+  // at once (afterplot runs before the frame is painted, so the labels never
+  // show off their bars), and let the loop retarget from the bars' new places.
+  chartEl._barHoverRedrawn = () => {
+    if (!curScale || (!pointer.active && rafId === null)) return;   // at rest
+    const got = gatherBars();
+    if (!got || got.N !== stateN) return;
+    paint(got.bars, got.N);
+    currentBoldBar = null;   // the rebuilt score label lost its bold
+    ensureLoop();
+  };
 
   chartEl.addEventListener("mousemove", (ev) => {
     pointer.x = ev.clientX; pointer.y = ev.clientY; pointer.active = true;
@@ -1217,7 +1264,7 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
 /** Compute the minimum tick rotation angle so that x-axis labels don't overlap.
  *  Models 2-D rectangle collision for rotated labels: returns 0 (horizontal)
  *  when labels fit, else a negative angle in [-5, -90]. */
-export function computeTickAngle(labels) {
+export function computeTickAngle(labels, slotPx = null) {
   if (!labels || labels.length <= 1) return 0;
   const chartEl = document.getElementById("chart");
   const margins = 80;
@@ -1233,7 +1280,9 @@ export function computeTickAngle(labels) {
   } catch (_) {
     labelWidth = Math.max(...labels.map((l) => l.length)) * fontSize * 0.55;
   }
-  const slotWidth = plotWidth / labels.length;
+  // Each label's room: the given slot (a chart that pans sideways), else the
+  // plot's width shared by all of them.
+  const slotWidth = slotPx || plotWidth / labels.length;
   const gap = 4;
   if (labelWidth + gap <= slotWidth) return 0;
   for (let deg = 5; deg < 90; deg += 5) {
@@ -1244,10 +1293,10 @@ export function computeTickAngle(labels) {
 }
 
 /** Compute annotation font size that shrinks when labels get crowded. */
-export function computeAnnotationFontSize(totalPositions) {
+export function computeAnnotationFontSize(totalPositions, chartWidth = null) {
   const chartEl = document.getElementById("chart");
   const margins = 80;
-  const plotWidth = (chartEl ? chartEl.clientWidth : 1200) - margins;
+  const plotWidth = (chartWidth ?? (chartEl ? chartEl.clientWidth : 1200)) - margins;
   const availablePerLabel = plotWidth / totalPositions;
   const maxChars = state.currentNormalization === "zscore" ? 6 : 5;
   const fittedSize = availablePerLabel / (maxChars * 0.6);

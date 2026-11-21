@@ -8,8 +8,8 @@ import { initComparison } from "../shared/comparison.js";
 initComparison({
   filenamePrefix: "noreval-chart",
   defaultShot: "5",
-  defaultSizeMin: 8,
-  defaultSizeMax: 20,
+  defaultSizeMin: 4,
+  defaultSizeMax: 40,
   sizeRangeMin: 1,
   sizeRangeMax: 700,
   // Unchecking tasks in the default category-average view keeps averaging

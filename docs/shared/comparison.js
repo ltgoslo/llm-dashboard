@@ -18,7 +18,7 @@ import {
 import {
   makePlotlyConfig, getPlotlyLayout, plotChart,
   computeTickAngle, computeAnnotationFontSize, computeYRange,
-  makeYAxis, makeErrorY,
+  makeYAxis, makeErrorY, Y_TICK_FONT,
 } from "./chart.js";
 import {
   showTooltip, hideTooltip, populateMetricSelector, hideMetricSelector,
@@ -33,6 +33,7 @@ import {
   PHONE_SCREEN, initModuleToggles, initChartJump, buildTaskPicker, syncTaskPicker, attachInfoCard,
   setGroupCheckbox, shortUrl,
 } from "./pickers.js";
+import { setBarPan, buttonsFitOutside } from "./bar-pan.js";
 import { UrlState } from "./url-state.js";
 
 let CFG = null;            // Dashboard configuration (set in initComparison)
@@ -208,6 +209,9 @@ function buildScatterCompositeImages(modelDirs, xs, paperYs, colors, glyph) {
 // by the dashboard's initComparison() defaults before first render.
 let currentSizeMin = 6;
 let currentSizeMax = 24;
+// "Filter by model size": on, the chart shows the models in the size range
+// as ranked bars; off, every size, as a size-vs-score scatter plot.
+let sizeFilterOn = true;
 let fullyOpenOnly = false;
 // Whether the URL supplied a valid normalization; otherwise the selection-
 // dependent default applies (autoSetNormalization).
@@ -298,10 +302,6 @@ export async function initComparison(config) {
     // pages), and "Select all" from there returns to the default view.
     // Off: such a subset is task-averaged, as before.
     keepCategoryAverage: false,
-    // Most models drawn as bars; with more, the chart switches to the
-    // size-vs-score scatter plot (as it does when the size range is fully
-    // open), since that many bars become too thin to read.
-    maxBars: 40,
   }, config);
   plotlyConfig = makePlotlyConfig(CFG.filenamePrefix, exportMetadata);
   // Scopes the comparison pages' phone layout in style.css.
@@ -385,10 +385,12 @@ function exportMetadata() {
     y_axis: getNormYLabel(),
     metric: aggregate ? "main metric of each task" : getEffectiveMetric(sel),
     tasks: aggregate ? selectedTasks().sort() : [sel],
-    // null: that end of the size slider is open (see isModelInSizeRange).
+    // null: that end of the size slider is open (see isModelInSizeRange);
+    // all of it null with the size filter off (every size, as a scatter).
+    size_filter: sizeFilterOn,
     model_size_b: {
-      min: currentSizeMin <= CFG.sizeRangeMin ? null : currentSizeMin,
-      max: currentSizeMax >= CFG.sizeRangeMax ? null : currentSizeMax,
+      min: !sizeFilterOn || currentSizeMin <= CFG.sizeRangeMin ? null : currentSizeMin,
+      max: !sizeFilterOn || currentSizeMax >= CFG.sizeRangeMax ? null : currentSizeMax,
     },
     fully_open_only: fullyOpenOnly,
   };
@@ -413,6 +415,7 @@ function resetViewState() {
   state.currentNormalization = "baseline";   // replaced by the dynamic default unless the URL sets one
   currentSizeMin = CFG.defaultSizeMin;
   currentSizeMax = CFG.defaultSizeMax;
+  sizeFilterOn = true;
   fullyOpenOnly = false;
   checkedModels.clear();
   addDefaultModels();
@@ -442,6 +445,7 @@ function syncControlsFromState() {
   syncTaskControlsFromState();
   syncPickers();
   updateRangeSliderUI();
+  syncSizeFilterUI();
   const fo = document.getElementById("fully-open-toggle");
   if (fo) fo.checked = fullyOpenOnly;
 }
@@ -579,6 +583,12 @@ function setupUrlState() {
       default: () => CFG.defaultSizeMin + "-" + CFG.defaultSizeMax,
     },
     {
+      key: "sizefilter",
+      get: () => sizeFilterOn ? "1" : "0",
+      set: (v) => sizeFilterOn = v !== "0",
+      default: "1",
+    },
+    {
       key: "open",
       get: () => fullyOpenOnly ? "1" : "0",
       set: (v) => fullyOpenOnly = v === "1",
@@ -653,8 +663,31 @@ function bindEventListeners() {
       renderChart();
     });
   }
+  const sfToggle = document.getElementById("size-filter-toggle");
+  if (sfToggle) {
+    sfToggle.addEventListener("change", (e) => {
+      sizeFilterOn = e.target.checked;
+      syncSizeFilterUI();
+      renderChart();
+    });
+  }
 
   initRangeSlider();
+  syncSizeFilterUI();
+}
+
+/** The size slider greys out (and takes no input) while the size filter is
+ *  off; the toggle shows the filter's state. */
+function syncSizeFilterUI() {
+  const toggle = document.getElementById("size-filter-toggle");
+  if (toggle) toggle.checked = sizeFilterOn;
+  document.getElementById("size-slider-container")?.classList.toggle("size-filter-off", !sizeFilterOn);
+  for (const id of ["thumb-min", "thumb-max"]) {
+    const thumb = document.getElementById(id);
+    if (!thumb) continue;
+    thumb.tabIndex = sizeFilterOn ? 0 : -1;
+    thumb.setAttribute("aria-disabled", String(!sizeFilterOn));
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -915,7 +948,7 @@ function categoryBreakdown(taskScores) {
 
 function isModelInSizeRange(modelDir) {
   const size = state.DATA.model_parameters?.[modelDir];
-  if (size !== undefined && size !== 0) {
+  if (sizeFilterOn && size !== undefined && size !== 0) {
     // A thumb resting at either end of the track leaves that side open, so a
     // model outside the track's range (a 0.9B model below its 1B end) shows
     // whenever the slider is opened to that end.
@@ -987,6 +1020,7 @@ function matchesModelSearch(m) {
 /** The size range as text ("8–20B", "up to 20B", "from 8B"), or "" when
  *  the slider is fully open. */
 function sizeRangeText() {
+  if (!sizeFilterOn) return "";
   const lo = currentSizeMin > CFG.sizeRangeMin, hi = currentSizeMax < CFG.sizeRangeMax;
   if (lo && hi) return `${currentSizeMin}–${currentSizeMax}B`;
   if (hi) return `up to ${currentSizeMax}B`;
@@ -998,7 +1032,8 @@ function sizeRangeText() {
  *  models …": "outside 8–20B", "larger than 20B", "smaller than 8B", each
  *  "… or not fully open" with the fully-open filter on. */
 function filteredOutPhrase() {
-  const lo = currentSizeMin > CFG.sizeRangeMin, hi = currentSizeMax < CFG.sizeRangeMax;
+  const lo = sizeFilterOn && currentSizeMin > CFG.sizeRangeMin;
+  const hi = sizeFilterOn && currentSizeMax < CFG.sizeRangeMax;
   const size = lo && hi ? `outside ${currentSizeMin}–${currentSizeMax}B`
     : hi ? `larger than ${currentSizeMax}B`
     : lo ? `smaller than ${currentSizeMin}B` : "";
@@ -1012,7 +1047,7 @@ function modelFilterNote(m) {
   const lo = currentSizeMin <= CFG.sizeRangeMin ? -Infinity : currentSizeMin;
   const hi = currentSizeMax >= CFG.sizeRangeMax ? Infinity : currentSizeMax;
   const reasons = [];
-  if (size && (size < lo || size > hi)) reasons.push(`outside the size range (${sizeRangeText()})`);
+  if (sizeFilterOn && size && (size < lo || size > hi)) reasons.push(`outside the size range (${sizeRangeText()})`);
   if (fullyOpenOnly && !state.DATA.model_fully_open?.[m]) reasons.push("not fully open");
   return reasons.length ? "Not in the chart: " + reasons.join(" and ") + "." : "";
 }
@@ -1253,7 +1288,7 @@ function syncSettingsSummary() {
     chosen("prompt-agg-select"),
     state.currentNormalization === "none" ? "no rescaling" : chosen("norm-select"),
     metricShown ? chosen("metric-select").replace(/ \(default\)$/, "") : "",
-    sizeRangeText() || "all sizes",
+    sizeFilterOn ? sizeRangeText() || "all sizes" : "all sizes (scatter)",
     fullyOpenOnly ? "fully open" : "",
   ].filter(Boolean);
   // A line may break between the items, not inside one ("8–20B"), and
@@ -1374,11 +1409,12 @@ function renderChart() {
   }
   setChartLoading(false);
 
-  // When the user fully opens the size range, or more than CFG.maxBars
-  // models are shown, the bar chart would squeeze them into illegible thin
-  // bars; switch to a scatter plot with model size on a log x-axis so each
-  // model becomes a distinct point.
-  const useScatter = isFullSizeRange() || getModelList().length > CFG.maxBars;
+  // The size filter off shows every model by size: a scatter plot with size
+  // on a log x-axis. On, ranked bars (panning when they don't all fit,
+  // renderModelBars); the pan controls are off for every other chart.
+  const useScatter = !sizeFilterOn;
+  setBarPan(document.getElementById("chart"), null);
+  document.getElementById("chart")._exportFigure = null;   // (renderModelBars may set one)
 
   if (!getModelList().length) {
     renderEmptyState(noModelsMessage());
@@ -1403,13 +1439,6 @@ function noModelsMessage() {
   return range
     ? `No selected ${what} in the size range (${range}) – widen it above`
     : `No selected ${what} – pick models below`;
-}
-
-/** True when the user has fully opened the size-range slider — one of the
- *  two cues (with more than CFG.maxBars models) for switching from
- *  per-model bars to a size-vs-score scatter plot. */
-function isFullSizeRange() {
-  return currentSizeMin <= CFG.sizeRangeMin && currentSizeMax >= CFG.sizeRangeMax;
 }
 
 /** Convert a y-data value to a paper-fraction (for image positioning). */
@@ -1482,17 +1511,39 @@ function formatModelSize(b) {
   return +b.toPrecision(3) + "B";
 }
 
-// Margins of the bar chart; the bottom and left ones grow to fit long model
-// names (barMargins).
-const BAR_MARGIN = { l: 105, r: 4, t: 8, b: 100 };
+// Margins of the bar chart; the bottom one grows to fit long model names
+// (barMargins), the left one keeps the plot at the column's edge (barView).
+// The bars carry their values, so the chart has no y-axis labels: its plot
+// starts at the column's edge (the chart box reaches 5.5rem = 88px into the
+// page's padding, style.css), where the title starts.
+const BAR_MARGIN = { l: 88, r: 4, t: 8, b: 100 };
 const BAR_WIDTH = 0.85;   // of a model's slot
+// Bars that would get narrower than BAR_SLOT_MIN_PX each don't all fit: the
+// chart then shows as many as fit at about BAR_SLOT_PX, plus BAR_PEEK of the
+// next one at the edge, and pans sideways (bar-pan.js). The view's first
+// bar (fractional while panning) is kept across renders.
+const BAR_SLOT_PX = 52;
+const BAR_SLOT_MIN_PX = 48;
+const BAR_PEEK = 0.4;
+let barViewStart = -Infinity;   // the panning view's first bar; -Infinity: the start
+// The y-axis's numbers stand in a column left of the first bar, inside the
+// plot, so they pan away with the bars (Plotly's own tick labels would stay
+// at the plot's edge): shape labels, over a white band that hides the
+// gridlines behind them (renderModelBars).
+const Y_LABEL_GAP_PX = 8;   // between the numbers and the gridlines
+const AXIS_LABELS = "y-axis numbers";   // names those shapes (an image export drops them)
+let barYLabelPx = 0;        // the column's width, as last drawn
+// On a narrow page the bars go without their names (showBarNames), and the
+// plot needs only this much room below it.
+const BAR_BARE_MARGIN_B = 16;
+let barNamesShown = true;   // as last drawn (a resize may change it)
 const TICK_FONT_SIZE = 13;
 
 /** Rendered width (px) of each label in the chart's tick font. */
-function measureLabels(labels, fontSize = TICK_FONT_SIZE) {
+function measureLabels(labels, fontSize = TICK_FONT_SIZE, weight = 400) {
   try {
     const ctx = measureLabels.ctx || (measureLabels.ctx = document.createElement("canvas").getContext("2d"));
-    ctx.font = `${fontSize}px 'Mona Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif`;
+    ctx.font = `${weight} ${fontSize}px 'Mona Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif`;
     return labels.map((l) => ctx.measureText(l).width);
   } catch (_) {
     return labels.map((l) => l.length * fontSize * 0.55);
@@ -1578,7 +1629,7 @@ function bindNarrowScreenListeners() {
     timer = setTimeout(() => {
       if (window.innerWidth === width) return;
       width = window.innerWidth;
-      if (useHorizontalBars()) renderChart();
+      if (useHorizontalBars() || barPanChanges() || barNamesChange()) renderChart();
     }, 200);
   });
   // A touch closes the tooltip wherever it lands (a tap on a bar reopens it
@@ -1603,6 +1654,15 @@ function bindNarrowScreenListeners() {
 }
 
 /** Set the chart box to `px` tall; null restores the stylesheet's height. */
+/** Whether a resize changes how the bars pan: a chart that pans may now fit
+ *  (or show more or fewer bars), and one that fits may now have to pan. */
+function barPanChanges() {
+  const chart = document.getElementById("chart");
+  if (!chart || !sizeFilterOn) return false;
+  if (chart.classList.contains("bar-pan")) return true;
+  return getModelList().length * BAR_SLOT_MIN_PX > chart.clientWidth - BAR_MARGIN.l - BAR_MARGIN.r - barYLabelPx;
+}
+
 function setChartHeight(px) {
   const el = document.getElementById("chart");
   if (el) el.style.height = px == null ? "" : px + "px";
@@ -1612,11 +1672,10 @@ function setChartHeight(px) {
  *  (0, or negative: rotated labels end at their tick and hang down-left).
  *  The bottom margin covers the longest label's drop; the left one keeps
  *  the first labels — whose ticks sit (0.6 + i) slots of `slotPx` right of
- *  the plot's left edge — on the page, also when the chart box starts
- *  `offscreen` px left of the screen (it reaches into the page's left
- *  padding, which a tablet-width page doesn't have). `shift`: the labels'
+ *  the plot's left edge — inside the figure (an image export: on the page
+ *  the plot keeps to the column's edge, barView). `shift`: the labels'
  *  shift to the right (rotatedLabelShift). */
-function barMargins(labels, angleDeg, slotPx, offscreen = 0, shift = 0) {
+function barMargins(labels, angleDeg, slotPx, shift = 0) {
   const rad = Math.abs(angleDeg) * Math.PI / 180;
   const lineHeight = TICK_FONT_SIZE * 1.2;
   const widths = measureLabels(labels);
@@ -1626,7 +1685,7 @@ function barMargins(labels, angleDeg, slotPx, offscreen = 0, shift = 0) {
   return {
     ...BAR_MARGIN,
     b: Math.max(BAR_MARGIN.b, Math.ceil(drop + 14)),
-    l: Math.max(BAR_MARGIN.l, Math.ceil(Math.max(0, ...reach) + 8 + offscreen)),
+    l: Math.max(BAR_MARGIN.l, Math.ceil(Math.max(0, ...reach) + 8)),
   };
 }
 
@@ -1644,13 +1703,30 @@ function rotatedLabelShift(angleDeg, slotPx) {
 }
 
 /** Make the chart box `extra` px taller than the stylesheet's height (room
- *  for long model names below the bars, so the plot area keeps its size);
- *  0 restores the stylesheet's height. */
+ *  for long model names below the bars) or, negative, shorter (bars without
+ *  names), so the plot area keeps its size; 0 restores the stylesheet's
+ *  height. */
 function setChartExtraHeight(extra) {
   const el = document.getElementById("chart");
   if (!el) return;
   el.style.height = "";
-  if (extra > 0) el.style.height = el.clientHeight + extra + "px";
+  if (extra) el.style.height = el.clientHeight + extra + "px";
+}
+
+/** Whether the bars carry their names under them: not on a narrow page (a
+ *  tablet, a window under about 1260px), whose side padding can't hold the
+ *  first names — nor the pan buttons (bar-pan.js buttonsFitOutside). There
+ *  the plot spans the column, as on a wide page, instead of leaving room
+ *  for the names, and a bar's tooltip (a tap or hover) names it. */
+function showBarNames(chartEl) {
+  const r = chartEl.getBoundingClientRect();
+  return buttonsFitOutside(r.left + BAR_MARGIN.l, r.right);
+}
+
+/** Whether a resize crosses that width: the bars gain or lose their names. */
+function barNamesChange() {
+  const chart = document.getElementById("chart");
+  return !!chart && sizeFilterOn && !useHorizontalBars() && showBarNames(chart) !== barNamesShown;
 }
 
 /** The bars ordered by performance: highest value first (every metric of
@@ -1684,9 +1760,6 @@ function renderModelBars(modelNames, opts) {
   clearScatterHooks();
   const labels = modelNames.map(getModelLabel);
   const xPositions = computeOrgXPositions(modelNames);
-  const xRange = xPositions.length
-    ? [xPositions[0] - 0.6, xPositions[xPositions.length - 1] + 0.5]
-    : null;
   const fmt = scoreDecimals();
   const hiArr = ciValues ? ciValues.map((c) => c?.hiDist ?? 0) : null;
   const loArr = ciValues ? ciValues.map((c) => c?.loDist ?? 0) : null;
@@ -1703,23 +1776,54 @@ function renderModelBars(modelNames, opts) {
     hoverinfo: "none",
     ...(ciValues && { error_y: makeErrorY(ciValues) }),
   };
-  const tickAngle = computeTickAngle(labels);
   const chartEl = document.getElementById("chart");
   const chartWidth = chartEl?.clientWidth || 1200;
-  const offscreen = Math.max(0, -(chartEl?.getBoundingClientRect().left ?? 0));
-  const slotPx = (chartWidth - BAR_MARGIN.l - BAR_MARGIN.r) / (labels.length + 0.1);
-  const labelShift = rotatedLabelShift(tickAngle, slotPx);
-  const margin = barMargins(labels, tickAngle, slotPx, offscreen, labelShift);
+  barNamesShown = chartEl ? showBarNames(chartEl) : true;
+  // The y-axis's ticks, as Plotly would place them on the plot's height
+  // (which stays the stylesheet's chart height less the default margins,
+  // whatever the names need: setChartExtraHeight), and their column.
+  setChartExtraHeight(0);
+  const yTicks = barYTicks(yRange, (chartEl?.clientHeight || 500) - BAR_MARGIN.t - BAR_MARGIN.b);
+  barYLabelPx = Math.ceil(Math.max(0, ...measureLabels(yTicks.map((tk) => tk.text), Y_TICK_FONT.size, Y_TICK_FONT.weight))) + Y_LABEL_GAP_PX;
+  const view = barView(labels, chartWidth, barNamesShown, barYLabelPx);
+  const { tickAngle, labelShift, margin, lead } = view;
   setChartExtraHeight(margin.b - BAR_MARGIN.b);
+  if (view.panning) barViewStart = Math.min(Math.max(-lead, barViewStart), labels.length - view.visible);
+  const last = xPositions[xPositions.length - 1];
+  // The numbers, right-aligned a gap short of the gridlines, which start
+  // 0.1 slot before the first bar (as Plotly's plot did, before the column):
+  // labels of empty shapes over the band, both in the layer between the
+  // gridlines and the bars — under the bars (one widened by the hover can
+  // reach them) and cut at the plot's edge with them. One on the plot's
+  // bottom or top edge sits just inside it. (Shape labels keep ~3px from
+  // their shape's edge.)
+  const numbersEnd = -0.6;
+  const plotHeight = (chartEl?.clientHeight || 500) - margin.t - margin.b;
+  const edgePx = (v) => (v - yRange[0]) / (yRange[1] - yRange[0]) * plotHeight;
+  const yNumbers = [
+    { type: "rect", layer: "between", name: AXIS_LABELS, xref: "x", yref: "y",
+      x0: -0.5 - lead, x1: numbersEnd, y0: yRange[0], y1: yRange[1], fillcolor: "#fff", line: { width: 0 } },
+    ...yTicks.map((tk) => ({
+      type: "rect", layer: "between", name: AXIS_LABELS, xref: "x", yref: "y",
+      x0: -0.5 - lead, x1: numbersEnd - (Y_LABEL_GAP_PX - 3) / view.slotPx, y0: tk.v, y1: tk.v,
+      fillcolor: "rgba(0,0,0,0)", line: { width: 0 },
+      label: {
+        text: tk.text, font: { ...Y_TICK_FONT }, padding: 0,
+        textposition: edgePx(tk.v) < Y_TICK_FONT.size * 0.6 ? "bottom right"
+          : plotHeight - edgePx(tk.v) < Y_TICK_FONT.size * 0.6 ? "top right" : "middle right",
+      },
+    })),
+  ];
   const layout = getPlotlyLayout({
-    yaxis: makeYAxis(yRange),
+    yaxis: { ...makeYAxis(yRange), tickvals: yTicks.map((tk) => tk.v), showticklabels: false },
     xaxis: { automargin: false,
-      range: xRange,
-      tickvals: xPositions, ticktext: labels,
+      range: view.panning ? [barViewStart - 0.5, barViewStart - 0.5 + view.visible] : [-0.5 - lead, last + 0.5],
+      tickvals: xPositions, ticktext: labels, showticklabels: barNamesShown,
       tickangle: tickAngle, ticklabelshift: labelShift, showgrid: false,
     },
     showlegend: false,
     margin,
+    shapes: yNumbers,
     annotations: labels.map((label, i) => ({
       x: xPositions[i],
       y: below[i]
@@ -1728,7 +1832,7 @@ function renderModelBars(modelNames, opts) {
       text: values[i] != null ? values[i].toFixed(fmt) : "",
       showarrow: false, yshift: below[i] ? -10 : 10,
       xanchor: "center",
-      font: { size: computeAnnotationFontSize(labels.length), color: "#000", weight: 500 },
+      font: { size: computeAnnotationFontSize(view.panning ? Math.floor(view.visible) : labels.length), color: "#000", weight: 500 },
     })),
     images: buildOrgImages(modelNames, xPositions, values, yRange),
   });
@@ -1736,7 +1840,101 @@ function renderModelBars(modelNames, opts) {
     score: values[i] || 0,
     se: below[i] ? -(loArr ? (loArr[i] || 0) : 0) : (hiArr ? (hiArr[i] || 0) : 0),
   }));
+  if (view.panning) {
+    // The chart moves only by panning: no drag-zoom. A bar panned to the
+    // left edge keeps its label, running into the page's padding (or off
+    // the screen), not dropped (Plotly's default for a label running past
+    // the chart).
+    layout.dragmode = false;
+    layout.xaxis.fixedrange = true;
+    layout.yaxis.fixedrange = true;
+    layout.xaxis.ticklabeloverflow = "allow";
+  }
   plotChart([trace], touchSafe(layout), plotlyConfig, onChartHover, hideTooltip);
+  if (view.panning) {
+    setBarPan(chartEl, {
+      total: labels.length, visible: view.visible, start: barViewStart, lead, slotPx: view.slotPx,
+      onChange: (s) => { barViewStart = s <= -lead + 1e-6 ? -Infinity : s; },
+    });
+  } else {
+    barViewStart = -Infinity;
+  }
+  // An image export (chart.js) draws every bar with its name, as a wide
+  // page shows bars that all fit, with Plotly's own y-axis numbers.
+  if (chartEl) chartEl._exportFigure = (width) => exportBarFigure(chartEl, labels, [-0.6, last + 0.5], width);
+}
+
+/** The y-axis's ticks on `range`, as Plotly places them (its auto ticks) on
+ *  an axis `lengthPx` long: 5–10 of them, about 40px apart or more, a step
+ *  of 2, 5 or 10 × a power of ten; with their labels, as Plotly writes
+ *  them. */
+function barYTicks([lo, hi], lengthPx) {
+  const nt = Math.min(9, Math.max(4, lengthPx / 40)) + 1;
+  const rough = (hi - lo) / nt;
+  const base = 10 ** Math.floor(Math.log10(rough));
+  const step = base * [2, 5, 10].find((m) => m >= rough / base - 1e-9);
+  const decimals = Math.max(0, -Math.floor(Math.log10(step) + 1e-9));
+  const ticks = [];
+  for (let k = Math.ceil(lo / step - 1e-9); k * step <= hi + 1e-9; k++) {
+    const v = +(k * step).toFixed(decimals + 2);
+    ticks.push({ v, text: (v < 0 ? "\u2212" : "") + String(+Math.abs(v).toFixed(decimals)) });
+  }
+  return ticks;
+}
+
+/** The figure of an image export of the bars `width` px wide: all of them,
+ *  each with its name, laid out as barView lays out bars that fit, with
+ *  Plotly's own y-axis numbers instead of the panning column. */
+function exportBarFigure(gd, labels, xRange, width) {
+  const slotPx = (width - BAR_MARGIN.l - BAR_MARGIN.r) / (labels.length + 0.1);
+  const tickAngle = computeTickAngle(labels, slotPx);
+  const labelShift = rotatedLabelShift(tickAngle, slotPx);
+  const layout = structuredClone(gd.layout);
+  Object.assign(layout.xaxis, { range: xRange, showticklabels: true, tickangle: tickAngle, ticklabelshift: labelShift });
+  layout.yaxis.showticklabels = true;
+  layout.shapes = (layout.shapes || []).filter((s) => s.name !== AXIS_LABELS);
+  layout.margin = barMargins(labels, tickAngle, slotPx, labelShift);
+  const size = computeAnnotationFontSize(labels.length, width);
+  layout.annotations = layout.annotations.map((a) => ({ ...a, font: { ...a.font, size } }));
+  return { data: structuredClone(gd.data), layout };
+}
+
+/** The bars' geometry: all of them across the plot when each gets at least
+ *  BAR_SLOT_MIN_PX (as before); else as many as fit at about BAR_SLOT_PX,
+ *  plus a peek of the next, and the chart pans (bar-pan.js; its ‹ › buttons
+ *  sit outside the plot, or on top of its edges). The y-axis's numbers take
+ *  the first `numbersPx` of the plot, then 0.1 slot, then the first bar;
+ *  panned, they go with it. Returns {panning, visible (slots in view, the
+ *  peek included), slotPx, lead (the slots before the first bar's: the
+ *  numbers' column and the 0.1), tickAngle, labelShift, margin}. The plot
+ *  starts at the page column's edge, under the title, whatever the names:
+ *  the first ones hang into the page's side padding (one too long even for
+ *  that is cut at the window's edge), and the bottom margin fits their
+ *  drop. A panning plot also reaches the column's right edge. Without
+ *  `names` (showBarNames) the plot needs little room below. */
+function barView(labels, chartWidth, names, numbersPx) {
+  const fitWidth = chartWidth - BAR_MARGIN.l - BAR_MARGIN.r - numbersPx;
+  const panning = labels.length * BAR_SLOT_MIN_PX > fitWidth;
+  const r = panning ? 0 : BAR_MARGIN.r;
+  let slotPx, visible;
+  if (panning) {
+    // From the start: the numbers, 0.1 slot, as many bars as fit at about
+    // BAR_SLOT_PX, and BAR_PEEK of the next.
+    const room = chartWidth - BAR_MARGIN.l - numbersPx;
+    slotPx = room / (Math.max(4, Math.floor(room / BAR_SLOT_PX)) + 0.1 + BAR_PEEK);
+    visible = (chartWidth - BAR_MARGIN.l) / slotPx;
+  } else {
+    slotPx = fitWidth / (labels.length + 0.1);
+    visible = labels.length;
+  }
+  const lead = numbersPx / slotPx + 0.1;
+  if (!names) {
+    return { panning, visible, slotPx, lead, tickAngle: 0, labelShift: 0, margin: { ...BAR_MARGIN, r, b: BAR_BARE_MARGIN_B } };
+  }
+  const tickAngle = computeTickAngle(labels, slotPx);
+  const labelShift = rotatedLabelShift(tickAngle, slotPx);
+  const { b } = barMargins(labels, tickAngle, slotPx, labelShift);
+  return { panning, visible, slotPx, lead, tickAngle, labelShift, margin: { ...BAR_MARGIN, r, b } };
 }
 
 /** renderModelBars on a narrow screen: one row per model, best at the top,

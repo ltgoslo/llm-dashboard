@@ -300,6 +300,15 @@ header.dashboard-header h1 {
   transition: transform 0.15s, color 0.15s;
 }
 .chart-title-details[open] > summary::after { transform: rotate(225deg); }
+/* The comparison pages' arrow: smaller and lighter, nearer the text's
+   x-height. */
+.comparison-page .chart-title-details > summary::after {
+  width: 0.38em;
+  height: 0.38em;
+  border-right-width: 0.15em;
+  border-bottom-width: 0.15em;
+  top: -0.18em;
+}
 
 .chart-title {
   font-family: var(--font-serif);
@@ -375,6 +384,9 @@ header.dashboard-header h1 {
      negative bottom inset leaves room for the shadow below. */
   clip-path: inset(0 0 -2rem 0);
 }
+/* The comparison pages' controls go without it: the chart follows them
+   directly. */
+.comparison-page .controls-bar:has(+ #chart) { box-shadow: none; }
 
 .control-group { display: flex; align-items: center; gap: 0.5rem; }
 .control-group label { font-weight: 500; font-size: 0.9rem; color: var(--fg-muted); }
@@ -647,10 +659,15 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
 .range-thumb.active { cursor: grabbing; }
 
 /* "Fully open" filter toggle — restrict to models with public weights+data. */
-.fully-open-label {
+.fully-open-label, .size-filter-label {
   display: flex; align-items: center; gap: 0.35rem;
   cursor: pointer; user-select: none; white-space: nowrap;
   font-size: 0.9rem; font-weight: 500; color: var(--fg-muted);
+}
+/* "Filter by model size" off: the slider greys out and takes no input
+   (comparison.js syncSizeFilterUI). */
+.size-slider-container.size-filter-off .range-slider {
+  opacity: 0.35; filter: grayscale(1); pointer-events: none;
 }
 
 /* ────────────────────────────────────────────────────────────
@@ -712,9 +729,59 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
    plot edges. CSS `clip-path: inset()` doesn't work on SVG <g> elements
    (it's keyed off the content bbox, not the plot rect), so we just leave
    Plotly's `clip-path="url(#…)"` attribute intact in line-mode. */
-#chart:not(.line-mode) [clip-path] {
+#chart:not(.line-mode):not(.bar-pan) [clip-path] {
   clip-path: none !important;
 }
+
+/* ──── Panning bar chart (bar-pan.js) ────
+   A chart with more bars than fit keeps Plotly's plot-area clip (above:
+   the bars beyond the view must not show), and pans by a sideways drag —
+   on a touch screen only sideways: a vertical swipe still scrolls the
+   page. At an edge with more bars beyond, the bars run under a soft
+   shadow. The ‹ › buttons sit outside the plot, in the page's side
+   padding, or on top of the plot's edges where that is too narrow
+   (bar-pan.js places them); a swipe may start on them too. */
+.comparison-page #chart.bar-pan { touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+/* Its buttons too, as a swipe may start on them (the selector outranks the
+   touch screens' `manipulation` for every button, further down). */
+.comparison-page #chart ~ .bar-pan-btn { touch-action: pan-y; }
+#chart.bar-pan .nsewdrag { cursor: grab !important; }
+#chart.bar-pan.bar-pan-dragging .nsewdrag { cursor: grabbing !important; }
+.bar-pan-shadow {
+  position: absolute; z-index: 40; pointer-events: none;
+  opacity: 0; transition: opacity 0.2s;
+  /* Soft ends: it fades in down from the plot's top, and out over its last
+     --tail px, below the axis (bar-pan.js sets the box and --tail). */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 calc(100% - var(--tail, 0px)), transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 calc(100% - var(--tail, 0px)), transparent);
+}
+/* Light at the edge, with an eased fall-off: a shadow rather than a stripe. */
+.bar-pan-shadow-left { background: linear-gradient(to right, rgba(15, 23, 42, 0.11), rgba(15, 23, 42, 0.05) 30%, rgba(15, 23, 42, 0.015) 65%, rgba(15, 23, 42, 0)); }
+.bar-pan-shadow-right { background: linear-gradient(to left, rgba(15, 23, 42, 0.11), rgba(15, 23, 42, 0.05) 30%, rgba(15, 23, 42, 0.015) 65%, rgba(15, 23, 42, 0)); }
+.bar-pan-shadow.shown { opacity: 1; }
+.bar-pan-btn {
+  position: absolute; z-index: 45;
+  display: grid; place-items: center;
+  width: 2.25rem; height: 2.25rem; margin-top: -1.125rem; padding: 0;
+  border: 1px solid var(--control-border); border-radius: 50%;
+  background: var(--surface); box-shadow: var(--control-shadow);
+  color: var(--fg-muted); cursor: pointer; outline: none;
+  opacity: 0; pointer-events: none;
+  user-select: none; -webkit-user-select: none;
+  transition: opacity 0.2s, color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+.bar-pan-btn::before {               /* chevron */
+  content: ""; width: 0.5rem; height: 0.5rem;
+  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+}
+.bar-pan-prev::before { transform: translateX(0.12rem) rotate(135deg); }
+.bar-pan-next::before { transform: translateX(-0.12rem) rotate(-45deg); }
+.bar-pan-btn.shown { opacity: 1; pointer-events: auto; }
+.bar-pan-btn:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light), var(--control-shadow); }
+@media (hover: hover) {
+  .bar-pan-btn:hover { color: var(--accent); border-color: var(--control-border-hover); background: var(--accent-light); }
+}
+.bar-pan-shadow[hidden], .bar-pan-btn[hidden] { display: none; }
 
 /* Bar hover: chart.js sets inline `scale` and `translate` on each bar path
    as a continuous function of the cursor's distance to the bar's rect.
@@ -1260,6 +1327,9 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   header.dashboard-header h1 { font-size: 1.7rem; }
   .chart-title { font-size: 1.2rem; }
   .controls-bar { gap: 0.75rem; padding: 0.5rem 0.6rem; }
+  /* The comparison pages' top row starts at the column's edge, under the
+     title, as the bottom row does. */
+  .comparison-page .chart-zone .controls-bar:not(:has(+ #chart)) { padding-left: 0; padding-right: 0; }
   .checkbox-grid { grid-template-columns: 1fr; }
   #chart { height: 380px; }
   .module-header h3 { font-size: 1rem; }
@@ -1360,10 +1430,10 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   .comparison-page .chart-zone .shot-toggle { width: 100%; height: 2.5rem; }
   .comparison-page .chart-zone .shot-btn { flex: 1 1 0; padding: 0 0.25rem; }
   .comparison-page .range-slider { flex: none; max-width: none; min-width: 0; margin: 0.45rem 10px 0.95rem; }
-  .comparison-page .chart-zone .fully-open-label {
-    min-height: 2.75rem; gap: 0.6rem; font-size: 0.9rem; color: var(--fg);
+  .comparison-page .chart-zone .control-group > :is(.fully-open-label, .size-filter-label) {
+    min-height: 2.75rem; gap: 0.6rem; font-size: 0.9rem; line-height: 1.5; color: var(--fg);
   }
-  .comparison-page .chart-zone .fully-open-label input { width: 1.25rem; height: 1.25rem; }
+  .comparison-page .chart-zone :is(.fully-open-label, .size-filter-label) input { width: 1.25rem; height: 1.25rem; }
   /* The task dropdown: its label inside, before the chosen task. */
   .comparison-page .chart-zone .control-task > label { display: none; }
   .comparison-page .chart-zone .control-task .ui-select::before {

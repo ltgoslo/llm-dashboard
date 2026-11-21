@@ -193,8 +193,8 @@ const CONTROL_TOOLTIPS = [
   },
   {
     anchor: "#size-slider-container",
-    title: "Model size",
-    body: "Restrict the chart to models whose parameter count (in billions) falls within this range. Models outside the range are excluded from the chart and from any aggregate scores.",
+    title: "Filter by model size",
+    body: "Ticked, the chart shows the models whose parameter count (in billions) falls within this range, as bars ranked by score; when they don't all fit, the chart pans sideways (swipe sideways or Shift-scroll over it, drag it, or use its arrows). Unticked, it shows models of every size in a scatter plot of score against size.",
   },
   {
     anchor: "#fully-open-container",

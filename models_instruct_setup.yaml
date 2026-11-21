@@ -1,6 +1,6 @@
 # Norwegian instruction-tuned models
 normistral-11b-thinking-full:
-  display_name: "NorMistral 11B Thinking"
+  display_name: "NorMistral Thinking"
   category: norwegian
   organization: LTG/UiO
   parameters: 11.4
@@ -12,13 +12,13 @@ normistral-11b-thinking-full:
   color: "#DD0000"
 
 normistral-11b-thinking-base-like:
-  display_name: "NorMistral 11B Thinking (base-like)"
+  display_name: "NorMistral Thinking (base)"
   category: norwegian
   organization: LTG/UiO
   parameters: 11.4
   license: "Apache 2.0"
   fully_open: false
-  description: "Same model as NorMistral 11B Thinking, but evaluated as a base model without chat template or reasoning traces."
+  description: "Same model as NorMistral Thinking, but evaluated as a base model without chat template or reasoning traces."
   huggingface_url: https://huggingface.co/ltg/normistral-11b-thinking
   default: true
   color: "#DD0000"

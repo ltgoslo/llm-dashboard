@@ -52,6 +52,7 @@ llm-dashboard/
     │   ├── chart.js              ← Plotly config, colors, layout helpers
     │   ├── ui.js                 ← tooltip, task-checkbox grid (progress pages), metric selector
     │   ├── pickers.js            ← Tasks / Models sections of noreval + noreval-gen: task picker, info cards
+    │   ├── bar-pan.js            ← sideways panning of a bar chart with more models than fit (noreval + noreval-gen)
     │   ├── dropdown.js           ← custom <select> dropdown (same look on every system)
     │   ├── segmented.js          ← sliding thumb of the shot / error-band button groups
     │   ├── selection.js          ← task-selection logic + shared control listeners
