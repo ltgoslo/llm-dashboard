@@ -307,7 +307,7 @@ function categoryRows(category, benches) {
     if (dir) {
       const pair = [dir.from, dir.to].sort((a, b) => languageRank(a) - languageRank(b) || a.localeCompare(b));
       key = "dir\u0000" + dir.prefix + "\u0000" + pair.join("\u0000");
-      variant = { bench, label: "→ " + dir.to, rank: pair.indexOf(dir.from), dir, pair };
+      variant = { bench, label: dir.to, toward: true, rank: pair.indexOf(dir.from), dir, pair };
     } else if (lang) {
       key = "lang\u0000" + name;
       variant = { bench, label: LANGUAGE_SUFFIX[lang[1]], rank: languageRank(LANGUAGE_SUFFIX[lang[1]]) };
@@ -338,10 +338,42 @@ function categoryRows(category, benches) {
     rows.push({
       label: withoutCategory(name, category),
       title: capitalize(name),
-      variants: variants.map(({ bench, label }) => ({ bench, label })),
+      variants: variants.map(({ bench, label, toward }) => ({ bench, label, toward: !!toward })),
     });
   }
   return rows.sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: "base" }));
+}
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+/** A drawn arrow in the text's colour — the page font's arrow glyphs are
+ *  hairlines at these sizes: "to" points right (→), "both" both ways (↔). */
+function arrowIcon(kind) {
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("class", "task-arrow task-arrow-" + kind);
+  svg.setAttribute("viewBox", kind === "both" ? "0 0 18 10" : "0 0 14 10");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("focusable", "false");
+  const path = document.createElementNS(SVG_NS, "path");
+  path.setAttribute("d", kind === "both"
+    ? "M2 5h14M5.5 1.5 2 5l3.5 3.5M12.5 1.5 16 5l-3.5 3.5"
+    : "M1.5 5h10M8 1.5 11.5 5 8 8.5");
+  svg.append(path);
+  return svg;
+}
+
+/** A task name with its arrows ("Bokmål ↔ English", "Bokmål → Sámi")
+ *  drawn; the text keeps them for screen readers (hidden on screen). */
+function withArrows(text) {
+  const out = document.createDocumentFragment();
+  text.split(/ (↔|→) /).forEach((part, i) => {
+    if (i % 2 === 0) { out.append(part); return; }
+    const glyph = document.createElement("span");
+    glyph.className = "visually-hidden";
+    glyph.textContent = " " + part + " ";
+    out.append(arrowIcon(part === "↔" ? "both" : "to"), glyph);
+  });
+  return out;
 }
 
 /** Info-card content of a task (or of a dataset row, from its first task —
@@ -402,7 +434,7 @@ export function buildTaskPicker({ onChange }) {
       box.type = "checkbox";
       const name = document.createElement("span");
       name.className = "task-row-name";
-      name.textContent = row.label;
+      name.append(withArrows(row.label));
       main.append(box, name);
       attachInfoCard(main, () => taskCard(row.variants[0].bench, row.title));
       rowEl.append(main);
@@ -415,7 +447,13 @@ export function buildTaskPicker({ onChange }) {
           pill.type = "button";
           pill.className = "variant-pill";
           pill.dataset.bench = v.bench;
-          pill.textContent = v.label;
+          if (v.toward) {
+            // "→ Nynorsk": the translation into Nynorsk.
+            pill.append(arrowIcon("to"), v.label);
+            pill.setAttribute("aria-label", "to " + v.label);
+          } else {
+            pill.textContent = v.label;
+          }
           attachInfoCard(pill, () => taskCard(v.bench));
           pills.append(pill);
         }
