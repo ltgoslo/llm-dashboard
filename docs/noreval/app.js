@@ -8,7 +8,7 @@ import { initComparison } from "../shared/comparison.js";
 initComparison({
   filenamePrefix: "noreval-chart",
   defaultShot: "5",
-  defaultSizeMin: 6,
+  defaultSizeMin: 8,
   defaultSizeMax: 20,
   sizeRangeMin: 1,
   sizeRangeMax: 700,

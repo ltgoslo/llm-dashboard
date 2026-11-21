@@ -1370,6 +1370,7 @@ function formatModelSize(b) {
 // Margins of the bar chart; the bottom and left ones grow to fit long model
 // names (barMargins).
 const BAR_MARGIN = { l: 105, r: 4, t: 8, b: 100 };
+const BAR_WIDTH = 0.85;   // of a model's slot
 const TICK_FONT_SIZE = 13;
 
 /** Rendered width (px) of each label in the chart's tick font. */
@@ -1468,19 +1469,33 @@ function setChartHeight(px) {
  *  the first labels — whose ticks sit (0.6 + i) slots of `slotPx` right of
  *  the plot's left edge — on the page, also when the chart box starts
  *  `offscreen` px left of the screen (it reaches into the page's left
- *  padding, which a tablet-width page doesn't have). */
-function barMargins(labels, angleDeg, slotPx, offscreen = 0) {
+ *  padding, which a tablet-width page doesn't have). `shift`: the labels'
+ *  shift to the right (rotatedLabelShift). */
+function barMargins(labels, angleDeg, slotPx, offscreen = 0, shift = 0) {
   const rad = Math.abs(angleDeg) * Math.PI / 180;
   const lineHeight = TICK_FONT_SIZE * 1.2;
   const widths = measureLabels(labels);
   const drop = Math.max(0, ...widths.map((w) => w * Math.sin(rad) + lineHeight * Math.cos(rad)));
   const reach = widths.map((w, i) => (rad === 0 ? w / 2 : w * Math.cos(rad) + lineHeight / 2 * Math.sin(rad))
-    - (0.6 + i) * slotPx);
+    - (0.6 + i) * slotPx - shift);
   return {
     ...BAR_MARGIN,
     b: Math.max(BAR_MARGIN.b, Math.ceil(drop + 14)),
     l: Math.max(BAR_MARGIN.l, Math.ceil(Math.max(0, ...reach) + 8 + offscreen)),
   };
+}
+
+/** How far (px) to move rotated model names right of their bars' centres.
+ *  Plotly ends a rotated name, at mid-height, exactly under its bar's
+ *  centre, so a name at a shallow angle hangs mostly under the gap and the
+ *  bar to its left. Shifting it right by a quarter of a bar times
+ *  cos(angle) keeps vertical names centred and ends flatter ones up to
+ *  three quarters across their bar (all the way to the right edge looked
+ *  pushed too far). Flat names (angle 0) are centred by Plotly and stay
+ *  put. */
+function rotatedLabelShift(angleDeg, slotPx) {
+  if (!angleDeg) return 0;
+  return Math.round(BAR_WIDTH * slotPx / 4 * Math.cos(Math.abs(angleDeg) * Math.PI / 180));
 }
 
 /** Make the chart box `extra` px taller than the stylesheet's height (room
@@ -1535,7 +1550,7 @@ function renderModelBars(modelNames, opts) {
   const below = values.map((v) => v != null && v < 0);
   const trace = {
     x: xPositions, y: values, type: "bar",
-    width: 0.85,
+    width: BAR_WIDTH,
     marker: { color: modelNames.map(getModelColor), line: { width: 0 }, cornerradius: 6 },
     // The final value (for the tooltip — the plotted y animates) and the
     // model's name (for the JSON export) ride along in customdata.
@@ -1547,15 +1562,16 @@ function renderModelBars(modelNames, opts) {
   const chartEl = document.getElementById("chart");
   const chartWidth = chartEl?.clientWidth || 1200;
   const offscreen = Math.max(0, -(chartEl?.getBoundingClientRect().left ?? 0));
-  const margin = barMargins(labels, tickAngle,
-    (chartWidth - BAR_MARGIN.l - BAR_MARGIN.r) / (labels.length + 0.1), offscreen);
+  const slotPx = (chartWidth - BAR_MARGIN.l - BAR_MARGIN.r) / (labels.length + 0.1);
+  const labelShift = rotatedLabelShift(tickAngle, slotPx);
+  const margin = barMargins(labels, tickAngle, slotPx, offscreen, labelShift);
   setChartExtraHeight(margin.b - BAR_MARGIN.b);
   const layout = getPlotlyLayout({
     yaxis: makeYAxis(yRange),
     xaxis: { automargin: false,
       range: xRange,
       tickvals: xPositions, ticktext: labels,
-      tickangle: tickAngle, showgrid: false,
+      tickangle: tickAngle, ticklabelshift: labelShift, showgrid: false,
     },
     showlegend: false,
     margin,

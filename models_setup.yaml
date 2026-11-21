@@ -1197,7 +1197,7 @@ LFM2.5-230M-Base:
   description: "Small hybrid base model from Liquid AI designed for on-device use, combining double-gated short-convolution blocks with grouped-query attention (14 layers). Trained on 28T tokens with a 32k context, covering 9 languages (not Norwegian)."
   huggingface_url: https://huggingface.co/LiquidAI/LFM2.5-230M-Base
   default: true
-  color: "#a0522d"
+  color: "#e58af5"
 
 LFM2.5-2.6B-Base:
   display_name: "LFM2.5 2.6B"
@@ -1209,7 +1209,7 @@ LFM2.5-2.6B-Base:
   description: "Hybrid base model from Liquid AI designed for on-device use, combining double-gated short-convolution blocks with grouped-query attention (30 layers). Trained on 34T tokens with a 128k context, covering 16 languages (not Norwegian)."
   huggingface_url: https://huggingface.co/LiquidAI/LFM2.5-2.6B-Base
   default: true
-  color: "#a0522d"
+  color: "#e58af5"
 
 LFM2.5-8B-A1B-Base:
   display_name: "LFM2.5 8B-A1B"
@@ -1221,7 +1221,7 @@ LFM2.5-8B-A1B-Base:
   description: "Mixture-of-Experts hybrid base model from Liquid AI with 8.3B total and 1.5B active parameters, combining double-gated short-convolution blocks with grouped-query attention. Trained on 38T tokens with a 128k context, covering 9 languages (not Norwegian)."
   huggingface_url: https://huggingface.co/LiquidAI/LFM2.5-8B-A1B-Base
   default: true
-  color: "#a0522d"
+  color: "#e58af5"
 
 LFM2.5-24B-A2B-Base:
   display_name: "LFM2.5 24B-A2B"
@@ -1233,4 +1233,4 @@ LFM2.5-24B-A2B-Base:
   description: "The largest LFM2.5 model: a Mixture-of-Experts hybrid base model from Liquid AI with 24B total and 2.45B active parameters (64 experts, top-4 routing), combining short-convolution blocks with grouped-query attention. Trained on 36T tokens, then mid-trained at 32k and 128k context; covers 16 languages (not Norwegian)."
   huggingface_url: https://huggingface.co/LiquidAI/LFM2.5-24B-A2B-Base
   default: true
-  color: "#a0522d"
+  color: "#e58af5"
