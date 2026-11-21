@@ -1187,18 +1187,6 @@ Nemotron-4-340B-Base-hf-FP8:
   default: true
   color: "#76b900"
 
-LFM2.5-230M-Base:
-  display_name: "LFM2.5 230M"
-  category: multilingual
-  organization: Liquid AI
-  parameters: 0.23
-  license: "LFM Open License v1.0"
-  fully_open: false
-  description: "Small hybrid base model from Liquid AI designed for on-device use, combining double-gated short-convolution blocks with grouped-query attention (14 layers). Trained on 28T tokens with a 32k context, covering 9 languages (not Norwegian)."
-  huggingface_url: https://huggingface.co/LiquidAI/LFM2.5-230M-Base
-  default: true
-  color: "#e58af5"
-
 LFM2.5-2.6B-Base:
   display_name: "LFM2.5 2.6B"
   category: multilingual
