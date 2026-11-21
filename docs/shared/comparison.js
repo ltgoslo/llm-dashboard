@@ -30,7 +30,8 @@ import {
   restoreCheckedTasksFromSelection, syncTaskControlsFromState,
 } from "./selection.js";
 import {
-  initModuleToggles, buildTaskPicker, syncTaskPicker, attachInfoCard, setGroupCheckbox, shortUrl,
+  PHONE_SCREEN, initModuleToggles, initChartJump, buildTaskPicker, syncTaskPicker, attachInfoCard,
+  setGroupCheckbox, shortUrl,
 } from "./pickers.js";
 import { UrlState } from "./url-state.js";
 
@@ -325,6 +326,8 @@ export async function initComparison(config) {
     buildTaskPicker({ onChange: () => onTaskCheckboxChange(renderChart) });
     buildModelPicker();
     initModuleToggles();
+    initChartJump();
+    buildSettingsToggle();
     attachControlTooltips();
 
     // The `norm` URL field has a dynamic default ("baseline" for aggregate
@@ -1200,6 +1203,70 @@ function syncPickers() {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Phone settings
+// ─────────────────────────────────────────────────────────────
+// On a phone the controls between the chart title and the chart fold away
+// behind one row that sums them up ("5-shot · max · random baseline ·
+// 8–20B") and opens them in place; the task dropdown stays. The chart then
+// starts on the first screen. Wider screens show every control, as before
+// (style.css hides the row there).
+
+/** Insert the settings row after the task dropdown; folded on a phone. */
+function buildSettingsToggle() {
+  const zone = document.querySelector(".chart-zone");
+  const taskGroup = document.getElementById("task-select")?.closest(".control-group");
+  if (!zone || !taskGroup || document.getElementById("settings-toggle")) return;
+  taskGroup.classList.add("control-task");
+  const button = document.createElement("button");
+  button.type = "button";
+  button.id = "settings-toggle";
+  button.className = "settings-toggle";
+  const name = document.createElement("span");
+  name.className = "settings-toggle-name";
+  name.textContent = "Settings";
+  const summary = document.createElement("span");
+  summary.className = "settings-summary";
+  summary.id = "settings-summary";
+  button.append(name, summary);
+  taskGroup.after(button);
+  const setOpen = (open) => {
+    zone.classList.toggle("settings-folded", !open);
+    button.setAttribute("aria-expanded", String(open));
+  };
+  setOpen(!window.matchMedia(PHONE_SCREEN).matches);
+  button.addEventListener("click", () => setOpen(zone.classList.contains("settings-folded")));
+  syncSettingsSummary();
+}
+
+/** The folded settings in one line: shots, prompt aggregation, rescaling,
+ *  the metric of a single-task view, the size range and the open filter. */
+function syncSettingsSummary() {
+  const el = document.getElementById("settings-summary");
+  if (!el) return;
+  const chosen = (id) => {
+    const select = document.getElementById(id);
+    return select?.selectedOptions?.[0]?.textContent.trim() || "";
+  };
+  const metricShown = document.getElementById("metric-control")?.style.display !== "none";
+  const items = [
+    state.currentShot + "-shot",
+    chosen("prompt-agg-select"),
+    state.currentNormalization === "none" ? "no rescaling" : chosen("norm-select"),
+    metricShown ? chosen("metric-select").replace(/ \(default\)$/, "") : "",
+    sizeRangeText() || "all sizes",
+    fullyOpenOnly ? "fully open" : "",
+  ].filter(Boolean);
+  // A line may break between the items, not inside one ("8–20B"), and
+  // after a separator, not before it.
+  el.replaceChildren(...items.flatMap((text, i) => {
+    const span = document.createElement("span");
+    span.className = "settings-summary-item";
+    span.textContent = i < items.length - 1 ? text + "\u00a0·" : text;
+    return i ? [" ", span] : [span];
+  }));
+}
+
+// ─────────────────────────────────────────────────────────────
 // Chart hover
 // ─────────────────────────────────────────────────────────────
 
@@ -1291,6 +1358,7 @@ function renderChart() {
   } else if (state.metricsSetup[sel]) {
     populateMetricSelector([sel]);
   }
+  syncSettingsSummary();
 
   updateChartTitle();
 
@@ -1312,7 +1380,9 @@ function renderChart() {
   // model becomes a distinct point.
   const useScatter = isFullSizeRange() || getModelList().length > CFG.maxBars;
 
-  if (isAggregateSelection(sel)) {
+  if (!getModelList().length) {
+    renderEmptyState(noModelsMessage());
+  } else if (isAggregateSelection(sel)) {
     if (!selectedTasks().length) renderEmptyState("No tasks selected – tick tasks below to compute the average");
     else if (useScatter) renderAggregateScatter();
     else renderAggregateBarChart();
@@ -1322,6 +1392,17 @@ function renderChart() {
   }
 
   urlState.save();
+}
+
+/** Why the chart has no model to show — none selected, or the size range
+ *  or the fully-open filter leaves out all the selected ones. */
+function noModelsMessage() {
+  if (!checkedModels.size) return "No models selected – pick models below";
+  const range = sizeRangeText();
+  const what = fullyOpenOnly ? "fully-open model" : "model";
+  return range
+    ? `No selected ${what} in the size range (${range}) – widen it above`
+    : `No selected ${what} – pick models below`;
 }
 
 /** True when the user has fully opened the size-range slider — one of the
@@ -1418,11 +1499,11 @@ function measureLabels(labels, fontSize = TICK_FONT_SIZE) {
   }
 }
 
-// Narrow screens (phones): the bar chart runs horizontally — one row per
-// model, its name on the left — so names stay readable and the chart grows
-// downwards instead of squeezing the bars side by side. Matches the
-// `max-width: 640px` block of style.css (full-width chart box).
-const NARROW_SCREEN = "(max-width: 640px)";
+// Phones (PHONE_SCREEN, pickers.js): the bar chart runs horizontally — one
+// row per model, its name on the left — so names stay readable and the
+// chart grows downwards instead of squeezing the bars side by side; also a
+// phone held sideways, which has no height for the desktop chart. Matches
+// the phone block of style.css (full-width chart box).
 const ROW_PX = 26;              // height of one model's row
 const ROW_LABEL_FONT = 12;      // model names on the left axis
 const ROW_VALUE_LABEL_PX = 40;  // room for a value label past a bar's end
@@ -1448,9 +1529,25 @@ function rowValueRange(values, ciValues, plotWidth) {
   return [negative ? lo - share * span : lo, positive ? hi + share * span : hi];
 }
 
-/** Whether the bars are drawn horizontally (narrow screen). */
+/** Whether the bars are drawn horizontally (a phone). */
 function useHorizontalBars() {
-  return window.matchMedia(NARROW_SCREEN).matches;
+  return window.matchMedia(PHONE_SCREEN).matches;
+}
+
+/** Whether the device has a touch screen. */
+function isTouchScreen() {
+  return navigator.maxTouchPoints > 0 || window.matchMedia("(any-pointer: coarse)").matches;
+}
+
+/** On a touch screen a swipe that starts on the chart must scroll the page:
+ *  Plotly would zoom into the chart instead (its default drag), with no way
+ *  back on a phone. Fixed axes and no drag mode keep the taps (tooltips). */
+function touchSafe(layout) {
+  if (!isTouchScreen()) return layout;
+  layout.dragmode = false;
+  layout.xaxis = { ...layout.xaxis, fixedrange: true };
+  layout.yaxis = { ...layout.yaxis, fixedrange: true };
+  return layout;
 }
 
 /** Model names for the left axis: those wider than `maxPx` are broken onto
@@ -1474,7 +1571,7 @@ function wrapRowLabels(labels, maxPx) {
  *  height-only resizes of a mobile browser's address bar). On touch
  *  screens a tooltip has no mouse to leave from, so a tap closes it. */
 function bindNarrowScreenListeners() {
-  window.matchMedia(NARROW_SCREEN).addEventListener("change", () => renderChart());
+  window.matchMedia(PHONE_SCREEN).addEventListener("change", () => renderChart());
   let width = window.innerWidth, timer = null;
   window.addEventListener("resize", () => {
     clearTimeout(timer);
@@ -1488,6 +1585,20 @@ function bindNarrowScreenListeners() {
   // for that bar, through plotly_click); a mouse press only outside the chart.
   document.addEventListener("pointerdown", (e) => {
     if (e.pointerType === "touch" || !document.getElementById("chart")?.contains(e.target)) hideTooltip();
+  });
+  // A tap on a model's name, left of its horizontal bar, opens the bar's
+  // tooltip too. (The names take no pointer events: the row is found from
+  // the tap's height.)
+  const chartEl = document.getElementById("chart");
+  chartEl?.addEventListener("click", (e) => {
+    const trace = chartEl.data?.[0], fl = chartEl._fullLayout;
+    if (trace?.orientation !== "h" || !fl?.yaxis) return;
+    const box = chartEl.getBoundingClientRect();
+    const x = e.clientX - box.left, y = e.clientY - box.top - fl._size.t;
+    if (x >= fl._size.l || y < 0 || y > fl._size.h) return;
+    const i = Math.round(fl.yaxis.p2l(y));
+    if (!trace.customdata?.[i]) return;
+    onChartHover({ points: [{ customdata: trace.customdata[i], x: trace.x[i], y: i }], event: e });
   });
 }
 
@@ -1625,7 +1736,7 @@ function renderModelBars(modelNames, opts) {
     score: values[i] || 0,
     se: below[i] ? -(loArr ? (loArr[i] || 0) : 0) : (hiArr ? (hiArr[i] || 0) : 0),
   }));
-  plotChart([trace], layout, plotlyConfig, onChartHover, hideTooltip);
+  plotChart([trace], touchSafe(layout), plotlyConfig, onChartHover, hideTooltip);
 }
 
 /** renderModelBars on a narrow screen: one row per model, best at the top,
@@ -1685,7 +1796,7 @@ function renderModelBarsHorizontal(modelNames, { values, ciValues, customdata })
     score: v || 0,
     se: below[i] ? -(loArr ? (loArr[i] || 0) : 0) : (hiArr ? (hiArr[i] || 0) : 0),
   }));
-  plotChart([trace], layout, plotlyConfig, onChartHover, hideTooltip);
+  plotChart([trace], touchSafe(layout), plotlyConfig, onChartHover, hideTooltip);
 }
 
 /** Logos of the horizontal bars: one per row (a blank one without a logo,
@@ -1701,8 +1812,12 @@ function buildRowLogos(modelNames, values, xRange, plotWidth) {
     const scale = (org && ORG_LOGO_SCALE[org]) || 1;
     const side = ROW_PX * 0.56 * scale;   // px
     const negative = values[i] != null && values[i] < 0;
+    // A bar too short for its logo (a score near 0, as z-scores have) gets
+    // none: it would stick out over the error bar and the value.
+    const barPx = Math.abs(values[i] || 0) / ((hi - lo) || 1) * plotWidth;
+    const fits = barPx >= side + 8;
     return {
-      source: filename ? `../shared/logos/${filename}` : BLANK_IMAGE,
+      source: filename && fits ? `../shared/logos/${filename}` : BLANK_IMAGE,
       xref: "paper", yref: "y",
       x: negative ? zero - pad : zero + pad, y: i,
       sizex: side / plotWidth, sizey: (side / ROW_PX),
@@ -1741,7 +1856,7 @@ function renderEmptyState(message) {
       showarrow: false, font: { size: 15, color: "#64748b" },
     }],
   });
-  plotChart([], layout, plotlyConfig, null, hideTooltip);
+  plotChart([], touchSafe(layout), plotlyConfig, null, hideTooltip);
 }
 
 function renderAggregateBarChart() {
@@ -1829,8 +1944,10 @@ function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
   };
 
   // The chart box reaches into the page's left padding (style.css),
-  // except on narrow screens, where it keeps to the column.
+  // except on narrow screens, where it keeps to the column. A phone gets a
+  // taller plot, to spread the points out, but one that fits its screen.
   const narrow = useHorizontalBars();
+  if (narrow) setChartHeight(Math.round(Math.min(560, Math.max(300, window.innerHeight * 0.68))));
   const margin = { l: narrow ? 40 : 105, r: 20, t: 8, b: 60 };
   const xaxis = scatterXAxis(xs);
   const el = document.getElementById("chart");
@@ -1851,7 +1968,7 @@ function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
   // can scale only the hovered model's images, not nearby ones.
   document.getElementById("chart")._scatterImageMap = composite.imageToModel;
 
-  plotChart([trace], layout, plotlyConfig, onChartHover, hideTooltip);
+  plotChart([trace], touchSafe(layout), plotlyConfig, onChartHover, hideTooltip);
 }
 
 // ─────────────────────────────────────────────────────────────

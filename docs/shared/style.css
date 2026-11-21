@@ -1236,24 +1236,147 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   .module-header h3 { font-size: 1rem; }
 }
 
-/* Phones (≤ 640px) on the comparison pages (body.comparison-page, set by
-   comparison.js): the chart box keeps to the column instead of reaching
-   into a left padding the narrow page doesn't have; the bar chart turns
-   horizontal and sets its own height (comparison.js useHorizontalBars —
-   same breakpoint); the size slider fills its row, and its thumbs grow,
-   with a 44px touch area; the tooltip fits the screen. */
-@media (max-width: 640px) {
-  .comparison-page #chart { margin-left: 0; width: 100%; height: 420px; }
-  .comparison-page .size-slider-container { flex: 1 1 100%; }
-  .comparison-page .range-slider { max-width: none; margin: 0 10px; }
+/* The settings row of the phone layout (comparison.js buildSettingsToggle)
+   exists only there. */
+.settings-toggle { display: none; }
+
+/* Touch screens: quick taps on the controls, chips and bars are taps, not a
+   double-tap zoom of the page (which also delays every tap on iOS);
+   scrolling and pinch-zoom stay. */
+.comparison-page :is(button, label, input, .ui-select, .ui-select-options, .picker-module, #chart) {
+  touch-action: manipulation;
+}
+/* The size slider's thumbs are finger-sized on a touch screen (tablets
+   too), with a 44px touch area around them. */
+@media (pointer: coarse) {
   .comparison-page .range-thumb { width: 20px; height: 20px; }
   .comparison-page .range-thumb::before {
     content: ""; position: absolute; inset: -12px; border-radius: 50%;
   }
+}
+
+/* "Show chart": floats at the bottom of a phone's screen after a change in
+   the sections below the chart, while the chart is out of sight
+   (pickers.js initChartJump). */
+.chart-jump {
+  position: fixed; z-index: 800; left: 50%; bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  height: 2.75rem; padding: 0 1.1rem 0 0.95rem;
+  border: 0; border-radius: 999px;
+  background: var(--accent); color: #fff;
+  font: 600 0.92rem/1 var(--font-sans);
+  box-shadow: 0 6px 18px rgba(30, 41, 59, 0.28);
+  cursor: pointer; outline: none;
+  animation: chart-jump-in 0.2s ease-out;
+}
+.chart-jump::before {                 /* up arrow */
+  content: ""; width: 0.45rem; height: 0.45rem; margin-top: 0.25rem;
+  border-left: 2px solid currentColor; border-top: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+.chart-jump[hidden] { display: none; }
+.chart-jump:focus-visible { box-shadow: 0 0 0 3px var(--accent-light), 0 6px 18px rgba(30, 41, 59, 0.28); }
+@keyframes chart-jump-in { from { opacity: 0; transform: translate(-50%, 0.5rem); } }
+
+/* Phones on the comparison pages (body.comparison-page, set by
+   comparison.js): narrow screens, and touch screens too short for the
+   desktop layout — a phone held sideways (PHONE_SCREEN in pickers.js).
+   • The chart box keeps to the column instead of reaching into a left
+     padding the page doesn't have; the bar chart turns horizontal and sets
+     its own height (comparison.js useHorizontalBars), as does the scatter.
+   • The controls fold behind a settings row under the task dropdown, which
+     sums them up; open, each has its label above it and the full width,
+     at finger size. The task dropdown carries its label inside.
+   • Dropdown lists span the screen, with finger-sized rows; the size
+     slider's thumbs grow, with a 44px touch area; the tooltip fits the
+     screen; the export buttons go (they'd cover the scale above the bars,
+     and downloading chart files isn't a phone task). */
+@media (max-width: 640px), (max-height: 500px) and (pointer: coarse) {
+  .comparison-page #chart { margin-left: 0; width: 100%; height: 420px; }
   .comparison-page .custom-tooltip { max-width: calc(100vw - 24px); }
-  /* The export buttons would cover the scale above the bars; downloading
-     chart files isn't a phone task. */
   .comparison-page .modebar-container { display: none; }
+  /* The chart title's arrow follows its last word (a flex box would park
+     it at the right edge, beside two lines of title). */
+  .comparison-page .chart-title-details > summary { display: block; }
+  .comparison-page .chart-title-details > summary::after { margin-left: 0.35em; }
+  .comparison-page .chart-title { font-size: 1.2rem; }
+  .comparison-page .about-inline > summary { display: block; }
+  /* About's formulas fit the screen (or scroll inside their box), never
+     widening the page. */
+  .comparison-page .about-formula { overflow-x: auto; }
+  .comparison-page .about-formula .katex { font-size: 1em; }
+  .comparison-page .about-inline > summary::after { margin-left: 0.4em; position: relative; top: -0.15em; }
+
+  /* Controls: one column, each label above its control, both bars on the
+     column's edge; wide (sideways) screens keep the controls to 30rem. */
+  .comparison-page .chart-zone .controls-bar {
+    /* one line: a wrapping column would stretch the controls to the widest
+       one's natural width (a long task name), past the screen's edge */
+    display: flex; flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 0.75rem;
+    padding-top: 0.25rem; padding-bottom: 0.25rem;
+  }
+  .comparison-page .chart-zone .controls-bar:not(:has(+ #chart)) { padding-left: 0; padding-right: 0; }
+  .comparison-page .chart-zone .control-group {
+    display: flex; flex-direction: column; align-items: stretch; gap: 0.3rem;
+    min-width: 0; max-width: 30rem;   /* a long task name is cut, not widening the page */
+  }
+  .comparison-page .chart-zone .ui-select-label { min-width: 0; }
+  .comparison-page .chart-zone .control-group > label { font-size: 0.8rem; line-height: 1.2; }
+  .comparison-page .chart-zone .ui-select { width: 100%; height: 2.5rem; }
+  .comparison-page .chart-zone .shot-toggle { width: 100%; height: 2.5rem; }
+  .comparison-page .chart-zone .shot-btn { flex: 1 1 0; padding: 0 0.25rem; }
+  .comparison-page .range-slider { flex: none; max-width: none; min-width: 0; margin: 0.45rem 10px 0.95rem; }
+  .comparison-page .chart-zone .fully-open-label {
+    min-height: 2.75rem; gap: 0.6rem; font-size: 0.9rem; color: var(--fg);
+  }
+  .comparison-page .chart-zone .fully-open-label input { width: 1.25rem; height: 1.25rem; }
+  /* The task dropdown: its label inside, before the chosen task. */
+  .comparison-page .chart-zone .control-task > label { display: none; }
+  .comparison-page .chart-zone .control-task .ui-select::before {
+    content: "Task"; flex-shrink: 0; margin-right: 0.6rem;
+    font-weight: 500; font-size: 0.85rem; color: var(--fg-muted);
+  }
+
+  /* The settings row and its folding: folded, it shows the settings'
+     summary (wrapping rather than cut off); open, its name. */
+  .comparison-page .settings-toggle {
+    min-width: 0; max-width: 30rem;
+    display: flex; align-items: center; gap: 0.6rem;
+    min-height: 2.5rem; padding: 0.4rem 0.8rem;
+    border: 1px solid var(--control-border); border-radius: var(--control-radius);
+    background: var(--surface); box-shadow: var(--control-shadow);
+    font: var(--control-font); color: var(--fg); text-align: left;
+    cursor: pointer; outline: none;
+  }
+  .comparison-page .settings-toggle::before {          /* sliders icon */
+    content: ""; flex-shrink: 0; width: 1rem; height: 1rem;
+    background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M4 7h10M18 7h2M4 17h4M12 17h8'/%3E%3Ccircle cx='16' cy='7' r='2.2'/%3E%3Ccircle cx='10' cy='17' r='2.2'/%3E%3C/svg%3E");
+  }
+  .comparison-page .settings-toggle-name, .comparison-page .settings-summary { flex: 1; min-width: 0; }
+  .comparison-page .settings-summary { font-size: 0.85rem; font-weight: 500; line-height: 1.35; color: var(--fg); }
+  .comparison-page .settings-summary-item { white-space: nowrap; }
+  .comparison-page .settings-toggle[aria-expanded="false"] .settings-toggle-name,
+  .comparison-page .settings-toggle[aria-expanded="true"] .settings-summary {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  .comparison-page .settings-toggle::after {           /* chevron: down folded, up open */
+    content: ""; flex-shrink: 0; width: 0.42rem; height: 0.42rem; margin: 0 0.1rem 0.2rem 0;
+    border-right: 1.5px solid var(--fg-muted); border-bottom: 1.5px solid var(--fg-muted);
+    transform: rotate(45deg); transition: transform 0.15s;
+  }
+  .comparison-page .settings-toggle[aria-expanded="true"]::after { transform: rotate(225deg); margin: 0.2rem 0.1rem 0 0; }
+  .comparison-page .settings-toggle:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+  .comparison-page .chart-zone.settings-folded .control-group:not(.control-task) { display: none !important; }
+  .comparison-page .chart-zone.settings-folded .controls-bar:has(+ #chart) { padding-top: 0; padding-bottom: 0.6rem; }
+
+  /* Dropdown lists: the screen's width, finger-sized rows. */
+  .comparison-page .ui-select-options {
+    left: 12px !important; right: 12px; min-width: 0 !important; max-width: none;
+  }
+  .comparison-page .ui-select-options li[role="option"] { padding: 0.65rem 1rem; white-space: normal; }
+  .comparison-page .ui-select-options li.ui-select-grouped { padding-left: 1.75rem; }
+  .comparison-page .ui-select-group { padding: 0.8rem 1rem 0.3rem; }
 
   /* Pickers: the sections start folded, as full-width header rows between
      rules (pickers.js initModuleToggles); the toolbar fills its row; an
@@ -1267,13 +1390,36 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   .comparison-page .module-name { font-size: 1.1rem; }
   .comparison-page .module-toggle::after { margin-left: auto; }
   .comparison-page .picker-module .module-actions { margin-left: 0; }
-  .comparison-page .model-search { flex: 1 1 100%; width: auto; height: 2.25rem; font-size: 1rem; }
-  .comparison-page .small-btn { height: 2rem; }
+  .comparison-page .model-search { flex: 1 1 100%; width: auto; height: 2.5rem; font-size: 1rem; }
+  .comparison-page .small-btn { height: 2.5rem; padding: 0 0.85rem; }
   .comparison-page .picker-module:not(.collapsed) .module-body { padding-bottom: 1.25rem; }
-  .comparison-page .task-row-main { min-height: 2.25rem; }
-  .comparison-page .variant-pill { height: 1.75rem; padding: 0 0.6rem; font-size: 0.75rem; }
+  .comparison-page .task-cat-header, .comparison-page .model-cat-header { min-height: 2.5rem; }
+  .comparison-page .task-row-main { min-height: 2.5rem; }
+  .comparison-page .variant-pill { height: 2rem; padding: 0 0.6rem; font-size: 0.75rem; }
   .comparison-page .org-row { grid-template-columns: minmax(0, 1fr); }
+  .comparison-page .org-label { min-height: 2.25rem; }
   .comparison-page .org-chips { padding-left: var(--label-inset); }
-  .comparison-page .model-chip { height: 2rem; }
-  .comparison-page .picker-more { min-height: 2.25rem; }
+  .comparison-page .model-chip { height: 2.25rem; }
+  .comparison-page .picker-more { min-height: 2.5rem; }
+}
+
+/* Small phones: the page title on one line. */
+@media (max-width: 360px) {
+  .comparison-page header.dashboard-header h1 { font-size: 1.45rem; }
+}
+
+/* A phone held sideways (after the phone block, which it refines): short —
+   the compact header of wide screens — and, from 480px wide, two columns
+   of controls (the task beside the folded settings row; open, the controls
+   in pairs). */
+@media (max-height: 500px) and (pointer: coarse) {
+  .comparison-page header.dashboard-header { padding: 0.75rem 0; }
+  .comparison-page header.dashboard-header h1 { font-size: 0.9rem; }
+}
+@media (max-height: 500px) and (pointer: coarse) and (min-width: 480px) {
+  .comparison-page .chart-zone .controls-bar {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem 1rem; align-items: end;
+  }
+  .comparison-page .chart-zone .control-group,
+  .comparison-page .settings-toggle { max-width: none; }
 }

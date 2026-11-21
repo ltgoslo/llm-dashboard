@@ -9,7 +9,11 @@ import { state } from "./state.js";
 import { METRIC_DISPLAY, capitalize } from "./core.js";
 import { defaultTaskDisplayName } from "./ui.js";
 
-const NARROW_SCREEN = "(max-width: 640px)";
+// Phones: narrow screens, and touch screens too short for the desktop
+// layout (a phone held sideways). They get the phone layout — horizontal
+// bars, folded settings and sections (comparison.js); style.css has the
+// same query.
+export const PHONE_SCREEN = "(max-width: 640px), (max-height: 500px) and (pointer: coarse)";
 
 // ─────────────────────────────────────────────────────────────
 // Collapsible sections
@@ -19,7 +23,7 @@ const NARROW_SCREEN = "(max-width: 640px)";
  *  sections start open, except on a phone, where they would push the page
  *  far below the chart. */
 export function initModuleToggles() {
-  const narrow = window.matchMedia(NARROW_SCREEN).matches;
+  const narrow = window.matchMedia(PHONE_SCREEN).matches;
   for (const module of document.querySelectorAll(".picker-module")) {
     const button = module.querySelector(".module-toggle");
     if (!button) continue;
@@ -38,6 +42,44 @@ export function setGroupCheckbox(cb, on, n) {
   if (!cb) return;
   cb.checked = n > 0 && on === n;
   cb.indeterminate = on > 0 && on < n;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Back to the chart (phones)
+// ─────────────────────────────────────────────────────────────
+// The sections sit below the chart: on a phone, a change made there
+// happens out of the chart's sight. A floating button then offers the way
+// back up, until the chart is in view again.
+
+/** Show a "Show chart" button after a change in the sections while the
+ *  chart is off screen, on a phone; it scrolls to the chart's title. */
+export function initChartJump() {
+  const chart = document.getElementById("chart");
+  const sections = document.querySelector(".modules-section");
+  const target = document.querySelector(".chart-section") || chart;
+  if (!chart || !sections || !("IntersectionObserver" in window)) return;
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "chart-jump";
+  button.textContent = "Show chart";
+  button.hidden = true;
+  document.body.append(button);
+  let chartInView = true;
+  new IntersectionObserver(([entry]) => {
+    chartInView = entry.isIntersecting;
+    if (chartInView) button.hidden = true;
+  }, { threshold: 0.15 }).observe(chart);
+  // The controls that change what the chart shows (not the folding, the
+  // search or "Show more").
+  const CHANGES = ".model-chip, .variant-pill, input[type=checkbox], .small-btn";
+  sections.addEventListener("click", (e) => {
+    if (!window.matchMedia(PHONE_SCREEN).matches || !e.target.closest(CHANGES)) return;
+    requestAnimationFrame(() => { if (!chartInView) button.hidden = false; });
+  });
+  button.addEventListener("click", () => {
+    button.hidden = true;
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 }
 
 // ─────────────────────────────────────────────────────────────
