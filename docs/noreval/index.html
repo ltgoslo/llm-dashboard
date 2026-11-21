@@ -78,7 +78,7 @@
                                 <h3>Dashboard features</h3>
                                 <ul>
                                     <li><strong>Filter by size or openness.</strong> The bottom row of controls lets you restrict to a model-size range or limit to fully open models (open weights, training data and code).</li>
-                                    <li><strong>Select/deselect models &amp; tasks.</strong> The two sections below the plot let you choose exactly which models and tasks contribute to each view.</li>
+                                    <li><strong>Choose tasks &amp; models.</strong> The two sections below the plot choose what each view covers; a task's Bokm&aring;l and Nynorsk variants (or its two translation directions) can be toggled separately. The model list shows the models that pass the size and openness filters &ndash; <em>Show more</em> lists the others, and the search finds any model. Hover over a task or model (or long-press it on a touch screen) for its description.</li>
                                     <li><strong>Metric selector.</strong> Individual task views offer a dropdown (top control row) to switch between all available metrics for that benchmark.</li>
                                     <li><strong>Chart export.</strong> Charts can be downloaded as PNG or SVG, and the underlying data exported as JSON, via the toolbar buttons.</li>
                                 </ul>
@@ -185,38 +185,43 @@
     <div class="band band-tint">
         <div class="band-inner">
             <section class="modules-section">
-                <div id="task-checkboxes" class="module">
+                <div id="task-module" class="module picker-module">
                     <div class="module-header">
-                        <h3>Tasks included in aggregation</h3>
+                        <h3 class="module-title">
+                            <button type="button" class="module-toggle" aria-expanded="true" aria-controls="task-module-body">
+                                <span class="module-name">Tasks</span>
+                                <span class="module-summary" id="task-summary"></span>
+                            </button>
+                        </h3>
                         <div class="module-actions">
                             <button id="select-all-btn" class="small-btn">Select all</button>
                             <button id="select-none-btn" class="small-btn">Select none</button>
                         </div>
                     </div>
-                    <div id="checkbox-grid" class="checkbox-grid"></div>
+                    <div class="module-body" id="task-module-body">
+                        <div id="task-picker" class="task-picker"></div>
+                    </div>
                 </div>
 
-                <div id="model-panels">
-                    <div id="norwegian-models-panel" class="module model-panel">
-                        <div class="module-header">
-                            <h3>Norwegian language models</h3>
-                            <div class="module-actions">
-                                <button class="small-btn model-select-all" data-category="norwegian">Select all</button>
-                                <button class="small-btn model-select-none" data-category="norwegian">Select none</button>
-                            </div>
+                <div id="model-module" class="module picker-module">
+                    <div class="module-header">
+                        <h3 class="module-title">
+                            <button type="button" class="module-toggle" aria-expanded="true" aria-controls="model-module-body">
+                                <span class="module-name">Models</span>
+                                <span class="module-summary" id="model-summary"></span>
+                            </button>
+                        </h3>
+                        <div class="module-actions">
+                            <input type="search" id="model-search" class="model-search" placeholder="Search models" aria-label="Search models" autocomplete="off" spellcheck="false">
+                            <button id="model-select-all" class="small-btn" title="Select all the models listed">Select all</button>
+                            <button id="model-select-none" class="small-btn" title="Deselect all the models listed">Select none</button>
+                            <button id="model-reset" class="small-btn" title="Select the default set of models again">Reset to default</button>
                         </div>
-                        <div id="norwegian-model-grid" class="model-checkbox-grid"></div>
                     </div>
-
-                    <div id="multilingual-models-panel" class="module model-panel">
-                        <div class="module-header">
-                            <h3>Multilingual &amp; non-Norwegian language models</h3>
-                            <div class="module-actions">
-                                <button class="small-btn model-select-all" data-category="multilingual">Select all</button>
-                                <button class="small-btn model-select-none" data-category="multilingual">Select none</button>
-                            </div>
-                        </div>
-                        <div id="multilingual-model-grid" class="model-checkbox-grid"></div>
+                    <div class="module-body" id="model-module-body">
+                        <div id="model-picker" class="model-picker"></div>
+                        <p id="model-picker-empty" class="picker-empty" hidden></p>
+                        <button type="button" id="model-show-more" class="picker-more" aria-controls="model-picker" hidden></button>
                     </div>
                 </div>
             </section>

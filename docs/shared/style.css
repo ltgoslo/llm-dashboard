@@ -904,24 +904,161 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
 .task-description-inline a { color: var(--accent); text-decoration: none; word-break: break-all; }
 .task-description-inline a:hover { color: var(--accent-hover); }
 
-/* ──── Model panel — used in the "Models" module(s) ────
-   One .model-panel per category (e.g. Norwegian / Multilingual).
-   Inside, models are grouped by organization (.model-org-group)
-   each with its own header and a column of <details> model items.
-   Item structure mirrors the task grid: summary holds the
-   checkbox + colour dot + name; expanding shows .model-description-inline. */
-.model-panel + .model-panel { margin-top: 2.5rem; }
-
-/* Search field + "Reset to default" above the model panels (built in
-   comparison.js buildModelToolbar). The search hides non-matching models,
-   and organizations / panels left empty, with the `hidden` attribute —
-   which the display rules of these elements would otherwise override. */
-.model-toolbar {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem;
-  margin-bottom: 1.75rem;
+/* ──── Pickers — the Tasks and Models sections of the comparison pages
+   (noreval, noreval-gen; shared/pickers.js and comparison.js
+   buildModelPicker). Each section's header is a button that folds the
+   section away (closed by default on phones), with a live count after the
+   title. Tasks: category columns of dataset rows, a dataset's variants
+   (Bokmål / Nynorsk, translation directions) as toggle pills on its row.
+   Models: one row per organization — its logo badge and name, then a
+   toggle chip per model. A toggle that is on is white with an accent
+   outline, one that is off is flat with a dashed outline; a model chip
+   outside the size / openness filters is faded. ──── */
+.picker-module {
+  margin-bottom: 2.25rem;
+  /* Every checkbox of a section sits on one line, flush with its title,
+     and every label after one (category, task, organization) on a second:
+     the checkbox's width plus this gap in. */
+  --label-gap: 0.5rem;
+  --label-inset: calc(0.95rem + var(--label-gap));
 }
+.picker-module .module-header { margin-bottom: 0.85rem; gap: 0.6rem 1rem; }
+.picker-module .module-title { margin: 0; font: inherit; }
+.module-toggle {
+  display: inline-flex; align-items: baseline; gap: 0.65rem;
+  padding: 0; border: 0; border-radius: 4px; background: none;
+  font: inherit; color: inherit; text-align: left; cursor: pointer;
+  outline: none;
+}
+.module-name {
+  font-family: var(--font-serif); font-weight: 700; font-size: 1.2rem; color: #000;
+  transition: color 0.15s;
+}
+.module-summary {
+  font: 500 0.85rem/1.2 var(--font-sans); color: var(--fg-muted);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.module-toggle::after {             /* chevron: down when open, right when folded */
+  content: ""; flex-shrink: 0;
+  width: 0.4rem; height: 0.4rem; margin: 0 0.15rem 0 0;
+  border-right: 1.5px solid var(--fg-muted); border-bottom: 1.5px solid var(--fg-muted);
+  /* On the text baseline, like the title and the count, and moved onto
+     the middle of the count's lowercase letters (measured): the two
+     borders make a V in the lower half of the turned box, a > in its
+     right half. */
+  transform: translateY(-20%) rotate(45deg); transition: transform 0.15s, border-color 0.15s;
+}
+.picker-module.collapsed .module-toggle::after { transform: translate(-35%, 4%) rotate(-45deg); }
+.module-toggle:focus-visible .module-name { color: var(--accent); }
+.module-toggle:focus-visible::after { border-color: var(--accent); }
+.module-toggle:focus-visible { box-shadow: 0 0 0 3px var(--accent-light); }
+.picker-module .module-actions { margin-left: auto; flex-wrap: wrap; align-items: center; }
+.picker-module.collapsed .module-header { margin-bottom: 0; }
+.picker-module.collapsed .module-actions,
+.picker-module.collapsed .module-body { display: none; }
+
+/* Category headers of both pickers: tri-state checkbox + name, ruled. */
+.task-cat-header, .model-cat-header {
+  display: flex; align-items: center; gap: var(--label-gap);
+  padding-bottom: 0.25rem; margin-bottom: 0.2rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem; font-weight: 700; color: #000;
+  cursor: pointer;
+}
+
+/* Tasks: the categories flow through balanced columns. */
+.task-picker { column-width: 21.5rem; column-gap: 1.25rem; }
+.task-cat { break-inside: avoid; padding-bottom: 1rem; }
+.task-row {
+  display: flex; align-items: center; gap: 0.25rem;
+  margin: 0 -0.3rem; padding: 0 0.3rem; border-radius: 4px;
+  transition: background 0.1s;
+}
+.task-row-main {
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; gap: var(--label-gap);
+  min-height: 1.7rem; padding: 0.15rem 0;
+  font-size: 0.79rem; line-height: 1.3; color: var(--fg);
+  cursor: pointer;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+.task-variants { display: inline-flex; gap: 0.15rem; flex-shrink: 0; }
+
+/* Toggle pills (task variants) and chips (models). */
+.variant-pill, .model-chip {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  border: 1px dashed rgba(100, 116, 139, 0.5);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--fg-muted);
+  font-family: var(--font-sans);
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  transition: color 0.12s, border-color 0.12s, background-color 0.12s, opacity 0.12s;
+}
+.variant-pill[aria-pressed="true"], .model-chip[aria-pressed="true"] {
+  border-style: solid; border-color: rgba(99, 102, 241, 0.55);
+  background: var(--surface);
+  color: var(--fg);
+  box-shadow: 0 1px 3px rgba(30, 41, 59, 0.08);
+}
+.variant-pill:focus-visible, .model-chip:focus-visible { box-shadow: 0 0 0 3px var(--accent-light); border-color: var(--accent); }
+.variant-pill { height: 1.3rem; padding: 0 0.34rem; font-size: 0.67rem; font-weight: 600; }
+.variant-pill[aria-pressed="true"] { color: var(--accent); }
+.model-chip { height: 1.75rem; padding: 0 0.7rem 0 0.55rem; font-size: 0.8rem; font-weight: 500; }
+.model-chip-dot {                   /* the model's colour: a ring when off, filled when on */
+  width: 0.55rem; height: 0.55rem; flex-shrink: 0; border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--dot);
+}
+.model-chip[aria-pressed="true"] .model-chip-dot { background: var(--dot); }
+.model-chip.filtered-out { opacity: 0.45; }
+
+/* Models: organization rows, the organization's label on the left. */
+.model-cat + .model-cat { margin-top: 1.5rem; }
+.org-row {
+  display: grid; grid-template-columns: 12rem minmax(0, 1fr); gap: 0.35rem 1rem;
+  align-items: start;
+  padding: 0.25rem 0;
+}
+.org-row + .org-row { border-top: 1px solid rgba(210, 217, 228, 0.7); }
+.org-label {
+  display: flex; align-items: center; gap: var(--label-gap);
+  min-height: 1.75rem; min-width: 0;
+  font-size: 0.85rem; font-weight: 600; color: var(--fg);
+  cursor: pointer;
+}
+.org-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.org-badge {
+  display: inline-grid; place-items: center; flex-shrink: 0;
+  width: 1.3rem; height: 1.3rem; border-radius: 50%;
+  background: var(--badge);
+}
+.org-badge img { width: 64%; height: 64%; object-fit: contain; }
+.org-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+
+.model-cat[hidden], .org-row[hidden], .model-chip[hidden],
+.picker-empty[hidden], .picker-more[hidden] { display: none; }
+.picker-empty { padding-top: 0.25rem; font-size: 0.85rem; color: var(--fg-muted); }
+.picker-more {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  margin: 0.7rem 0 0; padding: 0.2rem 0;
+  border: 0; background: none; outline: none;
+  font: 600 0.82rem/1.3 var(--font-sans); color: var(--accent);
+  cursor: pointer;
+}
+.picker-more::after {
+  content: ""; width: 0.38rem; height: 0.38rem; margin-bottom: 0.2rem;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg); transition: transform 0.15s;
+}
+.picker-more[aria-expanded="true"]::after { transform: rotate(225deg); margin: 0.2rem 0 0; }
+.picker-more:focus-visible { color: var(--accent-hover); box-shadow: 0 0 0 3px var(--accent-light); border-radius: 4px; }
+
+/* Model search (in the Models header). */
 .model-search {
-  flex: 0 1 20rem; min-width: 0;
+  width: 16rem; min-width: 0; flex: 0 1 auto;
   height: 1.9rem; padding: 0 0.7rem 0 1.9rem;
   font: 500 0.85rem/1.2 var(--font-sans); color: var(--fg);
   border: 1px solid var(--control-border); border-radius: var(--control-radius);
@@ -934,77 +1071,41 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
 .model-search::placeholder { color: var(--fg-muted); }
 .model-search:hover, .model-search:focus { border-color: var(--control-border-hover); }
 .model-search:focus { box-shadow: 0 0 0 3px var(--accent-light), 0 1px 6px rgba(30, 41, 59, 0.1); }
-.model-search-empty { font-size: 0.85rem; color: var(--fg-muted); }
-.model-panel[hidden], .model-org-group[hidden],
-.model-checkbox-grid details.model-item[hidden] { display: none; }
 
-.model-checkbox-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 0.75rem 1rem; align-items: start;
+/* Hover styles only for a pointer that hovers: a touch screen keeps them
+   on the element tapped last, so a chip just switched off would look on. */
+@media (hover: hover) {
+  .module-toggle:hover .module-name { color: var(--accent); }
+  .module-toggle:hover::after { border-color: var(--accent); }
+  .task-row:hover { background: rgba(99, 102, 241, 0.06); }
+  .variant-pill:hover, .model-chip:hover {
+    border-color: var(--control-border-hover); background: var(--accent-light); color: var(--accent);
+  }
+  .model-chip.filtered-out:hover { opacity: 0.85; }
+  .picker-more:hover { color: var(--accent-hover); }
 }
-.model-org-header {
-  display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem;
-  padding-bottom: 0.2rem; border-bottom: 1px solid var(--border); cursor: pointer;
-}
-.model-org-group h4 {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: 0.9rem; font-weight: 700; color: #000;
-}
-.model-org-group { display: grid; grid-template-columns: 1fr; gap: 0; }
 
-/* Each model is a <details>; same pattern as task-item. */
-.model-checkbox-grid details.model-item { display: block; }
-.model-checkbox-grid details.model-item > summary {
-  list-style: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.18rem 0.0rem 0.18rem 1rem;
-  font-size: 0.82rem;
-  border-radius: 4px;
-  transition: background 0.1s;
-  color: var(--fg);
+/* Info card of a task or model (pickers.js attachInfoCard): like the
+   chart tooltip, but it takes the pointer, so its link can be clicked. */
+.info-card {
+  position: fixed; z-index: 900;
+  width: max-content; max-width: min(24rem, calc(100vw - 16px));
+  padding: 0.65rem 0.85rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0; border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+  font-family: var(--font-sans); font-size: 0.8rem; line-height: 1.5; color: #1e293b;
 }
-.model-checkbox-grid details.model-item > summary::-webkit-details-marker { display: none; }
-.model-checkbox-grid details.model-item > summary::after {
-  content: "";
-  display: inline-block;
-  width: 0.5em;
-  height: 0.5em;
-  margin-left: auto;
-  border-right: 0.1em solid currentColor;
-  border-bottom: 0.1em solid currentColor;
-  transform: rotate(45deg);
-  vertical-align: middle;
-  color: var(--fg-muted);
-  transition: transform 0.15s;
+.info-card[hidden] { display: none; }
+.info-card-title { font-family: var(--font-serif); font-weight: 700; font-size: 0.9rem; margin-bottom: 0.15rem; }
+.info-card-meta { color: #64748b; font-size: 0.72rem; margin-bottom: 0.35rem; }
+.info-card-body { color: #475569; }
+.info-card-note { margin-top: 0.4rem; font-size: 0.75rem; font-weight: 600; color: #1e293b; }
+.info-card-link {
+  display: inline-block; margin-top: 0.35rem;
+  font-size: 0.75rem; color: var(--accent); text-decoration: none; word-break: break-all;
 }
-.model-checkbox-grid details.model-item[open] > summary::after { transform: rotate(225deg); }
-.model-checkbox-grid details.model-item > summary:hover { background: rgba(99, 102, 241, 0.08); }
-.model-checkbox-grid details.model-item > summary:hover::after { color: var(--accent); }
-.model-checkbox-grid .model-name { flex: 1; min-width: 0; }
-
-.model-description-inline {
-  font-size: 0.82rem;
-  color: var(--fg-muted);
-  line-height: 1.5;
-  padding: 0.3rem 0.6rem 0.5rem 1.0rem;
-}
-.model-description-inline .meta {
-  font-size: 0.72rem;
-  display: block;
-  margin-bottom: 0.25rem;
-  color: var(--fg-muted);
-}
-.model-description-inline a { color: var(--accent); text-decoration: none; word-break: break-all; }
-.model-description-inline a:hover { color: var(--accent-hover); }
-
-.model-color-dot {
-  display: inline-block; width: 10px; height: 10px;
-  border-radius: 50%; flex-shrink: 0;
-}
+.info-card-link:hover { color: var(--accent-hover); text-decoration: underline; }
 
 /* ────────────────────────────────────────────────────────────
    Tooltip — always rendered on a light background since it's
@@ -1153,4 +1254,26 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   /* The export buttons would cover the scale above the bars; downloading
      chart files isn't a phone task. */
   .comparison-page .modebar-container { display: none; }
+
+  /* Pickers: the sections start folded, as full-width header rows between
+     rules (pickers.js initModuleToggles); the toolbar fills its row; an
+     organization's name sits above its chips; bigger touch targets. */
+  .comparison-page .modules-section { padding: 1.5rem 0 2rem; }
+  .comparison-page .picker-module { margin: 0; border-bottom: 1px solid var(--border); }
+  .comparison-page .picker-module:first-child { border-top: 1px solid var(--border); }
+  .comparison-page .picker-module .module-header { margin-bottom: 0.6rem; }
+  .comparison-page .picker-module .module-title { flex: 1 1 100%; }
+  .comparison-page .module-toggle { width: 100%; padding: 0.8rem 0; }
+  .comparison-page .module-name { font-size: 1.1rem; }
+  .comparison-page .module-toggle::after { margin-left: auto; }
+  .comparison-page .picker-module .module-actions { margin-left: 0; }
+  .comparison-page .model-search { flex: 1 1 100%; width: auto; height: 2.25rem; font-size: 1rem; }
+  .comparison-page .small-btn { height: 2rem; }
+  .comparison-page .picker-module:not(.collapsed) .module-body { padding-bottom: 1.25rem; }
+  .comparison-page .task-row-main { min-height: 2.25rem; }
+  .comparison-page .variant-pill { height: 1.75rem; padding: 0 0.6rem; font-size: 0.75rem; }
+  .comparison-page .org-row { grid-template-columns: minmax(0, 1fr); }
+  .comparison-page .org-chips { padding-left: var(--label-inset); }
+  .comparison-page .model-chip { height: 2rem; }
+  .comparison-page .picker-more { min-height: 2.25rem; }
 }

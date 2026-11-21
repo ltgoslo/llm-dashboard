@@ -17,8 +17,8 @@ Six independent dashboards live under one repository:
 
 Each dashboard has its own URL and its own `data.json`. The shared JavaScript /
 CSS library lives in `docs/shared/` — score access, normalization, the chart
-toolbar, the task-checkbox grid, and tooltips are written once and imported by
-each dashboard via ES modules.
+toolbar, the task and model pickers, and tooltips are written once and imported
+by each dashboard via ES modules.
 
 ## Repository layout
 
@@ -50,7 +50,8 @@ llm-dashboard/
     │   ├── state.js              ← single mutable state object
     │   ├── core.js               ← score access, normalization, aggregation
     │   ├── chart.js              ← Plotly config, colors, layout helpers
-    │   ├── ui.js                 ← tooltip, checkboxes, metric selector
+    │   ├── ui.js                 ← tooltip, task-checkbox grid (progress pages), metric selector
+    │   ├── pickers.js            ← Tasks / Models sections of noreval + noreval-gen: task picker, info cards
     │   ├── dropdown.js           ← custom <select> dropdown (same look on every system)
     │   ├── segmented.js          ← sliding thumb of the shot / error-band button groups
     │   ├── selection.js          ← task-selection logic + shared control listeners

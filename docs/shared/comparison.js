@@ -22,7 +22,6 @@ import {
 } from "./chart.js";
 import {
   showTooltip, hideTooltip, populateMetricSelector, hideMetricSelector,
-  buildTaskCheckboxes, bindModuleActionStopPropagation,
   attachControlTooltips, markAppReady, setChartHeader, defaultTaskDisplayName,
 } from "./ui.js";
 import {
@@ -30,6 +29,9 @@ import {
   populateTaskDropdown, onTaskCheckboxChange, bindTaskControls,
   restoreCheckedTasksFromSelection, syncTaskControlsFromState,
 } from "./selection.js";
+import {
+  initModuleToggles, buildTaskPicker, syncTaskPicker, attachInfoCard, setGroupCheckbox, shortUrl,
+} from "./pickers.js";
 import { UrlState } from "./url-state.js";
 
 let CFG = null;            // Dashboard configuration (set in initComparison)
@@ -320,13 +322,9 @@ export async function initComparison(config) {
     // Sync UI controls
     populateTaskDropdown();
     bindEventListeners();
-    buildTaskCheckboxes({
-      filterSourceFn: () => state.checkedTasks,
-      onChange: () => onTaskCheckboxChange(renderChart),
-    });
-    buildModelCheckboxes();
-    buildModelToolbar();
-    bindModuleActionStopPropagation();
+    buildTaskPicker({ onChange: () => onTaskCheckboxChange(renderChart) });
+    buildModelPicker();
+    initModuleToggles();
     attachControlTooltips();
 
     // The `norm` URL field has a dynamic default ("baseline" for aggregate
@@ -439,7 +437,7 @@ function applyUrlFromHash() {
 /** Sync every control's DOM state from the current settings. */
 function syncControlsFromState() {
   syncTaskControlsFromState();
-  syncModelCheckboxStates();
+  syncPickers();
   updateRangeSliderUI();
   const fo = document.getElementById("fully-open-toggle");
   if (fo) fo.checked = fullyOpenOnly;
@@ -652,26 +650,6 @@ function bindEventListeners() {
       renderChart();
     });
   }
-
-  // A panel's "Select all" / "Select none": while a model search is active,
-  // only the models it lists.
-  const panelModels = (cat) => allModelIds().filter((m) =>
-    (state.DATA.model_categories?.[m] || "multilingual") === cat
-    && (!modelSearchMatches || modelSearchMatches.has(m)));
-  document.querySelectorAll(".model-select-all").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      for (const m of panelModels(btn.dataset.category)) checkedModels.add(m);
-      syncModelCheckboxStates();
-      renderChart();
-    });
-  });
-  document.querySelectorAll(".model-select-none").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      for (const m of panelModels(btn.dataset.category)) checkedModels.delete(m);
-      syncModelCheckboxStates();
-      renderChart();
-    });
-  });
 
   initRangeSlider();
 }
@@ -969,204 +947,256 @@ function computeOrgXPositions(modelNames) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Model checkbox panel
+// Model picker
 // ─────────────────────────────────────────────────────────────
+// The models by category (Norwegian / multilingual) and organization, one
+// toggle chip per model, smallest first. The picker lists the models the
+// size range and the fully-open filter let into the chart; "Show N more"
+// adds the others, faded, as does a search that matches them. The bulk
+// toggles — Select all / none, an organization's or a category's checkbox —
+// act on the chips listed.
 
-// The models matching the model search (null: no search). While a search is
-// active, the panels' "Select all" / "Select none" act on these only.
-let modelSearchMatches = null;
+const MODEL_CATEGORIES = [
+  ["norwegian", "Norwegian language models"],
+  ["multilingual", "Multilingual & non-Norwegian language models"],
+];
+// Whether the models outside the filters are listed too ("Show N more").
+let showAllModels = false;
+// The words of the model search, lowercased ([] = no search).
+let modelSearchWords = [];
 
-/** The search field and "Reset to default" button above the model panels. */
-function buildModelToolbar() {
-  const panels = document.getElementById("model-panels");
-  if (!panels || document.getElementById("model-search")) return;
-  const bar = document.createElement("div");
-  bar.className = "model-toolbar";
+function modelCategory(m) {
+  return state.DATA.model_categories?.[m] || "multilingual";
+}
+function modelOrg(m) {
+  return state.DATA.model_organizations?.[m] || "Other";
+}
+function modelSize(m) {
+  return state.DATA.model_parameters?.[m] || 0;
+}
 
-  const search = document.createElement("input");
-  search.type = "search";
-  search.id = "model-search";
-  search.className = "model-search";
-  search.placeholder = "Search models";
-  search.setAttribute("aria-label", "Search models");
-  search.autocomplete = "off";
-  search.spellcheck = false;
-  search.addEventListener("input", () => applyModelSearch(search.value));
+/** Whether model `m` matches every word of the model search. */
+function matchesModelSearch(m) {
+  const text = [getModelLabel(m), modelOrg(m), m].join(" ").toLowerCase();
+  return modelSearchWords.every((w) => text.includes(w));
+}
 
-  const reset = document.createElement("button");
-  reset.type = "button";
-  reset.className = "small-btn";
-  reset.textContent = "Reset to default";
-  reset.title = "Select the default set of models again";
-  reset.addEventListener("click", () => {
+/** The size range as text ("8–20B", "up to 20B", "from 8B"), or "" when
+ *  the slider is fully open. */
+function sizeRangeText() {
+  const lo = currentSizeMin > CFG.sizeRangeMin, hi = currentSizeMax < CFG.sizeRangeMax;
+  if (lo && hi) return `${currentSizeMin}–${currentSizeMax}B`;
+  if (hi) return `up to ${currentSizeMax}B`;
+  if (lo) return `from ${currentSizeMin}B`;
+  return "";
+}
+
+/** The models the filters leave out, as a phrase completing "Show 12 more
+ *  models …": "outside 8–20B", "larger than 20B", "smaller than 8B", each
+ *  "… or not fully open" with the fully-open filter on. */
+function filteredOutPhrase() {
+  const lo = currentSizeMin > CFG.sizeRangeMin, hi = currentSizeMax < CFG.sizeRangeMax;
+  const size = lo && hi ? `outside ${currentSizeMin}–${currentSizeMax}B`
+    : hi ? `larger than ${currentSizeMax}B`
+    : lo ? `smaller than ${currentSizeMin}B` : "";
+  return [size, fullyOpenOnly ? "not fully open" : ""].filter(Boolean).join(" or ");
+}
+
+/** Why model `m` isn't in the chart although it may be selected, or "". */
+function modelFilterNote(m) {
+  if (isModelInSizeRange(m)) return "";
+  const size = modelSize(m);
+  const lo = currentSizeMin <= CFG.sizeRangeMin ? -Infinity : currentSizeMin;
+  const hi = currentSizeMax >= CFG.sizeRangeMax ? Infinity : currentSizeMax;
+  const reasons = [];
+  if (size && (size < lo || size > hi)) reasons.push(`outside the size range (${sizeRangeText()})`);
+  if (fullyOpenOnly && !state.DATA.model_fully_open?.[m]) reasons.push("not fully open");
+  return reasons.length ? "Not in the chart: " + reasons.join(" and ") + "." : "";
+}
+
+/** Info-card content of a model's chip. */
+function modelCard(m) {
+  const info = state.DATA.model_info?.[m];
+  const url = info?.huggingface_url;
+  return {
+    title: getModelLabel(m),
+    meta: modelMetaLine(m),
+    body: info?.description || "",
+    note: modelFilterNote(m),
+    link: url ? { href: url, text: shortUrl(url) } : null,
+  };
+}
+
+/** The organization's badge: its logo on a disk of its color, as on the
+ *  bars and the scatter points. */
+function orgBadge(org, color) {
+  const badge = document.createElement("span");
+  badge.className = "org-badge";
+  badge.style.setProperty("--badge", color);
+  const file = ORG_LOGO[org];
+  if (file) {
+    const img = document.createElement("img");
+    img.src = `../shared/logos/${file}`;
+    img.alt = "";
+    img.decoding = "async";
+    const scale = ORG_LOGO_SCALE[org];
+    if (scale) img.style.scale = String(scale);
+    badge.append(img);
+  }
+  return badge;
+}
+
+/** Build the model picker into #model-picker and wire its toolbar. */
+function buildModelPicker() {
+  const root = document.getElementById("model-picker");
+  if (!root) return;
+  root.replaceChildren();
+  const bySize = (a, b) => modelSize(a) - modelSize(b) || getModelLabel(a).localeCompare(getModelLabel(b));
+
+  for (const [category, title] of MODEL_CATEGORIES) {
+    const models = allModelIds().filter((m) => modelCategory(m) === category);
+    if (!models.length) continue;
+    const section = document.createElement("section");
+    section.className = "model-cat";
+
+    const header = document.createElement("label");
+    header.className = "model-cat-header";
+    const catBox = document.createElement("input");
+    catBox.type = "checkbox";
+    const name = document.createElement("span");
+    name.textContent = title;
+    header.append(catBox, name);
+    section.append(header);
+
+    const rows = document.createElement("div");
+    rows.className = "org-rows";
+    const orgs = [...new Set(models.map(modelOrg))].sort((a, b) => a.localeCompare(b));
+    for (const org of orgs) {
+      const orgModels = models.filter((m) => modelOrg(m) === org).sort(bySize);
+      const row = document.createElement("div");
+      row.className = "org-row";
+
+      const label = document.createElement("label");
+      label.className = "org-label";
+      const orgBox = document.createElement("input");
+      orgBox.type = "checkbox";
+      const orgName = document.createElement("span");
+      orgName.className = "org-name";
+      orgName.textContent = org;
+      label.append(orgBox, orgBadge(org, getModelColor(orgModels[0])), orgName);
+
+      const chips = document.createElement("div");
+      chips.className = "org-chips";
+      for (const m of orgModels) {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "model-chip";
+        chip.dataset.model = m;
+        const dot = document.createElement("span");
+        dot.className = "model-chip-dot";
+        dot.style.setProperty("--dot", getModelColor(m));
+        const text = document.createElement("span");
+        text.className = "model-chip-name";
+        text.textContent = getModelLabel(m);
+        chip.append(dot, text);
+        attachInfoCard(chip, () => modelCard(m));
+        chips.append(chip);
+      }
+      row.append(label, chips);
+      rows.append(row);
+    }
+    section.append(rows);
+    root.append(section);
+  }
+
+  const listed = (scope) => [...scope.querySelectorAll(".model-chip:not([hidden])")].map((c) => c.dataset.model);
+  const setModels = (models, on) => {
+    for (const m of models) {
+      if (on) checkedModels.add(m); else checkedModels.delete(m);
+    }
+    renderChart();
+  };
+
+  root.addEventListener("click", (e) => {
+    const chip = e.target.closest(".model-chip");
+    if (!chip) return;
+    const m = chip.dataset.model;
+    setModels([m], !checkedModels.has(m));
+  });
+  root.addEventListener("change", (e) => {
+    const box = e.target;
+    const scope = box.closest(".org-row") || box.closest(".model-cat");
+    if (scope) setModels(listed(scope), box.checked);
+  });
+
+  document.getElementById("model-select-all")?.addEventListener("click", () => setModels(listed(root), true));
+  document.getElementById("model-select-none")?.addEventListener("click", () => setModels(listed(root), false));
+  document.getElementById("model-reset")?.addEventListener("click", () => {
     checkedModels.clear();
     addDefaultModels();
-    syncModelCheckboxStates();
     renderChart();
   });
-
-  const empty = document.createElement("span");
-  empty.id = "model-search-empty";
-  empty.className = "model-search-empty";
-  empty.textContent = "No model matches the search.";
-  empty.hidden = true;
-
-  bar.append(search, reset, empty);
-  panels.prepend(bar);
-}
-
-/** List only the models whose name, organization or id contains every
- *  word of `query` (all of them for an empty query), and hide the
- *  organizations and panels left empty. */
-function applyModelSearch(query) {
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-  modelSearchMatches = words.length ? new Set() : null;
-  for (const item of document.querySelectorAll(".model-checkbox-grid details.model-item")) {
-    const dir = item.dataset.model;
-    const text = [getModelLabel(dir), state.DATA.model_organizations?.[dir] || "", dir].join(" ").toLowerCase();
-    const match = words.every((w) => text.includes(w));
-    item.hidden = !match;
-    if (match && modelSearchMatches) modelSearchMatches.add(dir);
-  }
-  for (const group of document.querySelectorAll(".model-org-group")) {
-    group.hidden = !group.querySelector("details.model-item:not([hidden])");
-  }
-  let any = false;
-  for (const panel of document.querySelectorAll(".model-panel")) {
-    panel.hidden = !panel.querySelector("details.model-item:not([hidden])");
-    any = any || !panel.hidden;
-  }
-  const empty = document.getElementById("model-search-empty");
-  if (empty) empty.hidden = any;
-}
-
-function buildModelCheckboxes() {
-  const catModels = { norwegian: {}, multilingual: {} };
-  for (const dir of allModelIds()) {
-    const cat = state.DATA.model_categories?.[dir] || "multilingual";
-    const org = state.DATA.model_organizations?.[dir] || "Other";
-    if (!catModels[cat]) catModels[cat] = {};
-    if (!catModels[cat][org]) catModels[cat][org] = [];
-    catModels[cat][org].push(dir);
-  }
-
-  const gridIds = { norwegian: "norwegian-model-grid", multilingual: "multilingual-model-grid" };
-  for (const catKey of ["norwegian", "multilingual"]) {
-    const grid = document.getElementById(gridIds[catKey]);
-    if (!grid) continue;
-    grid.innerHTML = "";
-
-    const orgs = Object.keys(catModels[catKey] || {}).sort();
-    for (const org of orgs) {
-      const models = catModels[catKey][org];
-      models.sort((a, b) => {
-        const sizeCmp = (state.DATA.model_parameters?.[a] || 0) - (state.DATA.model_parameters?.[b] || 0);
-        if (sizeCmp !== 0) return sizeCmp;
-        return getModelLabel(a).localeCompare(getModelLabel(b));
-      });
-
-      const orgDiv = document.createElement("div");
-      orgDiv.className = "model-org-group";
-      const headerDiv = document.createElement("div");
-      headerDiv.className = "model-org-header";
-      const gcb = document.createElement("input");
-      gcb.type = "checkbox"; gcb.className = "model-group-checkbox";
-      gcb.dataset.org = org; gcb.dataset.cat = catKey;
-      const initAll = models.length > 0 && models.every((m) => checkedModels.has(m));
-      const initSome = models.some((m) => checkedModels.has(m));
-      gcb.checked = initAll;
-      gcb.indeterminate = !initAll && initSome;
-      gcb.addEventListener("change", () => {
-        for (const m of models) {
-          if (gcb.checked) checkedModels.add(m); else checkedModels.delete(m);
-        }
-        syncModelCheckboxStates();
-        renderChart();
-      });
-      headerDiv.addEventListener("click", (e) => { if (e.target !== gcb) gcb.click(); });
-      const h4 = document.createElement("h4"); h4.textContent = org;
-      headerDiv.appendChild(gcb); headerDiv.appendChild(h4);
-      orgDiv.appendChild(headerDiv);
-
-      for (const modelDir of models) {
-        // Each model is a <details>; click the name to expand its description
-        // and metadata. Checkbox click stops propagation so it doesn't toggle.
-        const item = document.createElement("details");
-        item.className = "model-item";
-        item.dataset.model = modelDir;
-
-        const summary = document.createElement("summary");
-        const cb = document.createElement("input");
-        cb.type = "checkbox"; cb.checked = checkedModels.has(modelDir);
-        cb.dataset.model = modelDir;
-        cb.addEventListener("change", () => {
-          if (cb.checked) checkedModels.add(modelDir);
-          else checkedModels.delete(modelDir);
-          syncModelCheckboxStates();
-          renderChart();
-        });
-        cb.addEventListener("click", (e) => e.stopPropagation());
-
-        const dot = document.createElement("span");
-        dot.className = "model-color-dot";
-        dot.style.backgroundColor = getModelColor(modelDir);
-
-        const nameSpan = document.createElement("span");
-        nameSpan.className = "model-name";
-        nameSpan.textContent = getModelLabel(modelDir);
-
-        summary.appendChild(cb);
-        summary.appendChild(dot);
-        summary.appendChild(nameSpan);
-        item.appendChild(summary);
-
-        // Description body
-        const info = state.DATA.model_info?.[modelDir];
-        const desc = document.createElement("div");
-        desc.className = "model-description-inline";
-        if (info) {
-          const meta = modelMetaLine(modelDir);
-          if (meta) {
-            const metaEl = document.createElement("span");
-            metaEl.className = "meta";
-            metaEl.textContent = meta;
-            desc.appendChild(metaEl);
-          }
-          if (info.description) desc.appendChild(document.createTextNode(info.description));
-          if (info.huggingface_url) {
-            if (info.description) desc.appendChild(document.createElement("br"));
-            const a = document.createElement("a");
-            a.href = info.huggingface_url;
-            a.target = "_blank";
-            a.rel = "noopener noreferrer";
-            a.textContent = info.huggingface_url.replace("https://huggingface.co/", "hf.co/");
-            desc.appendChild(a);
-          }
-        }
-        item.appendChild(desc);
-        orgDiv.appendChild(item);
-      }
-      grid.appendChild(orgDiv);
-    }
-  }
-}
-
-function syncModelCheckboxStates() {
-  document.querySelectorAll(".model-checkbox-grid input[data-model]").forEach((cb) => {
-    cb.checked = checkedModels.has(cb.dataset.model);
+  document.getElementById("model-search")?.addEventListener("input", (e) => {
+    modelSearchWords = e.target.value.toLowerCase().split(/\s+/).filter(Boolean);
+    syncModelPicker();
   });
-  document.querySelectorAll(".model-group-checkbox").forEach((gcb) => {
-    const org = gcb.dataset.org;
-    const cat = gcb.dataset.cat;
-    const models = allModelIds().filter(
-      (m) => (state.DATA.model_categories?.[m] || "multilingual") === cat
-          && (state.DATA.model_organizations?.[m] || "Other") === org
-    );
-    const allChecked = models.length > 0 && models.every((m) => checkedModels.has(m));
-    const someChecked = models.some((m) => checkedModels.has(m));
-    gcb.checked = allChecked;
-    gcb.indeterminate = !allChecked && someChecked;
+  document.getElementById("model-show-more")?.addEventListener("click", () => {
+    showAllModels = !showAllModels;
+    syncModelPicker();
   });
+}
+
+/** Show the selection, the filters and the search in the model picker and
+ *  its section header. */
+function syncModelPicker() {
+  const root = document.getElementById("model-picker");
+  if (!root) return;
+  const searching = modelSearchWords.length > 0;
+  let outside = 0;
+  for (const chip of root.querySelectorAll(".model-chip")) {
+    const m = chip.dataset.model;
+    const inFilters = isModelInSizeRange(m);
+    if (!inFilters) outside++;
+    chip.hidden = searching ? !matchesModelSearch(m) : !(inFilters || showAllModels);
+    chip.classList.toggle("filtered-out", !inFilters);
+    chip.setAttribute("aria-pressed", String(checkedModels.has(m)));
+  }
+  const groupState = (scope, boxSelector) => {
+    const models = [...scope.querySelectorAll(".model-chip:not([hidden])")].map((c) => c.dataset.model);
+    scope.hidden = models.length === 0;
+    setGroupCheckbox(scope.querySelector(boxSelector), models.filter((m) => checkedModels.has(m)).length, models.length);
+    return models.length;
+  };
+  for (const row of root.querySelectorAll(".org-row")) groupState(row, ".org-label input");
+  let listedCount = 0;
+  for (const section of root.querySelectorAll(".model-cat")) listedCount += groupState(section, ".model-cat-header input");
+
+  const summary = document.getElementById("model-summary");
+  if (summary) summary.textContent = `${getModelList().length} in the chart`;
+
+  const empty = document.getElementById("model-picker-empty");
+  if (empty) {
+    empty.hidden = listedCount > 0;
+    const range = sizeRangeText();
+    empty.textContent = searching ? "No model matches the search."
+      : `No ${fullyOpenOnly ? "fully-open " : ""}model${range ? ` within the size range (${range})` : ""}.`;
+  }
+
+  const more = document.getElementById("model-show-more");
+  if (more) {
+    more.hidden = searching || outside === 0;
+    const reason = filteredOutPhrase();
+    more.textContent = showAllModels
+      ? `Hide the models ${reason}`
+      : `Show ${outside} more ${outside === 1 ? "model" : "models"} ${reason}`;
+    more.setAttribute("aria-expanded", String(showAllModels));
+  }
+}
+
+/** Show the current task and model selection in the pickers under the chart. */
+function syncPickers() {
+  syncTaskPicker();
+  syncModelPicker();
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1250,6 +1280,10 @@ function onChartHover(data) {
 
 function renderChart() {
   const sel = state.currentTaskSelection;
+
+  // Every change of the task, model, size or openness selection ends in a
+  // render: the pickers under the chart follow here.
+  syncPickers();
 
   // Metric selector
   if (isAggregateSelection(sel)) {
