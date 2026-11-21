@@ -53,8 +53,10 @@ export function exportChartDataAsJSON(gd, metadata, filename) {
   const exportData = {
     metadata: {
       ...metadata,
-      title: gd.layout.title?.text || "",
-      y_axis: gd.layout.yaxis?.title?.text || gd.layout.yaxis?.title || "",
+      // A dashboard may supply these itself (the comparison pages draw their
+      // title outside the Plotly figure, so the layout has none).
+      title: metadata?.title ?? (gd.layout.title?.text || ""),
+      y_axis: metadata?.y_axis ?? (gd.layout.yaxis?.title?.text || gd.layout.yaxis?.title || ""),
       exported_at: new Date().toISOString(),
     },
     series: [],
@@ -67,6 +69,13 @@ export function exportChartDataAsJSON(gd, metadata, filename) {
       y: Array.from(trace.y),
     };
     if (trace.error_y?.array) series.error = Array.from(trace.error_y.array);
+    // The lower half-widths of asymmetric error bars, and the entity behind
+    // each point when the trace's customdata names it (the comparison
+    // charts, whose x is a bar position or a model size).
+    if (trace.error_y?.arrayminus) series.error_minus = Array.from(trace.error_y.arrayminus);
+    if (Array.isArray(trace.customdata) && trace.customdata.some((d) => d?.label != null)) {
+      series.labels = trace.customdata.map((d) => d?.label ?? null);
+    }
     exportData.series.push(series);
   }
   downloadJSON(exportData, filename || "chart-data.json");
@@ -287,6 +296,16 @@ function captureNaturalRects(chartEl) {
   // Only bars need a cached rect — they're what the cursor is hit-tested
   // against. Aux elements are positioned by model-column index, not measured.
   chartEl.querySelectorAll(BAR_RECT_SELECTOR).forEach(capRect);
+}
+
+// Re-measure after every redraw that is not part of the grow-up animation:
+// a responsive resize relayouts the chart, and the hover would otherwise
+// hit-test against the old geometry (no bar magnifies or bolds under the
+// cursor). Registered after each newPlot, which purges the previous one.
+function recaptureOnRedraw(chartEl) {
+  chartEl.on("plotly_afterplot", () => {
+    if (!chartEl._barAnimating) captureNaturalRects(chartEl);
+  });
 }
 
 // Hover handlers ask this. Returns the captured natural rect or null. If
@@ -829,6 +848,11 @@ function attachScatterHoverHighlight(chartEl) {
 
   function frame(now) {
     rafId = null;
+    // Bound once per chart element, these handlers outlive a switch from the
+    // scatter to the bar chart. Outside scatter mode there is nothing to do —
+    // acting on the last scatter's image map would retarget the bar chart's
+    // logos and hide or replace its tooltip.
+    if (!chartEl.classList.contains("scatter-mode")) { lastT = null; return; }
     const dt = lastT === null ? 16 : Math.max(1, Math.min(EMA_MAX_DT, now - lastT));
     lastT = now;
     const dtN = dt / 16;   // frames elapsed (normalised to 60 fps)
@@ -980,6 +1004,8 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
   // Each render rebuilds the chart, so hide any leftover focus halo (e.g. when
   // switching scatter → bars without a mouseleave). It reappears on next hover.
   if (chartEl._scatterHalo) chartEl._scatterHalo.style.opacity = "0";
+  // Set while the bars grow (recaptureOnRedraw must not measure them then).
+  chartEl._barAnimating = shouldAnimate;
 
   if (!shouldAnimate) {
     Plotly.newPlot("chart", traces, plotLayout, config).then(() => {
@@ -1016,7 +1042,10 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
       if (onHover) chartEl.on("plotly_hover", onHover);
       if (onUnhover) chartEl.on("plotly_unhover", onUnhover);
     }
-    if (barIndices.length) attachBarHoverHighlight(chartEl);
+    if (barIndices.length) {
+      attachBarHoverHighlight(chartEl);
+      recaptureOnRedraw(chartEl);
+    }
     if (isScatterMode) attachScatterHoverHighlight(chartEl);
     return;
   }
@@ -1047,6 +1076,7 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
   if (onHover) chartEl.on("plotly_hover", onHover);
   if (onUnhover) chartEl.on("plotly_unhover", onUnhover);
   attachBarHoverHighlight(chartEl);
+  recaptureOnRedraw(chartEl);
 
   const barYTargets = barIndices.map((i) => traces[i].y);
   // Indices (into barIndices) of bar traces that actually carry error bars,
@@ -1066,6 +1096,7 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
     : BAR_ANIM_DURATION;
 
   let animStart = null;
+  let barsAtTarget = false;   // a frame has drawn the bars at e1 = 1
   function tick(t) {
     if (animId !== currentAnim) return;   // a newer render took over
     if (animStart === null) animStart = t;
@@ -1084,9 +1115,14 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
     // each chart's bar traces either all carry error bars or none do.
     const traceUpdate = {};
     let traceIdx = null;
-    if (elapsed <= BAR_ANIM_DURATION) {
+    // Bars are written every frame until one has drawn them at e1 = 1, their
+    // exact targets — not only while elapsed ≤ BAR_ANIM_DURATION: a frame
+    // arriving late (a long task, a hidden tab) would otherwise leave them
+    // at the fraction the last on-time frame drew.
+    if (!barsAtTarget) {
       traceUpdate.y = barYTargets.map((arr) => arr.map((v) => v == null ? null : v * e1));
       traceIdx = barIndices;
+      barsAtTarget = p1 >= 1;
     }
     if (hasErrBars && elapsed >= phase2StartOffset) {
       traceUpdate["error_y.array"] = errBarTargets.map(
@@ -1125,6 +1161,7 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
       // mouse over during the animation) any inline CSS gets cleared
       // briefly inside the capture function. After this point the hover
       // handler has a locked, correct cache.
+      chartEl._barAnimating = false;
       captureNaturalRects(chartEl);
     }
   }

@@ -12,4 +12,7 @@ initComparison({
   defaultSizeMax: 20,
   sizeRangeMin: 1,
   sizeRangeMax: 700,
+  // Unchecking tasks in the default category-average view keeps averaging
+  // by category; "Select all" from there returns to the default view.
+  keepCategoryAverage: true,
 });

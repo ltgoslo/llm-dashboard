@@ -6,10 +6,15 @@ with valid results JSON files containing the expected main_metric.
 """
 
 import os
-import glob
 import json
+import sys
 
 import yaml
+
+# The build's own rules for which results file counts (the newest by file
+# name, or a plain results.json) and for metric-name aliases, so this check
+# looks at exactly what the dashboards show.
+from build_data import ZERO_IF_MISSING_METRICS, find_latest_results_json, reports_metric
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SHOT_SETTINGS = ["0-shot", "1-shot", "5-shot"]
@@ -20,15 +25,6 @@ def load_metrics_setup():
     path = os.path.join(BASE_DIR, "metrics_setup.yaml")
     with open(path) as f:
         return yaml.safe_load(f)
-
-
-def find_results_json(path, latest_only=False):
-    """Find results_*.json files under path. If latest_only, return only the newest."""
-    files = glob.glob(os.path.join(path, "**", "results_*.json"), recursive=True)
-    if latest_only and len(files) > 1:
-        files.sort(key=os.path.getmtime)
-        return [files[-1]]
-    return files
 
 
 def check_model_dir(model_path, benchmarks):
@@ -44,8 +40,7 @@ def check_model_dir(model_path, benchmarks):
             if not os.path.isdir(shot_path):
                 missing.append((benchmark, shot, "shot directory missing"))
                 continue
-            results = find_results_json(shot_path)
-            if not results:
+            if find_latest_results_json(shot_path) is None:
                 missing.append((benchmark, shot, "no results JSON found"))
     return missing
 
@@ -66,7 +61,8 @@ def check_main_metrics(base_paths, metrics_setup):
                 continue
             for benchmark, config in metrics_setup.items():
                 main_metric = config["main_metric"]
-                metric_key = f"{main_metric},none"
+                zero_note = (" (counted as 0 by the build)"
+                             if ZERO_IF_MISSING_METRICS.get(benchmark) == main_metric else "")
                 subtasks = config.get("subtasks", {})
                 bench_path = os.path.join(model_path, benchmark)
                 if not os.path.isdir(bench_path):
@@ -75,7 +71,8 @@ def check_main_metrics(base_paths, metrics_setup):
                     shot_path = os.path.join(bench_path, shot)
                     if not os.path.isdir(shot_path):
                         continue
-                    for results_file in find_results_json(shot_path, latest_only=True):
+                    results_file = find_latest_results_json(shot_path)
+                    if results_file is not None:
                         try:
                             with open(results_file) as f:
                                 data = json.load(f)
@@ -83,10 +80,10 @@ def check_main_metrics(base_paths, metrics_setup):
 
                             # Check main_metric in all result entries
                             for task_name, task_results in results.items():
-                                if metric_key not in task_results:
+                                if not reports_metric(task_results, main_metric):
                                     issues.append((
                                         model_dir, benchmark, shot, task_name,
-                                        f"missing {metric_key}",
+                                        f"missing {main_metric}{zero_note}",
                                     ))
 
                             # For benchmarks with subtasks, check each expected subtask
@@ -133,8 +130,6 @@ def main():
             else:
                 print(f"  {model}: OK ({len(benchmarks)} benchmarks x {len(SHOT_SETTINGS)} shots)")
 
-    exit()
-
     # Check data/norolmo/progress/ (training checkpoints)
     progress_dir = os.path.join(BASE_DIR, "data", "norolmo", "progress")
     if os.path.isdir(progress_dir):
@@ -172,7 +167,8 @@ def main():
         print("\n\nAll evaluations complete!")
     else:
         print("\n\nSome evaluations are missing (see above).")
+    return 1 if found_issues else 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

@@ -57,6 +57,8 @@ norec_document:
   description: "Binary document-level sentiment analysis based on the NoReC dataset. The main metric is macro F1 score, with a random baseline of approximately 0.485 (expected macro F1 of a uniform random classifier on this class-imbalanced test set)."
   main_metric: f1
   random_baseline: 0.4850709806
+  random_baselines:
+    acc: 0.5
   category: language understanding
   evaluation_type: classification
   metric_scale: unit
@@ -66,6 +68,8 @@ norec_sentence:
   description: "Binary sentence-level sentiment analysis based on the NoReC dataset. The main metric is macro F1 score, with a random baseline of approximately 0.482 (expected macro F1 of a uniform random classifier on this class-imbalanced test set)."
   main_metric: f1
   random_baseline: 0.4815172167
+  random_baselines:
+    acc: 0.5
   category: language understanding
   evaluation_type: classification
   metric_scale: unit
@@ -238,7 +242,7 @@ norsumm_nno_nob_translation:
   url: https://huggingface.co/datasets/ltg/norsumm-nob-nno-translation
 nortruthfulqa_gen_nno:
   pretty_name: generative QA (truthfulqa)
-  description: "Generative question-answering based on the TruthfulQA dataset, which includes questions questions that some humans would answer falsely due to a false belief or misconception. The model must generate an answer to each question, and the main metric is ROUGE-L, which measures the overlap between the generated answer and reference answers. The random baseline is 0.0 since the model must generate specific text."
+  description: "Generative question-answering based on the TruthfulQA dataset, which includes questions that some humans would answer falsely due to a false belief or misconception. The model must generate an answer to each question, and the main metric is ROUGE-L, which measures the overlap between the generated answer and reference answers. The random baseline is 0.0 since the model must generate specific text."
   main_metric: rougeL_max
   random_baseline: 0.0
   category: world knowledge & reasoning
@@ -247,7 +251,7 @@ nortruthfulqa_gen_nno:
   url: https://huggingface.co/datasets/ltg/nortruthfulqa_gen
 nortruthfulqa_gen_nob:
   pretty_name: generative QA (truthfulqa)
-  description: "Generative question-answering based on the TruthfulQA dataset, which includes questions questions that some humans would answer falsely due to a false belief or misconception. The model must generate an answer to each question, and the main metric is ROUGE-L, which measures the overlap between the generated answer and reference answers. The random baseline is 0.0 since the model must generate specific text."
+  description: "Generative question-answering based on the TruthfulQA dataset, which includes questions that some humans would answer falsely due to a false belief or misconception. The model must generate an answer to each question, and the main metric is ROUGE-L, which measures the overlap between the generated answer and reference answers. The random baseline is 0.0 since the model must generate specific text."
   main_metric: rougeL_max
   random_baseline: 0.0
   category: world knowledge & reasoning
@@ -265,7 +269,7 @@ nortruthfulqa_mc_nno:
   url: https://huggingface.co/datasets/ltg/nortruthfulqa_mc
 nortruthfulqa_mc_nob:
   pretty_name: multiple-choice QA (truthfulqa)
-  description: "Multiple-choice question-answering based on the TruthfulQA dataset, which includes questions that some humans would answer falsely due to a false belief or misconception. The model must select the correct answer from multiple choices, and the main metric is accuracy."
+  description: "Multiple-choice question-answering based on the TruthfulQA dataset, which includes questions that some humans would answer falsely due to a false belief or misconception. The model must select the correct answer from multiple choices, and the main metric is accuracy. The random baseline is approximately 0.232 since the model must choose the correct answer from multiple options."
   main_metric: acc
   random_baseline: 0.23170337745132827
   category: world knowledge & reasoning
@@ -283,7 +287,7 @@ nrk_quiz_qa_nno:
   url: https://huggingface.co/datasets/ltg/nrk_quiz_qa
 nrk_quiz_qa_nob:
   pretty_name: multiple-choice QA (nrk-quiz)
-  description: "Multiple-choice question-answering based on the NRK quiz dataset. The model must select the correct answer from multiple choices, and the main metric is accuracy."
+  description: "Multiple-choice question-answering based on the NRK quiz dataset. The model must select the correct answer from multiple choices, and the main metric is accuracy. The random baseline is approximately 0.284 since the model must choose the correct answer from multiple options."
   main_metric: acc
   random_baseline: 0.2836296296296296
   category: world knowledge & reasoning

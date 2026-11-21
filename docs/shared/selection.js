@@ -156,7 +156,8 @@ export function onTaskCheckboxChange(render) {
 /** Bind the control listeners shared by the NorEval dashboards: shot buttons,
  *  prompt-aggregation / normalization / metric selects, the task dropdown,
  *  and the task "Select all" / "Select none" buttons. `selectAll` is the
- *  selection "Select all" switches to. */
+ *  selection "Select all" switches to, or a function returning it (called
+ *  before the selection changes, so it can depend on the current view). */
 export function bindTaskControls(render, { selectAll = "__all__" } = {}) {
   document.querySelectorAll(".shot-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -190,9 +191,10 @@ export function bindTaskControls(render, { selectAll = "__all__" } = {}) {
   });
 
   document.getElementById("select-all-btn").addEventListener("click", () => {
+    const target = typeof selectAll === "function" ? selectAll() : selectAll;
     state.checkedTasks = new Set(Object.keys(state.metricsSetup));
-    state.currentTaskSelection = selectAll;
-    document.getElementById("task-select").value = selectAll;
+    state.currentTaskSelection = target;
+    document.getElementById("task-select").value = target;
     syncTaskCheckboxStates(() => state.checkedTasks);
     autoSetNormalization();
     render();

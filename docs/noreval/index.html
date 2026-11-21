@@ -60,9 +60,11 @@
 
                                 <p><strong>For mean.</strong> Symmetric CI from the <a href="https://en.wikipedia.org/wiki/Welch%E2%80%93Satterthwaite_equation">Welch&ndash;Satterthwaite</a> combination of sampling SE and the SD across prompts.</p>
 
-                                <p><strong>For median and first.</strong> Sampling CI of the prompt that achieved that statistic.</p>
+                                <p><strong>For min.</strong> The mirror image of max: the Bonferroni correction is on the upper bound.</p>
 
-                                <p><strong>Caveats.</strong> Three benchmarks (<em>norec_document</em>, <em>norec_sentence</em>, <em>ask_gec</em>) have no harness-supplied SE, so we apply the binomial bounds as a coarse placeholder &mdash; F1 and ERRANT-F<sub>0.5</sub> aren't proper Bernoulli proportions, so their CIs are indicative rather than exact. When averaging across benchmarks, lower and upper distances are propagated independently as $\sqrt{\sum d_i^2}/N$.</p>
+                                <p><strong>For median.</strong> Sampling CI of the prompt that achieved the median. With an even number of prompts the median lies halfway between the two middle prompts, and so does each bound: the midpoint of the two prompts' bounds.</p>
+
+                                <p><strong>Caveats.</strong> Three benchmarks (<em>norec_document</em>, <em>norec_sentence</em>, <em>ask_gec</em>) have no harness-supplied SE, so we apply the binomial bounds as a coarse placeholder &mdash; F1 and ERRANT-F<sub>0.5</sub> aren't proper Bernoulli proportions, so their CIs are indicative rather than exact. On <em>ask_gec</em>, a prompt whose ERRANT scoring failed counts as 0. When averaging across benchmarks, lower and upper distances are propagated independently as $\sqrt{\sum d_i^2}/N$.</p>
                             </div>
 
                             <div class="about-section">
@@ -75,7 +77,7 @@
                             <div class="about-section">
                                 <h3>Dashboard features</h3>
                                 <ul>
-                                    <li><strong>Filter by size or openness.</strong> The bottom row of controls lets you restrict to a model-size range or limit to fully-open-weight models.</li>
+                                    <li><strong>Filter by size or openness.</strong> The bottom row of controls lets you restrict to a model-size range or limit to fully open models (open weights, training data and code).</li>
                                     <li><strong>Select/deselect models &amp; tasks.</strong> The two sections below the plot let you choose exactly which models and tasks contribute to each view.</li>
                                     <li><strong>Metric selector.</strong> Individual task views offer a dropdown (top control row) to switch between all available metrics for that benchmark.</li>
                                     <li><strong>Chart export.</strong> Charts can be downloaded as PNG or SVG, and the underlying data exported as JSON, via the toolbar buttons.</li>

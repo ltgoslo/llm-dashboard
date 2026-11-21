@@ -7,7 +7,7 @@ normistral-11b-thinking-full:
   license: "Apache 2.0"
   fully_open: false
   description: "Instruction-tuned Norwegian language model with reasoning capabilities, fine-tuned from NorMistral 11B using SFT and reinforcement learning (d-RLAIF). Supports reasoning with <think> tokens."
-  huggingface_url: https://huggingface.co/norallm/normistral-11b-thinking
+  huggingface_url: https://huggingface.co/ltg/normistral-11b-thinking
   default: true
   color: "#DD0000"
 
@@ -19,7 +19,7 @@ normistral-11b-thinking-base-like:
   license: "Apache 2.0"
   fully_open: false
   description: "Same model as NorMistral 11B Thinking, but evaluated as a base model without chat template or reasoning traces."
-  huggingface_url: https://huggingface.co/norallm/normistral-11b-thinking
+  huggingface_url: https://huggingface.co/ltg/normistral-11b-thinking
   default: true
   color: "#DD0000"
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the five data.json files served by the dashboards.
+"""Build the six data.json files served by the dashboards.
 
 Reads benchmark/model configs from YAML files at the repo root and result
 JSONs from data/<dashboard>/{results,progress}/, and writes one consolidated
@@ -13,9 +13,10 @@ Outputs:
     docs/prelude/data.json        — OpenEuroLLM Prelude progression (NorEval 1.2)
     docs/norprelude/data.json     — NorPrelude: Prelude annealed on Scandinavian mixtures (NorEval 1.2)
 
-NorEval-side code (noreval, noreval-gen, norolmo) shares prompt-aggregation
-and metric-extraction logic in `noreval_lib`. MultiSynt is in its own block
-because its directory layout and aggregator quirks are non-trivially
+NorEval-side code (noreval, noreval-gen, norolmo) shares its metric
+extraction (`noreval_extract`, `noreval_process_model_dir`), and every
+dashboard reduces prompt variants with `aggregate_prompt_variants`.
+MultiSynt is in its own block because its directory layout and aggregator quirks are non-trivially
 different (per-partition scores via p0/p1/p2 dirs, MultiBLiMP custom
 aggregation, multiple shot dirs combined into one model, etc.).
 The Prelude dashboard reads NorEval-1.2 results — flat
@@ -161,6 +162,12 @@ MULTISYNT_DECODING_SUFFIX = "_greedy"
 # `errant` in MultiSynt's greedy (pre-NorEval-1.2) files and in some NorEval
 # 1.1 ask_gec runs (Prelude), as `errant_f05` everywhere else.
 METRIC_ALIASES = {"errant": "errant_f05"}
+# NorEval 1.1's ask_gec is scored with ERRANT outside the harness, and a
+# prompt whose ERRANT scoring failed has no ERRANT entry at all. Such a prompt
+# counts as 0 (owner's decision, as in the NorEval scores export), so every
+# model's prompt aggregates (mean / median / min, not only max) are taken
+# over the same prompts. Applied in noreval_extract (NorEval 1.1 dashboards).
+ZERO_IF_MISSING_METRICS = {"ask_gec": "errant_f05"}
 
 # NorOLMo training: 8M tokens per step (8192 × 1024).
 NOROLMO_TOKENS_PER_STEP = 8192 * 1024
@@ -510,12 +517,23 @@ def aggregate_prompt_variants(metric_values, metric_scale="unit", single_pick=No
         lo, hi = welch_mean_ci(triples, metric_scale, is_proportion)
         entry["mean_ci_lo"], entry["mean_ci_hi"] = round(lo, 6), round(hi, 6)
 
-        # Median / first: sampling CI of the selected prompt, no Bonferroni.
+        # Median: sampling CI of the prompt that achieved it, no Bonferroni.
+        # With an even number of prompts the median is the midpoint of the
+        # two middle prompts, and so is each bound: the midpoint of their
+        # sampling bounds (exact if the two estimates were perfectly
+        # correlated, conservative otherwise — prompts share their test
+        # items). A single prompt's CI could exclude that midpoint.
         med = statistics.median(values)
-        closest_idx = min(range(len(values)), key=lambda i: abs(values[i] - med))
-        v_m, se_m, n_m = triples[closest_idx]
-        lo, hi = sampling_ci(v_m, se_m, n_m, metric_scale, is_proportion)
+        if len(values) % 2:
+            middle = [min(range(len(values)), key=lambda i: abs(values[i] - med))]
+        else:
+            order = sorted(range(len(values)), key=lambda i: values[i])
+            middle = order[len(values) // 2 - 1: len(values) // 2 + 1]
+        bounds = [sampling_ci(*triples[i], metric_scale, is_proportion) for i in middle]
+        lo = sum(b[0] for b in bounds) / len(bounds)
+        hi = sum(b[1] for b in bounds) / len(bounds)
         entry["median_ci_lo"], entry["median_ci_hi"] = round(lo, 6), round(hi, 6)
+        # First: sampling CI of the first prompt, no Bonferroni.
         v_f, se_f, n_f = triples[0]
         lo, hi = sampling_ci(v_f, se_f, n_f, metric_scale, is_proportion)
         entry["first_ci_lo"], entry["first_ci_hi"] = round(lo, 6), round(hi, 6)
@@ -571,13 +589,25 @@ def collect_prompt_metrics(task_results, n_samples, exclusions, metric_scale,
             metric_values.setdefault(name, []).append((val, se, n_samples))
 
 
+def reports_metric(task_results, metric):
+    """Whether one task's results carry a value for `metric` (under any
+    METRIC_ALIASES name)."""
+    for key in task_results:
+        if key.endswith(",none") and "_stderr,none" not in key:
+            raw_name = key[: -len(",none")]
+            if METRIC_ALIASES.get(raw_name, raw_name) == metric:
+                return True
+    return False
+
+
 def noreval_extract(results_json_path, benchmark_name, subtasks, metrics_setup_entry):
     """Read a NorEval result JSON and aggregate metrics across prompt variants.
 
     For each `(benchmark_name|benchmark_name_p<N>)` entry under "results", and
     optionally each subtask entry (`benchmark_name_<subtask>`), extract every
     `<metric>,none` value. Aggregate across prompt variants with
-    aggregate_prompt_variants().
+    aggregate_prompt_variants(). A prompt that lacks its benchmark's
+    ZERO_IF_MISSING_METRICS metric (ask_gec's ERRANT) counts as 0 for it.
 
     Returns {metric_name: {…}} or None.
     """
@@ -600,13 +630,18 @@ def noreval_extract(results_json_path, benchmark_name, subtasks, metrics_setup_e
         if metrics_setup_entry else "unit"
     )
 
+    zero_fill = ZERO_IF_MISSING_METRICS.get(benchmark_name)
     metric_values = {}  # metric_name -> [(value, stderr_or_None, n), ...]
     for task_key, task_results in results.items():
         if task_key == benchmark_name or task_key.startswith(f"{benchmark_name}_p"):
+            n_samples = get_n_samples(n_samples_dict, task_key)
             collect_prompt_metrics(
-                task_results, get_n_samples(n_samples_dict, task_key),
+                task_results, n_samples,
                 bench_exclusions, metric_scale, metric_values,
             )
+            if zero_fill and not reports_metric(task_results, zero_fill):
+                se = resolve_se(zero_fill, 0.0, None, n_samples, metric_scale)
+                metric_values.setdefault(zero_fill, []).append((0.0, se, n_samples))
 
     for subtask_code, subtask_info in (subtasks or {}).items():
         subtask_key = f"{benchmark_name}_{subtask_code}"

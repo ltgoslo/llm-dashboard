@@ -237,14 +237,41 @@ export function taskBaseMetric(benchmark) {
   return has(wanted) ? wanted : has("acc") ? "acc" : info.main_metric;
 }
 
-/** Random baseline of a task for `metric`: the metric's own where the task
- *  declares one (`random_baselines`: NoReC's accuracy and conditional answer
- *  probability next to its macro-F1 main metric), else the task's. */
+/** Factor converting a value on a task's own scale (`metric_scale`, the
+ *  scale of its main metric, on which `max_performance` and the task-level
+ *  `random_baseline` are given) to the scale of `metric`: 1, unless the
+ *  metric lives on the other of the unit (0–1) / percent (0–100) scales —
+ *  e.g. TruthfulQA-gen's BLEU accuracy (unit) next to its ROUGE-L main
+ *  metric (percent). */
+function taskToMetricScale(benchmark, metric) {
+  const taskScale = state.metricsSetup[benchmark]?.metric_scale;
+  const metricScale = metric ? METRIC_SCALES[getBaseMetric(metric)] : undefined;
+  if (taskScale === "percent" && metricScale === "unit") return 0.01;
+  if (taskScale === "unit" && metricScale === "percent") return 100;
+  return 1;
+}
+
+/** Random baseline of a task for `metric`, on the metric's own scale: the
+ *  metric's own where the task declares one (`random_baselines`: NoReC's
+ *  accuracy and conditional answer probability next to its macro-F1 main
+ *  metric), else the task's, converted when the metric's scale differs from
+ *  the task's (see taskToMetricScale). */
 export function taskRandomBaseline(benchmark, metric) {
   const info = state.metricsSetup[benchmark];
   metric = metric || taskBaseMetric(benchmark);
   const own = metric ? info.random_baselines?.[llNormBase(getBaseMetric(metric))] : undefined;
-  return own != null ? own : info.random_baseline;
+  if (own != null) return own;
+  const f = taskToMetricScale(benchmark, metric);
+  return f === 1 ? info.random_baseline : info.random_baseline * f;
+}
+
+/** Perfect score of a task for `metric`, on the metric's own scale: the
+ *  task's `max_performance`, or 1 / 100 for a unit / percent metric shown
+ *  on a task of the other scale. */
+function taskMaxPerformance(benchmark, metric) {
+  const f = taskToMetricScale(benchmark, metric || taskBaseMetric(benchmark));
+  if (f === 1) return state.metricsSetup[benchmark].max_performance;
+  return f < 1 ? 1 : 100;
 }
 
 /** Whether a task is kept by the multisynt task-type selector (null/"all"
@@ -430,10 +457,11 @@ export function getCombinedCI(dataSource, entity, bench, shot, metric) {
 // ─────────────────────────────────────────────────────────────
 
 /** Baseline normalization: 0 = random baseline, 100 = perfect. The
- *  baseline is the task's, or the soft metric's own when `metric` is it. */
+ *  baseline is the task's, or the soft metric's own when `metric` is it;
+ *  both ends are on `metric`'s own scale (a 0–1 metric of a 0–100 task is
+ *  rescaled against 1, not against the task's 100). */
 export function baselineNorm(raw, benchmark, metric) {
-  const info = state.metricsSetup[benchmark];
-  const base = taskRandomBaseline(benchmark, metric), max = info.max_performance;
+  const base = taskRandomBaseline(benchmark, metric), max = taskMaxPerformance(benchmark, metric);
   return max === base ? 0 : ((raw - base) / (max - base)) * 100;
 }
 
@@ -478,8 +506,7 @@ function scaleDistance(dist, benchmark, metric, allRaw) {
   if (state.currentNormalization === "none") return toDisplayScale(dist, benchmark, metric);
   if (state.currentNormalization === "baseline") {
     if (!hasRandomBaseline(metric)) return toDisplayScale(dist, benchmark, metric);
-    const info = state.metricsSetup[benchmark];
-    const range = info.max_performance - taskRandomBaseline(benchmark, metric);
+    const range = taskMaxPerformance(benchmark, metric) - taskRandomBaseline(benchmark, metric);
     return range === 0 ? 0 : (dist / range) * 100;
   }
   if (state.currentNormalization === "minmax") {

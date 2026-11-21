@@ -96,7 +96,10 @@ For an instruction-tuned model, swap `data/noreval-gen/results/` and
    model in `data/noreval/`, `data/noreval-gen/`, and every NorOLMo checkpoint
    in `data/norolmo/progress/`
 2. Add a `<your-bench>:` entry to `metrics_setup.yaml` (pretty_name, main_metric,
-   random_baseline, category, evaluation_type, metric_scale, url)
+   random_baseline, category, evaluation_type, metric_scale, url). If another
+   metric shown in the metric selector has a different chance level than the
+   main metric, give it under `random_baselines:` (NoReC: `{acc: 0.5}` next to
+   its macro-F1 baseline)
 3. Run `build_data.py` and commit
 
 ### … new MultiSynt task
