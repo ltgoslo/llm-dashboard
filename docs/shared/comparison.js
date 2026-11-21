@@ -220,6 +220,10 @@ export async function initComparison(config) {
     // pages), and "Select all" from there returns to the default view.
     // Off: such a subset is task-averaged, as before.
     keepCategoryAverage: false,
+    // Most models drawn as bars; with more, the chart switches to the
+    // size-vs-score scatter plot (as it does when the size range is fully
+    // open), since that many bars become too thin to read.
+    maxBars: 40,
   }, config);
   plotlyConfig = makePlotlyConfig(CFG.filenamePrefix, exportMetadata);
 
@@ -1070,10 +1074,11 @@ function renderChart() {
 
   updateChartTitle();
 
-  // When the user fully opens the size range, the bar chart would squeeze
-  // 70+ models into illegible 1–2 pixel bars; switch to a scatter plot
-  // with model size on a log x-axis so each model becomes a distinct point.
-  const useScatter = isFullSizeRange();
+  // When the user fully opens the size range, or more than CFG.maxBars
+  // models are shown, the bar chart would squeeze them into illegible thin
+  // bars; switch to a scatter plot with model size on a log x-axis so each
+  // model becomes a distinct point.
+  const useScatter = isFullSizeRange() || getModelList().length > CFG.maxBars;
 
   if (isAggregateSelection(sel)) {
     if (!selectedTasks().length) renderEmptyState("No tasks selected – tick tasks below to compute the average");
@@ -1087,8 +1092,9 @@ function renderChart() {
   urlState.save();
 }
 
-/** True when the user has fully opened the size-range slider — the cue we
- *  use to switch from per-model bars to a size-vs-score scatter plot. */
+/** True when the user has fully opened the size-range slider — one of the
+ *  two cues (with more than CFG.maxBars models) for switching from
+ *  per-model bars to a size-vs-score scatter plot. */
 function isFullSizeRange() {
   return currentSizeMin <= CFG.sizeRangeMin && currentSizeMax >= CFG.sizeRangeMax;
 }
