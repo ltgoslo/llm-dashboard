@@ -202,6 +202,9 @@ const ERR_ANIM_DURATION = 250;
 const PHASE_OVERLAP = 250;   // ms by which phase 2 overlaps the tail of phase 1
 const BAR_ANIM_DEBOUNCE = 250;
 let lastPlotTime = 0;
+/** The next plotChart draws the bars at once (a re-layout of the same
+ *  chart, not a new one). */
+export function holdBarAnimation() { lastPlotTime = Date.now(); }
 let currentAnim = 0;   // monotonic id; in-flight rAF callbacks abort if outdated
 const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
@@ -332,6 +335,21 @@ function recaptureOnRedraw(chartEl) {
 // null, the bar is skipped this frame — better to do nothing than guess.
 function getBarNatRect(el) {
   return el._natRect || null;
+}
+
+/** A mouseleave into Plotly's drag cover — laid over the page while a
+ *  press lasts, so on every click — is no leaving: the mouse is still where
+ *  it was (the hover would otherwise drop until it moves). */
+function intoDragCover(ev) {
+  return !!ev.relatedTarget?.classList?.contains("dragcover");
+}
+
+/** The bars moved on the screen without a redraw (the page around them
+ *  slid): measure them again, and hover where the mouse is. */
+export function refreshBarHover(chartEl) {
+  if (!chartEl || chartEl._barAnimating) return;
+  captureNaturalRects(chartEl);
+  chartEl._barHoverRedrawn?.();
 }
 
 
@@ -577,6 +595,13 @@ function attachBarHoverHighlight(chartEl) {
         if (m < N) el.style.translate = `${curShift[m]}px 0`;
       });
     }
+    // Elements the page draws in a model's column (comparison.js: the open
+    // model's band) widen and move with its bar.
+    for (const { el, modelIdx } of chartEl._barFollowers?.() || []) {
+      if (modelIdx >= N) continue;
+      el.style.scale = `${curScale[modelIdx]} 1`;
+      el.style.translate = `${curShift[modelIdx]}px 0`;
+    }
   }
 
   // Bold the xtick + score label of the column the cursor sits inside.
@@ -608,6 +633,7 @@ function attachBarHoverHighlight(chartEl) {
     });
     AUX_SELECTORS.forEach((sel) =>
       chartEl.querySelectorAll(sel).forEach((el) => { el.style.translate = ""; }));
+    for (const { el } of chartEl._barFollowers?.() || []) { el.style.scale = ""; el.style.translate = ""; }
   }
 
   function frame(now) {
@@ -697,7 +723,8 @@ function attachBarHoverHighlight(chartEl) {
     pointer.x = ev.clientX; pointer.y = ev.clientY; pointer.active = true;
     ensureLoop();
   });
-  chartEl.addEventListener("mouseleave", () => {
+  chartEl.addEventListener("mouseleave", (ev) => {
+    if (intoDragCover(ev)) return;
     pointer.active = false;
     ensureLoop();
   });
@@ -1017,7 +1044,8 @@ function attachScatterHoverHighlight(chartEl) {
     pointer.x = ev.clientX; pointer.y = ev.clientY; pointer.active = true;
     ensureLoop();
   });
-  chartEl.addEventListener("mouseleave", () => {
+  chartEl.addEventListener("mouseleave", (ev) => {
+    if (intoDragCover(ev)) return;
     pointer.active = false;   // springs relax everything back to rest
     ensureLoop();
   });

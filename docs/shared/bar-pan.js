@@ -9,7 +9,7 @@
 //   • the ‹ › buttons, shown while there is more that way (from the
 //     keyboard: Enter / Space, ←/→ one bar, Home/End). They sit outside the
 //     plot, in the page's side padding; where that is too narrow for them
-//     (a tablet, a narrow window: buttonsFitOutside) they sit on top of the
+//     (a tablet, a narrow window: buttonFitsBeside) they sit on top of the
 //     plot's edges.
 // At an edge with more bars beyond, the bars run under a soft shadow. All of
 // the plot's content — bars, logos, the y-axis's numbers and the bars'
@@ -44,7 +44,9 @@ const pan = {
 
 const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 const minStart = () => -pan.lead;
-const maxStart = () => Math.max(minStart(), pan.total - pan.visible);
+/** The slots in sight: the view's, less those the details drawer covers. */
+const inSight = () => pan.visible - coverPx() / pan.slotPx;
+const maxStart = () => Math.max(minStart(), pan.total - inSight());
 const clampStart = (s) => Math.min(maxStart(), Math.max(minStart(), s));
 
 /** Turn panning on for the bar chart just drawn in `chart`, or off (null).
@@ -79,14 +81,47 @@ export function panBarsBy(bars) {
   if (pan.enabled) animateTo(pan.start + bars);
 }
 
-/** Whether the page's side padding beside a plot spanning `left`…`right`
- *  (px on the screen) holds the ‹ › buttons: true from a window about
- *  1260px wide (the column is 1152px). Narrower, they sit on top of the
- *  plot, and comparison.js leaves the bars without their names. */
-export function buttonsFitOutside(left, right) {
+/** Pan so that bar `i` is in full view (animated), if it isn't. */
+export function revealBar(i) {
+  if (!pan.enabled || i < 0) return;
+  if (i < pan.start) animateTo(i - 0.5);
+  else if (i > pan.start + inSight() - 1) animateTo(i - inSight() + 1.5);
+}
+
+/** The page around the chart changed (the model details drawer came or
+ *  went): the buttons and shadows placed again, the view kept within
+ *  reach (the bars the drawer covers panned to). */
+export function refreshBarPan() {
+  if (!pan.enabled) return;
+  position();
+  const s = clampStart(pan.start);
+  if (Math.abs(s - pan.start) > 1e-6) setStart(s);
+  else indicate();
+}
+
+/** Whether `room` px of the page's side padding, beside the plot, hold a
+ *  ‹ › button outside it: true from a window about 1260px wide (the column
+ *  is 1152px). Narrower, the buttons sit on top of the plot's edges, and
+ *  comparison.js leaves the bars without their names. */
+export function buttonFitsBeside(room) {
   const button = BUTTON_REM * parseFloat(getComputedStyle(document.documentElement).fontSize);
-  const room = Math.min(left, document.documentElement.clientWidth - right);
   return room >= SCREEN_EDGE_PX + button + BUTTON_GAP_PX;
+}
+
+/** The page's right edge on the screen: short of the window's while the
+ *  model details drawer covers it (the body's --page-cover-right,
+ *  style.css). */
+function pageRight() {
+  const cover = parseFloat(getComputedStyle(document.body).getPropertyValue("--page-cover-right")) || 0;
+  return document.documentElement.clientWidth - cover;
+}
+
+/** The px of the plot's right end under the details drawer (the chart
+ *  runs on under it, its bars as without it). */
+function coverPx() {
+  const size = pan.chart?._fullLayout?._size;
+  if (!size) return 0;
+  return Math.max(0, pan.chart.getBoundingClientRect().left + size.l + size.w - pageRight());
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -165,7 +200,7 @@ function ensureUI(chart) {
   pan.ui = { shadowL, shadowR, prev, next, all: [shadowL, shadowR, prev, next] };
 
   // A view's worth, keeping the bar at the edge in view.
-  const page = () => Math.max(1, Math.floor(pan.visible) - 1);
+  const page = () => Math.max(1, Math.floor(inSight()) - 1);
   prev.addEventListener("click", () => { if (!pan.dragged) panBarsBy(-page()); });
   next.addEventListener("click", () => { if (!pan.dragged) panBarsBy(page()); });
   for (const button of [prev, next]) {
@@ -187,25 +222,31 @@ function ensureUI(chart) {
 
 /** Put the shadows on the plot's edges (down to a little below the axis)
  *  and the buttons at mid-height outside them, in the page's side padding —
- *  or, where that is too narrow for them, on top of the plot's edges, both
- *  sides alike. The plot's position in the chart comes from Plotly's
- *  layout. */
+ *  or, on a side where that is too narrow for one, on top of the plot's
+ *  edge. Where the details drawer covers the plot's right end, › sits on
+ *  the drawer's edge, and the drawer's own shadow is the right one. The
+ *  plot's position in the chart comes from Plotly's layout. */
 function position() {
   const ui = pan.ui, size = pan.chart?._fullLayout?._size;
   if (!ui || !size || !pan.enabled) return;
   const x0 = pan.chart.offsetLeft + size.l, y0 = pan.chart.offsetTop + size.t;
+  const cover = coverPx(), w = size.w - cover;   // the plot in sight
   const tail = Math.min(SHADOW_TAIL_PX, size.b);
-  for (const [el, left] of [[ui.shadowL, x0], [ui.shadowR, x0 + size.w - SHADOW_PX]]) {
+  for (const [el, left] of [[ui.shadowL, x0], [ui.shadowR, x0 + w - SHADOW_PX]]) {
     Object.assign(el.style, { left: left + "px", top: y0 + "px", width: SHADOW_PX + "px", height: size.h + tail + "px" });
     el.style.setProperty("--tail", tail + "px");
   }
+  pan.chart.classList.toggle("bar-pan-covered", cover > 0);
+  pan.chart.style.setProperty("--pan-cover", cover + "px");
   const btn = ui.prev.offsetWidth;
   const plotLeft = pan.chart.getBoundingClientRect().left + size.l;
-  const outside = buttonsFitOutside(plotLeft, plotLeft + size.w);
-  ui.prev.style.left = (outside ? x0 - BUTTON_GAP_PX - btn : x0 + OVERLAY_INSET_PX) + "px";
-  ui.next.style.left = (outside ? x0 + size.w + BUTTON_GAP_PX : x0 + size.w - OVERLAY_INSET_PX - btn) + "px";
+  // Each side on its own: with the details drawer open, › sits on its edge.
+  const leftOut = buttonFitsBeside(plotLeft), rightOut = !cover && buttonFitsBeside(pageRight() - plotLeft - size.w);
+  ui.prev.style.left = (leftOut ? x0 - BUTTON_GAP_PX - btn : x0 + OVERLAY_INSET_PX) + "px";
+  ui.next.style.left = (rightOut ? x0 + size.w + BUTTON_GAP_PX : x0 + w - OVERLAY_INSET_PX - btn) + "px";
   ui.prev.style.top = ui.next.style.top = y0 + size.h / 2 + "px";
-  for (const button of [ui.prev, ui.next]) button.classList.toggle("over-plot", !outside);
+  ui.prev.classList.toggle("over-plot", !leftOut);
+  ui.next.classList.toggle("over-plot", !rightOut);
   clipScores(size);
 }
 

@@ -14,11 +14,12 @@ import {
   getBaseMetric, aggregateScores, isAggregateSelection, isMacroSelection,
   getEffectiveMetric, formatTitleWithShot, capitalize, taskTitleDescription,
   wantCI, normNeedsAllValues, scoreDecimals, taskBaseMetric, getNormYLabel,
+  toDisplayScale,
 } from "./core.js";
 import {
   makePlotlyConfig, getPlotlyLayout, plotChart,
   computeTickAngle, computeAnnotationFontSize, computeYRange,
-  makeYAxis, makeErrorY, Y_TICK_FONT,
+  makeYAxis, makeErrorY, Y_TICK_FONT, hexToRgb, holdBarAnimation, refreshBarHover,
 } from "./chart.js";
 import {
   showTooltip, hideTooltip, populateMetricSelector, hideMetricSelector,
@@ -33,8 +34,9 @@ import {
   PHONE_SCREEN, initModuleToggles, initChartJump, buildTaskPicker, syncTaskPicker, attachInfoCard,
   setGroupCheckbox, shortUrl,
 } from "./pickers.js";
-import { setBarPan, buttonsFitOutside } from "./bar-pan.js";
+import { setBarPan, buttonFitsBeside, revealBar, refreshBarPan } from "./bar-pan.js";
 import { UrlState } from "./url-state.js";
+import { createModelDetail, DETAIL_DRAWER, detailMotion } from "./model-detail.js";
 
 let CFG = null;            // Dashboard configuration (set in initComparison)
 let plotlyConfig = null;   // Built from CFG.filenamePrefix
@@ -329,6 +331,7 @@ export async function initComparison(config) {
     initChartJump();
     buildSettingsToggle();
     attachControlTooltips();
+    initModelDetail();
 
     // The `norm` URL field has a dynamic default ("baseline" for aggregate
     // selections, "none" otherwise). That default is only applied on save —
@@ -421,6 +424,7 @@ function resetViewState() {
   addDefaultModels();
   state.checkedTasks = new Set(Object.keys(state.metricsSetup));
   urlNormApplied = false;
+  detailModel = null;
 }
 
 /** Check the data's default model set. */
@@ -618,6 +622,16 @@ function setupUrlState() {
           // A list naming no known model (a stale link) keeps the default set.
           if (checkedModels.size === 0) addDefaultModels();
         }
+      },
+      default: "",
+    },
+    {
+      // The model whose details are open (renderChart drops one not in the chart).
+      key: "model",
+      get: () => (detailModel ? modelAlias._toAlias[detailModel] || detailModel : ""),
+      set: (v) => {
+        const dir = modelAlias._toSel[v] || v;
+        detailModel = isKnownModel(dir) ? dir : null;
       },
       default: "",
     },
@@ -1313,8 +1327,18 @@ function promptPhrase(n, nMax) {
     + ((fewer ? nMax : n) === 1 ? " prompt" : " prompts");
 }
 
+/** A tap on a touch screen is followed by the mouse events a browser
+ *  makes of it; Plotly answers its mousedown with a second click, carrying
+ *  the bar hovered before (which would show that bar's tooltip, or open
+ *  that model, again). */
+let lastTouchAt = -Infinity;
+document.addEventListener("touchstart", () => { lastTouchAt = performance.now(); }, { capture: true, passive: true });
+function touchEcho(ev) {
+  return ev?.type === "mousedown" && performance.now() - lastTouchAt < 1000;
+}
+
 function onChartHover(data) {
-  if (!data.points || !data.points.length) return;
+  if (!data.points || !data.points.length || touchEcho(data.event)) return;
   const pt = data.points[0];
   const cd = pt.customdata;
   const obj = cd != null && typeof cd === "object" ? cd : null;
@@ -1377,6 +1401,607 @@ function onChartHover(data) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Model details (model-detail.js)
+// ─────────────────────────────────────────────────────────────
+// A click on a model's bar (or row, or scatter point) opens its details: on
+// a wide screen in a drawer over the page's right end, otherwise in a panel
+// under the chart. With a mouse, a click on the open model's bar closes them
+// again; a tap on a touch screen still shows the bar's tooltip too (the bars
+// there often go without names) and leaves the page where it is. The
+// details' × or Esc closes them; ← / → step to the neighbouring bar. A link
+// with the model in it (URL `model`) opens them. What they show doesn't
+// follow the chart's settings (modelDetailData).
+//
+// The open model's bar is marked: a band of its colour behind it (which
+// widens and moves with the bar under the mouse: chart.js _barFollowers),
+// its name in bold. The band fades in and out and glides to the next model.
+//
+// The drawer leaves the page's layout as it is: the page slides left only as
+// far as the controls need to clear it (placeDrawer), and the chart runs on
+// under it — a panning bar chart pans to the bars it covers (bar-pan.js);
+// another chart is laid out again to end at its edge. The motion — the
+// drawer's slide, the page's shift, the band — runs together on Web
+// Animations, with the heavy work (building the drawer, the page's layout,
+// the band's relayout) done before it starts and any relayout of the chart
+// after it. The bar hover follows the mouse through all this (rehover).
+
+let detailModel = null;        // the model whose details are open, or null
+let detailView = null;         // model-detail.js's drawer / panel
+let detailShot = null;         // the shot the details show (null: the page's default)
+let detailCache = null;        // {key, data}: the details' last content
+let bandModel = null;          // the model whose band the chart shows
+let bandFadingOut = false;     // …still, while the band fades out
+let drawerMove = null;         // the drawer's opening or closing under way (a token)
+let lastPointer = null;        // the mouse's last place on the page, {x, y}
+const SELECTED_MARK = "selected model";   // names the open model's band
+const BAND_ALPHA = 0.12;
+const FINE_POINTER = window.matchMedia("(hover: hover) and (pointer: fine)");
+const DRAWER_SCREEN = window.matchMedia(DETAIL_DRAWER);
+const nextFrame = () => new Promise((resolve) => requestAnimationFrame(() => resolve()));
+
+function initModelDetail() {
+  const chart = document.getElementById("chart");
+  const zone = chart?.closest(".chart-zone");
+  if (!zone) return;
+  detailView = createModelDetail(zone, {
+    onClose: () => selectModelDetail(null),
+    onShot: (shot) => { detailShot = shot; refreshModelDetail(); },
+  });
+  chart._barFollowers = bandFollowers;
+  // Across the breakpoint the drawer and the panel swap.
+  DRAWER_SCREEN.addEventListener("change", () => {
+    if (!detailModel) return;
+    holdBarAnimation();
+    renderChart();
+  });
+  // The drawer's place follows the page's width and the controls' (a view
+  // with more of them, a task's longer name).
+  const replace = () => { if (drawerSettled()) placeDrawerAgain(); };
+  window.addEventListener("resize", replace);
+  if ("ResizeObserver" in window) new ResizeObserver(replace).observe(zone);
+  // The mouse leaving the chart ends its hover. A browser misses the
+  // leaving when the element under a still mouse was redrawn (a chart laid
+  // out again): then the mouse's next move off the chart tells it.
+  let mouseInChart = false;
+  document.addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "mouse") return;
+    lastPointer = { x: e.clientX, y: e.clientY };
+    const inside = chart.contains(e.target);
+    if (mouseInChart && !inside && !e.target.classList?.contains("dragcover")) {
+      chart.dispatchEvent(new MouseEvent("mouseleave", { relatedTarget: e.target }));
+    }
+    mouseInChart = inside;
+  }, { passive: true });
+  document.documentElement.addEventListener("mouseleave", () => { lastPointer = null; });
+  chart.addEventListener("mouseleave", (e) => {
+    if (!FINE_POINTER.matches || e.relatedTarget?.classList?.contains("dragcover")) return;
+    Plotly.Fx?.unhover(chart);
+    hideTooltip();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (!detailModel || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    if (e.key === "Escape") { selectModelDetail(null); return; }
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    // Not from a control that takes the arrow keys itself (a slider's
+    // thumb, the pan buttons, a dropdown, the model search).
+    const t = e.target;
+    if (t !== document.body && !t.closest?.(".model-detail")) return;
+    if (t.matches?.("input, select, textarea")) return;
+    const order = barOrder();
+    const i = order.indexOf(detailModel), j = i + (e.key === "ArrowLeft" ? -1 : 1);
+    if (i < 0 || j < 0 || j >= order.length) return;
+    e.preventDefault();
+    selectModelDetail(order[j]);
+    revealBar(j);
+  });
+}
+
+/** The models in the bar chart's order (its ranking; top to bottom in
+ *  rows), or [] for another chart. */
+function barOrder() {
+  const gd = document.getElementById("chart");
+  return gd?.data?.[0]?.type === "bar" && gd._barModels ? gd._barModels : [];
+}
+
+/** After a chart's newPlot: a click on a model's bar or point opens it;
+ *  with a mouse, the pointer says the bars can be clicked. */
+function bindModelDetailClicks(chartEl) {
+  if (!chartEl) return;
+  chartEl.on("plotly_click", (data) => { if (!touchEcho(data.event)) openFromChart(data.points?.[0]?.customdata?.modelDir); });
+  const drag = () => chartEl.querySelector(".nsewdrag");
+  chartEl.on("plotly_hover", () => { if (FINE_POINTER.matches) drag()?.classList.add("bar-clickable"); });
+  chartEl.on("plotly_unhover", () => drag()?.classList.remove("bar-clickable"));
+}
+
+/** A click (or tap) on model `m` in the chart. */
+function openFromChart(m) {
+  if (!m) return;
+  if (FINE_POINTER.matches) selectModelDetail(m === detailModel ? null : m);
+  else selectModelDetail(m, { tap: true });
+}
+
+/** Open model `m`'s details (null: close them). The panel comes into
+ *  sight: scrolled to after a click, a button to it after a tap (which
+ *  shows the bar's tooltip, left open). */
+function selectModelDetail(m, { tap = false } = {}) {
+  if (m === detailModel) {
+    if (m && tap) detailView?.reveal("button");
+    return;
+  }
+  const was = detailModel;
+  detailModel = m;
+  urlState.save();
+  if (DRAWER_SCREEN.matches && !was !== !m) {
+    if (m) openDrawer(); else closeDrawer(was);
+    return;
+  }
+  if (m) {
+    detailView.show(modelDetailData(m), { reveal: tap ? "button" : "scroll" });
+    loadDetailModels(m);
+  } else {
+    detailView.hide({ animate: true });
+  }
+  moveBand(m)?.play?.();
+}
+
+/** The drawer slides in, the page shifting with it if the controls need
+ *  room, the band fading in. All the heavy work comes first, before
+ *  anything moves: the drawer's content (laid out off the window), the
+ *  page's layout for it, the band's relayout. Once in, a chart that
+ *  doesn't pan is laid out again to end at the drawer's edge, and the
+ *  chart pans to the open model's bar if the drawer covers it. */
+async function openDrawer() {
+  const move = drawerMove = {};
+  const cl = document.body.classList;
+  const shift = placeDrawer();
+  cl.add("detail-layout");
+  detailView.show(modelDetailData(detailModel), { offWindow: true });
+  loadDetailModels(detailModel);
+  const band = moveBand(detailModel, { wait: true });
+  await nextFrame();
+  await nextFrame();   // (laid out and painted, nothing moved yet)
+  if (move !== drawerMove) return;
+  const motion = [detailView.slide(true), ...shiftPage(0, -shift), band?.()].filter(Boolean);
+  await Promise.all(motion.map((a) => a.finished.catch(() => {})));
+  if (move !== drawerMove) return;
+  cl.add("detail-open", "detail-cover");   // (the page's shift held by style.css now)
+  for (const a of motion) a.cancel();
+  drawerMove = null;
+  const chart = document.getElementById("chart");
+  if (chartCovered() > 0 && !chart.classList.contains("bar-pan")) {
+    holdBarAnimation();
+    renderChart();
+  } else {
+    refreshBarPan();
+    refreshBarHover(chart);   // (the bars moved with the page)
+    refreshModelDetail();     // (results that came in while it moved)
+  }
+  revealBar(barOrder().indexOf(detailModel));
+  rehover();
+}
+
+/** The drawer slides off, the page shifting back, the band fading out. A
+ *  chart laid out to end at the drawer is first drawn whole again (under
+ *  it, before anything moves). */
+async function closeDrawer(was) {
+  const move = drawerMove = {};
+  const cl = document.body.classList;
+  const shift = cl.contains("detail-open") ? pageShift() : 0;
+  cl.remove("detail-cover");
+  bandModel = was;
+  if (chartCut() > 0) {
+    setChartCut(0);
+    holdBarAnimation();
+    renderChart();
+    await nextFrame();
+    await nextFrame();
+    if (move !== drawerMove) return;
+  } else {
+    refreshBarPan();   // (› back outside the plot, under the drawer still)
+  }
+  cl.remove("detail-open");   // (the shift's motion takes over from here)
+  const motion = [detailView.slide(false), ...shiftPage(-shift, 0), moveBand(null)].filter(Boolean);
+  await Promise.all(motion.map((a) => a.finished.catch(() => {})));
+  if (move !== drawerMove) return;
+  cl.remove("detail-layout");
+  for (const a of motion) a.cancel();
+  drawerMove = null;
+  const chart = document.getElementById("chart");
+  refreshBarPan();
+  refreshBarHover(chart);   // (the bars moved back with the page)
+  rehover();
+}
+
+/** The page (its columns, and the flag line's flag) slides from `from` to
+ *  `to` px: the Animations, held at `to` when done. */
+function shiftPage(from, to) {
+  if (Math.abs(from - to) < 0.5) return [];
+  const frames = [{ transform: `translateX(${from}px)` }, { transform: `translateX(${to}px)` }];
+  const motion = [...document.querySelectorAll(".band-inner")].map((e) => e.animate(frames, detailMotion({ fill: "forwards" })));
+  const flag = document.querySelector(".flag-line");
+  if (flag) motion.push(flag.animate(frames, detailMotion({ fill: "forwards", pseudoElement: "::before" })));
+  return motion;
+}
+
+/** Whether the drawer is open beside the chart, settled. */
+function drawerSettled() {
+  return DRAWER_SCREEN.matches && document.body.classList.contains("detail-open") && !drawerMove;
+}
+
+/** Whether the drawer covers the page's right end (renders keep to its
+ *  edge or run under it). */
+function drawerBeside() {
+  return DRAWER_SCREEN.matches && document.body.classList.contains("detail-cover");
+}
+
+const bodyPx = (name) => parseFloat(document.body.style.getPropertyValue(name)) || 0;
+/** The page's shift for the open drawer (px, leftwards). */
+function pageShift() { return document.body.classList.contains("detail-open") ? bodyPx("--page-shift") : 0; }
+/** The drawer's left edge on the screen. */
+function drawerEdge() { return document.documentElement.clientWidth - (bodyPx("--drawer-w") || DRAWER_MAX_PX); }
+/** The px of the chart's box the drawer would cover (the box as without a cut). */
+function chartCovered() {
+  const f = closedChartFrame();
+  return Math.max(0, f.left + f.width - pageShift() - drawerEdge());
+}
+function chartCut() { return bodyPx("--chart-cut"); }
+function setChartCut(px) { document.body.style.setProperty("--chart-cut", Math.max(0, Math.ceil(px)) + "px"); }
+
+/** The chart's width and left edge on the screen without the drawer: from
+ *  the layout (the page's shift is a transform; a cut left out). */
+function closedChartFrame() {
+  const chart = document.getElementById("chart");
+  const zone = chart.closest(".chart-zone");
+  const reach = -parseFloat(getComputedStyle(chart).marginLeft) || 0;   // into the page's padding
+  return { width: zone.offsetWidth + reach, left: layoutLeft(zone) - reach };
+}
+
+/** An element's left edge in the page's layout (transforms left out). */
+function layoutLeft(el) {
+  let x = 0;
+  for (let e = el; e; e = e.offsetParent) x += e.offsetLeft;
+  return x - window.scrollX;
+}
+
+const DRAWER_MAX_PX = 420, DRAWER_MIN_PX = 360;
+const DRAWER_GAP_PX = 12;     // between the controls (or the sections below) and the drawer
+const PAGE_KEEP_LEFT_PX = 60; // the page slides left no further: ‹ stays outside the plot
+
+/** The drawer's place, the page's layout kept (style.css body.detail-*):
+ *  the page slides left (--page-shift) just far enough for the controls'
+ *  right end to clear the drawer, keeping room for ‹ on the left; failing
+ *  that, the drawer narrows (--drawer-w, to DRAWER_MIN_PX), and failing
+ *  that too, the controls wrap (--controls-inset). The sections below the
+ *  chart clear it (--page-inset). Returns the shift. */
+function placeDrawer() {
+  const body = document.body, chart = document.getElementById("chart");
+  const zone = chart?.closest(".chart-zone");
+  if (!zone) return 0;
+  const W = document.documentElement.clientWidth;
+  body.style.setProperty("--controls-inset", "0px");   // (measured unwrapped)
+  const zoneLeft = layoutLeft(zone), zoneRight = zoneLeft + zone.offsetWidth;
+  const zr = zone.getBoundingClientRect();
+  const controlsRight = zoneLeft + Math.max(0, ...[...zone.querySelectorAll(".controls-bar .control-group")]
+    .filter((g) => g.offsetParent).map((g) => g.getBoundingClientRect().right - zr.left));
+  const maxShift = Math.max(0, zoneLeft - PAGE_KEEP_LEFT_PX);
+  const need = (w) => controlsRight + DRAWER_GAP_PX - (W - w);
+  let width = DRAWER_MAX_PX;
+  const shift = Math.round(Math.min(maxShift, Math.max(0, need(width))));
+  if (need(width) > maxShift) width = Math.max(DRAWER_MIN_PX, W - (controlsRight - shift) - DRAWER_GAP_PX);
+  const edge = W - width;
+  body.style.setProperty("--drawer-w", width + "px");
+  body.style.setProperty("--page-shift", shift + "px");
+  body.style.setProperty("--controls-inset", Math.max(0, Math.ceil(controlsRight - shift + DRAWER_GAP_PX - edge)) + "px");
+  body.style.setProperty("--page-inset", Math.max(0, Math.ceil(zoneRight - shift + 24 - edge)) + "px");
+  return shift;
+}
+
+/** placeDrawer with the drawer open: a changed shift glides. */
+function placeDrawerAgain() {
+  const was = pageShift();
+  const shift = placeDrawer();
+  if (shift !== was) {
+    shiftPage(-was, -shift).forEach((a) => a.finished.then(() => a.cancel(), () => {}));
+    refreshBarPan();
+  }
+}
+
+/** Before a render: with no opening or closing under way, the page as the
+ *  details want it — a drawer open or not (a link opening one; across the
+ *  breakpoint) — and the band. */
+function syncModelDetail() {
+  if (!drawerMove) {
+    const cl = document.body.classList;
+    if (detailModel && DRAWER_SCREEN.matches) {
+      if (cl.contains("detail-open")) placeDrawerAgain();
+      else { placeDrawer(); cl.add("detail-layout", "detail-open", "detail-cover"); }
+    } else {
+      cl.remove("detail-layout", "detail-open", "detail-cover");
+      setChartCut(0);
+    }
+  }
+  if (!bandFadingOut) bandModel = detailModel;
+}
+
+/** After a render: the details show the open model (their content doesn't
+ *  follow the chart; it changes with the details' shot, or as the models'
+ *  results come in — a link opening the details loads the compared models
+ *  here). */
+function refreshModelDetail() {
+  if (!detailView || drawerMove) return;
+  if (detailModel) {
+    detailView.show(modelDetailData(detailModel));
+    loadDetailModels(detailModel);
+  } else {
+    detailView.hide();
+  }
+}
+
+/** After a redraw under the mouse: replayPointer, now and (a new chart
+ *  is finished asynchronously, its logos loading) once Plotly's drag layer
+ *  is there. */
+function rehover() {
+  replayPointer();
+  replayPointerSoon();
+}
+
+/** replayPointer at the next frame (once, however often asked: a pan);
+ *  while the mouse is over the plot and its drag layer isn't drawn yet, a
+ *  few frames later. */
+let replayFrame = null;
+function replayPointerSoon(tries = 30) {
+  if (replayFrame !== null) return;
+  replayFrame = requestAnimationFrame(() => {
+    replayFrame = null;
+    if (replayPointer() === "wait" && tries > 1) replayPointerSoon(tries - 1);
+  });
+}
+
+/** Hover the chart where the mouse is (after a redraw or a relayout that
+ *  moved things under a still mouse): the bar's magnification, its bold
+ *  name and its tooltip follow the mouse, not where it was. */
+function replayPointer() {
+  if (!lastPointer || !FINE_POINTER.matches) return;
+  const { x, y } = lastPointer;
+  const chart = document.getElementById("chart");
+  const el = document.elementFromPoint(x, y);
+  if (!chart || !el || !chart.contains(el)) return;
+  // Over the plot, to Plotly's drag layer (its hover listens there; the
+  // event bubbles on to the chart's own hover); elsewhere on the chart, to
+  // the element there.
+  const fl = chart._fullLayout, c = chart.getBoundingClientRect();
+  const overPlot = !!fl?._size && x >= c.left + fl._size.l && x <= c.left + fl._size.l + fl._size.w
+    && y >= c.top + fl._size.t && y <= c.top + fl._size.t + fl._size.h;
+  const drag = chart.querySelector(".nsewdrag");
+  if (overPlot && !drag) return "wait";
+  (overPlot ? drag : el).dispatchEvent(new MouseEvent("mousemove", { clientX: x, clientY: y, bubbles: true, cancelable: true, view: window }));
+}
+
+/** The band's colour for model `m`, [r, g, b, alpha]. */
+function bandColor(m, alpha) {
+  const c = getModelColor(m);
+  return [...(/^#[0-9a-f]{6}$/i.test(c) ? hexToRgb(c) : [99, 102, 241]), alpha];
+}
+const rgbaText = ([r, g, b, a]) => `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${+a.toFixed(3)})`;
+const rgbText = ([r, g, b]) => `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+
+/** The band shape behind bar (row: `horizontal`) `pos`. */
+function bandShape(pos, color, horizontal) {
+  const across = horizontal
+    ? { xref: "paper", yref: "y", x0: 0, x1: 1, y0: pos - 0.5, y1: pos + 0.5 }
+    : { xref: "x", yref: "paper", x0: pos - 0.5, x1: pos + 0.5, y0: 0, y1: 1 };
+  return { type: "rect", name: SELECTED_MARK, layer: "below", ...across, fillcolor: rgbaText(color), line: { width: 0 } };
+}
+
+/** The bar names with the open model's in bold (a row's name may run over
+ *  two lines). */
+function boldLabels(labels, i) {
+  return labels.map((l, j) => (j === i ? l.split("<br>").map((part) => "<b>" + part + "</b>").join("<br>") : l));
+}
+
+/** The open model's band and bold name, for a bar chart's layout. */
+function selectionMark(modelNames, labels, horizontal = false) {
+  const i = bandModel ? modelNames.indexOf(bandModel) : -1;
+  return {
+    shapes: i < 0 ? [] : [bandShape(i, bandColor(bandModel, BAND_ALPHA), horizontal)],
+    ticktext: boldLabels(labels, detailModel ? modelNames.indexOf(detailModel) : -1),
+  };
+}
+
+/** The band's path in the bar chart as drawn. */
+function bandPath(gd) {
+  const k = (gd.layout.shapes || []).findIndex((sh) => sh.name === SELECTED_MARK);
+  return k < 0 ? null : gd.querySelector(`.shapelayer path[data-index="${k}"]`);
+}
+
+/** The band and the bold name as bandModel and detailModel want them, in
+ *  one relayout of the bar chart as drawn. */
+function setBand(gd, horizontal, order) {
+  const shapes = (gd.layout.shapes || []).filter((sh) => sh.name !== SELECTED_MARK);
+  const i = bandModel ? order.indexOf(bandModel) : -1;
+  if (i >= 0) shapes.push(bandShape(i, bandColor(bandModel, BAND_ALPHA), horizontal));
+  Plotly.relayout(gd, {
+    shapes, [horizontal ? "yaxis.ticktext" : "xaxis.ticktext"]: boldLabels(gd._barLabels, detailModel ? order.indexOf(detailModel) : -1),
+  });
+}
+
+/** The band to model `to`'s bar on the bar chart as drawn (null: away),
+ *  and its motion on the new path: fading in, gliding from the old bar
+ *  (taking the new colour), or fading out (then gone, in one relayout).
+ *  Returns the motion's Animation, started; with `wait`, a function that
+ *  starts it (the band unseen till then). The relayout comes first, the
+ *  motion runs on the path alone (no relayouts while it moves). */
+function moveBand(to, { wait = false } = {}) {
+  const gd = document.getElementById("chart");
+  const order = barOrder();
+  const from = bandModel;
+  if (!order.length) { bandModel = to; bandFadingOut = false; return null; }
+  const horizontal = gd.data[0].orientation === "h";
+  const ax = horizontal ? gd._fullLayout.yaxis : gd._fullLayout.xaxis;
+  const iFrom = from ? order.indexOf(from) : -1, iTo = to ? order.indexOf(to) : -1;
+  let path, frames, fill;
+  if (iTo < 0) {
+    path = bandPath(gd);
+    const gone = () => {
+      if (!bandFadingOut) return;
+      bandFadingOut = false;
+      bandModel = detailModel;
+      setBand(gd, horizontal, barOrder());
+    };
+    bandFadingOut = true;
+    if (!path) { gone(); return null; }
+    frames = [{ opacity: 1 }, { opacity: 0 }];
+    fill = "forwards";
+    const start = () => {
+      const a = path.animate(frames, detailMotion({ fill }));
+      a.finished.then(gone, () => {});
+      return a;
+    };
+    return wait ? start : start();
+  }
+  bandFadingOut = false;
+  bandModel = to;
+  setBand(gd, horizontal, order);
+  path = bandPath(gd);
+  if (!path || iFrom === iTo) return null;
+  if (iFrom < 0) frames = [{ opacity: 0 }, { opacity: 1 }];
+  else {
+    const d = ax.l2p(iFrom) - ax.l2p(iTo);
+    frames = [{ transform: horizontal ? `translateY(${d}px)` : `translateX(${d}px)`, fill: rgbText(bandColor(from, 1)) },
+      { transform: "none", fill: rgbText(bandColor(to, 1)) }];
+  }
+  if (wait) path.style.opacity = "0";
+  const start = () => {
+    path.style.opacity = "";
+    return path.animate(frames, detailMotion());
+  };
+  return wait ? start : start();
+}
+
+/** chart.js's bar hover: the band, with its bar's index (it widens and
+ *  moves with the bar). */
+function bandFollowers() {
+  const gd = document.getElementById("chart");
+  const i = bandModel ? barOrder().indexOf(bandModel) : -1;
+  if (i < 0 || gd.data[0].orientation === "h") return [];
+  const el = bandPath(gd);
+  if (!el) return [];
+  el.style.transformBox = "fill-box";
+  el.style.transformOrigin = "50% 50%";
+  return [{ el, modelIdx: i }];
+}
+
+/** The variant a task's name doesn't say (its written standard). */
+function taskVariant(bench, name) {
+  if (/[→↔]|Bokmål|Nynorsk|English|Sámi/.test(name)) return "";
+  return bench.endsWith("_nob") ? "Bokmål" : bench.endsWith("_nno") ? "Nynorsk" : "";
+}
+
+/** Run `fn` with state's fields patched (restored after). */
+function withState(patch, fn) {
+  const saved = {};
+  for (const k of Object.keys(patch)) { saved[k] = state[k]; state[k] = patch[k]; }
+  try { return fn(); } finally { Object.assign(state, saved); }
+}
+
+/** The details' shot: the one picked in them, else the page's default. */
+function detailShotNow() {
+  const shots = shotValues();
+  if (shots.includes(detailShot)) return detailShot;
+  return shots.includes(CFG.defaultShot) ? CFG.defaultShot : shots[shots.length - 1];
+}
+
+/** The models the details compare model `m` with: the dashboard's default
+ *  models (whose results are in), and `m`. */
+function detailModels(m, loadedOnly = true) {
+  const base = (state.DATA.default_models || allModelIds()).filter(isKnownModel);
+  const all = base.includes(m) ? base : [...base, m];
+  return loadedOnly ? all.filter((x) => Object.hasOwn(state.DATA.models, x)) : all;
+}
+
+/** Load the compared models' results not in yet (the details follow). */
+function loadDetailModels(m) {
+  const missing = detailModels(m, false).filter((x) => !Object.hasOwn(state.DATA.models, x));
+  if (missing.length) ensureModelsLoaded(missing).then(() => { if (detailModel) refreshModelDetail(); });
+}
+
+/** The details' content for model `m`, whatever the chart shows: with the
+ *  best prompt and random-baseline rescaling, over all tasks — its card
+ *  (facts: lines of items); its category average at each shot; and its
+ *  profile at the details' shot: per category, the category average and
+ *  each task's score, each with every compared model's (detailModels)
+ *  score on the same scale. */
+function modelDetailData(m) {
+  const shot = detailShotNow();
+  const models = detailModels(m);
+  const key = [m, shot, models.join(",")].join("|");
+  if (detailCache?.key === key) return detailCache.data;
+  const tasks = Object.keys(state.metricsSetup);
+  const fixed = {
+    currentShot: shot, currentPromptAgg: "max", currentNormalization: "baseline", currentMetric: null,
+    currentTaskSelection: DEFAULT_SELECTION, checkedTasks: new Set(tasks),
+  };
+  const data = withState(fixed, () => {
+    const idx = models.indexOf(m);
+    const fmt = scoreDecimals();
+    const ok = (v) => v != null && !Number.isNaN(v);
+    const text = (v) => (ok(v) ? v.toFixed(fmt) : "–");
+    const mine = (vals) => ({ value: ok(vals[idx]) ? vals[idx] : null, text: text(vals[idx]) });
+    // The category average over all tasks at each shot count (the shot
+    // shown in the details is one of them: the label says no shot).
+    const headline = { label: capitalize(getChartTitleText().replace(` (${shot}-shot)`, "")) };
+    const shots = shotValues().map((s) => ({
+      shot: s, current: s === shot, text: text(withState({ currentShot: s }, () => aggregateModelResult(m, models)?.score)),
+    }));
+    const byCat = new Map();
+    for (const b of tasks) {
+      const all = models.map((mm) => {
+        const raw = getScore(state.DATA.models, mm, b, shot);
+        return raw === undefined ? null : normScore(raw, b, null);
+      });
+      const info = state.metricsSetup[b];
+      const name = info.pretty_name || b;
+      const cat = info.category || "other";
+      if (!byCat.has(cat)) byCat.set(cat, []);
+      byCat.get(cat).push({ key: b, name, variant: taskVariant(b, name), ...mine(all), all });
+    }
+    // Categories as the tooltip lists them; a category's value is the mean
+    // of its task scores (categoryBreakdown).
+    const groups = [...byCat].sort(([a], [b]) => a.localeCompare(b)).map(([cat, rows]) => {
+      rows.sort((a, b) => a.name.localeCompare(b.name) || a.variant.localeCompare(b.variant));
+      const all = models.map((_, j) => {
+        const vs = rows.map((r) => r.all[j]).filter(ok);
+        return vs.length ? vs.reduce((x, y) => x + y, 0) / vs.length : null;
+      });
+      return { key: "__cat__" + cat, name: capitalize(cat), ...mine(all), all, rows };
+    });
+    // One scale for every row, from the lowest to the highest value shown.
+    const values = groups.flatMap((g) => [...g.all, ...g.rows.flatMap((r) => r.all)]).filter(ok);
+    if (!values.length) values.push(0);
+    let lo = Math.min(...values), hi = Math.max(...values);
+    if (!(hi > lo)) { lo -= 1; hi += 1; }
+    const pad = (hi - lo) * 0.03;
+    return { headline, shots, groups, domain: [lo - pad, hi + pad] };
+  });
+  const info = state.DATA.model_info?.[m];
+  const url = info?.huggingface_url;
+  const color = getModelColor(m);
+  const params = state.DATA.model_parameters?.[m];
+  Object.assign(data, {
+    model: m, title: getModelLabel(m), color, signature: shot + "|" + models.join(","), others: models.length - 1,
+    badge: () => orgBadge(modelOrg(m), color),
+    facts: [
+      [modelOrg(m), params ? formatModelSize(params) + " parameters" : ""].filter(Boolean),
+      [info?.license ? "License: " + info.license : "", getModelOpenLabel(m)].filter(Boolean),
+    ].filter((line) => line.length),
+    description: info?.description || "",
+    link: url ? { href: url, text: shortUrl(url) } : null,
+  });
+  detailCache = { key, data };
+  return data;
+}
+
+// ─────────────────────────────────────────────────────────────
 // Chart rendering
 // ─────────────────────────────────────────────────────────────
 
@@ -1396,6 +2021,7 @@ function renderChart() {
   syncSettingsSummary();
 
   updateChartTitle();
+  syncModelDetail();
 
   // Results in per-model files: when the view shows models whose results
   // aren't loaded yet, fetch them and render then. Only the latest render
@@ -1414,6 +2040,7 @@ function renderChart() {
   // renderModelBars); the pan controls are off for every other chart.
   const useScatter = !sizeFilterOn;
   setBarPan(document.getElementById("chart"), null);
+  if (drawerBeside()) setChartCut(0);   // (the renderers cut the chart for the drawer where they need)
   document.getElementById("chart")._exportFigure = null;   // (renderModelBars may set one)
 
   if (!getModelList().length) {
@@ -1428,6 +2055,7 @@ function renderChart() {
   }
 
   urlState.save();
+  refreshModelDetail();
 }
 
 /** Why the chart has no model to show — none selected, or the size range
@@ -1629,7 +2257,7 @@ function bindNarrowScreenListeners() {
     timer = setTimeout(() => {
       if (window.innerWidth === width) return;
       width = window.innerWidth;
-      if (useHorizontalBars() || barPanChanges() || barNamesChange()) renderChart();
+      if (useHorizontalBars() || barPanChanges() || barNamesChange() || drawerBeside()) renderChart();
     }, 200);
   });
   // A touch closes the tooltip wherever it lands (a tap on a bar reopens it
@@ -1650,6 +2278,7 @@ function bindNarrowScreenListeners() {
     const i = Math.round(fl.yaxis.p2l(y));
     if (!trace.customdata?.[i]) return;
     onChartHover({ points: [{ customdata: trace.customdata[i], x: trace.x[i], y: i }], event: e });
+    openFromChart(trace.customdata[i].modelDir);
   });
 }
 
@@ -1715,18 +2344,20 @@ function setChartExtraHeight(extra) {
 
 /** Whether the bars carry their names under them: not on a narrow page (a
  *  tablet, a window under about 1260px), whose side padding can't hold the
- *  first names — nor the pan buttons (bar-pan.js buttonsFitOutside). There
+ *  first names — nor the pan buttons (bar-pan.js buttonFitsBeside). There
  *  the plot spans the column, as on a wide page, instead of leaving room
- *  for the names, and a bar's tooltip (a tap or hover) names it. */
-function showBarNames(chartEl) {
-  const r = chartEl.getBoundingClientRect();
-  return buttonsFitOutside(r.left + BAR_MARGIN.l, r.right);
+ *  for the names, and a bar's tooltip (a tap or hover) names it. `left`:
+ *  the chart's left edge on the screen (with the drawer open, where it is
+ *  without the drawer). */
+function showBarNames(chartEl, left = chartEl.getBoundingClientRect().left) {
+  return buttonFitsBeside(left + BAR_MARGIN.l);
 }
 
 /** Whether a resize crosses that width: the bars gain or lose their names. */
 function barNamesChange() {
   const chart = document.getElementById("chart");
-  return !!chart && sizeFilterOn && !useHorizontalBars() && showBarNames(chart) !== barNamesShown;
+  return !!chart && sizeFilterOn && !useHorizontalBars()
+    && showBarNames(chart, drawerBeside() ? closedChartFrame().left : undefined) !== barNamesShown;
 }
 
 /** The bars ordered by performance: highest value first (every metric of
@@ -1777,15 +2408,23 @@ function renderModelBars(modelNames, opts) {
     ...(ciValues && { error_y: makeErrorY(ciValues) }),
   };
   const chartEl = document.getElementById("chart");
-  const chartWidth = chartEl?.clientWidth || 1200;
-  barNamesShown = chartEl ? showBarNames(chartEl) : true;
+  // With the drawer open, the bars as wide and named as without it, so
+  // opening and closing it moves none: a chart that pans runs on under the
+  // drawer (bar-pan.js pans to the bars it covers); one whose bars all fit
+  // ends at the drawer's edge, panning to those it would cover.
+  const closed = drawerBeside() ? closedChartFrame() : null;
+  barNamesShown = chartEl ? showBarNames(chartEl, closed?.left) : true;
   // The y-axis's ticks, as Plotly would place them on the plot's height
   // (which stays the stylesheet's chart height less the default margins,
   // whatever the names need: setChartExtraHeight), and their column.
   setChartExtraHeight(0);
   const yTicks = barYTicks(yRange, (chartEl?.clientHeight || 500) - BAR_MARGIN.t - BAR_MARGIN.b);
   barYLabelPx = Math.ceil(Math.max(0, ...measureLabels(yTicks.map((tk) => tk.text), Y_TICK_FONT.size, Y_TICK_FONT.weight))) + Y_LABEL_GAP_PX;
-  const view = barView(labels, chartWidth, barNamesShown, barYLabelPx);
+  const asClosed = closed ? barView(labels, closed.width, barNamesShown, barYLabelPx) : null;
+  if (closed) setChartCut(asClosed.panning ? 0 : chartCovered());
+  const cut = closed ? chartCut() > 0 : false;
+  const chartWidth = chartEl?.clientWidth || 1200;
+  const view = barView(labels, chartWidth, barNamesShown, barYLabelPx, cut ? asClosed.slotPx : null);
   const { tickAngle, labelShift, margin, lead } = view;
   setChartExtraHeight(margin.b - BAR_MARGIN.b);
   if (view.panning) barViewStart = Math.min(Math.max(-lead, barViewStart), labels.length - view.visible);
@@ -1817,7 +2456,8 @@ function renderModelBars(modelNames, opts) {
   const layout = getPlotlyLayout({
     yaxis: { ...makeYAxis(yRange), tickvals: yTicks.map((tk) => tk.v), showticklabels: false },
     xaxis: { automargin: false,
-      range: view.panning ? [barViewStart - 0.5, barViewStart - 0.5 + view.visible] : [-0.5 - lead, last + 0.5],
+      range: view.panning ? [barViewStart - 0.5, barViewStart - 0.5 + view.visible]
+        : view.fixed ? [-0.5 - lead, -0.5 - lead + view.visible] : [-0.5 - lead, last + 0.5],
       tickvals: xPositions, ticktext: labels, showticklabels: barNamesShown,
       tickangle: tickAngle, ticklabelshift: labelShift, showgrid: false,
     },
@@ -1832,7 +2472,7 @@ function renderModelBars(modelNames, opts) {
       text: values[i] != null ? values[i].toFixed(fmt) : "",
       showarrow: false, yshift: below[i] ? -10 : 10,
       xanchor: "center",
-      font: { size: computeAnnotationFontSize(view.panning ? Math.floor(view.visible) : labels.length), color: "#000", weight: 500 },
+      font: { size: computeAnnotationFontSize(barsInView(asClosed || view, labels.length)), color: "#000", weight: 500 },
     })),
     images: buildOrgImages(modelNames, xPositions, values, yRange),
   });
@@ -1850,11 +2490,22 @@ function renderModelBars(modelNames, opts) {
     layout.yaxis.fixedrange = true;
     layout.xaxis.ticklabeloverflow = "allow";
   }
+  const mark = selectionMark(modelNames, labels);
+  layout.shapes.push(...mark.shapes);
+  layout.xaxis.ticktext = mark.ticktext;
   plotChart([trace], touchSafe(layout), plotlyConfig, onChartHover, hideTooltip);
+  if (chartEl) {
+    chartEl._barModels = modelNames;
+    chartEl._barLabels = labels;
+    bindModelDetailClicks(chartEl);
+  }
   if (view.panning) {
     setBarPan(chartEl, {
       total: labels.length, visible: view.visible, start: barViewStart, lead, slotPx: view.slotPx,
-      onChange: (s) => { barViewStart = s <= -lead + 1e-6 ? -Infinity : s; },
+      onChange: (s) => {
+        barViewStart = s <= -lead + 1e-6 ? -Infinity : s;
+        replayPointerSoon();   // (the bars slid under a still mouse)
+      },
     });
   } else {
     barViewStart = -Infinity;
@@ -1892,7 +2543,8 @@ function exportBarFigure(gd, labels, xRange, width) {
   const layout = structuredClone(gd.layout);
   Object.assign(layout.xaxis, { range: xRange, showticklabels: true, tickangle: tickAngle, ticklabelshift: labelShift });
   layout.yaxis.showticklabels = true;
-  layout.shapes = (layout.shapes || []).filter((s) => s.name !== AXIS_LABELS);
+  layout.shapes = (layout.shapes || []).filter((s) => s.name !== AXIS_LABELS && s.name !== SELECTED_MARK);
+  layout.xaxis.ticktext = labels;
   layout.margin = barMargins(labels, tickAngle, slotPx, labelShift);
   const size = computeAnnotationFontSize(labels.length, width);
   layout.annotations = layout.annotations.map((a) => ({ ...a, font: { ...a.font, size } }));
@@ -1912,7 +2564,8 @@ function exportBarFigure(gd, labels, xRange, width) {
  *  that is cut at the window's edge), and the bottom margin fits their
  *  drop. A panning plot also reaches the column's right edge. Without
  *  `names` (showBarNames) the plot needs little room below. */
-function barView(labels, chartWidth, names, numbersPx) {
+function barView(labels, chartWidth, names, numbersPx, fixedSlotPx = null) {
+  if (fixedSlotPx) return fixedBarView(labels, chartWidth, names, numbersPx, fixedSlotPx);
   const fitWidth = chartWidth - BAR_MARGIN.l - BAR_MARGIN.r - numbersPx;
   const panning = labels.length * BAR_SLOT_MIN_PX > fitWidth;
   const r = panning ? 0 : BAR_MARGIN.r;
@@ -1935,6 +2588,26 @@ function barView(labels, chartWidth, names, numbersPx) {
   const labelShift = rotatedLabelShift(tickAngle, slotPx);
   const { b } = barMargins(labels, tickAngle, slotPx, labelShift);
   return { panning, visible, slotPx, lead, tickAngle, labelShift, margin: { ...BAR_MARGIN, r, b } };
+}
+
+/** barView with the drawer open: the bars `slotPx` wide, as without the
+ *  drawer, from the plot's left edge on; the plot reaches the drawer, and
+ *  pans when they run under it. (`fixed`: the view isn't fitted to the
+ *  bars.) */
+function fixedBarView(labels, chartWidth, names, numbersPx, slotPx) {
+  const visible = (chartWidth - BAR_MARGIN.l) / slotPx;
+  const lead = numbersPx / slotPx + 0.1;
+  const panning = lead + labels.length > visible + 1e-6;
+  const margin = { ...BAR_MARGIN, r: 0 };
+  if (!names) return { panning, fixed: true, visible, slotPx, lead, tickAngle: 0, labelShift: 0, margin: { ...margin, b: BAR_BARE_MARGIN_B } };
+  const tickAngle = computeTickAngle(labels, slotPx);
+  const labelShift = rotatedLabelShift(tickAngle, slotPx);
+  return { panning, fixed: true, visible, slotPx, lead, tickAngle, labelShift, margin: { ...margin, b: barMargins(labels, tickAngle, slotPx, labelShift).b } };
+}
+
+/** The bars a view shows at once (the scores' font follows it). */
+function barsInView(view, total) {
+  return view.panning ? Math.floor(view.visible) : total;
 }
 
 /** renderModelBars on a narrow screen: one row per model, best at the top,
@@ -1994,7 +2667,22 @@ function renderModelBarsHorizontal(modelNames, { values, ciValues, customdata })
     score: v || 0,
     se: below[i] ? -(loArr ? (loArr[i] || 0) : 0) : (hiArr ? (hiArr[i] || 0) : 0),
   }));
+  const mark = selectionMark(modelNames, ticktext, true);
+  layout.shapes = mark.shapes;
+  layout.yaxis.ticktext = mark.ticktext;
   plotChart([trace], touchSafe(layout), plotlyConfig, onChartHover, hideTooltip);
+  const chartEl = document.getElementById("chart");
+  if (!chartEl) return;
+  chartEl._barModels = modelNames;
+  chartEl._barLabels = ticktext;
+  bindModelDetailClicks(chartEl);
+  // An image export leaves out the open model's mark.
+  chartEl._exportFigure = () => {
+    const out = structuredClone(chartEl.layout);
+    out.shapes = (out.shapes || []).filter((sh) => sh.name !== SELECTED_MARK);
+    out.yaxis.ticktext = ticktext;
+    return { data: structuredClone(chartEl.data), layout: out };
+  };
 }
 
 /** Logos of the horizontal bars: one per row (a blank one without a logo,
@@ -2124,6 +2812,7 @@ function renderSingleBenchmarkScatter(benchmark) {
  *  scatter modes. */
 function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
   setChartExtraHeight(0);
+  if (drawerBeside()) setChartCut(chartCovered());   // (ends at the drawer's edge)
   const paperYs = ys.map((y) => paperFraction(y, yRange));
   const customdata = dirs.map((m, i) => Object.assign(
     { modelDir: m, ci: cis[i], value: ys[i], label: getModelLabel(m) },
@@ -2167,6 +2856,7 @@ function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
   document.getElementById("chart")._scatterImageMap = composite.imageToModel;
 
   plotChart([trace], touchSafe(layout), plotlyConfig, onChartHover, hideTooltip);
+  bindModelDetailClicks(el);
 }
 
 // ─────────────────────────────────────────────────────────────

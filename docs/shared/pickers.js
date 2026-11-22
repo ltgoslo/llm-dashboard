@@ -141,7 +141,10 @@ function fillCard({ title, meta, body, note, link }) {
     a.href = link.href;
     a.target = "_blank";
     a.rel = "noopener noreferrer";
-    a.textContent = link.text || link.href;
+    const text = document.createElement("span");
+    text.className = "link-text";   // (style.css underlines it on hover)
+    text.textContent = link.text || link.href;
+    a.append(text);
     parts.push(a);
   }
   card.replaceChildren(...parts);
