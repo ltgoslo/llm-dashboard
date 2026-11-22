@@ -342,8 +342,9 @@ export async function initComparison(config) {
 
     if (hasURL) syncControlsFromState();
 
-    // The first chart is drawn under the loading overlay, with its results.
-    await ensureModelsLoaded(getModelList());
+    // The first chart is drawn under the loading overlay, with its results
+    // (and on a phone the font its rows are measured in).
+    await Promise.all([ensureModelsLoaded(getModelList()), useHorizontalBars() && rowFontLoaded()]);
     renderChart();
     markAppReady();
     prefetchDefaultModels();
@@ -1336,9 +1337,16 @@ document.addEventListener("touchstart", () => { lastTouchAt = performance.now();
 function touchEcho(ev) {
   return ev?.type === "mousedown" && performance.now() - lastTouchAt < 1000;
 }
+/** Whether the page is used by touch: the last pointer pressed on it was a
+ *  finger, and no mouse has moved since. A tap on a bar (or a point, or a
+ *  bar's name) opens the model's details and shows nothing else: no tooltip
+ *  (the details name the model, as does the button to them). */
+let touchInput = false;
+document.addEventListener("pointerdown", (e) => { touchInput = e.pointerType === "touch"; }, { capture: true, passive: true });
+document.addEventListener("pointermove", (e) => { if (e.pointerType === "mouse") touchInput = false; }, { capture: true, passive: true });
 
 function onChartHover(data) {
-  if (!data.points || !data.points.length || touchEcho(data.event)) return;
+  if (!data.points || !data.points.length || touchEcho(data.event) || touchInput) return;
   const pt = data.points[0];
   const cd = pt.customdata;
   const obj = cd != null && typeof cd === "object" ? cd : null;
@@ -1406,9 +1414,9 @@ function onChartHover(data) {
 // A click on a model's bar (or row, or scatter point) opens its details: on
 // a wide screen in a drawer over the page's right end, otherwise in a panel
 // under the chart. With a mouse, a click on the open model's bar closes them
-// again; a tap on a touch screen still shows the bar's tooltip too (the bars
-// there often go without names) and leaves the page where it is. The
-// details' × or Esc closes them; ← / → step to the neighbouring bar. A link
+// again; a tap on a touch screen opens them and nothing else (no tooltip:
+// touchInput) and leaves the page where it is, with a button to the panel.
+// The details' × or Esc closes them; ← / → step to the neighbouring bar. A link
 // with the model in it (URL `model`) opens them. What they show doesn't
 // follow the chart's settings (modelDetailData).
 //
@@ -1521,8 +1529,7 @@ function openFromChart(m) {
 }
 
 /** Open model `m`'s details (null: close them). The panel comes into
- *  sight: scrolled to after a click, a button to it after a tap (which
- *  shows the bar's tooltip, left open). */
+ *  sight: scrolled to after a click, a button to it after a tap. */
 function selectModelDetail(m, { tap = false } = {}) {
   if (m === detailModel) {
     if (m && tap) detailView?.reveal("button");
@@ -1785,12 +1792,26 @@ function bandColor(m, alpha) {
 const rgbaText = ([r, g, b, a]) => `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${+a.toFixed(3)})`;
 const rgbText = ([r, g, b]) => `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
 
-/** The band shape behind bar (row: `horizontal`) `pos`. */
+/** The band shape behind bar (row: `horizontal`) `pos`. A row's band is the
+ *  row across the whole chart, its name too (rowBandPath). */
 function bandShape(pos, color, horizontal) {
-  const across = horizontal
-    ? { xref: "paper", yref: "y", x0: 0, x1: 1, y0: pos - 0.5, y1: pos + 0.5 }
-    : { xref: "x", yref: "paper", x0: pos - 0.5, x1: pos + 0.5, y0: 0, y1: 1 };
-  return { type: "rect", name: SELECTED_MARK, layer: "below", ...across, fillcolor: rgbaText(color), line: { width: 0 } };
+  if (horizontal) {
+    return { type: "path", name: SELECTED_MARK, layer: "below", xref: "paper", yref: "y",
+      path: rowBandPath(pos), fillcolor: rgbaText(color), line: { width: 0 } };
+  }
+  return { type: "rect", name: SELECTED_MARK, layer: "below", xref: "x", yref: "paper",
+    x0: pos - 0.5, x1: pos + 0.5, y0: 0, y1: 1, fillcolor: rgbaText(color), line: { width: 0 } };
+}
+
+/** Row `pos`'s band on the phone's chart: a rounded rectangle the row's
+ *  height from the chart's left edge (under the name) to its right, in
+ *  paper units across (from the plot's margins: rowBandSpan) and rows down. */
+let rowBandSpan = { x0: 0, x1: 1, rx: 0 };
+function rowBandPath(pos) {
+  const { x0, x1, rx } = rowBandSpan, ry = ROW_BAND_RADIUS_PX / ROW_PX;
+  const y0 = pos - 0.5, y1 = pos + 0.5;
+  return `M${x0 + rx},${y0} L${x1 - rx},${y0} Q${x1},${y0} ${x1},${y0 + ry} L${x1},${y1 - ry} Q${x1},${y1} ${x1 - rx},${y1}`
+    + ` L${x0 + rx},${y1} Q${x0},${y1} ${x0},${y1 - ry} L${x0},${y0 + ry} Q${x0},${y0} ${x0 + rx},${y0} Z`;
 }
 
 /** The bar names with the open model's in bold (a row's name may run over
@@ -2182,11 +2203,40 @@ function measureLabels(labels, fontSize = TICK_FONT_SIZE, weight = 400) {
 // row per model, its name on the left — so names stay readable and the
 // chart grows downwards instead of squeezing the bars side by side; also a
 // phone held sideways, which has no height for the desktop chart. Matches
-// the phone block of style.css (full-width chart box).
-const ROW_PX = 26;              // height of one model's row
+// the phone block of style.css (full-width chart box). The rows are all as
+// tall as a name on two lines needs (wrapRowLabels), so a long name keeps
+// clear of its neighbours and the bars keep one rhythm.
+const ROW_PX = 32;              // height of one model's row
+const ROW_BAR_PX = 22;          // a bar's thickness
 const ROW_LABEL_FONT = 12;      // model names on the left axis
+const ROW_LABEL_WEIGHT = 500;
+const ROW_LABEL_GAP_PX = 8;     // between a name and its bar
 const ROW_VALUE_LABEL_PX = 40;  // room for a value label past a bar's end
-const H_MARGIN = { t: 26, r: 10, b: 6 };
+const ROW_GRID_COLOR = "#e9ecf0";   // the value axis's gridlines: lighter than a wide chart's,
+const ROW_ZERO_COLOR = "#a0a8b4";   // and its zero line (z-scores) less stark
+const ROW_NAMES_SHARE = 0.4;    // of the chart's width: a name wider than that wraps
+const ROW_BAND_RADIUS_PX = 6;   // the open model's band: its corners,
+const ROW_BAND_BLEED_PX = 8;    // and how far it reaches past the chart's sides
+const ROW_FONT = `${ROW_LABEL_WEIGHT} ${ROW_LABEL_FONT}px 'Mona Sans'`;
+const H_MARGIN = { t: 22, r: 10, b: 6 };
+
+/** The rows are laid out from their names' widths, so in the page's font:
+ *  the first chart waits for it a while (rowFontLoaded), and one drawn in a
+ *  fallback font all the same is drawn again once it has come. */
+function rowFontLoaded(ms = 1500) {
+  if (!document.fonts?.load) return Promise.resolve();
+  return Promise.race([document.fonts.load(ROW_FONT).catch(() => {}), new Promise((r) => setTimeout(r, ms))]);
+}
+let rowFontAwaited = false;
+function redrawWhenRowFontLoads() {
+  if (rowFontAwaited || !document.fonts?.check || document.fonts.check(ROW_FONT)) return;
+  rowFontAwaited = true;
+  document.fonts.load(ROW_FONT).then(() => {
+    if (!useHorizontalBars() || !document.fonts.check(ROW_FONT)) return;
+    holdBarAnimation();
+    renderChart();
+  }, () => {});
+}
 
 /** Value range of the horizontal bars: from 0 — or the lowest error-bar
  *  end, when a value is negative — to the highest error-bar end, widened
@@ -2232,7 +2282,7 @@ function touchSafe(layout) {
 /** Model names for the left axis: those wider than `maxPx` are broken onto
  *  two lines at the space closest to their middle. */
 function wrapRowLabels(labels, maxPx) {
-  const widths = measureLabels(labels, ROW_LABEL_FONT);
+  const widths = measureLabels(labels, ROW_LABEL_FONT, ROW_LABEL_WEIGHT);
   return labels.map((label, i) => {
     if (widths[i] <= maxPx || !label.includes(" ")) return label;
     const mid = label.length / 2;
@@ -2260,14 +2310,14 @@ function bindNarrowScreenListeners() {
       if (useHorizontalBars() || barPanChanges() || barNamesChange() || drawerBeside()) renderChart();
     }, 200);
   });
-  // A touch closes the tooltip wherever it lands (a tap on a bar reopens it
-  // for that bar, through plotly_click); a mouse press only outside the chart.
+  // A touch closes the tooltip wherever it lands (a tap shows none:
+  // touchInput); a mouse press only outside the chart.
   document.addEventListener("pointerdown", (e) => {
     if (e.pointerType === "touch" || !document.getElementById("chart")?.contains(e.target)) hideTooltip();
   });
-  // A tap on a model's name, left of its horizontal bar, opens the bar's
-  // tooltip too. (The names take no pointer events: the row is found from
-  // the tap's height.)
+  // A click or tap on a model's name, left of its horizontal bar, does what
+  // one on the bar does. (The names take no pointer events: the row is found
+  // from the tap's height.)
   const chartEl = document.getElementById("chart");
   chartEl?.addEventListener("click", (e) => {
     const trace = chartEl.data?.[0], fl = chartEl._fullLayout;
@@ -2614,20 +2664,21 @@ function barsInView(view, total) {
  *  its name on the left (on two lines if long), the bar
  *  growing right from 0 (left for a negative value) with the organization's
  *  logo at its start and the value after its error bar; the value scale on
- *  top. The chart box grows to fit the rows. A tap anywhere on a row shows
- *  the model's tooltip (hovermode "y"). */
+ *  top. The chart box grows to fit the rows. A tap anywhere on a row opens
+ *  the model's details (hovermode "y"). */
 function renderModelBarsHorizontal(modelNames, { values, ciValues, customdata }) {
   clearScatterHooks();
   const labels = modelNames.map(getModelLabel);
   const rows = modelNames.map((_, i) => i);
   const width = document.getElementById("chart")?.clientWidth || 360;
-  const ticktext = wrapRowLabels(labels, width * 0.36);
-  const lineWidths = measureLabels(ticktext.flatMap((t) => t.split("<br>")), ROW_LABEL_FONT);
+  const ticktext = wrapRowLabels(labels, width * ROW_NAMES_SHARE);
+  const lineWidths = measureLabels(ticktext.flatMap((t) => t.split("<br>")), ROW_LABEL_FONT, ROW_LABEL_WEIGHT);
   const margin = {
     ...H_MARGIN,
-    l: Math.min(Math.ceil(Math.max(0, ...lineWidths)) + 10, Math.round(width * 0.45)),
+    l: Math.min(Math.ceil(Math.max(0, ...lineWidths)) + ROW_LABEL_GAP_PX + 2, Math.round(width * 0.45)),
   };
   setChartHeight(margin.t + margin.b + rows.length * ROW_PX);
+  redrawWhenRowFontLoads();
   const fmt = scoreDecimals();
   const hiArr = ciValues ? ciValues.map((c) => c?.hiDist ?? 0) : null;
   const loArr = ciValues ? ciValues.map((c) => c?.loDist ?? 0) : null;
@@ -2635,8 +2686,8 @@ function renderModelBarsHorizontal(modelNames, { values, ciValues, customdata })
   const errorX = ciValues && { ...makeErrorY(ciValues), thickness: 1.6, width: 3 };
   const trace = {
     type: "bar", orientation: "h",
-    x: values, y: rows, width: 0.72,
-    marker: { color: modelNames.map(getModelColor), line: { width: 0 }, cornerradius: 4 },
+    x: values, y: rows, width: ROW_BAR_PX / ROW_PX,
+    marker: { color: modelNames.map(getModelColor), line: { width: 0 }, cornerradius: 5 },
     customdata: customdata.map((d, i) => ({ ...d, value: values[i], label: labels[i] })),
     hoverinfo: "none",
     ...(errorX && { error_x: errorX }),
@@ -2644,11 +2695,11 @@ function renderModelBarsHorizontal(modelNames, { values, ciValues, customdata })
   const plotWidth = Math.max(1, width - margin.l - margin.r);
   const xRange = rowValueRange(values, ciValues, plotWidth);
   const layout = getPlotlyLayout({
-    xaxis: { ...makeYAxis(xRange), side: "top", tickfont: { size: 11, color: "#64748b" } },
+    xaxis: { ...makeYAxis(xRange), gridcolor: ROW_GRID_COLOR, zerolinecolor: ROW_ZERO_COLOR, side: "top", tickfont: { size: 11, color: "#64748b" } },
     yaxis: {
       range: [rows.length - 0.5, -0.5], tickvals: rows, ticktext,
-      showgrid: false, automargin: false, ticks: "", ticklen: 0,
-      tickfont: { size: ROW_LABEL_FONT, color: "#1e293b", weight: 500 },
+      showgrid: false, automargin: false, ticks: "", ticklen: 0, ticklabelstandoff: ROW_LABEL_GAP_PX - 2,
+      tickfont: { size: ROW_LABEL_FONT, color: "#1e293b", weight: ROW_LABEL_WEIGHT },
     },
     hovermode: "y",
     showlegend: false,
@@ -2659,7 +2710,7 @@ function renderModelBarsHorizontal(modelNames, { values, ciValues, customdata })
       text: v != null ? v.toFixed(fmt) : "",
       showarrow: false,
       xanchor: below[i] ? "right" : "left", xshift: below[i] ? -4 : 4,
-      font: { size: 11, color: "#000", weight: 500 },
+      font: { size: ROW_LABEL_FONT, color: "#000", weight: 500 },
     })),
     images: buildRowLogos(modelNames, values, xRange, plotWidth),
   });
@@ -2667,6 +2718,11 @@ function renderModelBarsHorizontal(modelNames, { values, ciValues, customdata })
     score: v || 0,
     se: below[i] ? -(loArr ? (loArr[i] || 0) : 0) : (hiArr ? (hiArr[i] || 0) : 0),
   }));
+  rowBandSpan = {
+    x0: -(margin.l + ROW_BAND_BLEED_PX) / plotWidth,
+    x1: 1 + (margin.r + ROW_BAND_BLEED_PX) / plotWidth,
+    rx: ROW_BAND_RADIUS_PX / plotWidth,
+  };
   const mark = selectionMark(modelNames, ticktext, true);
   layout.shapes = mark.shapes;
   layout.yaxis.ticktext = mark.ticktext;
@@ -2687,16 +2743,16 @@ function renderModelBarsHorizontal(modelNames, { values, ciValues, customdata })
 
 /** Logos of the horizontal bars: one per row (a blank one without a logo,
  *  as in buildOrgImages), inside the bar just past the zero line, sized to
- *  the row height. */
+ *  the bar's thickness. */
 function buildRowLogos(modelNames, values, xRange, plotWidth) {
   const [lo, hi] = xRange;
   const zero = lo < 0 && hi > lo ? Math.min(1, -lo / (hi - lo)) : 0;   // paper x of 0
-  const pad = 4 / plotWidth;
+  const pad = 5 / plotWidth;
   return modelNames.map((modelDir, i) => {
     const org = state.DATA.model_organizations?.[modelDir];
     const filename = org && ORG_LOGO[org];
     const scale = (org && ORG_LOGO_SCALE[org]) || 1;
-    const side = ROW_PX * 0.56 * scale;   // px
+    const side = ROW_BAR_PX * 0.72 * scale;   // px
     const negative = values[i] != null && values[i] < 0;
     // A bar too short for its logo (a score near 0, as z-scores have) gets
     // none: it would stick out over the error bar and the value.
@@ -2837,6 +2893,11 @@ function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
   if (narrow) setChartHeight(Math.round(Math.min(560, Math.max(300, window.innerHeight * 0.68))));
   const margin = { l: narrow ? 40 : 105, r: 20, t: 8, b: 60 };
   const xaxis = scatterXAxis(xs);
+  const yaxis = makeYAxis(yRange);
+  if (narrow) {   // (light lines, as the phone's bars have)
+    xaxis.gridcolor = yaxis.gridcolor = ROW_GRID_COLOR;
+    yaxis.zerolinecolor = ROW_ZERO_COLOR;
+  }
   const el = document.getElementById("chart");
   const composite = buildScatterCompositeImages(dirs, xs, paperYs, colors, {
     disk: narrow ? SCATTER_DISK_PX_NARROW : SCATTER_DISK_PX,
@@ -2845,7 +2906,7 @@ function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
     xSpan: xaxis.range[1] - xaxis.range[0],
   });
   const layout = getPlotlyLayout({
-    yaxis: makeYAxis(yRange),
+    yaxis,
     xaxis,
     showlegend: false,
     margin,

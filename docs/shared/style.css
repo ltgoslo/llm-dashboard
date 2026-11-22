@@ -1064,6 +1064,7 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
   -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
 }
 .task-variants { display: inline-flex; gap: 0.15rem; flex-shrink: 0; }
+.task-name-group { white-space: nowrap; }   /* "(nrk-quiz)": no break at its hyphen (pickers.js withArrows) */
 
 /* Toggle pills (task variants) and chips (models). */
 .variant-pill, .model-chip {
@@ -1477,7 +1478,10 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   .comparison-page .settings-toggle[aria-expanded="true"]::after { transform: rotate(225deg); margin: 0.2rem 0.1rem 0 0; }
   .comparison-page .settings-toggle:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
   .comparison-page .chart-zone.settings-folded .control-group:not(.control-task) { display: none !important; }
-  .comparison-page .chart-zone.settings-folded .controls-bar:has(+ #chart) { padding-top: 0; padding-bottom: 0.6rem; }
+  /* The chart 0.75rem under the controls, open or folded. (`:has(+ #chart)`
+     counts as an id: the base rule's 1rem + 1rem would beat a plainer one.) */
+  .comparison-page .chart-zone .controls-bar:has(+ #chart) { padding-bottom: 0.25rem; margin-bottom: 0.75rem; }
+  .comparison-page .chart-zone.settings-folded .controls-bar:has(+ #chart) { padding-top: 0; padding-bottom: 0; }
 
   /* Dropdown lists: the screen's width, finger-sized rows. */
   .comparison-page .ui-select-options {
@@ -1504,6 +1508,9 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   .comparison-page .picker-module:not(.collapsed) .module-body { padding-bottom: 1.25rem; }
   .comparison-page .task-cat-header, .comparison-page .model-cat-header { min-height: 2.5rem; }
   .comparison-page .task-row-main { min-height: 2.5rem; }
+  /* A task's name wraps short of its pills, and the pills stand apart. */
+  .comparison-page .task-row { gap: 0.75rem; }
+  .comparison-page .task-variants { gap: 0.35rem; }
   .comparison-page .variant-pill { height: 2rem; padding: 0 0.6rem; font-size: 0.75rem; }
   .comparison-page .org-row { grid-template-columns: minmax(0, 1fr); }
   .comparison-page .org-label { min-height: 2.25rem; }
@@ -1552,8 +1559,15 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   .model-detail .md-groups { columns: 2; column-gap: 3rem; }
   .model-detail .md-group { break-inside: avoid; }
 }
+/* A phone's panel: a section of the page under the chart, the screen's
+   width (no card in the page's margins, whose room its rows need), ruled
+   off from the chart; its content on the page's column. */
 @media (max-width: 640px) {
-  .model-detail { padding: 0 0.9rem 0.9rem; }
+  .model-detail {
+    margin: 1rem -1.5rem 0; padding: 0 1.5rem 0.5rem;
+    border-width: 1px 0 0; border-color: var(--border); border-radius: 0; box-shadow: none;
+  }
+  .model-detail .md-head { padding-top: 1.1rem; }
 }
 @media (min-width: 1180px) {
   /* The page keeps its layout (comparison.js placeDrawer): the drawer lies

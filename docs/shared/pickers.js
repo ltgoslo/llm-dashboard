@@ -366,11 +366,22 @@ function arrowIcon(kind) {
 }
 
 /** A task name with its arrows ("Bokmål ↔ English", "Bokmål → Sámi")
- *  drawn; the text keeps them for screen readers (hidden on screen). */
+ *  drawn; the text keeps them for screen readers (hidden on screen). A
+ *  dataset's hyphenated name in brackets stays on one line ("(nrk-quiz)"
+ *  doesn't break at its hyphen when the name wraps). */
 function withArrows(text) {
   const out = document.createDocumentFragment();
   text.split(/ (↔|→) /).forEach((part, i) => {
-    if (i % 2 === 0) { out.append(part); return; }
+    if (i % 2 === 0) {
+      part.split(/(\([^)]*-[^)]*\))/).forEach((piece, j) => {
+        if (j % 2 === 0) { if (piece) out.append(piece); return; }
+        const group = document.createElement("span");
+        group.className = "task-name-group";
+        group.textContent = piece;
+        out.append(group);
+      });
+      return;
+    }
     const glyph = document.createElement("span");
     glyph.className = "visually-hidden";
     glyph.textContent = " " + part + " ";
