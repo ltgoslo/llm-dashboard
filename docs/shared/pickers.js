@@ -6,7 +6,7 @@
 // The progress pages keep the task-checkbox grid of ui.js.
 
 import { state } from "./state.js";
-import { METRIC_DISPLAY, capitalize } from "./core.js";
+import { METRIC_DISPLAY, capitalize, compareCategories } from "./core.js";
 import { defaultTaskDisplayName } from "./ui.js";
 
 // Phones: narrow screens, and touch screens too short for the desktop
@@ -407,8 +407,9 @@ function taskCard(bench, title) {
 
 let taskPickerChange = null;
 
-/** Build the task picker into #task-picker. `onChange` runs after the user
- *  changes state.checkedTasks through it. */
+/** Build the task picker into #task-picker: the tasks under their
+ *  categories, in CATEGORY_ORDER. `onChange` runs after the user changes
+ *  state.checkedTasks through it. */
 export function buildTaskPicker({ onChange }) {
   const root = document.getElementById("task-picker");
   if (!root) return;
@@ -422,7 +423,7 @@ export function buildTaskPicker({ onChange }) {
     byCategory.get(info.category).push(bench);
   }
 
-  for (const category of [...byCategory.keys()].sort()) {
+  for (const category of [...byCategory.keys()].sort(compareCategories)) {
     const benches = byCategory.get(category);
     const section = document.createElement("section");
     section.className = "task-cat";

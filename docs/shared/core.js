@@ -143,6 +143,27 @@ export function capitalize(s) {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
 }
 
+// The NorEval task categories in the order the comparison pages list them
+// (task picker, task dropdown, model details): their NorEval description's
+// order, from linguistic knowledge to translation.
+export const CATEGORY_ORDER = [
+  "linguistic knowledge",
+  "language understanding",
+  "world knowledge & reasoning",
+  "generation & summarization",
+  "translation",
+];
+
+/** Sort comparator of category names: CATEGORY_ORDER's in its order, then
+ *  any other category alphabetically. */
+export function compareCategories(a, b) {
+  const rank = (c) => {
+    const i = CATEGORY_ORDER.indexOf(c);
+    return i < 0 ? CATEGORY_ORDER.length : i;
+  };
+  return rank(a) - rank(b) || a.localeCompare(b);
+}
+
 /** Build a chart-title task label that folds the shot setting into a trailing
  *  parenthetical, e.g. "reading comprehension (belebele)" + "5-shot" becomes
  *  "reading comprehension (Belebele; 5-shot)". The parenthetical's contents

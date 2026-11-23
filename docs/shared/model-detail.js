@@ -6,13 +6,15 @@
 //
 // The details don't follow the chart's settings: they show the model's
 // category average over all tasks at each shot count, and its score on
-// each task (random-baseline rescaling, best prompt) beside the other
-// models' scores, at a shot count of their own (the page's default; one
+// each task (random-baseline rescaling, best prompt; the tasks under their
+// categories' names) beside every other model's score, at a shot count of
+// their own (the page's default; one
 // picked here stays for the models opened after). Each fact once; three
 // type sizes (style.css). comparison.js computes the content
 // (modelDetailData) and runs the motion; this module lays the content out
 // and slides the drawer. Opening another model, only the model's own dots
-// move (to its scores) and its numbers change.
+// move (to its scores) and its numbers change. A task's row opens the
+// task's details (task-detail.js).
 
 import { hideTooltip } from "./ui.js";
 import { enhanceSegmentedControl } from "./segmented.js";
@@ -20,6 +22,7 @@ import { enhanceSegmentedControl } from "./segmented.js";
 /** Screens wide enough for the drawer (style.css has the same breakpoint). */
 export const DETAIL_DRAWER = "(min-width: 1180px)";
 const PANEL_IN_SIGHT_PX = 280;   // a click scrolls this much of the panel into sight
+const TASK_INTENT_MS = 120;      // the pointer resting this long on a task's row loads its details' data
 
 const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)");
 /** The details' motion — the drawer's slide, the page's shift, the band's
@@ -28,7 +31,7 @@ export function detailMotion(extra = {}) {
   return { duration: REDUCED_MOTION.matches ? 0 : 280, easing: "cubic-bezier(0.32, 0.72, 0, 1)", ...extra };
 }
 
-function el(tag, cls, text) {
+export function el(tag, cls, text) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
   if (text != null) e.textContent = text;
@@ -70,8 +73,9 @@ function buildHead(d, onClose) {
  *  segmented control (.shot-toggle, segmented.js): the shot the details
  *  show is on its thumb, a click on another shows that one. Built once and
  *  updated for each content, so the thumb slides to a newly picked shot.
- *  (Its buttons aren't .shot-btn: those are the page's own shots.) */
-function shotControl(onShot) {
+ *  (Its buttons aren't .shot-btn: those are the page's own shots.) The
+ *  task details' scores at each shot are the same control. */
+export function shotControl(onShot) {
   const h = el("div", "md-headline");
   const label = el("div", "md-label");
   const group = el("div", "shot-toggle md-shots");
@@ -124,7 +128,8 @@ function buildLegend(d) {
   return lg;
 }
 
-const position = (v, domain) => ((v - domain[0]) / (domain[1] - domain[0]) * 100).toFixed(2) + "%";
+/** Where `v` lies on a strip with the scale `domain`: a CSS left (%). */
+export const position = (v, domain) => ((v - domain[0]) / (domain[1] - domain[0]) * 100).toFixed(2) + "%";
 
 /** A row's dot strip: every model's score on the profile's scale (the
  *  model's own under its dot), and the model's dot. (Where its dot sits
@@ -142,14 +147,35 @@ function buildStrip(row, d) {
   return { strip: s, me };
 }
 
-/** One row (a category's, or a task's): name, dots, value. */
-function buildRow(row, d, cat, refs) {
-  const r = el("div", "md-row" + (cat ? " md-row-cat" : ""));
-  const name = el("span", "md-row-name", row.name);
-  if (row.variant) name.append(el("span", "md-row-variant", " · " + row.variant));
+/** A task's row: name, dots, value. A button that opens the task's
+ *  details (hooks.onTask(task, row)); the pointer resting on it or focus
+ *  on it says it may soon (hooks.onTaskIntent(task): the task's data can
+ *  start loading — not for every row the pointer crosses). */
+function buildRow(row, d, refs, hooks) {
+  const task = !!hooks.onTask;
+  const r = el(task ? "button" : "div", "md-row" + (task ? " md-row-task" : ""));
+  // (The name's parts underlined, as links are, under the pointer: .link-text.)
+  const name = el("span", "md-row-name");
+  name.append(el("span", "md-row-title link-text", row.name));
+  if (row.variant) {
+    const variant = el("span", "md-row-variant");
+    variant.append(el("span", "link-text", row.variant));
+    name.append(variant);
+  }
   const { strip, me } = buildStrip(row, d);
   const value = el("span", "md-row-value");
   r.append(name, strip, value);
+  if (task) {
+    r.type = "button";
+    r.setAttribute("aria-haspopup", "dialog");   // (the task's details)
+    r.dataset.task = row.key;
+    r.addEventListener("click", () => hooks.onTask(row.key, r));
+    const intent = () => hooks.onTaskIntent?.(row.key);
+    let rest = null;
+    r.addEventListener("pointerenter", () => { clearTimeout(rest); rest = setTimeout(intent, TASK_INTENT_MS); });
+    r.addEventListener("pointerleave", () => clearTimeout(rest));
+    r.addEventListener("focus", intent);
+  }
   refs.set(row.key, { me, value });
   return r;
 }
@@ -169,8 +195,10 @@ function fillRow(ref, row, d) {
  *  under it), its sheet scrolling the content; otherwise a panel after
  *  `anchor` (the chart's zone). And the button that floats at the bottom of
  *  the screen while the panel is out of sight below (a tap doesn't scroll
- *  the page). hooks: onClose(), onShot(shot). */
-export function createModelDetail(anchor, { onClose, onShot }) {
+ *  the page). hooks: onClose(), onShot(shot), onTask(task, rowElement),
+ *  onTaskIntent(task). */
+export function createModelDetail(anchor, hooks) {
+  const { onClose, onShot } = hooks;
   const root = el("aside", "model-detail");
   root.setAttribute("aria-label", "Model details");
   root.hidden = true;
@@ -222,8 +250,8 @@ export function createModelDetail(anchor, { onClose, onShot }) {
       groups = el("div", "md-groups");
       for (const g of d.groups) {
         const sec = el("section", "md-group");
-        sec.append(buildRow(g, d, true, refs));
-        for (const row of g.rows) sec.append(buildRow(row, d, false, refs));
+        sec.append(el("h3", "md-cat", g.name));
+        for (const row of g.rows) sec.append(buildRow(row, d, refs, hooks));
         groups.append(sec);
       }
       // (A new build's dots take their places at once, not gliding.)
@@ -239,10 +267,7 @@ export function createModelDetail(anchor, { onClose, onShot }) {
       sheet.scrollTop = 0;
     }
     parts = { head, desc, legend, groups };
-    for (const g of d.groups) {
-      fillRow(refs.get(g.key), g, d);
-      for (const row of g.rows) fillRow(refs.get(row.key), row, d);
-    }
+    for (const g of d.groups) for (const row of g.rows) fillRow(refs.get(row.key), row, d);
     if (!inPlace) {
       sheet.getBoundingClientRect();   // (placed without transitions)
       sheet.classList.remove("md-fresh");
@@ -265,6 +290,8 @@ export function createModelDetail(anchor, { onClose, onShot }) {
 
   return {
     isOpen: () => !root.hidden,
+    /** Task `task`'s row (a button), or null. */
+    taskRow: (task) => (root.hidden ? null : root.querySelector(`.md-row-task[data-task="${CSS.escape(task)}"]`)),
     /** Show `d` (open or not; the same content again changes nothing). A
      *  drawer opened `offWindow` waits off the window for slide(true); the
      *  panel appears (style.css fades it in), brought into sight: `reveal`

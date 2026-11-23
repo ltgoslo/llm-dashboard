@@ -72,8 +72,10 @@ export function autoSetNormalization() {
 
 /** Populate the task <select> with the category / eval-type / language
  *  aggregate optgroups and the individual tasks. `evalTypes: false` leaves
- *  out the eval-type group (pages with a task-type selector). */
-export function populateTaskDropdown({ evalTypes = true } = {}) {
+ *  out the eval-type group (pages with a task-type selector);
+ *  `compareCategories`, a sort comparator, orders the categories
+ *  (alphabetically without one). */
+export function populateTaskDropdown({ evalTypes = true, compareCategories } = {}) {
   const select = document.getElementById("task-select");
 
   const categories = {};
@@ -82,7 +84,7 @@ export function populateTaskDropdown({ evalTypes = true } = {}) {
   }
   const catGroup = document.createElement("optgroup");
   catGroup.label = "Aggregate by category";
-  for (const catName of Object.keys(categories).sort()) {
+  for (const catName of Object.keys(categories).sort(compareCategories)) {
     const opt = document.createElement("option");
     opt.value = "__cat__" + catName;
     opt.textContent = capitalize(catName);

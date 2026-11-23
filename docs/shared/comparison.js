@@ -14,7 +14,7 @@ import {
   getBaseMetric, aggregateScores, isAggregateSelection, isMacroSelection,
   getEffectiveMetric, formatTitleWithShot, capitalize, taskTitleDescription,
   wantCI, normNeedsAllValues, scoreDecimals, taskBaseMetric, getNormYLabel,
-  toDisplayScale,
+  toDisplayScale, METRIC_DISPLAY, TASK_NAME_DISPLAY, compareCategories,
 } from "./core.js";
 import {
   makePlotlyConfig, getPlotlyLayout, plotChart,
@@ -37,6 +37,7 @@ import {
 import { setBarPan, buttonFitsBeside, revealBar, refreshBarPan } from "./bar-pan.js";
 import { UrlState } from "./url-state.js";
 import { createModelDetail, DETAIL_DRAWER, detailMotion } from "./model-detail.js";
+import { createTaskDetail } from "./task-detail.js";
 
 let CFG = null;            // Dashboard configuration (set in initComparison)
 let plotlyConfig = null;   // Built from CFG.filenamePrefix
@@ -272,10 +273,14 @@ function ensureModelsLoaded(models) {
 }
 
 /** After the first chart: load the default models' results in the
- *  background, so moving the size slider over them needs no wait. */
+ *  background, so moving the size slider over them needs no wait, and the
+ *  scores the model details compare (loadBestScores). */
 function prefetchDefaultModels() {
   if (!state.DATA.model_ids) return;
-  const run = () => ensureModelsLoaded((state.DATA.default_models || []).filter(isKnownModel));
+  const run = () => {
+    ensureModelsLoaded((state.DATA.default_models || []).filter(isKnownModel));
+    loadBestScores();
+  };
   if ("requestIdleCallback" in window) requestIdleCallback(run, { timeout: 4000 });
   else setTimeout(run, 1500);
 }
@@ -323,7 +328,7 @@ export async function initComparison(config) {
     restoreCheckedTasksFromSelection(urlState);
 
     // Sync UI controls
-    populateTaskDropdown();
+    populateTaskDropdown({ compareCategories });
     bindEventListeners();
     buildTaskPicker({ onChange: () => onTaskCheckboxChange(renderChart) });
     buildModelPicker();
@@ -426,6 +431,7 @@ function resetViewState() {
   state.checkedTasks = new Set(Object.keys(state.metricsSetup));
   urlNormApplied = false;
   detailModel = null;
+  detailTask = null;
 }
 
 /** Check the data's default model set. */
@@ -633,6 +639,16 @@ function setupUrlState() {
       set: (v) => {
         const dir = modelAlias._toSel[v] || v;
         detailModel = isKnownModel(dir) ? dir : null;
+      },
+      default: "",
+    },
+    {
+      // The task whose details are open over the model's.
+      key: "detail",
+      get: () => (detailModel && detailTask ? taskAlias._toAlias[detailTask] || detailTask : ""),
+      set: (v) => {
+        const task = taskAlias._toSel[v] || v;
+        detailTask = Object.hasOwn(state.metricsSetup, task) ? task : null;
       },
       default: "",
     },
@@ -880,85 +896,21 @@ function modelScoreCI(m, bench, metric, allRaw) {
   return { score, ci };
 }
 
-/** Number of prompt templates behind a model's stored score on `bench`
- *  (current shot), or undefined when the entry doesn't say. */
-function promptCount(m, bench, metric) {
-  const e = state.DATA.models[m]?.[bench]?.[state.currentShot]?.[metric];
-  return e && typeof e === "object" && Number.isFinite(e.n_prompts) ? e.n_prompts : undefined;
-}
-
-/** The most prompt templates any model has on `bench` (current shot): a
- *  max / min / mean over fewer prompts is not directly comparable. With
- *  per-model results files, from the build's table over all models (the
- *  loaded ones may not include the model with the most). */
-const maxPromptCache = new Map();
-function maxPromptCount(bench, metric) {
-  const table = state.DATA.max_prompts;
-  if (table) {
-    const n = table[bench]?.[state.currentShot]?.[metric];
-    return typeof n === "number" ? n : undefined;
-  }
-  const key = bench + "\n" + state.currentShot + "\n" + metric;
-  if (!maxPromptCache.has(key)) {
-    let mx;
-    for (const m of Object.keys(state.DATA.models)) {
-      const n = promptCount(m, bench, metric);
-      if (n !== undefined && (mx === undefined || n > mx)) mx = n;
-    }
-    maxPromptCache.set(key, mx);
-  }
-  return maxPromptCache.get(key);
-}
-
 /** Aggregate {score, count, ci} for one model across state.checkedTasks,
- *  under the current macro/micro mode and normalization — plus, for the
- *  tooltip, the `tasksUsed` of `tasksTotal` selected tasks the model has a
- *  score on (models are otherwise silently compared on different task
- *  sets), the tasks it was scored on with fewer prompts than others, and
- *  its average per task category (categoryBreakdown). */
+ *  under the current macro/micro mode and normalization. */
 function aggregateModelResult(m, modelNames) {
   const needAll = normNeedsAllValues();
   const useCI = wantCI();
-  let tasksUsed = 0;
-  const fewerPrompts = [];
-  const taskScores = [];
-  const res = aggregateScores(state.checkedTasks, (bench) => {
+  return aggregateScores(state.checkedTasks, (bench) => {
     const raw = getScore(state.DATA.models, m, bench, state.currentShot);
     if (raw === undefined) return undefined;
-    tasksUsed++;
-    const metric = taskBaseMetric(bench);
-    const n = promptCount(m, bench, metric), nMax = maxPromptCount(bench, metric);
-    if (n !== undefined && nMax !== undefined && n < nMax) fewerPrompts.push({ bench, n, nMax });
     const allRaw = needAll ? allRawScores(modelNames, bench) : null;
     const score = normScore(raw, bench, allRaw);
     const ci = useCI
       ? normCI(getCombinedCI(state.DATA.models, m, bench, state.currentShot), bench, undefined, allRaw)
       : undefined;
-    taskScores.push([bench, score]);
     return { score, ci };
   }, isMacroSelection());
-  return res && {
-    ...res, tasksUsed, tasksTotal: selectedTasks().length, fewerPrompts,
-    categories: categoryBreakdown(taskScores),
-  };
-}
-
-/** A model's average (rescaled) score per task category, from its
- *  [bench, score] pairs — [{category, score, n}] in the task grid's
- *  (alphabetical) order, or [] when the tasks span fewer than two
- *  categories. Shown in the tooltips of aggregate views. */
-function categoryBreakdown(taskScores) {
-  const groups = new Map();
-  for (const [bench, score] of taskScores) {
-    const category = state.metricsSetup[bench]?.category;
-    if (score === undefined || Number.isNaN(score) || !category) continue;
-    const g = groups.get(category) || { sum: 0, n: 0 };
-    g.sum += score; g.n++;
-    groups.set(category, g);
-  }
-  if (groups.size < 2) return [];
-  return [...groups].sort(([a], [b]) => a.localeCompare(b))
-    .map(([category, g]) => ({ category, score: g.sum / g.n, n: g.n }));
 }
 
 function isModelInSizeRange(modelDir) {
@@ -1320,14 +1272,6 @@ function syncSettingsSummary() {
 // Chart hover
 // ─────────────────────────────────────────────────────────────
 
-/** "max over 5 prompts", or "max over 4 of 5 prompts" when the model has
- *  fewer prompts than the most any model has on the task and shot. */
-function promptPhrase(n, nMax) {
-  const fewer = nMax !== undefined && n < nMax;
-  return state.currentPromptAgg + " over " + (fewer ? n + " of " + nMax : n)
-    + ((fewer ? nMax : n) === 1 ? " prompt" : " prompts");
-}
-
 /** A tap on a touch screen is followed by the mouse events a browser
  *  makes of it; Plotly answers its mousedown with a second click, carrying
  *  the bar hovered before (which would show that bar's tooltip, or open
@@ -1345,6 +1289,8 @@ let touchInput = false;
 document.addEventListener("pointerdown", (e) => { touchInput = e.pointerType === "touch"; }, { capture: true, passive: true });
 document.addEventListener("pointermove", (e) => { if (e.pointerType === "mouse") touchInput = false; }, { capture: true, passive: true });
 
+/** The chart's tooltip, short: the model, its score, and what a click
+ *  does (the model's details have the rest). */
 function onChartHover(data) {
   if (!data.points || !data.points.length || touchEcho(data.event) || touchInput) return;
   const pt = data.points[0];
@@ -1356,56 +1302,38 @@ function onChartHover(data) {
   // final value in customdata.
   const value = obj?.value != null ? obj.value : pt.y;
   if (value == null) return;
-  const fmt = scoreDecimals();
-  const v = Number(value);
-  const scoreStr = v.toFixed(fmt);
-  const sel = state.currentTaskSelection;
-
-  let ciStr = "";
-  if (obj?.ci) {
-    const lo = v - (obj.ci.loDist ?? 0), hi = v + (obj.ci.hiDist ?? 0);
-    if ((obj.ci.loDist ?? 0) > 0 || (obj.ci.hiDist ?? 0) > 0) {
-      ciStr = ` (95% CI: ${Number(lo).toFixed(fmt)} – ${Number(hi).toFixed(fmt)})`;
-    }
-  }
-
-  let scoreBody;
-  if (isAggregateSelection(sel)) {
-    const count = obj ? obj.count : cd;
-    // Flag an average over fewer than all selected tasks (no score on some).
-    const partial = obj && obj.tasksTotal !== undefined && obj.tasksUsed < obj.tasksTotal
-      ? obj.tasksUsed + " of " + obj.tasksTotal + " tasks" : "";
-    const countStr = isMacroSelection()
-      ? [count != null ? count + " categories" : "", partial].filter(Boolean).join("; ")
-      : partial || (count != null ? count + " tasks" : "");
-    const fewer = obj?.fewerPrompts || [];
-    const promptNote = fewer.length === 1
-      ? " · fewer prompts than other models on " + defaultTaskDisplayName(fewer[0].bench)
-        + " (" + fewer[0].n + " of " + fewer[0].nMax + ")"
-      : fewer.length > 1 ? " · fewer prompts than other models on " + fewer.length + " tasks" : "";
-    scoreBody = "Average: " + scoreStr + ciStr + (countStr ? " (" + countStr + ")" : "") + promptNote;
-  } else {
-    scoreBody = "Score: " + scoreStr + ciStr
-      + (obj?.nPrompts !== undefined ? " · " + promptPhrase(obj.nPrompts, obj.maxPrompts) : "");
-  }
-
-  // With a known model whose info carries a description, the tooltip becomes
-  // a model card (name, meta line, description) with the score as footer.
-  // Without one it is still titled with the model's name (pt.x is the bar's
-  // position or the model's size).
+  const score = (isAggregateSelection(state.currentTaskSelection) ? "Average: " : "Score: ")
+    + Number(value).toFixed(scoreDecimals());
+  // Titled with the model's name (without a model: pt.x, the bar's position
+  // or the model's size).
   const modelDir = obj ? obj.modelDir : null;
-  const info = modelDir ? state.DATA.model_info?.[modelDir] : null;
-  const title = modelDir ? getModelLabel(modelDir) : String(pt.x);
-  // Aggregate views list the model's average per task category below the
-  // score, to show where its overall number comes from.
-  const rows = isAggregateSelection(sel)
-    ? (obj?.categories || []).map((c) => ({ label: capitalize(c.category), value: c.score.toFixed(fmt) }))
-    : [];
-  if (info?.description) {
-    showTooltip(data.event, title, info.description, scoreBody, modelMetaLine(modelDir), rows);
-  } else {
-    showTooltip(data.event, title, scoreBody, "", "", rows);
-  }
+  chartTip = {
+    event: data.event, modelDir, title: modelDir ? getModelLabel(modelDir) : String(pt.x), body: score,
+    mark: pt.data?.type === "bar" ? "bar" : "point",
+  };
+  showChartTip();
+}
+
+/** The chart's tooltip while it shows ({event, modelDir, title, body,
+ *  mark}), or null. Its last line, a hint in plain text, says what a click
+ *  on the hovered bar or point does: with a mouse, one on the open model's
+ *  closes its details (openFromChart). It names the bar: the tooltip itself
+ *  is no control. */
+let chartTip = null;
+function showChartTip() {
+  const { event, modelDir, title, body, mark } = chartTip;
+  const hint = !modelDir ? ""
+    : modelDir === detailModel ? `Click the ${mark} to close the details` : `Click the ${mark} for details`;
+  showTooltip(event, title, body, "", "", hint);
+}
+/** The details opened or closed (a click, ← / →, Esc) under a showing
+ *  tooltip: its last line follows. */
+function refreshChartTip() {
+  if (chartTip && document.getElementById("custom-tooltip").classList.contains("visible")) showChartTip();
+}
+function onChartUnhover() {
+  chartTip = null;
+  hideTooltip();
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1418,7 +1346,8 @@ function onChartHover(data) {
 // touchInput) and leaves the page where it is, with a button to the panel.
 // The details' × or Esc closes them; ← / → step to the neighbouring bar. A link
 // with the model in it (URL `model`) opens them. What they show doesn't
-// follow the chart's settings (modelDetailData).
+// follow the chart's settings, and compares the model with every model of
+// the dashboard, shown or not (modelDetailData).
 //
 // The open model's bar is marked: a band of its colour behind it (which
 // widens and moves with the bar under the mouse: chart.js _barFollowers),
@@ -1437,6 +1366,8 @@ let detailModel = null;        // the model whose details are open, or null
 let detailView = null;         // model-detail.js's drawer / panel
 let detailShot = null;         // the shot the details show (null: the page's default)
 let detailCache = null;        // {key, data}: the details' last content
+let detailTask = null;         // the task whose details are open over the model's, or null
+let taskView = null;           // task-detail.js's view
 let bandModel = null;          // the model whose band the chart shows
 let bandFadingOut = false;     // …still, while the band fades out
 let drawerMove = null;         // the drawer's opening or closing under way (a token)
@@ -1451,10 +1382,14 @@ function initModelDetail() {
   const chart = document.getElementById("chart");
   const zone = chart?.closest(".chart-zone");
   if (!zone) return;
+  const onShot = (shot) => { detailShot = shot; refreshModelDetail(); };
   detailView = createModelDetail(zone, {
     onClose: () => selectModelDetail(null),
-    onShot: (shot) => { detailShot = shot; refreshModelDetail(); },
+    onShot,
+    onTask: openTaskDetail,
+    onTaskIntent: loadTaskFile,
   });
+  taskView = createTaskDetail({ onClose: () => closeTaskDetail(), onShot });
   chart._barFollowers = bandFollowers;
   // Across the breakpoint the drawer and the panel swap.
   DRAWER_SCREEN.addEventListener("change", () => {
@@ -1488,6 +1423,11 @@ function initModelDetail() {
   });
   document.addEventListener("keydown", (e) => {
     if (!detailModel || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    // Over the model's details, the task's: Esc closes them (only).
+    if (detailTask) {
+      if (e.key === "Escape") { e.preventDefault(); closeTaskDetail(); }
+      return;
+    }
     if (e.key === "Escape") { selectModelDetail(null); return; }
     if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
     // Not from a control that takes the arrow keys itself (a slider's
@@ -1536,15 +1476,17 @@ function selectModelDetail(m, { tap = false } = {}) {
     return;
   }
   const was = detailModel;
+  if (!m) closeTaskDetail({ animate: false });
   detailModel = m;
   urlState.save();
+  refreshChartTip();
   if (DRAWER_SCREEN.matches && !was !== !m) {
     if (m) openDrawer(); else closeDrawer(was);
     return;
   }
   if (m) {
     detailView.show(modelDetailData(m), { reveal: tap ? "button" : "scroll" });
-    loadDetailModels(m);
+    loadDetailScores();
   } else {
     detailView.hide({ animate: true });
   }
@@ -1563,7 +1505,7 @@ async function openDrawer() {
   const shift = placeDrawer();
   cl.add("detail-layout");
   detailView.show(modelDetailData(detailModel), { offWindow: true });
-  loadDetailModels(detailModel);
+  loadDetailScores();
   const band = moveBand(detailModel, { wait: true });
   await nextFrame();
   await nextFrame();   // (laid out and painted, nothing moved yet)
@@ -1738,10 +1680,11 @@ function refreshModelDetail() {
   if (!detailView || drawerMove) return;
   if (detailModel) {
     detailView.show(modelDetailData(detailModel));
-    loadDetailModels(detailModel);
+    loadDetailScores();
   } else {
     detailView.hide();
   }
+  syncTaskDetail();
 }
 
 /** After a redraw under the mouse: replayPointer, now and (a new chart
@@ -1932,35 +1875,79 @@ function detailShotNow() {
   return shots.includes(CFG.defaultShot) ? CFG.defaultShot : shots[shots.length - 1];
 }
 
-/** The models the details compare model `m` with: the dashboard's default
- *  models (whose results are in), and `m`. */
-function detailModels(m, loadedOnly = true) {
-  const base = (state.DATA.default_models || allModelIds()).filter(isKnownModel);
-  const all = base.includes(m) ? base : [...base, m];
-  return loadedOnly ? all.filter((x) => Object.hasOwn(state.DATA.models, x)) : all;
+/** The models the details compare: all of the dashboard's, shown on the
+ *  chart or not, that have results in `source` (detailResults). */
+function detailModels(source) {
+  return allModelIds().filter((x) => isKnownModel(x) && Object.hasOwn(source, x));
 }
 
-/** Load the compared models' results not in yet (the details follow). */
-function loadDetailModels(m) {
-  const missing = detailModels(m, false).filter((x) => !Object.hasOwn(state.DATA.models, x));
-  if (missing.length) ensureModelsLoaded(missing).then(() => { if (detailModel) refreshModelDetail(); });
+// Every model's best-prompt score on each task's main metric at each shot
+// (details/best.json, build_data.py write_task_details), for a page whose
+// results are in per-model files: the details compare all models without
+// loading each one's results. As results: {model: {task: {shot: {metric:
+// {max}}}}}, or {} if the file can't be loaded.
+let bestScores = null;
+let bestScoresLoad = null;
+
+/** Load the best scores (once; on a page with every model's results in
+ *  data.json there is nothing to load). */
+function loadBestScores() {
+  if (!state.DATA.model_ids) return Promise.resolve();
+  if (!bestScoresLoad) {
+    const url = "details/best.json" + (state.DATA.details_version ? "?v=" + state.DATA.details_version : "");
+    bestScoresLoad = fetch(url)
+      .then((r) => { if (!r.ok) throw new Error(r.status + " " + r.statusText + " (" + url + ")"); return r.json(); })
+      .then((b) => {
+        const out = {};
+        b.models.forEach((m, i) => {
+          const results = out[m] = {};
+          b.tasks.forEach((t, j) => {
+            const metric = state.metricsSetup[t]?.main_metric;
+            if (!metric) return;
+            for (const [shot, rows] of Object.entries(b.shots)) {
+              const v = rows[i]?.[j];
+              if (v != null) (results[t] ||= {})[shot] = { [metric]: { max: v } };
+            }
+          });
+        });
+        bestScores = out;
+      })
+      .catch((err) => { console.error("Could not load the models' best scores:", err); bestScores = {}; });
+  }
+  return bestScoresLoad;
+}
+
+/** The results the details read: every model's best scores, else (on a
+ *  page with every model's results, or before the best scores are in, or
+ *  if they can't be) the results loaded. */
+function detailResults() {
+  return bestScores && Object.keys(bestScores).length ? bestScores : state.DATA.models;
+}
+
+/** Load the details' best scores if they aren't in yet (the details follow). */
+function loadDetailScores() {
+  if (bestScores || !state.DATA.model_ids) return;
+  loadBestScores().then(() => { if (detailModel) refreshModelDetail(); });
 }
 
 /** The details' content for model `m`, whatever the chart shows: with the
  *  best prompt and random-baseline rescaling, over all tasks — its card
  *  (facts: lines of items); its category average at each shot; and its
- *  profile at the details' shot: per category, the category average and
- *  each task's score, each with every compared model's (detailModels)
- *  score on the same scale. */
+ *  profile at the details' shot: per category, each task's score with
+ *  every compared model's (detailModels) score on the same scale. */
 function modelDetailData(m) {
   const shot = detailShotNow();
-  const models = detailModels(m);
-  const key = [m, shot, models.join(",")].join("|");
+  const source = detailResults();
+  const models = detailModels(source);
+  if (!models.includes(m)) models.push(m);
+  const signature = [shot, models.join(","), source === bestScores ? "best" : "loaded"].join("|");
+  const key = m + "|" + signature;
   if (detailCache?.key === key) return detailCache.data;
   const tasks = Object.keys(state.metricsSetup);
   const fixed = {
     currentShot: shot, currentPromptAgg: "max", currentNormalization: "baseline", currentMetric: null,
-    currentTaskSelection: DEFAULT_SELECTION, checkedTasks: new Set(tasks),
+    currentTaskSelection: DEFAULT_SELECTION, checkedTasks: new Set(tasks), showCIBands: false,
+    DATA: { ...state.DATA, models: source },
   };
   const data = withState(fixed, () => {
     const idx = models.indexOf(m);
@@ -1986,18 +1973,13 @@ function modelDetailData(m) {
       if (!byCat.has(cat)) byCat.set(cat, []);
       byCat.get(cat).push({ key: b, name, variant: taskVariant(b, name), ...mine(all), all });
     }
-    // Categories as the tooltip lists them; a category's value is the mean
-    // of its task scores (categoryBreakdown).
-    const groups = [...byCat].sort(([a], [b]) => a.localeCompare(b)).map(([cat, rows]) => {
+    // The categories in CATEGORY_ORDER, each its tasks' heading.
+    const groups = [...byCat].sort(([a], [b]) => compareCategories(a, b)).map(([cat, rows]) => {
       rows.sort((a, b) => a.name.localeCompare(b.name) || a.variant.localeCompare(b.variant));
-      const all = models.map((_, j) => {
-        const vs = rows.map((r) => r.all[j]).filter(ok);
-        return vs.length ? vs.reduce((x, y) => x + y, 0) / vs.length : null;
-      });
-      return { key: "__cat__" + cat, name: capitalize(cat), ...mine(all), all, rows };
+      return { key: "__cat__" + cat, name: capitalize(cat), rows };
     });
     // One scale for every row, from the lowest to the highest value shown.
-    const values = groups.flatMap((g) => [...g.all, ...g.rows.flatMap((r) => r.all)]).filter(ok);
+    const values = groups.flatMap((g) => g.rows.flatMap((r) => r.all)).filter(ok);
     if (!values.length) values.push(0);
     let lo = Math.min(...values), hi = Math.max(...values);
     if (!(hi > lo)) { lo -= 1; hi += 1; }
@@ -2009,7 +1991,7 @@ function modelDetailData(m) {
   const color = getModelColor(m);
   const params = state.DATA.model_parameters?.[m];
   Object.assign(data, {
-    model: m, title: getModelLabel(m), color, signature: shot + "|" + models.join(","), others: models.length - 1,
+    model: m, title: getModelLabel(m), color, signature, others: models.length - 1,
     badge: () => orgBadge(modelOrg(m), color),
     facts: [
       [modelOrg(m), params ? formatModelSize(params) + " parameters" : ""].filter(Boolean),
@@ -2019,6 +2001,222 @@ function modelDetailData(m) {
     link: url ? { href: url, text: shortUrl(url) } : null,
   });
   detailCache = { key, data };
+  return data;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Task details (task-detail.js)
+// ─────────────────────────────────────────────────────────────
+// A click on a task's row in the model's details opens the task's details
+// over them, grown out of the row: the task, and the model's results on it,
+// from the task's file (details/tasks/<task>.json), which starts loading
+// when the pointer comes over the row. They follow the details' model and
+// shot (a shot picked in them is the details'). × or Esc closes them,
+// shrinking back into the row; closing the model's details closes them
+// too. A link with the task in it (URL `detail`, with `model`) opens them.
+
+const taskFiles = new Map();   // task → {promise, data (undefined until loaded; null if it can't be)}
+let taskOpening = null;        // a token while a task's details wait for its file
+let taskDetailCache = null;    // {key, data}: the task details' last content
+
+/** Load task `task`'s file (once): a promise of its content, null if it
+ *  can't be loaded. */
+function loadTaskFile(task) {
+  if (!Object.hasOwn(state.metricsSetup, task)) return Promise.resolve(null);
+  let entry = taskFiles.get(task);
+  if (!entry) {
+    const url = "details/tasks/" + encodeURIComponent(task) + ".json"
+      + (state.DATA.details_version ? "?v=" + state.DATA.details_version : "");
+    entry = { data: undefined };
+    entry.promise = fetch(url)
+      .then((r) => { if (!r.ok) throw new Error(r.status + " " + r.statusText + " (" + url + ")"); return r.json(); })
+      .catch((err) => { console.error(`Could not load the details of ${task}:`, err); return null; })
+      .then((data) => (entry.data = data));
+    taskFiles.set(task, entry);
+  }
+  return entry.promise;
+}
+
+/** Open task `task`'s details from its row in the model's details (once
+ *  its file is in). */
+async function openTaskDetail(task, row) {
+  if (!detailModel) return;
+  const token = taskOpening = {};
+  detailTask = task;
+  urlState.save();
+  await loadTaskFile(task);
+  if (taskOpening !== token || detailTask !== task || !detailModel) return;
+  taskOpening = null;
+  hideTooltip();
+  const from = row?.isConnected ? row.getBoundingClientRect() : null;
+  taskView.show(taskDetailData(detailModel, task), { from, refocusTo: row });
+}
+
+/** Close the task's details: shrunk back into its row (`animate`), else
+ *  at once. */
+function closeTaskDetail({ animate = true } = {}) {
+  const task = detailTask;
+  detailTask = null;
+  taskOpening = null;
+  urlState.save();
+  if (!taskView?.isOpen()) return;
+  const row = task && detailView?.taskRow(task);
+  taskView.hide({ to: animate && row ? row.getBoundingClientRect() : null, focus: row });
+}
+
+/** The task's details as the state wants them: shown for the open model
+ *  and shot (opened at once, from a link: once the task's file is in), or
+ *  closed. */
+function syncTaskDetail() {
+  if (!taskView || taskOpening) return;
+  if (!detailModel || !detailTask) {
+    if (taskView.isOpen()) taskView.hide();
+    return;
+  }
+  const entry = taskFiles.get(detailTask);
+  if (entry && entry.data !== undefined) {
+    taskView.show(taskDetailData(detailModel, detailTask));
+    return;
+  }
+  const token = taskOpening = {};
+  loadTaskFile(detailTask).then(() => {
+    if (taskOpening !== token) return;
+    taskOpening = null;
+    syncTaskDetail();
+  });
+}
+
+/** A task's name as a title: capitalized, its dataset's name cased as a
+ *  proper noun ("Reading comprehension (Belebele)"). */
+function taskTitle(name) {
+  const m = name.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
+  if (!m) return capitalize(name);
+  const inner = TASK_NAME_DISPLAY[m[2].toLowerCase()] || m[2];
+  return capitalize(m[1]) + " (" + inner + ")";
+}
+
+const NUMBER_WORDS = ["no", "one", "two", "three", "four", "five"];
+
+/** How the task's answers are scored (the prompts' note), for `shot`. */
+function scoringNote(about, prompts, shot) {
+  const out = [];
+  if (about.output === "multiple_choice") {
+    out.push(prompts.every((p) => !p.text && !p.instruction)
+      ? "No prompt: each answer option is scored on its own, and the one the model finds most likely is its answer."
+      : "The answer option the model finds most likely is its answer.");
+  } else if (about.output === "generate_until") {
+    const until = about.until || [];
+    const stop = until.includes("\n") ? " until a line break" : until.includes("\n\n") ? " until an empty line" : "";
+    const most = about.max_tokens ? ` (at most ${about.max_tokens} tokens)` : "";
+    out.push(`The model writes its answer${about.sampling ? "" : " greedily"}${stop}${most}, scored against the reference.`);
+  }
+  const k = +shot;
+  if (k > 0) {
+    const n = NUMBER_WORDS[k] || String(k);
+    out.push(`At ${shot}-shot, ${n} solved example${k === 1 ? " comes" : "s come"} first, in the same format.`);
+  }
+  return out.join(" ");
+}
+
+/** The task details' content for model `m` on task `task`, at the
+ *  details' shot (task-detail.js): best prompt, random-baseline rescaling,
+ *  every model of the dashboard that has results for the task. */
+function taskDetailData(m, task) {
+  const info = state.metricsSetup[task];
+  const file = taskFiles.get(task)?.data || null;
+  const shot = detailShotNow();
+  const key = [m, task, shot, !!file].join("|");
+  if (taskDetailCache?.key === key) return taskDetailCache.data;
+  const name = info.pretty_name || task;
+  const color = getModelColor(m);
+  const metric = METRIC_DISPLAY[info.main_metric] || info.main_metric;
+  const about = file?.about || {};
+  const prompts = file?.prompts || [];
+  const ids = file ? file.models : [];
+  const mi = ids.indexOf(m);
+  const known = ids.map((id) => isKnownModel(id));
+  const kinds = { multiple_choice: "multiple choice", generate_until: "generated answers" };
+  const url = info.url || (about.dataset ? "https://huggingface.co/datasets/" + about.dataset : "");
+  const fixed = { currentShot: shot, currentPromptAgg: "max", currentNormalization: "baseline", currentMetric: null };
+  const data = withState(fixed, () => {
+    const fmt = scoreDecimals();
+    const norm = (v) => (v == null || Number.isNaN(v) ? null : normScore(v, task, null));
+    const text = (v) => (v == null ? "–" : v.toFixed(fmt));
+    const best = (vals) => {
+      const ok = (vals || []).filter((v) => v != null);
+      return ok.length ? Math.max(...ok) : null;
+    };
+    const ci = (pair) => (pair ? [norm(pair[0]), norm(pair[1])] : null);
+    const block = file?.shots?.[shot];
+    // The model's best score at each shot.
+    const shots = shotValues().map((s) => {
+      const v = norm(best(file?.shots?.[s]?.prompts[mi]));
+      return { shot: s, current: s === shot, text: text(v) };
+    });
+    // A row of every model's scores at this shot: `pick(row of a model)`.
+    const scoreRow = (key, label, pick, pickCI) => {
+      const all = ids.map((id, j) => (known[j] && block?.[key]?.[j] ? norm(pick(block[key][j])) : null));
+      const value = mi >= 0 ? all[mi] : null;
+      return { name: label, value, text: text(value), all, ci: mi >= 0 && pickCI ? ci(pickCI(mi)) : null };
+    };
+    const mine = mi >= 0 ? block?.prompts[mi] || [] : [];
+    const top = mine.length > 1 ? mine.indexOf(best(mine)) : -1;
+    const promptRows = prompts.map((p, i) => ({
+      ...scoreRow("prompts", `Prompt ${i + 1}`, (r) => r[i], (j) => block?.prompt_ci?.[j]?.[i]),
+      key: "p" + i, best: i === top, template: p,
+    }));
+    const partRows = file?.parts?.length
+      ? file.parts.map((code, i) => ({
+          ...scoreRow("parts", info.subtasks?.[code]?.pretty_name || code, (r) => r[i], (j) => block?.part_ci?.[j]?.[i]),
+          key: code, note: info.subtasks?.[code]?.description || "",
+        }))
+      : null;
+    // Every model's best score, in order.
+    const ranked = ids.map((id, j) => (known[j] && block ? { id, name: getModelLabel(id), value: norm(best(block.prompts[j])), me: j === mi } : null))
+      .filter((r) => r && r.value != null)
+      .sort((a, b) => b.value - a.value || a.name.localeCompare(b.name));
+    for (const r of ranked) r.text = text(r.value);
+    const bestCI = mi >= 0 ? ci(block?.best_ci?.[mi]) : null;
+    // The strips' scale: from the lowest to the highest value shown; the
+    // bars' from 0.
+    const shown = [
+      ...promptRows.flatMap((r) => (promptRows.length > 1 ? [...r.all, ...(r.ci || [])] : [])),
+      ...(partRows || []).flatMap((r) => [...r.all, ...(r.ci || [])]),
+    ].filter((v) => v != null);
+    let lo = shown.length ? Math.min(...shown) : 0, hi = shown.length ? Math.max(...shown) : 1;
+    if (!(hi > lo)) { lo -= 1; hi += 1; }
+    const pad = (hi - lo) * 0.03;
+    const barValues = [0, ...ranked.map((r) => r.value), ...(bestCI || [])];
+    const barLo = Math.min(...barValues), barHi = Math.max(...barValues);
+    const others = ranked.filter((r) => !r.me).length;
+    const several = prompts.length > 1;
+    const rescaled = info.random_baseline > 0 ? ", rescaled from random guessing (0) to a perfect score (100)" : "";
+    return {
+      task, shot,
+      model: { id: m, title: getModelLabel(m), color },
+      title: taskTitle(name), variant: taskVariant(task, name),
+      facts: [
+        // (The category, unless the task's name says it.)
+        name.toLowerCase().startsWith((info.category || "").toLowerCase()) ? "" : capitalize(info.category || ""),
+        kinds[about.output] || "",
+        file?.examples ? file.examples.toLocaleString("en") + " examples" : "",
+        prompts.length ? (prompts.length === 1 ? "1 prompt" : prompts.length + " prompts") : "",
+      ].filter(Boolean),
+      link: url ? { href: url, text: shortUrl(url) } : null,
+      description: info.description || "",
+      headline: { label: capitalize(metric) + (several ? " with its best prompt" : "") + rescaled },
+      shots, others,
+      note: file ? scoringNote(about, prompts, shot) : "The task's prompts and scores could not be loaded.",
+      prompts: promptRows, parts: partRows,
+      domain: [lo - pad, hi + pad],
+      ranking: {
+        title: ranked.length + " models",
+        note: `${shot}-shot${several ? ", each with its best prompt" : ""}.`,
+        rows: ranked, ci: bestCI, domain: [barLo, barHi + (barHi - barLo) * 0.02],
+      },
+    };
+  });
+  taskDetailCache = { key, data };
   return data;
 }
 
@@ -2543,7 +2741,7 @@ function renderModelBars(modelNames, opts) {
   const mark = selectionMark(modelNames, labels);
   layout.shapes.push(...mark.shapes);
   layout.xaxis.ticktext = mark.ticktext;
-  plotChart([trace], touchSafe(layout), plotlyConfig, onChartHover, hideTooltip);
+  plotChart([trace], touchSafe(layout), plotlyConfig, onChartHover, onChartUnhover);
   if (chartEl) {
     chartEl._barModels = modelNames;
     chartEl._barLabels = labels;
@@ -2726,7 +2924,7 @@ function renderModelBarsHorizontal(modelNames, { values, ciValues, customdata })
   const mark = selectionMark(modelNames, ticktext, true);
   layout.shapes = mark.shapes;
   layout.yaxis.ticktext = mark.ticktext;
-  plotChart([trace], touchSafe(layout), plotlyConfig, onChartHover, hideTooltip);
+  plotChart([trace], touchSafe(layout), plotlyConfig, onChartHover, onChartUnhover);
   const chartEl = document.getElementById("chart");
   if (!chartEl) return;
   chartEl._barModels = modelNames;
@@ -2810,8 +3008,6 @@ function renderAggregateBarChart() {
     ciValues: wantCI() ? results.map((r) => r ? r.ci : null) : null,
     customdata: results.map((r, i) => ({
       count: r ? r.count : 0, ci: r ? r.ci : null, modelDir: modelNames[i],
-      tasksUsed: r?.tasksUsed, tasksTotal: r?.tasksTotal, fewerPrompts: r?.fewerPrompts,
-      categories: r?.categories,
     })),
     yRange: computeAggregateYRange(),
   });
@@ -2828,10 +3024,7 @@ function renderSingleBenchmarkBarChart(benchmark) {
   renderModelBars(modelNames, {
     values: points.map((p) => p ? p.score : null),
     ciValues: wantCI() ? points.map((p) => p ? p.ci : null) : null,
-    customdata: modelNames.map((m, i) => ({
-      ci: points[i]?.ci ?? null, modelDir: m,
-      nPrompts: promptCount(m, benchmark, metric), maxPrompts: maxPromptCount(benchmark, metric),
-    })),
+    customdata: modelNames.map((m, i) => ({ ci: points[i]?.ci ?? null, modelDir: m })),
     yRange: computeSingleYRange(benchmark, metric),
   });
 }
@@ -2856,10 +3049,8 @@ function renderSingleBenchmarkScatter(benchmark) {
   const allRaw = (state.currentNormalization !== "none")
     ? allRawScores(modelNames, benchmark, metric)
     : null;
-  const { xs, ys, dirs, colors, cis, extras } = collectScatterPoints(modelNames, (m) => {
-    const p = modelScoreCI(m, benchmark, metric, allRaw);
-    return p && { ...p, nPrompts: promptCount(m, benchmark, metric), maxPrompts: maxPromptCount(benchmark, metric) };
-  });
+  const { xs, ys, dirs, colors, cis, extras } = collectScatterPoints(
+    modelNames, (m) => modelScoreCI(m, benchmark, metric, allRaw));
   plotScatter(xs, ys, dirs, colors, cis, computeSingleYRange(benchmark, metric), extras);
 }
 
@@ -2916,7 +3107,7 @@ function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
   // can scale only the hovered model's images, not nearby ones.
   document.getElementById("chart")._scatterImageMap = composite.imageToModel;
 
-  plotChart([trace], touchSafe(layout), plotlyConfig, onChartHover, hideTooltip);
+  plotChart([trace], touchSafe(layout), plotlyConfig, onChartHover, onChartUnhover);
   bindModelDetailClicks(el);
 }
 

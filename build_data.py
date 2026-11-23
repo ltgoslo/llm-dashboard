@@ -10,6 +10,10 @@ Outputs:
         each model's results in docs/noreval/models/<model>.json, loaded
         on demand by the page — see write_comparison_data)
     docs/noreval-gen/data.json    — instruction-tuned NorEval comparison
+    docs/noreval{,-gen}/details/  — what the model details show beyond the
+        chart's data (write_task_details): each task's prompts and every
+        model's score with each of them (tasks/<task>.json), and on noreval
+        every model's best-prompt scores (best.json)
     docs/norolmo/data.json        — NorOLMo progression + ablations
     docs/multisynt/data.json      — multilingual progression
     docs/prelude/data.json        — OpenEuroLLM Prelude progression (NorEval 1.2)
@@ -27,6 +31,7 @@ formulation-aware extraction/reduction helpers on a NorOLMo-shaped
 (single trajectory, per-step) data.json.
 """
 
+import ast
 import glob
 import hashlib
 import json
@@ -34,6 +39,8 @@ import math
 import os
 import re
 import statistics
+import string
+from collections import Counter
 from pathlib import Path
 
 import yaml
@@ -602,7 +609,185 @@ def reports_metric(task_results, metric):
     return False
 
 
-def noreval_extract(results_json_path, benchmark_name, subtasks, metrics_setup_entry):
+# ── Per-prompt detail for the model details' task view ──────────────────
+# (write_task_details). A prompt's text as the page shows it: a template
+# whose slots, the dataset's fields, are written {{expression}}.
+
+
+def _format_slots(s):
+    """A str.format() template's {name} fields as {{name}} slots ({{ and }}
+    escapes become plain braces)."""
+    out = []
+    for literal, field, _spec, _conv in string.Formatter().parse(s):
+        out.append(literal)
+        if field is not None:
+            out.append("{{" + (field or "?") + "}}")
+    return "".join(out)
+
+
+def _literal_template(node):
+    """A string expression (an f-string, a plain string, or a plain string
+    .format()-ed) as a display template, or None."""
+    if isinstance(node, ast.JoinedStr):
+        parts = []
+        for v in node.values:
+            if isinstance(v, ast.Constant) and isinstance(v.value, str):
+                parts.append(v.value)
+            elif isinstance(v, ast.FormattedValue):
+                parts.append("{{" + ast.unparse(v.value) + "}}")
+        return "".join(parts)
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return _format_slots(node.value)
+    if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "format"):
+        return _literal_template(node.func.value)
+    return None
+
+
+def function_prompt_template(src):
+    """The prompt a doc_to_text function (its source, as the harness logs
+    it) builds: the string it assigns to `prompt`, or else returns, with its
+    variables as slots. None when there is no such string."""
+    try:
+        tree = ast.parse(src)
+    except SyntaxError:
+        return None
+    fn = next((n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)), None)
+    if fn is None:
+        return None
+    for node in ast.walk(fn):
+        if isinstance(node, ast.Assign) and any(
+                isinstance(t, ast.Name) and t.id == "prompt" for t in node.targets):
+            text = _literal_template(node.value)
+            if text is not None:
+                return text
+    for node in ast.walk(fn):
+        if isinstance(node, ast.Return) and node.value is not None:
+            text = _literal_template(node.value)
+            if text is not None:
+                return text
+    return None
+
+
+def display_template(value):
+    """A config's doc_to_text / doc_to_choice / doc_to_target as the page
+    shows it: a Jinja template as it is, a dataset field as its slot, a
+    function's prompt string (function_prompt_template), a list of literal
+    choices as a list; anything else (an index) None."""
+    if isinstance(value, list):
+        return [str(v) for v in value]
+    if not isinstance(value, str):
+        return None
+    if value.lstrip().startswith("def "):
+        return function_prompt_template(value)
+    if re.fullmatch(r"[A-Za-z_]\w*", value):
+        return "{{" + value + "}}"
+    return value
+
+
+def prompt_display_config(cfg):
+    """One prompt's config as the task view shows it: its text (with the
+    task's instruction, if any, before it), the answer options a multiple-
+    choice prompt scores, the reference a generated answer is scored
+    against."""
+    out = {"text": display_template(cfg.get("doc_to_text")) or ""}
+    if cfg.get("description"):
+        out["instruction"] = str(cfg["description"])
+    if cfg.get("output_type") == "multiple_choice":
+        choices = display_template(cfg.get("doc_to_choice"))
+        if choices:
+            out["choices"] = choices
+    elif cfg.get("output_type") == "generate_until":
+        target = display_template(cfg.get("doc_to_target"))
+        if target:
+            out["target"] = target
+    return out
+
+
+def task_about(cfg):
+    """A task's setup, from one of its prompts' configs: the dataset (its
+    Hugging Face path, subset, split), the output type and, for generated
+    answers, the decoding."""
+    about = {
+        "dataset": cfg.get("dataset_path") or "",
+        "subset": cfg.get("dataset_name") or "",
+        "split": cfg.get("test_split") or cfg.get("validation_split") or "",
+        "output": cfg.get("output_type") or "",
+    }
+    if about["output"] == "generate_until":
+        gen = cfg.get("generation_kwargs") or {}
+        about["max_tokens"] = gen.get("max_new_tokens") or gen.get("max_gen_toks")
+        about["until"] = [str(u) for u in (gen.get("until") or [])]
+        about["sampling"] = bool(gen.get("do_sample"))
+    return about
+
+
+def collect_prompt_details(data, benchmark_name, subtasks, config, bench_exclusions,
+                           metric_scale, out):
+    """Fill `out` with one results file's per-prompt detail: the main
+    metric's value and plain 95% CI with each prompt ("prompts": {index:
+    (value, lo, hi)}; prompt <benchmark>_p<N> is index N, a lone
+    <benchmark> entry index 0) and in each subtask ("parts": {code: (value,
+    lo, hi)}), each prompt's display config ("configs"), the task's setup
+    ("about") and its number of examples ("examples"). The values are the
+    ones the aggregate reduces (noreval_extract)."""
+    main = config["main_metric"]
+    is_proportion = main.split(": ", 1)[0] in PROPORTION_METRIC_NAMES
+    zero_fill = ZERO_IF_MISSING_METRICS.get(benchmark_name)
+    results = data.get("results", {})
+    n_samples_dict = data.get("n-samples", {})
+    configs = data.get("configs", {})
+
+    def point(task_results, n):
+        values = {}
+        collect_prompt_metrics(task_results, n, bench_exclusions, metric_scale, values)
+        triples = values.get(main)
+        if triples:
+            v, se, n = triples[0]
+        elif zero_fill == main and not reports_metric(task_results, zero_fill):
+            v, se = 0.0, resolve_se(zero_fill, 0.0, None, n, metric_scale)
+        else:
+            return None
+        lo, hi = sampling_ci(v, se, n, metric_scale, is_proportion)
+        return (round(v, 6), round(lo, 6), round(hi, 6))
+
+    prompts, cfgs, examples = {}, {}, None
+    for task_key, task_results in results.items():
+        if task_key == benchmark_name:
+            idx = 0
+        else:
+            m = re.fullmatch(re.escape(benchmark_name) + r"_p(\d+)", task_key)
+            if not m:
+                continue
+            idx = int(m.group(1))
+        n = get_n_samples(n_samples_dict, task_key)
+        p = point(task_results, n)
+        if p is not None:
+            prompts[idx] = p
+        if task_key in configs:
+            cfgs[idx] = prompt_display_config(configs[task_key])
+        if examples is None and n:
+            examples = n
+    parts = {}
+    for code in (subtasks or {}):
+        key = f"{benchmark_name}_{code}"
+        if key in results:
+            n = get_n_samples(n_samples_dict, key)
+            p = point(results[key], n)
+            if p is not None:
+                parts[code] = p
+            if key in configs and not cfgs:
+                cfgs[0] = prompt_display_config(configs[key])
+    if examples is None and subtasks:
+        ns = [get_n_samples(n_samples_dict, f"{benchmark_name}_{c}") for c in subtasks]
+        examples = sum(n for n in ns if n) or None
+    first = next((configs[k] for k in configs if k.startswith(benchmark_name)), None)
+    out.update(prompts=prompts, parts=parts, configs=cfgs,
+               about=task_about(first) if first else {}, examples=examples)
+
+
+def noreval_extract(results_json_path, benchmark_name, subtasks, metrics_setup_entry,
+                    prompt_details=None):
     """Read a NorEval result JSON and aggregate metrics across prompt variants.
 
     For each `(benchmark_name|benchmark_name_p<N>)` entry under "results", and
@@ -610,6 +795,8 @@ def noreval_extract(results_json_path, benchmark_name, subtasks, metrics_setup_e
     `<metric>,none` value. Aggregate across prompt variants with
     aggregate_prompt_variants(). A prompt that lacks its benchmark's
     ZERO_IF_MISSING_METRICS metric (ask_gec's ERRANT) counts as 0 for it.
+    With `prompt_details` (a dict), also fills it with the file's
+    per-prompt detail (collect_prompt_details).
 
     Returns {metric_name: {…}} or None.
     """
@@ -657,15 +844,21 @@ def noreval_extract(results_json_path, benchmark_name, subtasks, metrics_setup_e
             rename=lambda m, p=pretty_name: f"{m}: {p}",
         )
 
+    if prompt_details is not None and metrics_setup_entry:
+        collect_prompt_details(data, benchmark_name, subtasks, metrics_setup_entry,
+                               bench_exclusions, metric_scale, prompt_details)
+
     return aggregate_prompt_variants(metric_values, metric_scale)
 
 
-def noreval_process_model_dir(model_path, metrics_setup):
+def noreval_process_model_dir(model_path, metrics_setup, details=None):
     """Walk one model directory and collect per-benchmark per-shot scores.
 
     Returns (scores, discovered_metrics) where:
       scores = {benchmark: {shot: {metric: {…}}}}
       discovered_metrics = {benchmark: set_of_metric_names}
+    With `details` (a dict), also fills details[benchmark][shot] with the
+    per-prompt detail of each results file (collect_prompt_details).
     """
     scores = {}
     discovered = {}
@@ -679,10 +872,13 @@ def noreval_process_model_dir(model_path, metrics_setup):
             results_file = find_latest_results_json(shot_path)
             if results_file is None:
                 continue
-            agg = noreval_extract(results_file, benchmark, subtasks, config)
+            prompt_details = {} if details is not None else None
+            agg = noreval_extract(results_file, benchmark, subtasks, config, prompt_details)
             if agg is not None:
                 bench_scores[shot_key] = agg
                 discovered.setdefault(benchmark, set()).update(agg.keys())
+                if prompt_details:
+                    details.setdefault(benchmark, {})[shot_key] = prompt_details
         if bench_scores:
             scores[benchmark] = bench_scores
     return scores, discovered
@@ -787,8 +983,10 @@ def build_noreval_lang_lists(metrics_setup):
 # ─────────────────────────────────────────────────────────────
 
 
-def build_comparison_data(results_dir, models_yaml, metrics_setup):
-    """Build a complete data.json for a comparison dashboard."""
+def build_comparison_data(results_dir, models_yaml, metrics_setup, details=None):
+    """Build a complete data.json for a comparison dashboard. With `details`
+    (a dict), also fills details[model][benchmark][shot] with the per-prompt
+    detail the model details' task view shows (write_task_details)."""
     models = {}
     discovered = {}
     if results_dir.is_dir():
@@ -797,8 +995,11 @@ def build_comparison_data(results_dir, models_yaml, metrics_setup):
             if not model_path.is_dir():
                 continue
             print(f"  Model: {model_dir}")
-            scores, disc = noreval_process_model_dir(str(model_path), metrics_setup)
+            model_details = {} if details is not None else None
+            scores, disc = noreval_process_model_dir(str(model_path), metrics_setup, model_details)
             models[model_dir] = scores
+            if model_details is not None:
+                details[model_dir] = model_details
             for b, mset in disc.items():
                 discovered.setdefault(b, set()).update(mset)
 
@@ -1731,25 +1932,6 @@ def write_data(out_path, data):
     print(f"  → wrote {out_path.relative_to(BASE_DIR)} ({size_kb:.1f} KB)")
 
 
-def max_prompt_counts(models):
-    """{bench: {shot: {metric: the most prompt templates any model has}}} —
-    what the comparison page's "fewer prompts than other models" notes
-    compare against, which with per-model results files it can't compute
-    from the models it has loaded."""
-    table = {}
-    for results in models.values():
-        for bench, shots in results.items():
-            for shot, metrics in shots.items():
-                for metric, point in metrics.items():
-                    n = point.get("n_prompts") if isinstance(point, dict) else None
-                    if isinstance(n, bool) or not isinstance(n, (int, float)) or not math.isfinite(n):
-                        continue
-                    cell = table.setdefault(bench, {}).setdefault(shot, {})
-                    if metric not in cell or n > cell[metric]:
-                        cell[metric] = n
-    return table
-
-
 # Fields of a stored score entry the comparison pages never read: their
 # prompt aggregations are max / mean / median / min only (no "first", no
 # "stdev" = prompt_sd), and nothing shows the best prompt's index. Dropped
@@ -1779,10 +1961,10 @@ def write_comparison_data(out_path, data):
     """Write a comparison dashboard with its results split per model, so the
     page loads only the models a view shows (docs/shared/comparison.js
     ensureModelsLoaded): data.json keeps everything but `models`, plus
-    `model_ids` (all models, in data order), `max_prompts`
-    (max_prompt_counts) and `results_version` (a hash of all results, which
-    the page appends to the results URLs so a browser never mixes files of
-    two builds); each model's results go to models/<model id>.json, minus
+    `model_ids` (all models, in data order) and `results_version` (a hash
+    of all results, which the page appends to the results URLs so a
+    browser never mixes files of two builds); each model's results go to
+    models/<model id>.json, minus
     the fields the page never reads (COMPARISON_UNUSED_FIELDS). Files of
     models that no longer exist are removed."""
     models = data["models"]
@@ -1800,27 +1982,137 @@ def write_comparison_data(out_path, data):
         digest.update(f"{m}\t{blob}\n".encode())
     core = {k: v for k, v in data.items() if k != "models"}
     core["model_ids"] = list(models)
-    core["max_prompts"] = max_prompt_counts(models)
     core["results_version"] = digest.hexdigest()[:12]
     write_data(out_path, core)
     total_kb = sum(len(b.encode()) for b in blobs.values()) / 1024
     print(f"  → wrote {len(blobs)} files to {models_dir.relative_to(BASE_DIR)}/ ({total_kb:.1f} KB)")
 
 
+def _most_common(items):
+    """The most common of JSON-able `items` (the first of a tie), or None."""
+    counts = Counter(json.dumps(x, sort_keys=True, ensure_ascii=False) for x in items)
+    return json.loads(counts.most_common(1)[0][0]) if counts else None
+
+
+def write_task_details(page_dir, data, details, best_scores=False):
+    """Write what a comparison page's model details show beyond the chart's
+    data, into <page>/details/, and set data["details_version"] (a hash of
+    these files, which the page appends to their URLs):
+
+      tasks/<task>.json — the task view (docs/shared/task-detail.js): the
+        task's setup ("about", "examples"), its prompts as shown ("prompts":
+        the display config most models logged for each prompt index), its
+        subtasks ("parts": the metrics_setup codes), and per shot every
+        model's main-metric score and plain 95% CI with each prompt and in
+        each subtask, and the best prompt's CI (as the chart's max). The
+        models ("models") in data order; per shot, a row per model (null
+        without results).
+      best.json (`best_scores`, for a page whose results are split per
+        model) — every model's best-prompt main-metric score per task and
+        shot: the model details compare all models without loading each
+        one's results.
+
+    `details` is build_comparison_data's per-prompt detail. Files of tasks
+    that no longer exist are removed."""
+    out_dir = page_dir / "details"
+    tasks_dir = out_dir / "tasks"
+    tasks_dir.mkdir(parents=True, exist_ok=True)
+    models = list(data["models"])
+    blobs = {}
+    for bench, info in data["metrics_setup"].items():
+        main = info["main_metric"]
+        per_model = {m: details.get(m, {}).get(bench, {}) for m in models}
+        present = [m for m in models if per_model[m]]
+        if not present:
+            continue
+        runs = [run for m in present for run in per_model[m].values()]
+        indices = sorted({i for run in runs for i in run["prompts"]} | {i for run in runs for i in run["configs"]})
+        prompts = [_most_common(run["configs"][i] for run in runs if i in run["configs"]) or {"text": ""}
+                   for i in indices]
+        parts = list(info.get("subtasks") or {})
+        shots = {}
+        for shot in SHOT_SETTINGS:
+            rows = [per_model[m].get(shot) for m in present]
+            if not any(rows):
+                continue
+            entries = [data["models"][m].get(bench, {}).get(shot, {}).get(main) for m in present]
+            for m, row, entry in zip(present, rows, entries):
+                # The prompts' best is the score the chart shows as "max".
+                if row and row["prompts"] and isinstance(entry, dict):
+                    best = max(v for v, _, _ in row["prompts"].values())
+                    if abs(best - entry["max"]) > 1e-9:
+                        print(f"  WARNING: {m} {bench} {shot}-shot: best prompt {best} ≠ max {entry['max']}")
+            block = {
+                "prompts": [[row["prompts"][i][0] if i in row["prompts"] else None for i in indices]
+                            if row else None for row in rows],
+                "prompt_ci": [[list(row["prompts"][i][1:]) if i in row["prompts"] else None for i in indices]
+                              if row else None for row in rows],
+                "best_ci": [[entry["max_ci_lo"], entry["max_ci_hi"]]
+                            if isinstance(entry, dict) and "max_ci_lo" in entry else None
+                            for entry in entries],
+            }
+            if parts:
+                block["parts"] = [[row["parts"][c][0] if c in row["parts"] else None for c in parts]
+                                  if row else None for row in rows]
+                block["part_ci"] = [[list(row["parts"][c][1:]) if c in row["parts"] else None for c in parts]
+                                    if row else None for row in rows]
+            shots[shot] = block
+        task = {
+            "task": bench,
+            "about": _most_common(run["about"] for run in runs if run.get("about")) or {},
+            "examples": _most_common(run["examples"] for run in runs if run.get("examples")),
+            "prompts": prompts,
+        }
+        if parts:
+            task["parts"] = parts
+        task["models"] = present
+        task["shots"] = shots
+        blobs[f"tasks/{bench}.json"] = json.dumps(task, ensure_ascii=False, separators=(",", ":"))
+    if best_scores:
+        tasks = list(data["metrics_setup"])
+        best = {
+            "tasks": tasks,
+            "models": models,
+            "shots": {
+                shot: [[(data["models"][m].get(t, {}).get(shot, {}).get(data["metrics_setup"][t]["main_metric"]) or {}).get("max")
+                        for t in tasks] for m in models]
+                for shot in SHOT_SETTINGS
+            },
+        }
+        blobs["best.json"] = json.dumps(best, ensure_ascii=False, separators=(",", ":"))
+    for old in tasks_dir.glob("*.json"):
+        if f"tasks/{old.name}" not in blobs:
+            old.unlink()
+    if not best_scores and (out_dir / "best.json").exists():
+        (out_dir / "best.json").unlink()
+    digest = hashlib.sha1()
+    for name, blob in blobs.items():
+        with open(out_dir / name, "w") as f:
+            f.write(blob)
+        digest.update(f"{name}\t{blob}\n".encode())
+    data["details_version"] = digest.hexdigest()[:12]
+    total_kb = sum(len(b.encode()) for b in blobs.values()) / 1024
+    print(f"  → wrote {len(blobs)} files to {out_dir.relative_to(BASE_DIR)}/ ({total_kb:.1f} KB)")
+
+
 def main():
     metrics_setup = load_yaml(METRICS_SETUP_YAML)
 
     print("\n=== Building docs/noreval/data.json (base models) ===")
+    details = {}
     noreval = build_comparison_data(
-        NOREVAL_RESULTS, MODELS_SETUP_YAML, metrics_setup
+        NOREVAL_RESULTS, MODELS_SETUP_YAML, metrics_setup, details
     )
+    write_task_details(NOREVAL_OUT.parent, noreval, details, best_scores=True)
     write_comparison_data(NOREVAL_OUT, noreval)
     print(f"  Models: {len(noreval['models'])}")
 
     print("\n=== Building docs/noreval-gen/data.json (instruct models) ===")
+    details = {}
     noreval_gen = build_comparison_data(
-        NOREVAL_GEN_RESULTS, INSTRUCT_MODELS_SETUP_YAML, metrics_setup
+        NOREVAL_GEN_RESULTS, INSTRUCT_MODELS_SETUP_YAML, metrics_setup, details
     )
+    write_task_details(NOREVAL_GEN_OUT.parent, noreval_gen, details)
     write_data(NOREVAL_GEN_OUT, noreval_gen)
     print(f"  Models: {len(noreval_gen['models'])}")
 

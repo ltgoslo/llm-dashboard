@@ -32,10 +32,9 @@ export function markAppReady() {
 
 let tooltipTimeout = null;
 
-/** Show the tooltip at the pointer. `rows` (optional) is a list of
- *  {label, value} drawn as a two-column table under the footer, e.g. a
- *  model's average per task category in an aggregate view. */
-export function showTooltip(event, title, body, footer, meta, rows = []) {
+/** Show the tooltip at the pointer. `hint` (optional) is a last line of
+ *  help in plain muted text, e.g. what a click on the hovered mark does. */
+export function showTooltip(event, title, body, footer, meta, hint = "") {
   const tooltip = document.getElementById("custom-tooltip");
   const titleEl = document.getElementById("tooltip-title");
   const metaEl = document.getElementById("tooltip-meta");
@@ -45,29 +44,24 @@ export function showTooltip(event, title, body, footer, meta, rows = []) {
   metaEl.textContent = meta || ""; metaEl.style.display = meta ? "" : "none";
   bodyEl.textContent = body || ""; bodyEl.style.display = body ? "" : "none";
   footerEl.textContent = footer || ""; footerEl.style.display = footer ? "" : "none";
-  renderTooltipRows(footerEl, rows);
+  renderTooltipHint(footerEl, hint);
   positionTooltip(tooltip, event);
   tooltip.classList.add("visible");
 }
 
-/** Fill (or hide) the tooltip's row table, created after the footer on
- *  first use. Built from text nodes, so labels can't inject markup. */
-function renderTooltipRows(footerEl, rows) {
-  let table = document.getElementById("tooltip-rows");
-  if (!table) {
-    table = document.createElement("div");
-    table.id = "tooltip-rows";
-    table.className = "tooltip-rows";
-    footerEl.after(table);
+/** Fill (or hide) the tooltip's hint line: created after the footer on
+ *  first use. */
+function renderTooltipHint(footerEl, hint) {
+  let line = document.getElementById("tooltip-hint");
+  if (!line) {
+    if (!hint) return;
+    line = document.createElement("div");
+    line.id = "tooltip-hint";
+    line.className = "tooltip-hint";
+    footerEl.after(line);
   }
-  table.replaceChildren(...(rows || []).flatMap(({ label, value }) => {
-    const l = document.createElement("span");
-    l.className = "tooltip-row-label"; l.textContent = label;
-    const v = document.createElement("span");
-    v.className = "tooltip-row-value"; v.textContent = value;
-    return [l, v];
-  }));
-  table.style.display = rows && rows.length ? "" : "none";
+  line.textContent = hint;
+  line.style.display = hint ? "" : "none";
 }
 
 export function hideTooltip() {
