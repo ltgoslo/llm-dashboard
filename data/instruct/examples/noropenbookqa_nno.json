@@ -1,0 +1,885 @@
+{
+ "task": "noropenbookqa_nno",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 5,
+   "doc_fingerprint": "3b1526a20187",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Faktatekst: Binders er ofte laga av ferromagnetisk metall\nSpørsmål til teksten: Korleis kan ein best beskrive gjenstanden som blir nytta for å halde papir saman?\n\nSvaralternativ:\n- Den er stor\n- Den er laga av tre\n- Den er ferromagnetisk\n- Den er elektronisk\n\nKva er rett svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Den er stor",
+     "Den er laga av tre",
+     "Den er ferromagnetisk",
+     "Den er elektronisk"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Den er ferromagnetisk"
+  },
+  {
+   "draw": 1,
+   "doc_index": 57,
+   "doc_fingerprint": "ba371c1b490e",
+   "prompt_variant": "noropenbookqa_nno_mcf_p2",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Månen er det himmelobjektet som er er nærmast jorda\nKva destinasjon utanfor jordkloden er den raskaste å kome seg til?\n A: Ingen av alternativa\n B: Ein tur til Mars\n C: Ein tur til månen\n D: Ein tur til nordstjerna\n\nEr det rette svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ingen av alternativa",
+     "Ein tur til Mars",
+     "Ein tur til månen",
+     "Ein tur til nordstjerna"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Ein tur til månen)"
+  },
+  {
+   "draw": 2,
+   "doc_index": 43,
+   "doc_fingerprint": "bbd677e93012",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Bakgrunn: Veps nyttar brodden sin som forsvar\n\nSpørsmål: Nokre skapningar har ein brodd på kroppen sin som dei nyttar for å stikke med. Kva slags skapning av dei følgjande alternativa er det som ikkje har ein slik brodd?\n- Veps\n- Bier\n- Skorpionar\n- Sommarfuglar\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Veps",
+     "Bier",
+     "Skorpionar",
+     "Sommarfuglar"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Sommarfuglar"
+  },
+  {
+   "draw": 3,
+   "doc_index": 21,
+   "doc_fingerprint": "30082d6c346e",
+   "prompt_variant": "noropenbookqa_nno_mcf_p0",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Ei stjerne er ei kjelde til lys gjennom kjernefysiske reaksjonar\nKva slags himmelsk førekomst er årsaka til kjernefysisk aktivitet?\n\nAlternativ:\n A: Aksial planetarisk rotasjon\n B: Kometar\n C: Planetarisk formasjon\n D: Strålane til sola\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Aksial planetarisk rotasjon",
+     "Kometar",
+     "Planetarisk formasjon",
+     "Strålane til sola"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Strålane til sola)"
+  },
+  {
+   "draw": 4,
+   "doc_index": 41,
+   "doc_fingerprint": "09e58fa33885",
+   "prompt_variant": "noropenbookqa_nno_mcf_p3",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Bakgrunn: Eit kompass er eit reiskap som bestemmer retning ved å peike nordover\n\nSpørsmål: Kva nyttar ein eit kompass til?\n A: Å teste varme\n B: For vindaukning\n C: Det målar distanse\n D: Det vis retning\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Å teste varme",
+     "For vindaukning",
+     "Det målar distanse",
+     "Det vis retning"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Det vis retning)"
+  },
+  {
+   "draw": 5,
+   "doc_index": 71,
+   "doc_fingerprint": "b23f01a2bd27",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Plasma blir danna av elektronar som skil seg ut frå atomar i stjerner på himmelen\nKva er den nærmaste kjelda av plasma til planeten vår?\n- Alle desse\n- Ei sky på himmelen\n- Den nærmaste stjerna som skin sterkt\n- Den nakne måneoverflata\n\nEr det rette svaret Alle desse, Ei sky på himmelen, Den nærmaste stjerna som skin sterkt eller Den nakne måneoverflata?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Alle desse",
+     "Ei sky på himmelen",
+     "Den nærmaste stjerna som skin sterkt",
+     "Den nakne måneoverflata"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Den nærmaste stjerna som skin sterkt"
+  },
+  {
+   "draw": 6,
+   "doc_index": 44,
+   "doc_fingerprint": "243336a3a509",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Vanlegvis er krater på planetar danna av asteriodar som påverkar overflata til planeten eller månen\nKva kan asteroidar som kræsjar på planetar etterlate?\n\nAlternativ:\n- Store, skålforma hulrom i bakken\n- Romvesen og framand mat\n- Små bulkar i kjerna til planeten\n- Innsjøar fylt med saltvatn\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Store, skålforma hulrom i bakken",
+     "Romvesen og framand mat",
+     "Små bulkar i kjerna til planeten",
+     "Innsjøar fylt med saltvatn"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Store, skålforma hulrom i bakken"
+  },
+  {
+   "draw": 7,
+   "doc_index": 68,
+   "doc_fingerprint": "3051f369291a",
+   "prompt_variant": "noropenbookqa_nno_mcf_p1",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Faktatekst: Viss ein gjenstand gjennomgår ein kjemisk forandring, vil den gjenstanden få nye kjemiske eigenskapar\nSpørsmål til teksten: På korleis måte kan eit glas med vatn gjennomgå ein kjemisk forandring?\n\nSvaralternativ:\n A: Ved å tilsetje 2.3 desiliter med salt\n B: Ved å tilsetje 2.3 desiliter med skit\n C: Ved å tilsetje 2.3 desiliter med vatn\n D: Ved å tilsetje 2.3 desiliter med isbitar\n\nKva er rett svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ved å tilsetje 2.3 desiliter med salt",
+     "Ved å tilsetje 2.3 desiliter med skit",
+     "Ved å tilsetje 2.3 desiliter med vatn",
+     "Ved å tilsetje 2.3 desiliter med isbitar"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Ved å tilsetje 2.3 desiliter med salt)"
+  },
+  {
+   "draw": 8,
+   "doc_index": 1,
+   "doc_fingerprint": "43331323a013",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Ta utgangspunkt i følgande fakta når du svarar på spørsmålet: Dyr trenger energi for å kunne bevege seg\n\nKva av alternativa trenger energi for å kunne bevege seg?\nVel rett svar blant desse alternativa:\n– Ein ilder\n– Eit lauvtre\n– Ein mango\n– Brennenesle\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ein ilder",
+     "Eit lauvtre",
+     "Ein mango",
+     "Brennenesle"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Ein ilder"
+  },
+  {
+   "draw": 9,
+   "doc_index": 75,
+   "doc_fingerprint": "eec634d9ef51",
+   "prompt_variant": "noropenbookqa_nno_mcf_p4",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Ta utgangspunkt i følgande fakta når du svarar på spørsmålet: Overflata til månen inneheld mange krater\n\nKva trekk er månen kjent for å ha?\nVel rett svar blant desse alternativa:\n A: Frosne vassstraumar\n B: Store skålforma holrom\n C: Grotter danna av solvind\n D: Grupper av store tre\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Frosne vassstraumar",
+     "Store skålforma holrom",
+     "Grotter danna av solvind",
+     "Grupper av store tre"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Store skålforma holrom)"
+  },
+  {
+   "draw": 10,
+   "doc_index": 61,
+   "doc_fingerprint": "5205b61593e4",
+   "prompt_variant": "noropenbookqa_nno_mcf_p4",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Ta utgangspunkt i følgande fakta når du svarar på spørsmålet: Når aktiviteta hjå eit dyr aukar, vil mengda av vatn i det dyret sin kropp minke\n\nKva av alternativa vil ein gepard som spring heile dagen miste mykje av?\nVel rett svar blant desse alternativa:\n A: Blod\n B: Vatn\n C: Bytte\n D: Flekkar\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Blod",
+     "Vatn",
+     "Bytte",
+     "Flekkar"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Vatn)"
+  },
+  {
+   "draw": 11,
+   "doc_index": 70,
+   "doc_fingerprint": "811bfcbf394f",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "DNA er eit reiskap for å overføre arvelege eigenskapar frå foreldre til avkom\nKva kan DNA vidareføre?\n\nAlternativ:\n- Ulike typar klede\n- Karakterar\n- Storleiken på ein person sin alboge\n- Språk og dialektar\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ulike typar klede",
+     "Karakterar",
+     "Storleiken på ein person sin alboge",
+     "Språk og dialektar"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Storleiken på ein person sin alboge"
+  },
+  {
+   "draw": 12,
+   "doc_index": 87,
+   "doc_fingerprint": "db7c79a9aeff",
+   "prompt_variant": "noropenbookqa_nno_mcf_p3",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Bakgrunn: Dyr har sanseorgan\n\nSpørsmål: På korleis måte skil dyr seg ut frå plantar?\n A: Dyr er levande vesen\n B: Ingen av alternativa\n C: Dyr kan lukte\n D: Dyr treng næring\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Dyr er levande vesen",
+     "Ingen av alternativa",
+     "Dyr kan lukte",
+     "Dyr treng næring"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Dyr kan lukte)"
+  },
+  {
+   "draw": 13,
+   "doc_index": 12,
+   "doc_fingerprint": "d5c5ccd68d93",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Ved at vatn-nivået veks, vil mengda av tilgjengeleg land minke\nKva skjer når vatn-nivå aukar?\n- Fisk svømmer meir\n- Heimer blir bygde\n- Land blir høgare\n- Strender synker\n\nEr det rette svaret Fisk svømmer meir, Heimer blir bygde, Land blir høgare eller Strender synker?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Fisk svømmer meir",
+     "Heimer blir bygde",
+     "Land blir høgare",
+     "Strender synker"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Strender synker"
+  },
+  {
+   "draw": 14,
+   "doc_index": 22,
+   "doc_fingerprint": "e528fce85963",
+   "prompt_variant": "noropenbookqa_nno_mcf_p2",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Ein nyttar synet for å sense visuelle ting\nKan nyttar ein for å sanse visuelle ting?\n A: Nerver\n B: Skinnbeinet\n C: Nasebora\n D: Horhinna\n\nEr det rette svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Nerver",
+     "Skinnbeinet",
+     "Nasebora",
+     "Horhinna"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Horhinna)"
+  },
+  {
+   "draw": 15,
+   "doc_index": 54,
+   "doc_fingerprint": "b0603b714ad2",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Bakgrunn: Friksjon nyttast for å stoppe eit køyretøy med bremser\n\nSpørsmål: Kva av alternativa ville raskast ha stoppa ein bil?\n- Eit hjul med blaute bremseklossar\n- Eit hjul utan bremseklossar\n- Eit hjul med slitte bremseklossar\n- Eit hjul med tørre bremseklossar\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Eit hjul med blaute bremseklossar",
+     "Eit hjul utan bremseklossar",
+     "Eit hjul med slitte bremseklossar",
+     "Eit hjul med tørre bremseklossar"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Eit hjul med tørre bremseklossar"
+  },
+  {
+   "draw": 16,
+   "doc_index": 89,
+   "doc_fingerprint": "45f958d4ba02",
+   "prompt_variant": "noropenbookqa_nno_mcf_p0",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Migrasjon er ei instinktiv åtferd\nKva av alternativa syner ei instinktiv åtferd ?\n\nAlternativ:\n A: Hundar som ruller rundt på kommando\n B: Froskar som returnerer til dammane der dei låg egga sine\n C: Fuglar som etterliknar snakkinga til menneske\n D: Selar som klappar for å få godsaker frå trenarane sine\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Hundar som ruller rundt på kommando",
+     "Froskar som returnerer til dammane der dei låg egga sine",
+     "Fuglar som etterliknar snakkinga til menneske",
+     "Selar som klappar for å få godsaker frå trenarane sine"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Froskar som returnerer til dammane der dei låg egga sine)"
+  },
+  {
+   "draw": 17,
+   "doc_index": 31,
+   "doc_fingerprint": "1981ad78c58a",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Faktatekst: Skjelettsystemet beskytter indre organer\nSpørsmål til teksten: Korleis kan ein best beskriva hjartet?\n\nSvaralternativ:\n- Som ein del av nervesystemet\n- Som eit organ som filtrerer gift\n- Som ein sjølv-lækjande bakterie-beskyttar\n- Som noko som er beskytta av skjeletet\n\nKva er rett svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Som ein del av nervesystemet",
+     "Som eit organ som filtrerer gift",
+     "Som ein sjølv-lækjande bakterie-beskyttar",
+     "Som noko som er beskytta av skjeletet"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Som noko som er beskytta av skjeletet"
+  },
+  {
+   "draw": 18,
+   "doc_index": 81,
+   "doc_fingerprint": "6349778b8c8e",
+   "prompt_variant": "noropenbookqa_nno_mcf_p1",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Faktatekst: Ein forbrukar kan ikkje produsere sin eigen mat\nSpørsmål til teksten: Ein hjort et på ein åker, og vil ha meir mat. Uansett kor hardt hjorten prøver, kan han ikkje produsere\n\nSvaralternativ:\n A: eit lengre gevir\n B: mat for ham sjølv\n C: kalv\n D: urin\n\nKva er rett svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "eit lengre gevir",
+     "mat for ham sjølv",
+     "kalv",
+     "urin"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (mat for ham sjølv)"
+  },
+  {
+   "draw": 19,
+   "doc_index": 17,
+   "doc_fingerprint": "2441342c55a3",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Ta utgangspunkt i følgande fakta når du svarar på spørsmålet: Fotosyntesen lagar energi til plantar ved å omdanne karbondioksid, vatn og sollys til karbohydrat\n\nKva av alternativa kan ikkje kategoriserast som ein inputt i fotosyntesen?\nVel rett svar blant desse alternativa:\n– Sollys\n– Oksygen\n– Vatn\n– Karbondioksid\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Sollys",
+     "Oksygen",
+     "Vatn",
+     "Karbondioksid"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Oksygen"
+  },
+  {
+   "draw": 20,
+   "doc_index": 46,
+   "doc_fingerprint": "051d4dc0a5fa",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Vind forårsakar erosjon\nKva kan vind forårsake?\n\nAlternativ:\n- At det blir oversvømmelse av vatn på grunn av været\n- at små fuglar drep store fuglar\n- at fossar straumar bakover\n- at steinar blir forvitra til småstein\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "At det blir oversvømmelse av vatn på grunn av været",
+     "at små fuglar drep store fuglar",
+     "at fossar straumar bakover",
+     "at steinar blir forvitra til småstein"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: at steinar blir forvitra til småstein"
+  },
+  {
+   "draw": 21,
+   "doc_index": 77,
+   "doc_fingerprint": "34c7589ba251",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Ein kan finne vassdamp i atmosfæren\nKvar kan vatn opphalde seg i si gassform?\n- Inni ein frisbee-golf driver\n- Inne i eit messingrøyr\n- Ei mil oppe i lufta\n- Inne i ein basketball laga av skinn\n\nEr det rette svaret Inni ein frisbee-golf driver, Inne i eit messingrøyr, Ei mil oppe i lufta eller Inne i ein basketball laga av skinn?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Inni ein frisbee-golf driver",
+     "Inne i eit messingrøyr",
+     "Ei mil oppe i lufta",
+     "Inne i ein basketball laga av skinn"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Ei mil oppe i lufta"
+  },
+  {
+   "draw": 22,
+   "doc_index": 15,
+   "doc_fingerprint": "2bf6a5a3e49f",
+   "prompt_variant": "noropenbookqa_nno_mcf_p1",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Faktatekst: Fuglar legg egg\nSpørsmål til teksten: Kva slags dyr er det som legg egg?\n\nSvaralternativ:\n A: Emuar\n B: Hundar\n C: Ekorn\n D: Sjiraffar\n\nKva er rett svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Emuar",
+     "Hundar",
+     "Ekorn",
+     "Sjiraffar"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Emuar)"
+  },
+  {
+   "draw": 23,
+   "doc_index": 50,
+   "doc_fingerprint": "b039f65fd23a",
+   "prompt_variant": "noropenbookqa_nno_mcf_p3",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Bakgrunn: Sola er den stjerna som står nærmast jordkloden\n\nSpørsmål: Det er mange stjerner som er synlege på himmelen på natta, men kva slags stjerne er den mest synlege om dagen?\n A: Månen som står nære oss\n B: Klynga av orionstjerna\n C: Sola som skin kvar dag\n D: Alle desse\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Månen som står nære oss",
+     "Klynga av orionstjerna",
+     "Sola som skin kvar dag",
+     "Alle desse"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Sola som skin kvar dag)"
+  },
+  {
+   "draw": 24,
+   "doc_index": 27,
+   "doc_fingerprint": "978cee307de0",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Faktatekst: Levande fødsel vil seie at fosteret utviklar seg inne i mora i staden for i eit egg\nSpørsmål til teksten: Kva dyr føder levande ungar og ikkje egg?\n\nSvaralternativ:\n- Puddel\n- Kolibriar\n- Krokodiller\n- Aure\n\nKva er rett svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Puddel",
+     "Kolibriar",
+     "Krokodiller",
+     "Aure"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Puddel"
+  },
+  {
+   "draw": 25,
+   "doc_index": 7,
+   "doc_fingerprint": "e0671fbee29f",
+   "prompt_variant": "noropenbookqa_nno_mcf_p0",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Dvale er ei arveleg åtferd\nKva aktivitet syner ei arva återd?\n\nAlternativ:\n A: Bjørnar som går i vinterdvale\n B: Hundar som sit på kommando\n C: Opptrente selar som klappar\n D: Rotter som navigerar gjennom ein labyrint\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Bjørnar som går i vinterdvale",
+     "Hundar som sit på kommando",
+     "Opptrente selar som klappar",
+     "Rotter som navigerar gjennom ein labyrint"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Bjørnar som går i vinterdvale)"
+  },
+  {
+   "draw": 26,
+   "doc_index": 26,
+   "doc_fingerprint": "8a03bbcd51db",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Ta utgangspunkt i følgande fakta når du svarar på spørsmålet: Når krafta som blir utøvd på eit objekt aukar, aukar også avstanden\n\nKva forhold har distansen med krafta som blir utøvd på eit objekt?\nVel rett svar blant desse alternativa:\n– Revers\n– Omvendt\n– Lik\n– Direkte\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Revers",
+     "Omvendt",
+     "Lik",
+     "Direkte"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Direkte"
+  },
+  {
+   "draw": 27,
+   "doc_index": 40,
+   "doc_fingerprint": "e6859b6b532d",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Bakgrunn: Etterkvart som matmengda til eit dyr et aukar, vil vekta til dyret også auke\n\nSpørsmål: Kva kan du gjere dersom hunden din er overvektig?\n- Leggje til meir feitt i dietten til hunden\n- Minke kaloriinntaket til hunden\n- La hunden få sove meir\n- Auke kaloriinntaket til hunden\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Leggje til meir feitt i dietten til hunden",
+     "Minke kaloriinntaket til hunden",
+     "La hunden få sove meir",
+     "Auke kaloriinntaket til hunden"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Minke kaloriinntaket til hunden"
+  },
+  {
+   "draw": 28,
+   "doc_index": 18,
+   "doc_fingerprint": "4d2582b3901b",
+   "prompt_variant": "noropenbookqa_nno_mcf_p4",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Ta utgangspunkt i følgande fakta når du svarar på spørsmålet: Kjøtetarar er rovdyr\n\nKjøtetarar\nVel rett svar blant desse alternativa:\n A: et berre løvverk og grønsaker\n B: er nedst på næringskjeda\n C: treng bytte for å overleve\n D: treng karbondioksid for å overleve\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "et berre løvverk og grønsaker",
+     "er nedst på næringskjeda",
+     "treng bytte for å overleve",
+     "treng karbondioksid for å overleve"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (treng bytte for å overleve)"
+  },
+  {
+   "draw": 29,
+   "doc_index": 80,
+   "doc_fingerprint": "6c31df0bcf10",
+   "prompt_variant": "noropenbookqa_nno_mcf_p2",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Inga lys vil kunne skine gjennom ein ugjennomsiktig gjenstand\nKva er fordelen med ein vindaugsfolie i staden for eit ordinært vindauge?\n A: Vindaugsfolie er enklare å lage\n B: Vindaugsfolie slepp in mindre lys\n C: Vindaugsfolie er billigare å produsere\n D: Vindaugsfolie er mykje sterkare\n\nEr det rette svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Vindaugsfolie er enklare å lage",
+     "Vindaugsfolie slepp in mindre lys",
+     "Vindaugsfolie er billigare å produsere",
+     "Vindaugsfolie er mykje sterkare"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Vindaugsfolie slepp in mindre lys)"
+  },
+  {
+   "draw": 30,
+   "doc_index": 28,
+   "doc_fingerprint": "72c5f3b2c6e5",
+   "prompt_variant": "noropenbookqa_nno_mcf_p3",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Bakgrunn: Når lysheita på ein farge til eit objekt aukar, vil evna objektet har til å reflektere lys auke\n\nSpørsmål: Kva er ein passande farge å ha på biltrekket ditt viss du bur i ein ørken?\n A: Grågul\n B: Raud\n C: Svart\n D: Marineblå\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Grågul",
+     "Raud",
+     "Svart",
+     "Marineblå"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Grågul)"
+  },
+  {
+   "draw": 31,
+   "doc_index": 67,
+   "doc_fingerprint": "b1bde4614534",
+   "prompt_variant": "noropenbookqa_nno_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "I plantar blir sukker transportert frå blada til røtene\nGlukose går\n\nAlternativ:\n- frå røtene til blada til ein påskelilje\n- frå blada til ei rose til atmosfæren\n- frå blada til ein tusenfryd og deretter inn i blomsten sitt underjordiske støttesystem\n- frå sola til knoppane til ei solsikke\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "frå røtene til blada til ein påskelilje",
+     "frå blada til ei rose til atmosfæren",
+     "frå blada til ein tusenfryd og deretter inn i blomsten sitt underjordiske støttesystem",
+     "frå sola til knoppane til ei solsikke"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: frå blada til ein tusenfryd og deretter inn i blomsten sitt underjordiske støttesystem"
+  }
+ ]
+}

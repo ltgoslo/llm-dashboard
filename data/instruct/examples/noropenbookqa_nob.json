@@ -1,0 +1,890 @@
+{
+ "task": "noropenbookqa_nob",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 258,
+   "doc_fingerprint": "8ade855688fe",
+   "prompt_variant": "noropenbookqa_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skjelettet beskytter de indre organene.\nHvilken av disse beskytter skjelletet?\n\nAlternativer:\n A: Leveren\n B: Øyevipper\n C: Fingernegler\n D: Blodårer\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Leveren",
+     "Øyevipper",
+     "Fingernegler",
+     "Blodårer"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Leveren)"
+  },
+  {
+   "draw": 1,
+   "doc_index": 249,
+   "doc_fingerprint": "a4f2b497ee80",
+   "prompt_variant": "noropenbookqa_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Faktatekst: Når et objekt blir større, vil det bli lettere å se det\nSpørsmål til teksten: Hva slags type forhold er det mellom størrelsen på et objekt og evnen til å se det lettere?\n\nSvaralternativer:\n- Likt\n- Omvendt\n- Direkte\n- Reversert\n\nHva er riktig svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Likt",
+     "Omvendt",
+     "Direkte",
+     "Reversert"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Direkte"
+  },
+  {
+   "draw": 2,
+   "doc_index": 135,
+   "doc_fingerprint": "df8d404a5544",
+   "prompt_variant": "noropenbookqa_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Bakgrunn: Synet brukes for å sanse synlige ting\n\nSpørsmål: En person kan se\n- et radioopptak\n- en følelse\n- en skrevet melding\n- en abstrakt idé\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "et radioopptak",
+     "en følelse",
+     "en skrevet melding",
+     "en abstrakt idé"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: en skrevet melding"
+  },
+  {
+   "draw": 3,
+   "doc_index": 200,
+   "doc_fingerprint": "dee5b990228f",
+   "prompt_variant": "noropenbookqa_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tunfisk spiser fisk\nTunfisk spiser hovedsaklig\n- parasitter, soyabønner og linfrø\n- skilpadder, haier og korallrev\n- virvelløse marineorganismer, bruskorganismer og gelatinøse organismer\n- tare, krusflik og sjøgress\n\nEr det riktige svaret parasitter, soyabønner og linfrø, skilpadder, haier og korallrev, virvelløse marineorganismer, bruskorganismer og gelatinøse organismer eller tare, krusflik og sjøgress?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "parasitter, soyabønner og linfrø",
+     "skilpadder, haier og korallrev",
+     "virvelløse marineorganismer, bruskorganismer og gelatinøse organismer",
+     "tare, krusflik og sjøgress"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: virvelløse marineorganismer, bruskorganismer og gelatinøse organismer"
+  },
+  {
+   "draw": 4,
+   "doc_index": 211,
+   "doc_fingerprint": "b37a6464fb66",
+   "prompt_variant": "noropenbookqa_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Solen er stjernen med kortest avstand til jorden\nMange stjerner er synlige på nattehimmelen, men hvilken er mest synlig om dagen?\n A: Månen som er nærmest oss\n B: Orions belte\n C: Solen som skinner hele dagen\n D: Alle er riktige\n\nEr det riktige svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Månen som er nærmest oss",
+     "Orions belte",
+     "Solen som skinner hele dagen",
+     "Alle er riktige"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Solen som skinner hele dagen)"
+  },
+  {
+   "draw": 5,
+   "doc_index": 204,
+   "doc_fingerprint": "b8cfe841fb7f",
+   "prompt_variant": "noropenbookqa_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Ta utgangspunkt i følgende fakta når du svarer på spørsmålet: Koraller bor som regel i varmt vann\n\nKoraller vokser i\nVelg riktig svar blant disse alternativene:\n– kaldt vann\n– varmt vann\n– isområder\n– jungelskoger\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "kaldt vann",
+     "varmt vann",
+     "isområder",
+     "jungelskoger"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: varmt vann"
+  },
+  {
+   "draw": 6,
+   "doc_index": 50,
+   "doc_fingerprint": "ba059e26f74b",
+   "prompt_variant": "noropenbookqa_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Kjølig temperatur gjør at dyr skjelver\nVed hvilket klokkeslett vil en hund mest sannsynlig skjelve?\n\nAlternativer:\n- 13:00:00\n- 05:00:00\n- 09:00:00\n- 18:00:00\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "13:00:00",
+     "05:00:00",
+     "09:00:00",
+     "18:00:00"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: 05:00:00"
+  },
+  {
+   "draw": 7,
+   "doc_index": 202,
+   "doc_fingerprint": "98951664bc5b",
+   "prompt_variant": "noropenbookqa_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Bakgrunn: Sollys inneholder ultrafiolett lys\n\nSpørsmål: En kvinne ønsker å tilbringe den lyse og solfylte dagen på stranden. Hun passer på å stoppe i butikken for å kjøpe solkrem, og deretter smører hun solkremen nøye og grundig, fordi hun vet at\n A: UV-stråler er skadelige\n B: solskinn vil være moro\n C: solen er nær\n D: solen er i verdensrommet\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "UV-stråler er skadelige",
+     "solskinn vil være moro",
+     "solen er nær",
+     "solen er i verdensrommet"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (UV-stråler er skadelige)"
+  },
+  {
+   "draw": 8,
+   "doc_index": 155,
+   "doc_fingerprint": "be8f616e2932",
+   "prompt_variant": "noropenbookqa_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Faktatekst: Noen dyr røyter i varmt vær\nSpørsmål til teksten: Hva slags temperatur forårsaker røyting?\n\nSvaralternativer:\n A: Frysende kulde\n B: Høy temperatur\n C: Hvilken som helst temperatur\n D: Lav temperatur\n\nHva er riktig svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Frysende kulde",
+     "Høy temperatur",
+     "Hvilken som helst temperatur",
+     "Lav temperatur"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Høy temperatur)"
+  },
+  {
+   "draw": 9,
+   "doc_index": 201,
+   "doc_fingerprint": "f16e9827e87e",
+   "prompt_variant": "noropenbookqa_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Ta utgangspunkt i følgende fakta når du svarer på spørsmålet: Jevndøgn forekommer to ganger i året\n\nEn person har sjansen til å oppleve jevndøgn\nVelg riktig svar blant disse alternativene:\n A: ukentlig\n B: månedlig\n C: årlig\n D: halvårlig\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "ukentlig",
+     "månedlig",
+     "årlig",
+     "halvårlig"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (halvårlig)"
+  },
+  {
+   "draw": 10,
+   "doc_index": 348,
+   "doc_fingerprint": "cccb7e3cadcf",
+   "prompt_variant": "noropenbookqa_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Planter er kilder til biodrivstoff\nHva kunne jeg brukt som biodrivstoff?\n A: Gull\n B: Biler\n C: Diamanter\n D: Barnåler\n\nEr det riktige svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Gull",
+     "Biler",
+     "Diamanter",
+     "Barnåler"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Barnåler)"
+  },
+  {
+   "draw": 11,
+   "doc_index": 71,
+   "doc_fingerprint": "09ace75c8bb3",
+   "prompt_variant": "noropenbookqa_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Når mengden tilgjengelige ressurser minsker i et miljø, vil organismer måtte spare på de ressursene\nHva skjer når ressurser minsker i et miljø?\n\nAlternativer:\n A: Organismer bruker flere av ressursene sine\n B: Ressursbruk øker\n C: Fødselsraten går opp\n D: Organismer blir mer sparsomme med ressursene sine\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Organismer bruker flere av ressursene sine",
+     "Ressursbruk øker",
+     "Fødselsraten går opp",
+     "Organismer blir mer sparsomme med ressursene sine"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Organismer blir mer sparsomme med ressursene sine)"
+  },
+  {
+   "draw": 12,
+   "doc_index": 251,
+   "doc_fingerprint": "3fbcc4468412",
+   "prompt_variant": "noropenbookqa_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Reproduksjon produserer avkom\nHva er små valper et resultat av?\n- Reproduksjon\n- Dyrebutikk\n- Et tiggende barn\n- Evolusjon\n\nEr det riktige svaret Reproduksjon, Dyrebutikk, Et tiggende barn eller Evolusjon?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Reproduksjon",
+     "Dyrebutikk",
+     "Et tiggende barn",
+     "Evolusjon"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Reproduksjon"
+  },
+  {
+   "draw": 13,
+   "doc_index": 214,
+   "doc_fingerprint": "d4fa95d113a1",
+   "prompt_variant": "noropenbookqa_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Bakgrunn: Pesing er når dyr henger tunga ut av munnen for å tilpasse seg varme temperaturer\n\nSpørsmål: Et dyr kan puste og pese\n- på en solfylt dag\n- under en regnstorm\n- når det snør\n- på natta\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "på en solfylt dag",
+     "under en regnstorm",
+     "når det snør",
+     "på natta"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: på en solfylt dag"
+  },
+  {
+   "draw": 14,
+   "doc_index": 65,
+   "doc_fingerprint": "de1fcb15d283",
+   "prompt_variant": "noropenbookqa_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Et eksempel på kamuflasje er når en organisme ligner sine omgivelser\nHva er et eksempel på kamuflasje?\n\nAlternativer:\n- Å endre utseendet for å blende seg inn\n- Å gjemme barna sine for å unngå rovdyr\n- Å forandre formen sin for å virke større\n- Å grave seg selv ned for å forsvinne i et øyeblikk\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Å endre utseendet for å blende seg inn",
+     "Å gjemme barna sine for å unngå rovdyr",
+     "Å forandre formen sin for å virke større",
+     "Å grave seg selv ned for å forsvinne i et øyeblikk"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Å endre utseendet for å blende seg inn"
+  },
+  {
+   "draw": 15,
+   "doc_index": 112,
+   "doc_fingerprint": "4779d45f2566",
+   "prompt_variant": "noropenbookqa_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Faktatekst: En månefase skjer kun én gang i måneden\nSpørsmål til teksten: Generelt, hvor mange ganger pr måned er det fullmåne?\n\nSvaralternativer:\n- to ganger\n- tre ganger\n- en gang\n- fire ganger\n\nHva er riktig svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "to ganger",
+     "tre ganger",
+     "en gang",
+     "fire ganger"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: en gang"
+  },
+  {
+   "draw": 16,
+   "doc_index": 196,
+   "doc_fingerprint": "c2b3d86c84b1",
+   "prompt_variant": "noropenbookqa_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Ta utgangspunkt i følgende fakta når du svarer på spørsmålet: Nedarving skjer når et arvet kjennetegn blir kopiert fra forelder til avkom gjennom DNA\n\nEn kanin får et kull med kaninunger! De fleste babyene er hvite, akkurat som moren, men én baby har brune flekker, sånn som faren. Hva kan bli sagt om faren?\nVelg riktig svar blant disse alternativene:\n– Han har spredd pelsen sin\n– Han har fått mørke merker på ørene sine\n– Han har genetisk videreført et av sine fysiske trekk til kaninbabyen\n– Han er samme størrelse som moren\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Han har spredd pelsen sin",
+     "Han har fått mørke merker på ørene sine",
+     "Han har genetisk videreført et av sine fysiske trekk til kaninbabyen",
+     "Han er samme størrelse som moren"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Han har genetisk videreført et av sine fysiske trekk til kaninbabyen"
+  },
+  {
+   "draw": 17,
+   "doc_index": 255,
+   "doc_fingerprint": "b492bfa37095",
+   "prompt_variant": "noropenbookqa_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Bakgrunn: Planter bruker klorofyll for å absorbere solenergi\n\nSpørsmål: Hva absorberer den grønne delen av en planteorganisme?\n A: karbondioksid\n B: sollys\n C: okysgen\n D: vann\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "karbondioksid",
+     "sollys",
+     "okysgen",
+     "vann"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (sollys)"
+  },
+  {
+   "draw": 18,
+   "doc_index": 59,
+   "doc_fingerprint": "ac72acde7fa0",
+   "prompt_variant": "noropenbookqa_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Faktatekst: En storm kan forårsake et jordskred\nSpørsmål til teksten: Under jordskred forekommer det ofte store mengder\n\nSvaralternativer:\n A: luft\n B: gjørme\n C: snø\n D: vind\n\nHva er riktig svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "luft",
+     "gjørme",
+     "snø",
+     "vind"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (gjørme)"
+  },
+  {
+   "draw": 19,
+   "doc_index": 370,
+   "doc_fingerprint": "c485acb34ef8",
+   "prompt_variant": "noropenbookqa_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Ta utgangspunkt i følgende fakta når du svarer på spørsmålet: Produksjon av papir krever at man kutter ned trær\n\nFor et selskap som lager notatbøker for universiteter, så er hovedmaterialet deres\nVelg riktig svar blant disse alternativene:\n A: potetgull\n B: vann\n C: gress\n D: trær\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "potetgull",
+     "vann",
+     "gress",
+     "trær"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (trær)"
+  },
+  {
+   "draw": 20,
+   "doc_index": 191,
+   "doc_fingerprint": "4c1fa115cbd6",
+   "prompt_variant": "noropenbookqa_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Bakgrunn: Biodrivstoff brukes til å produsere elektrisitet ved forbrenning\n\nSpørsmål: Hva kan være en positiv effekt av forbrenning av biodrivstoff?\n A: Mangel på korn til matindustrien\n B: en økning i luftforurensning\n C: lyse opp et hjem\n D: avskoging av regnskogen for å gi plass til dyrket mark\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Mangel på korn til matindustrien",
+     "en økning i luftforurensning",
+     "lyse opp et hjem",
+     "avskoging av regnskogen for å gi plass til dyrket mark"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (lyse opp et hjem)"
+  },
+  {
+   "draw": 21,
+   "doc_index": 132,
+   "doc_fingerprint": "de88f30c5e04",
+   "prompt_variant": "noropenbookqa_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Bakgrunn: Bevegelse endrer oppspart energi til bevegelse og varme .\n\nSpørsmål: En fugl som starter å fly\n- bruker varme for å danne bevegelse\n- bruker kalorier for å danne bevegelse\n- bruker vinger for å danne varme\n- bruker kalorier for å danne energi\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bruker varme for å danne bevegelse",
+     "bruker kalorier for å danne bevegelse",
+     "bruker vinger for å danne varme",
+     "bruker kalorier for å danne energi"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: bruker kalorier for å danne bevegelse"
+  },
+  {
+   "draw": 22,
+   "doc_index": 312,
+   "doc_fingerprint": "c4730a79283f",
+   "prompt_variant": "noropenbookqa_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Metall en en elektrisk leder\nHva leder elektrisitet best?\n\nAlternativer:\n- fliser på gulvet\n- menneskekjøtt\n- hockeykøller\n- en biffkniv\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "fliser på gulvet",
+     "menneskekjøtt",
+     "hockeykøller",
+     "en biffkniv"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: en biffkniv"
+  },
+  {
+   "draw": 23,
+   "doc_index": 105,
+   "doc_fingerprint": "281e5c3cc2be",
+   "prompt_variant": "noropenbookqa_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Faktatekst: En elektronisk gjenstand trenger elektrisitet for å fungere\nSpørsmål til teksten: Hvilken av følgende kan bli brukt til å skru på en elektronisk gjenstand?\n\nSvaralternativer:\n- Oppladbart solcellebatteri\n- En kile\n- En magnet\n- En trykkmåler\n\nHva er riktig svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Oppladbart solcellebatteri",
+     "En kile",
+     "En magnet",
+     "En trykkmåler"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Oppladbart solcellebatteri"
+  },
+  {
+   "draw": 24,
+   "doc_index": 1,
+   "doc_fingerprint": "8c5f0fab9cd3",
+   "prompt_variant": "noropenbookqa_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Ta utgangspunkt i følgende fakta når du svarer på spørsmålet: Sekunder brukes til å måle tid\n\nEn måleenhet for tid som er mindre enn et minutt er\nVelg riktig svar blant disse alternativene:\n A: en dag\n B: et minutt\n C: en time\n D: et sekund\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "en dag",
+     "et minutt",
+     "en time",
+     "et sekund"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (et sekund)"
+  },
+  {
+   "draw": 25,
+   "doc_index": 265,
+   "doc_fingerprint": "7bfdb0daad47",
+   "prompt_variant": "noropenbookqa_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "En frosk spiser insekter\nHvis jeg ikke ønsker å bli et byttedyr, hva må jeg bli reinkarnert som da?\n A: Skorpion\n B: Flue\n C: Siriss\n D: Møll\n\nEr det riktige svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Skorpion",
+     "Flue",
+     "Siriss",
+     "Møll"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Skorpion)"
+  },
+  {
+   "draw": 26,
+   "doc_index": 169,
+   "doc_fingerprint": "7da0c76a9274",
+   "prompt_variant": "noropenbookqa_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Enkelte dyr tilpasser seg høye temperaturer ved hjelp av svette\nNoen dyr bruker en væske som kommer fra huden deres for å tilpasse seg\n\nAlternativer:\n A: kulde\n B: vann\n C: varme\n D: fuktighet\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "kulde",
+     "vann",
+     "varme",
+     "fuktighet"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (varme)"
+  },
+  {
+   "draw": 27,
+   "doc_index": 168,
+   "doc_fingerprint": "21bd79e9b8d6",
+   "prompt_variant": "noropenbookqa_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Ta utgangspunkt i følgende fakta når du svarer på spørsmålet: Firfisler spiser insekter\n\nEn firfirsle spiser primært\nVelg riktig svar blant disse alternativene:\n– fluer\n– små insekter\n– gummiormer\n– bær\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "fluer",
+     "små insekter",
+     "gummiormer",
+     "bær"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: små insekter"
+  },
+  {
+   "draw": 28,
+   "doc_index": 284,
+   "doc_fingerprint": "db900b0a98e1",
+   "prompt_variant": "noropenbookqa_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Månens overflate inneholder fjell\nMånens overflate inneholder\n- hunder\n- vann\n- høye topper\n- mennesker\n\nEr det riktige svaret hunder, vann, høye topper eller mennesker?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "hunder",
+     "vann",
+     "høye topper",
+     "mennesker"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: høye topper"
+  },
+  {
+   "draw": 29,
+   "doc_index": 239,
+   "doc_fingerprint": "56a468f16046",
+   "prompt_variant": "noropenbookqa_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Faktatekst: En stjerne er en kilde til lys gjennom kjernereaksjoner\nSpørsmål til teksten: En stjerne som brenner langt, langt borte, har enormt press og enorm temperatur. Dette tillater\n\nSvaralternativer:\n A: et rom å ha overlys\n B: svak belysning ved nattestid på Jorden\n C: å dekorere et tak med plastikkstjerner\n D: en person å være stjerna i showet\n\nHva er riktig svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "et rom å ha overlys",
+     "svak belysning ved nattestid på Jorden",
+     "å dekorere et tak med plastikkstjerner",
+     "en person å være stjerna i showet"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (svak belysning ved nattestid på Jorden)"
+  },
+  {
+   "draw": 30,
+   "doc_index": 281,
+   "doc_fingerprint": "d78d662413c3",
+   "prompt_variant": "noropenbookqa_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Når mengden nedbør i et område øker, vil mengden tilgjengelig vann i det området øke\nHva vil være mer tilgjengelig i et område som opplever økning i regn?\n\nAlternativer:\n A: Brann\n B: Luft\n C: Jord\n D: H2O\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Brann",
+     "Luft",
+     "Jord",
+     "H2O"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (H2O)"
+  },
+  {
+   "draw": 31,
+   "doc_index": 316,
+   "doc_fingerprint": "2b096bfe2a6b",
+   "prompt_variant": "noropenbookqa_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Ta utgangspunkt i følgende fakta når du svarer på spørsmålet: DNA muliggjør at medfødte egenskaper kan gå i arv fra foreldre til avkom\n\nDNA muliggjør at dette går i arv\nVelg riktig svar blant disse alternativene:\n A: klestyper\n B: skolekarakterer\n C: albustørrelse\n D: språk og dialekter\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "klestyper",
+     "skolekarakterer",
+     "albustørrelse",
+     "språk og dialekter"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (albustørrelse)"
+  }
+ ]
+}

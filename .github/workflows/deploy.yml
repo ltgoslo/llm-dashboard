@@ -11,6 +11,8 @@ on:
       - "multisynt_tasks.yaml"
       - "multisynt_models.yaml"
       - "noreval12_setup.yaml"
+      - "instruct_tasks.yaml"
+      - "instruct_models.yaml"
       - "build_data.py"
       - "docs/**"
   workflow_dispatch:
@@ -39,7 +41,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # -A: the per-model results files of docs/noreval/models/ come and go with the models
-          git add -A docs/noreval/data.json docs/noreval/models docs/noreval-gen/data.json docs/norolmo/data.json docs/multisynt/data.json docs/prelude/data.json docs/norprelude/data.json
+          # -A: the per-model results files of docs/noreval/models/ and the
+          # details' files (tasks, responses) come and go with the models
+          git add -A docs/noreval/data.json docs/noreval/models docs/noreval/details docs/noreval-gen/data.json docs/noreval-gen/details docs/instruct/data.json docs/instruct/details docs/norolmo/data.json docs/multisynt/data.json docs/prelude/data.json docs/norprelude/data.json
           git diff --cached --quiet || git commit -m "Auto-update data.json"
           git push

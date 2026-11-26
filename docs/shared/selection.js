@@ -62,12 +62,22 @@ export function setSingleTaskNormalization(norm) {
   singleTaskNormalization = norm;
 }
 
-/** Apply the selection-dependent default normalization (baseline for
- *  aggregate views, singleTaskNormalization for individual tasks) and sync
- *  the <select>. */
+// Default normalization of an aggregate view ("baseline"; "none" on a page
+// without rescaling: /instruct, whose tasks share one 0–5 grade scale).
+let aggregateNormalization = "baseline";
+
+/** Set the default normalization of the aggregate views. */
+export function setAggregateNormalization(norm) {
+  aggregateNormalization = norm;
+}
+
+/** Apply the selection-dependent default normalization (aggregateNormalization
+ *  for aggregate views, singleTaskNormalization for individual tasks) and
+ *  sync the <select>, if the page has one. */
 export function autoSetNormalization() {
-  state.currentNormalization = isAggregateSelection(state.currentTaskSelection) ? "baseline" : singleTaskNormalization;
-  document.getElementById("norm-select").value = state.currentNormalization;
+  state.currentNormalization = isAggregateSelection(state.currentTaskSelection) ? aggregateNormalization : singleTaskNormalization;
+  const select = document.getElementById("norm-select");
+  if (select) select.value = state.currentNormalization;
 }
 
 /** Populate the task <select> with the category / eval-type / language
@@ -156,7 +166,8 @@ export function onTaskCheckboxChange(render) {
 }
 
 /** Bind the control listeners shared by the NorEval dashboards: shot buttons,
- *  prompt-aggregation / normalization / metric selects, the task dropdown,
+ *  prompt-aggregation / normalization / metric selects (a page may go
+ *  without shots, prompt aggregation and rescaling: /instruct), the task dropdown,
  *  and the task "Select all" / "Select none" buttons. `selectAll` is the
  *  selection "Select all" switches to, or a function returning it (called
  *  before the selection changes, so it can depend on the current view). */
@@ -170,11 +181,11 @@ export function bindTaskControls(render, { selectAll = "__all__" } = {}) {
     });
   });
 
-  document.getElementById("prompt-agg-select").addEventListener("change", (e) => {
+  document.getElementById("prompt-agg-select")?.addEventListener("change", (e) => {
     state.currentPromptAgg = e.target.value;
     render();
   });
-  document.getElementById("norm-select").addEventListener("change", (e) => {
+  document.getElementById("norm-select")?.addEventListener("change", (e) => {
     state.currentNormalization = e.target.value;
     render();
   });
@@ -223,8 +234,10 @@ export function restoreCheckedTasksFromSelection(urlState) {
 /** Sync the shared controls' DOM state from `state` (after a URL restore). */
 export function syncTaskControlsFromState() {
   document.getElementById("task-select").value = state.currentTaskSelection;
-  document.getElementById("prompt-agg-select").value = state.currentPromptAgg;
-  document.getElementById("norm-select").value = state.currentNormalization;
+  const promptAgg = document.getElementById("prompt-agg-select");
+  if (promptAgg) promptAgg.value = state.currentPromptAgg;
+  const norm = document.getElementById("norm-select");
+  if (norm) norm.value = state.currentNormalization;
   document.querySelectorAll(".shot-btn").forEach((b) =>
     b.classList.toggle("active", b.dataset.shot === state.currentShot));
   syncTaskCheckboxStates(() => state.checkedTasks);

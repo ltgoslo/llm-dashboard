@@ -1,0 +1,571 @@
+# NorEval Instruct models (/instruct): display metadata, keyed by the
+# model's name in the run (data/instruct/results/<name>.json). Same fields
+# as models_setup.yaml. A model of the run without an entry here is shown
+# under its run name (build_data.py warns); `huggingface_url` defaults to
+# the checkpoint the run evaluated. A name ending in `-think` is the same
+# checkpoint evaluated with thinking turned on: it reasons before it
+# answers, and the judge sees only the answer. Sizes as on the other
+# pages for the same models; parameter counts from Hugging Face otherwise.
+#
+# Display names, short: the family and version, the total parameter count
+# (a mixture of experts: total-A active, 26B-A4B; Gemma's per-layer
+# embedding models: total-E effective, 8B-E4B), and " Thinking" for a model
+# that reasons before it answers (a `-think` run, NorMistral 11B Thinking;
+# build_data.py warns about a name without a size or a `-think` run
+# without it).
+
+# ── Norwegian models ─────────────────────────────────────────────
+
+normistral-11b-thinking:
+  display_name: "NorMistral 11B Thinking"
+  category: norwegian
+  organization: LTG/UiO
+  parameters: 11.4
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned Norwegian language model with reasoning capabilities, fine-tuned from NorMistral 11B using SFT and reinforcement learning (d-RLAIF)."
+  huggingface_url: https://huggingface.co/ltg/normistral-11b-thinking
+  default: true
+  color: "#DD0000"
+
+normistral-7b-warm-instruct:
+  display_name: "NorMistral 7B"
+  category: norwegian
+  organization: LTG/UiO
+  parameters: 7.2
+  license: "Apache 2.0"
+  fully_open: false
+  description: "NorMistral 7B (warm) instruction-tuned with supervised fine-tuning only, on openly licensed instruction datasets translated into Bokmål and Nynorsk."
+  huggingface_url: https://huggingface.co/ltg/normistral-7b-warm-instruct
+  default: true
+  color: "#DD0000"
+
+borealis2-31b-preview:
+  display_name: "Borealis2 31B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 31.3
+  license: "NB-License 1.0"
+  fully_open: false
+  description: "Preview of Borealis 2 from the National Library of Norway: Gemma 4 31B IT, continually pre-trained on Aurora (47B words, mostly Norwegian) and instruction-tuned for Norwegian."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis2-31b-preview
+  default: true
+  color: "#40263f"
+
+borealis2-31b-preview-think:
+  display_name: "Borealis2 31B Thinking"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 31.3
+  license: "NB-License 1.0"
+  fully_open: false
+  description: "Borealis 2 31B (preview), evaluated with thinking turned on: it reasons before it answers, and the judge sees only the answer."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis2-31b-preview
+  default: true
+  color: "#40263f"
+
+borealis2-26b-a4b-preview:
+  display_name: "Borealis2 26B-A4B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 25.8
+  license: "NB-License 1.0"
+  fully_open: false
+  description: "Preview of Borealis 2 from the National Library of Norway: the mixture-of-experts Gemma 4 26B-A4B IT, continually pre-trained on Aurora (47B words, mostly Norwegian) and instruction-tuned for Norwegian."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis2-26b-a4b-preview
+  default: true
+  color: "#40263f"
+
+borealis2-26b-a4b-preview-think:
+  display_name: "Borealis2 26B-A4B Thinking"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 25.8
+  license: "NB-License 1.0"
+  fully_open: false
+  description: "Borealis 2 26B-A4B (preview), evaluated with thinking turned on: it reasons before it answers, and the judge sees only the answer."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis2-26b-a4b-preview
+  default: true
+  color: "#40263f"
+
+borealis2-e4b-preview:
+  display_name: "Borealis2 8B-E4B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 8.0
+  license: "NB-License 1.0"
+  fully_open: false
+  description: "Preview of Borealis 2 from the National Library of Norway: Gemma 4 E4B, continually pre-trained on Aurora (47B words, mostly Norwegian) and instruction-tuned for Norwegian."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis2-e4b-preview
+  default: true
+  color: "#40263f"
+
+borealis2-e4b-preview-think:
+  display_name: "Borealis2 8B-E4B Thinking"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 8.0
+  license: "NB-License 1.0"
+  fully_open: false
+  description: "Borealis 2 E4B (preview), evaluated with thinking turned on: it reasons before it answers, and the judge sees only the answer."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis2-e4b-preview
+  default: true
+  color: "#40263f"
+
+borealis2-e2b-preview:
+  display_name: "Borealis2 5B-E2B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 5.1
+  license: "NB-License 1.0"
+  fully_open: false
+  description: "Preview of Borealis 2 from the National Library of Norway: Gemma 4 E2B, continually pre-trained on Aurora (47B words, mostly Norwegian) and instruction-tuned for Norwegian."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis2-e2b-preview
+  default: true
+  color: "#40263f"
+
+borealis2-e2b-preview-think:
+  display_name: "Borealis2 5B-E2B Thinking"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 5.1
+  license: "NB-License 1.0"
+  fully_open: false
+  description: "Borealis 2 E2B (preview), evaluated with thinking turned on: it reasons before it answers, and the judge sees only the answer."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis2-e2b-preview
+  default: true
+  color: "#40263f"
+
+borealis-27b:
+  display_name: "Borealis 27B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 27.4
+  license: "NB-License 1.0"
+  fully_open: false
+  description: "Norwegian instruction-tuned model from the National Library of Norway, fine-tuned from Gemma 3 27B IT. The full release: its instruction data include news material licensed under an agreement with Norwegian rights holders."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis-27b
+  default: true
+  color: "#40263f"
+
+borealis-12b:
+  display_name: "Borealis 12B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 12.2
+  license: "NB-License 1.0"
+  fully_open: false
+  description: "Norwegian instruction-tuned model from the National Library of Norway, fine-tuned from Gemma 3 12B IT. The full release: its instruction data include news material licensed under an agreement with Norwegian rights holders."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis-12b
+  default: true
+  color: "#40263f"
+
+borealis-4b:
+  display_name: "Borealis 4B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 4.3
+  license: "NB-License 1.0"
+  fully_open: false
+  description: "Norwegian instruction-tuned model from the National Library of Norway, fine-tuned from Gemma 3 4B IT. The full release: its instruction data include news material licensed under an agreement with Norwegian rights holders."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis-4b
+  default: true
+  color: "#40263f"
+
+borealis-1b:
+  display_name: "Borealis 1B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 1.0
+  license: "NB-License 1.0"
+  fully_open: false
+  description: "Norwegian instruction-tuned model from the National Library of Norway, fine-tuned from Gemma 3 1B IT. The full release: its instruction data include news material licensed under an agreement with Norwegian rights holders."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis-1b
+  default: true
+  color: "#40263f"
+
+borealis-270m:
+  display_name: "Borealis 270M"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 0.27
+  license: "NB-License 1.0"
+  fully_open: false
+  description: "Norwegian instruction-tuned model from the National Library of Norway, fine-tuned from Gemma 3 270M IT. The full release: its instruction data include news material licensed under an agreement with Norwegian rights holders."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis-270m
+  default: true
+  color: "#40263f"
+
+borealis-open-27b:
+  display_name: "Borealis Open 27B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 27.4
+  license: "Gemma Terms of Use"
+  fully_open: false
+  description: "The open release of Borealis 27B: Gemma 3 27B IT fine-tuned on the open version of the instruction data, without the licensed news material."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis-open-27b
+  default: true
+  color: "#40263f"
+
+borealis-open-12b:
+  display_name: "Borealis Open 12B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 12.2
+  license: "Gemma Terms of Use"
+  fully_open: false
+  description: "The open release of Borealis 12B: Gemma 3 12B IT fine-tuned on the open version of the instruction data, without the licensed news material."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis-open-12b
+  default: true
+  color: "#40263f"
+
+borealis-open-4b:
+  display_name: "Borealis Open 4B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 4.3
+  license: "Gemma Terms of Use"
+  fully_open: false
+  description: "The open release of Borealis 4B: Gemma 3 4B IT fine-tuned on the open version of the instruction data, without the licensed news material."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis-open-4b
+  default: true
+  color: "#40263f"
+
+borealis-open-1b:
+  display_name: "Borealis Open 1B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 1.0
+  license: "Gemma Terms of Use"
+  fully_open: false
+  description: "The open release of Borealis 1B: Gemma 3 1B IT fine-tuned on the open version of the instruction data, without the licensed news material."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis-open-1b
+  default: true
+  color: "#40263f"
+
+borealis-open-270m:
+  display_name: "Borealis Open 270M"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 0.27
+  license: "Gemma Terms of Use"
+  fully_open: false
+  description: "The open release of Borealis 270M: Gemma 3 270M IT fine-tuned on the open version of the instruction data, without the licensed news material."
+  huggingface_url: https://huggingface.co/NbAiLab/borealis-open-270m
+  default: true
+  color: "#40263f"
+
+nb-notram-llama-3.3-70b-instruct:
+  display_name: "NoTram Llama3.3 70B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 70.6
+  license: "Llama 3.3 Community License"
+  fully_open: false
+  description: "Norwegian instruction-tuned model from the National Library of Norway, fine-tuned from Llama 3.3 70B Instruct."
+  huggingface_url: https://huggingface.co/NbAiLab/nb-notram-llama-3.3-70b-instruct
+  default: true
+  color: "#40263f"
+
+nb-notram-llama-3.1-8b-instruct:
+  display_name: "NoTram Llama3.1 8B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 8.0
+  license: "Llama 3.1 Community License"
+  fully_open: false
+  description: "Norwegian instruction-tuned model from the National Library of Norway, fine-tuned from Llama 3.1 8B Instruct."
+  huggingface_url: https://huggingface.co/NbAiLab/nb-notram-llama-3.1-8b-instruct
+  default: true
+  color: "#40263f"
+
+nb-notram-llama-3.2-3b-instruct:
+  display_name: "NoTram Llama3.2 3B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 3.2
+  license: "Llama 3.2 Community License"
+  fully_open: false
+  description: "Norwegian instruction-tuned model from the National Library of Norway, fine-tuned from Llama 3.2 3B Instruct."
+  huggingface_url: https://huggingface.co/NbAiLab/nb-notram-llama-3.2-3b-instruct
+  default: true
+  color: "#40263f"
+
+nb-notram-llama-3.2-1b-instruct:
+  display_name: "NoTram Llama3.2 1B"
+  category: norwegian
+  organization: Nasjonalbiblioteket
+  parameters: 1.2
+  license: "Llama 3.2 Community License"
+  fully_open: false
+  description: "Norwegian instruction-tuned model from the National Library of Norway, fine-tuned from Llama 3.2 1B Instruct."
+  huggingface_url: https://huggingface.co/NbAiLab/nb-notram-llama-3.2-1b-instruct
+  default: true
+  color: "#40263f"
+
+norwai-magistral-24b-reasoning:
+  display_name: "NorwAI Magistral 24B"
+  category: norwegian
+  organization: NorwAI/NTNU
+  parameters: 23.9
+  license: "NorLLM License"
+  fully_open: false
+  description: "Norwegian reasoning model from NorwAI at NTNU, built on Mistral AI's Magistral (24B). In this run it mostly answered in its direct mode, without reasoning (a reasoning trace in 4% of the responses shown)."
+  huggingface_url: https://huggingface.co/NorwAI/NorwAI-Magistral-24B-reasoning
+  default: true
+  color: "#00509e"
+
+# ── Multilingual models ──────────────────────────────────────────
+
+gemma-4-31b-it:
+  display_name: "Gemma4 31B"
+  category: multilingual
+  organization: Google
+  parameters: 31.0
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned version of Gemma4 31B, Google's dense multimodal model with a 256k context window."
+  huggingface_url: https://huggingface.co/google/gemma-4-31B-it
+  default: true
+  color: "#3aab58"
+
+gemma-4-31b-it-think:
+  display_name: "Gemma4 31B Thinking"
+  category: multilingual
+  organization: Google
+  parameters: 31.0
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned Gemma4 31B, evaluated with thinking turned on: it reasons before it answers, and the judge sees only the answer."
+  huggingface_url: https://huggingface.co/google/gemma-4-31B-it
+  default: true
+  color: "#3aab58"
+
+gemma-4-26b-a4b-it:
+  display_name: "Gemma4 26B-A4B"
+  category: multilingual
+  organization: Google
+  parameters: 25.2
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned version of Gemma4 26B-A4B, Google's mixture-of-experts multimodal model with 3.8B parameters active per token and a 256k context window."
+  huggingface_url: https://huggingface.co/google/gemma-4-26B-A4B-it
+  default: true
+  color: "#3aab58"
+
+gemma-4-26b-a4b-it-think:
+  display_name: "Gemma4 26B-A4B Thinking"
+  category: multilingual
+  organization: Google
+  parameters: 25.2
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned Gemma4 26B-A4B, evaluated with thinking turned on: it reasons before it answers, and the judge sees only the answer."
+  huggingface_url: https://huggingface.co/google/gemma-4-26B-A4B-it
+  default: true
+  color: "#3aab58"
+
+gemma-4-12b-it:
+  display_name: "Gemma4 12B"
+  category: multilingual
+  organization: Google
+  parameters: 12.0
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned version of Gemma4 12B, Google's dense multimodal model with a 256k context window."
+  huggingface_url: https://huggingface.co/google/gemma-4-12B-it
+  default: true
+  color: "#3aab58"
+
+gemma-4-12b-it-think:
+  display_name: "Gemma4 12B Thinking"
+  category: multilingual
+  organization: Google
+  parameters: 12.0
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned Gemma4 12B, evaluated with thinking turned on: it reasons before it answers, and the judge sees only the answer."
+  huggingface_url: https://huggingface.co/google/gemma-4-12B-it
+  default: true
+  color: "#3aab58"
+
+gemma-4-e4b-it:
+  display_name: "Gemma4 8B-E4B"
+  category: multilingual
+  organization: Google
+  parameters: 8.0
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned version of Gemma4 E4B, Google's lightweight multimodal model with 4.5B effective parameters (8B in total)."
+  huggingface_url: https://huggingface.co/google/gemma-4-E4B-it
+  default: true
+  color: "#3aab58"
+
+gemma-4-e4b-it-think:
+  display_name: "Gemma4 8B-E4B Thinking"
+  category: multilingual
+  organization: Google
+  parameters: 8.0
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned Gemma4 E4B, evaluated with thinking turned on: it reasons before it answers, and the judge sees only the answer."
+  huggingface_url: https://huggingface.co/google/gemma-4-E4B-it
+  default: true
+  color: "#3aab58"
+
+gemma-4-e2b-it:
+  display_name: "Gemma4 5B-E2B"
+  category: multilingual
+  organization: Google
+  parameters: 5.1
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned version of Gemma4 E2B, Google's lightweight multimodal model with 2.3B effective parameters (5.1B in total)."
+  huggingface_url: https://huggingface.co/google/gemma-4-E2B-it
+  default: true
+  color: "#3aab58"
+
+gemma-4-e2b-it-think:
+  display_name: "Gemma4 5B-E2B Thinking"
+  category: multilingual
+  organization: Google
+  parameters: 5.1
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned Gemma4 E2B, evaluated with thinking turned on: it reasons before it answers, and the judge sees only the answer."
+  huggingface_url: https://huggingface.co/google/gemma-4-E2B-it
+  default: true
+  color: "#3aab58"
+
+mistral-medium-3.5-128b:
+  display_name: "Mistral Medium 3.5 128B"
+  category: multilingual
+  organization: Mistral AI
+  parameters: 127.7
+  license: "Modified MIT License"
+  fully_open: false
+  description: "Mistral AI's dense 128B flagship: one model for instructions, reasoning (its effort set per request) and coding, with a 256k context window."
+  huggingface_url: https://huggingface.co/mistralai/Mistral-Medium-3.5-128B
+  default: true
+  color: "#ff8c00"
+
+mistral-small-4-119b-2603:
+  display_name: "Mistral Small 4 119B"
+  category: multilingual
+  organization: Mistral AI
+  parameters: 119.4
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Mistral AI's mixture-of-experts model (119B parameters, 6.5B active per token) that unifies their instruction, reasoning and coding models, with a 256k context window."
+  huggingface_url: https://huggingface.co/mistralai/Mistral-Small-4-119B-2603
+  default: true
+  color: "#ff8c00"
+
+mistral-small-3.2-24b-instruct-2506:
+  display_name: "Mistral Small 3.2 24B"
+  category: multilingual
+  organization: Mistral AI
+  parameters: 24.0
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Mistral Small 3.2 (2506), Mistral AI's 24B instruction-tuned multimodal model."
+  huggingface_url: https://huggingface.co/mistralai/Mistral-Small-3.2-24B-Instruct-2506
+  default: true
+  color: "#ff8c00"
+
+magistral-small-2509:
+  display_name: "Magistral Small 24B"
+  category: multilingual
+  organization: Mistral AI
+  parameters: 24.0
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Mistral AI's reasoning model, fine-tuned from Mistral Small 3.2 (24B). In this run (no system prompt) it answered without reasoning."
+  huggingface_url: https://huggingface.co/mistralai/Magistral-Small-2509
+  default: true
+  color: "#ff8c00"
+
+mistral-nemo-instruct-2407:
+  display_name: "Mistral Nemo 12B"
+  category: multilingual
+  organization: Mistral AI
+  parameters: 12.2
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned version of Mistral Nemo 12B, trained jointly by Mistral AI and NVIDIA, with a 128k context window and multilingual support."
+  huggingface_url: https://huggingface.co/mistralai/Mistral-Nemo-Instruct-2407
+  default: true
+  color: "#ff8c00"
+
+ministral-3-14b-instruct-2512:
+  display_name: "Ministral3 14B"
+  category: multilingual
+  organization: Mistral AI
+  parameters: 13.5
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned version of Ministral 3 14B, Mistral AI's small multimodal model."
+  huggingface_url: https://huggingface.co/mistralai/Ministral-3-14B-Instruct-2512-BF16
+  default: true
+  color: "#ff8c00"
+
+ministral-3-14b-reasoning-2512:
+  display_name: "Ministral3 14B Reasoning"
+  category: multilingual
+  organization: Mistral AI
+  parameters: 13.5
+  license: "Apache 2.0"
+  fully_open: false
+  description: "The reasoning version of Ministral 3 14B, Mistral AI's small multimodal model. In this run (no system prompt) it answered without reasoning."
+  huggingface_url: https://huggingface.co/mistralai/Ministral-3-14B-Reasoning-2512
+  default: true
+  color: "#ff8c00"
+
+ministral-3-8b-instruct-2512:
+  display_name: "Ministral3 8B"
+  category: multilingual
+  organization: Mistral AI
+  parameters: 8.4
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned version of Ministral 3 8B, Mistral AI's small multimodal model."
+  huggingface_url: https://huggingface.co/mistralai/Ministral-3-8B-Instruct-2512-BF16
+  default: true
+  color: "#ff8c00"
+
+ministral-3-8b-reasoning-2512:
+  display_name: "Ministral3 8B Reasoning"
+  category: multilingual
+  organization: Mistral AI
+  parameters: 8.4
+  license: "Apache 2.0"
+  fully_open: false
+  description: "The reasoning version of Ministral 3 8B, Mistral AI's small multimodal model. In this run (no system prompt) it answered without reasoning."
+  huggingface_url: https://huggingface.co/mistralai/Ministral-3-8B-Reasoning-2512
+  default: true
+  color: "#ff8c00"
+
+ministral-3-3b-instruct-2512:
+  display_name: "Ministral3 3B"
+  category: multilingual
+  organization: Mistral AI
+  parameters: 3.4
+  license: "Apache 2.0"
+  fully_open: false
+  description: "Instruction-tuned version of Ministral 3 3B, Mistral AI's small multimodal model."
+  huggingface_url: https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512-BF16
+  default: true
+  color: "#ff8c00"
+
+ministral-3-3b-reasoning-2512:
+  display_name: "Ministral3 3B Reasoning"
+  category: multilingual
+  organization: Mistral AI
+  parameters: 3.4
+  license: "Apache 2.0"
+  fully_open: false
+  description: "The reasoning version of Ministral 3 3B, Mistral AI's small multimodal model. In this run (no system prompt) it answered without reasoning."
+  huggingface_url: https://huggingface.co/mistralai/Ministral-3-3B-Reasoning-2512
+  default: true
+  color: "#ff8c00"

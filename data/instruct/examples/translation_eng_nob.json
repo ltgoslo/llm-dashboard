@@ -1,0 +1,549 @@
+{
+ "task": "translation_eng_nob",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 1383,
+   "doc_fingerprint": "e9655558e14d",
+   "prompt_variant": "translation_eng_nob_p0",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Engelsk: I hope you're not mad at me.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Jeg håper du er ikke sint på meg."
+    ]
+   },
+   "reference_text": "<reference>\nJeg håper du er ikke sint på meg.\n</reference>"
+  },
+  {
+   "draw": 1,
+   "doc_index": 1021,
+   "doc_fingerprint": "d718a42d2a48",
+   "prompt_variant": "translation_eng_nob_p1",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Oversett følgende setning til norsk bokmål: I can't live without a TV.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Jeg kan ikke leve uten fjernsyn."
+    ]
+   },
+   "reference_text": "<reference>\nJeg kan ikke leve uten fjernsyn.\n</reference>"
+  },
+  {
+   "draw": 2,
+   "doc_index": 841,
+   "doc_fingerprint": "0e74f8f5931b",
+   "prompt_variant": "translation_eng_nob_p3",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Hva blir \"His hair is so long it reaches the floor.\" på bokmål?\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Håret hennes er så langt at det når bakken."
+    ]
+   },
+   "reference_text": "<reference>\nHåret hennes er så langt at det når bakken.\n</reference>"
+  },
+  {
+   "draw": 3,
+   "doc_index": 4204,
+   "doc_fingerprint": "2399bc3606df",
+   "prompt_variant": "translation_eng_nob_p2",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Gi en oversettelse til bokmål for denne setningen: Within a month of going abroad, he became sick.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Mindre enn en måned etter at han reiste utenlands ble han syk."
+    ]
+   },
+   "reference_text": "<reference>\nMindre enn en måned etter at han reiste utenlands ble han syk.\n</reference>"
+  },
+  {
+   "draw": 4,
+   "doc_index": 2478,
+   "doc_fingerprint": "82941aefde84",
+   "prompt_variant": "translation_eng_nob_p3",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Hva blir \"Open your book to page nine.\" på bokmål?\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Bla om boken til side ni."
+    ]
+   },
+   "reference_text": "<reference>\nBla om boken til side ni.\n</reference>"
+  },
+  {
+   "draw": 5,
+   "doc_index": 3682,
+   "doc_fingerprint": "f6f1b7b04e56",
+   "prompt_variant": "translation_eng_nob_p1",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Oversett følgende setning til norsk bokmål: Tom's house is on the other side of the river.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Huset til tom er på den andre siden av elven."
+    ]
+   },
+   "reference_text": "<reference>\nHuset til tom er på den andre siden av elven.\n</reference>"
+  },
+  {
+   "draw": 6,
+   "doc_index": 3226,
+   "doc_fingerprint": "a3221e4f075d",
+   "prompt_variant": "translation_eng_nob_p2",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Gi en oversettelse til bokmål for denne setningen: The train left.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Toget gikk."
+    ]
+   },
+   "reference_text": "<reference>\nToget gikk.\n</reference>"
+  },
+  {
+   "draw": 7,
+   "doc_index": 1686,
+   "doc_fingerprint": "c8aecf8eba67",
+   "prompt_variant": "translation_eng_nob_p0",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Engelsk: I read his book.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Jeg leste boken hans."
+    ]
+   },
+   "reference_text": "<reference>\nJeg leste boken hans.\n</reference>"
+  },
+  {
+   "draw": 8,
+   "doc_index": 2673,
+   "doc_fingerprint": "111c86aca0de",
+   "prompt_variant": "translation_eng_nob_p2",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Gi en oversettelse til bokmål for denne setningen: She plays tennis every day.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Hun spiller tennis hver dag."
+    ]
+   },
+   "reference_text": "<reference>\nHun spiller tennis hver dag.\n</reference>"
+  },
+  {
+   "draw": 9,
+   "doc_index": 2704,
+   "doc_fingerprint": "8be48e12ddb9",
+   "prompt_variant": "translation_eng_nob_p3",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Hva blir \"She smokes 20 cigarettes a day.\" på bokmål?\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Hun røyker 20 sigaretter om dagen."
+    ]
+   },
+   "reference_text": "<reference>\nHun røyker 20 sigaretter om dagen.\n</reference>"
+  },
+  {
+   "draw": 10,
+   "doc_index": 152,
+   "doc_fingerprint": "7e393ffd0b65",
+   "prompt_variant": "translation_eng_nob_p1",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Oversett følgende setning til norsk bokmål: A violinist I know claims that he owns a Stradivarius.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "En fiolinist jeg kjenner hevder at han eier en Stradivarius."
+    ]
+   },
+   "reference_text": "<reference>\nEn fiolinist jeg kjenner hevder at han eier en Stradivarius.\n</reference>"
+  },
+  {
+   "draw": 11,
+   "doc_index": 1036,
+   "doc_fingerprint": "88a0a858ba4d",
+   "prompt_variant": "translation_eng_nob_p0",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Engelsk: I carried out an analysis that showed that much more money would be needed than they had previously anticipated.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Jeg foretok en analyse som viste at det ville trengs mye mer penger enn de tidligere hadde regnet med."
+    ]
+   },
+   "reference_text": "<reference>\nJeg foretok en analyse som viste at det ville trengs mye mer penger enn de tidligere hadde regnet med.\n</reference>"
+  },
+  {
+   "draw": 12,
+   "doc_index": 636,
+   "doc_fingerprint": "6ad1bd6e98bb",
+   "prompt_variant": "translation_eng_nob_p1",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Oversett følgende setning til norsk bokmål: He dotes on his grandson.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Han er kjempeglad i barnebarnet sitt."
+    ]
+   },
+   "reference_text": "<reference>\nHan er kjempeglad i barnebarnet sitt.\n</reference>"
+  },
+  {
+   "draw": 13,
+   "doc_index": 3725,
+   "doc_fingerprint": "da839ca657d2",
+   "prompt_variant": "translation_eng_nob_p3",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Hva blir \"Tom was a good man.\" på bokmål?\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Tom var en god mann."
+    ]
+   },
+   "reference_text": "<reference>\nTom var en god mann.\n</reference>"
+  },
+  {
+   "draw": 14,
+   "doc_index": 4198,
+   "doc_fingerprint": "62bd526ddc3e",
+   "prompt_variant": "translation_eng_nob_p2",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Gi en oversettelse til bokmål for denne setningen: Will you come back tomorrow?\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Kommer du tilbake i morgen?"
+    ]
+   },
+   "reference_text": "<reference>\nKommer du tilbake i morgen?\n</reference>"
+  },
+  {
+   "draw": 15,
+   "doc_index": 2185,
+   "doc_fingerprint": "61c5c770ef38",
+   "prompt_variant": "translation_eng_nob_p0",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Engelsk: I wish I had asked you for advice.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Jeg skulle ønske jeg hadde spurt deg om råd."
+    ]
+   },
+   "reference_text": "<reference>\nJeg skulle ønske jeg hadde spurt deg om råd.\n</reference>"
+  },
+  {
+   "draw": 16,
+   "doc_index": 1329,
+   "doc_fingerprint": "695234609687",
+   "prompt_variant": "translation_eng_nob_p3",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Hva blir \"I have done this many times.\" på bokmål?\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Det har jeg gjort mange ganger."
+    ]
+   },
+   "reference_text": "<reference>\nDet har jeg gjort mange ganger.\n</reference>"
+  },
+  {
+   "draw": 17,
+   "doc_index": 4491,
+   "doc_fingerprint": "766ef9c00913",
+   "prompt_variant": "translation_eng_nob_p1",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Oversett følgende setning til norsk bokmål: You should never look directly at the Sun with the naked eye.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Man bør aldri se direkte på sola med det blotte øye."
+    ]
+   },
+   "reference_text": "<reference>\nMan bør aldri se direkte på sola med det blotte øye.\n</reference>"
+  },
+  {
+   "draw": 18,
+   "doc_index": 594,
+   "doc_fingerprint": "a7ba35a9cec1",
+   "prompt_variant": "translation_eng_nob_p0",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Engelsk: Having done my homework, I could finally watch television.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Etter at jeg hadde gjort leksene mine kunne jeg endelig se på TV."
+    ]
+   },
+   "reference_text": "<reference>\nEtter at jeg hadde gjort leksene mine kunne jeg endelig se på TV.\n</reference>"
+  },
+  {
+   "draw": 19,
+   "doc_index": 3627,
+   "doc_fingerprint": "6a3c4d349e9a",
+   "prompt_variant": "translation_eng_nob_p2",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Gi en oversettelse til bokmål for denne setningen: Tomorrow morning, we will leave Japan.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Vi forlater Japan i morgen tidlig."
+    ]
+   },
+   "reference_text": "<reference>\nVi forlater Japan i morgen tidlig.\n</reference>"
+  },
+  {
+   "draw": 20,
+   "doc_index": 1597,
+   "doc_fingerprint": "f66b3f0e342b",
+   "prompt_variant": "translation_eng_nob_p0",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Engelsk: I'm sure I've never seen her.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Jeg er sikker på jeg aldri har sett henne."
+    ]
+   },
+   "reference_text": "<reference>\nJeg er sikker på jeg aldri har sett henne.\n</reference>"
+  },
+  {
+   "draw": 21,
+   "doc_index": 1943,
+   "doc_fingerprint": "67832806c69f",
+   "prompt_variant": "translation_eng_nob_p2",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Gi en oversettelse til bokmål for denne setningen: It's cold here.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Det er kaldt her."
+    ]
+   },
+   "reference_text": "<reference>\nDet er kaldt her.\n</reference>"
+  },
+  {
+   "draw": 22,
+   "doc_index": 92,
+   "doc_fingerprint": "baf05205c176",
+   "prompt_variant": "translation_eng_nob_p1",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Oversett følgende setning til norsk bokmål: Are you going to school by bus?\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Skal du ta buss til skolen?"
+    ]
+   },
+   "reference_text": "<reference>\nSkal du ta buss til skolen?\n</reference>"
+  },
+  {
+   "draw": 23,
+   "doc_index": 3609,
+   "doc_fingerprint": "f791af0221a2",
+   "prompt_variant": "translation_eng_nob_p3",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Hva blir \"Tom missed the target.\" på bokmål?\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Tom bommet på målet."
+    ]
+   },
+   "reference_text": "<reference>\nTom bommet på målet.\n</reference>"
+  },
+  {
+   "draw": 24,
+   "doc_index": 4210,
+   "doc_fingerprint": "19eb23d6b5ff",
+   "prompt_variant": "translation_eng_nob_p2",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Gi en oversettelse til bokmål for denne setningen: Words fail me.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Jeg finner ikke ord."
+    ]
+   },
+   "reference_text": "<reference>\nJeg finner ikke ord.\n</reference>"
+  },
+  {
+   "draw": 25,
+   "doc_index": 3965,
+   "doc_fingerprint": "33be98bb3f3b",
+   "prompt_variant": "translation_eng_nob_p3",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Hva blir \"What do you think of modern art?\" på bokmål?\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Hva synes du om moderne kunst?"
+    ]
+   },
+   "reference_text": "<reference>\nHva synes du om moderne kunst?\n</reference>"
+  },
+  {
+   "draw": 26,
+   "doc_index": 4001,
+   "doc_fingerprint": "759134f5acf4",
+   "prompt_variant": "translation_eng_nob_p1",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Oversett følgende setning til norsk bokmål: What languages do you speak?\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Hvilke språk snakker du?"
+    ]
+   },
+   "reference_text": "<reference>\nHvilke språk snakker du?\n</reference>"
+  },
+  {
+   "draw": 27,
+   "doc_index": 2281,
+   "doc_fingerprint": "c3189a304a3e",
+   "prompt_variant": "translation_eng_nob_p0",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Engelsk: Let's wait and see.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "La oss vente og se."
+    ]
+   },
+   "reference_text": "<reference>\nLa oss vente og se.\n</reference>"
+  },
+  {
+   "draw": 28,
+   "doc_index": 1658,
+   "doc_fingerprint": "196e25d21c0d",
+   "prompt_variant": "translation_eng_nob_p2",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Gi en oversettelse til bokmål for denne setningen: Interoperability means compatibility with other systems.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Interoperabilitet betyr forenlighet med andre systemer."
+    ]
+   },
+   "reference_text": "<reference>\nInteroperabilitet betyr forenlighet med andre systemer.\n</reference>"
+  },
+  {
+   "draw": 29,
+   "doc_index": 2424,
+   "doc_fingerprint": "53d9998583d5",
+   "prompt_variant": "translation_eng_nob_p3",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Hva blir \"Nobody is going to stop me.\" på bokmål?\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Ingen kommer til å stoppe meg."
+    ]
+   },
+   "reference_text": "<reference>\nIngen kommer til å stoppe meg.\n</reference>"
+  },
+  {
+   "draw": 30,
+   "doc_index": 4114,
+   "doc_fingerprint": "9bda36c42695",
+   "prompt_variant": "translation_eng_nob_p0",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Engelsk: Wherever you may go, you will not find a better place than your home.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Hvor enn du går, vil du aldri finne et bedre sted enn ditt eget hjem."
+    ]
+   },
+   "reference_text": "<reference>\nHvor enn du går, vil du aldri finne et bedre sted enn ditt eget hjem.\n</reference>"
+  },
+  {
+   "draw": 31,
+   "doc_index": 731,
+   "doc_fingerprint": "b6f57335638e",
+   "prompt_variant": "translation_eng_nob_p1",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": "eng",
+   "prompt": "Oversett følgende setning til norsk bokmål: He married an actress.\nBokmål:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Han giftet seg med en skuespillerinne."
+    ]
+   },
+   "reference_text": "<reference>\nHan giftet seg med en skuespillerinne.\n</reference>"
+  }
+ ]
+}

@@ -1,0 +1,885 @@
+{
+ "task": "noropenbookqa_no_fact_nno",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 85,
+   "doc_fingerprint": "56ab2c90054a",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva av alternativa spelar inn i forma til eit bregnfrø?\n\nAlternativ:\n- Flaks\n- Menneske\n- Gull\n- Arv\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Flaks",
+     "Menneske",
+     "Gull",
+     "Arv"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Arv"
+  },
+  {
+   "draw": 1,
+   "doc_index": 20,
+   "doc_fingerprint": "348b79748e49",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p4",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva brukar ei grashoppe for å beskytte seg sjølv mot rovdyr?\nVel rett svar blant desse alternativa:\n A: Gift\n B: Utsjånaden sin\n C: Fart\n D: Høyrselen sin\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Gift",
+     "Utsjånaden sin",
+     "Fart",
+     "Høyrselen sin"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Utsjånaden sin)"
+  },
+  {
+   "draw": 2,
+   "doc_index": 40,
+   "doc_fingerprint": "e6859b6b532d",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p2",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva kan du gjere dersom hunden din er overvektig?\n A: Leggje til meir feitt i dietten til hunden\n B: Minke kaloriinntaket til hunden\n C: La hunden få sove meir\n D: Auke kaloriinntaket til hunden\n\nEr det rette svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Leggje til meir feitt i dietten til hunden",
+     "Minke kaloriinntaket til hunden",
+     "La hunden få sove meir",
+     "Auke kaloriinntaket til hunden"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Minke kaloriinntaket til hunden)"
+  },
+  {
+   "draw": 3,
+   "doc_index": 69,
+   "doc_fingerprint": "5d0b4e3219f0",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Du kan oppleve eit trykkskifte når\n- du skriv veldig høgt\n- du svever i lufta ved hopp\n- går tur\n- syklar\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "du skriv veldig høgt",
+     "du svever i lufta ved hopp",
+     "går tur",
+     "syklar"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: du svever i lufta ved hopp"
+  },
+  {
+   "draw": 4,
+   "doc_index": 74,
+   "doc_fingerprint": "0585a16dba12",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p0",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Cellulær respirasjon er når energi blir produsert i ei celle ved forbuk av\n\nAlternativ:\n A: vatn\n B: næringsstoff\n C: mitokondrier\n D: gass\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "vatn",
+     "næringsstoff",
+     "mitokondrier",
+     "gass"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (næringsstoff)"
+  },
+  {
+   "draw": 5,
+   "doc_index": 19,
+   "doc_fingerprint": "f0ee005ea9b7",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p1",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Karbonstål er alltid\n\nSvaralternativ:\n A: attraktiv for ulike gjenstandar som inneheld jern\n B: beståande av ein magnetisk personlegdom\n C: bygd opp av jern og bitar av magnetar\n D: hard som ein magnetiserande stang\n\nKva er rett svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "attraktiv for ulike gjenstandar som inneheld jern",
+     "beståande av ein magnetisk personlegdom",
+     "bygd opp av jern og bitar av magnetar",
+     "hard som ein magnetiserande stang"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (attraktiv for ulike gjenstandar som inneheld jern)"
+  },
+  {
+   "draw": 6,
+   "doc_index": 71,
+   "doc_fingerprint": "b23f01a2bd27",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva er den nærmaste kjelda av plasma til planeten vår?\nVel rett svar blant desse alternativa:\n– Alle desse\n– Ei sky på himmelen\n– Den nærmaste stjerna som skin sterkt\n– Den nakne måneoverflata\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Alle desse",
+     "Ei sky på himmelen",
+     "Den nærmaste stjerna som skin sterkt",
+     "Den nakne måneoverflata"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Den nærmaste stjerna som skin sterkt"
+  },
+  {
+   "draw": 7,
+   "doc_index": 78,
+   "doc_fingerprint": "92f0a493a2e2",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kvar i verda er den åttande månaden i året ein vintermånad?\n- I brasil\n- I delstaten Indiana i USA\n- I London\n- I Kanada\n\nEr det rette svaret I brasil, I delstaten Indiana i USA, I London eller I Kanada?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "I brasil",
+     "I delstaten Indiana i USA",
+     "I London",
+     "I Kanada"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: I brasil"
+  },
+  {
+   "draw": 8,
+   "doc_index": 32,
+   "doc_fingerprint": "9040604b20f6",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: I ein fast fase har materie ein\n\nSvaralternativ:\n- konkret figurasjon\n- tvetydig form\n- formlaus form\n- radioaktiv glød\n\nKva er rett svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "konkret figurasjon",
+     "tvetydig form",
+     "formlaus form",
+     "radioaktiv glød"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: konkret figurasjon"
+  },
+  {
+   "draw": 9,
+   "doc_index": 28,
+   "doc_fingerprint": "72c5f3b2c6e5",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p3",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kva er ein passande farge å ha på biltrekket ditt viss du bur i ein ørken?\n A: Grågul\n B: Raud\n C: Svart\n D: Marineblå\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Grågul",
+     "Raud",
+     "Svart",
+     "Marineblå"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Grågul)"
+  },
+  {
+   "draw": 10,
+   "doc_index": 17,
+   "doc_fingerprint": "2441342c55a3",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kva av alternativa kan ikkje kategoriserast som ein inputt i fotosyntesen?\n\nSvaralternativ:\n- Sollys\n- Oksygen\n- Vatn\n- Karbondioksid\n\nKva er rett svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Sollys",
+     "Oksygen",
+     "Vatn",
+     "Karbondioksid"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Oksygen"
+  },
+  {
+   "draw": 11,
+   "doc_index": 29,
+   "doc_fingerprint": "fde0248b4dca",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Måleeininga avleia frå det franske ordet milliliter er ei einig som generelt sett vert nytta for å måle volum av verdiar mellom 1 og\n- 1000\n- 250\n- 5000\n- 300\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "1000",
+     "250",
+     "5000",
+     "300"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: 1000"
+  },
+  {
+   "draw": 12,
+   "doc_index": 35,
+   "doc_fingerprint": "5def7a2b262f",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kven av dyrepara er det mest sannsynleg at vil ete bær?\n- Bjørn eller menneske\n- Bjørn eller hai\n- Bjørn eller løve\n- Bjørn eller ulv\n\nEr det rette svaret Bjørn eller menneske, Bjørn eller hai, Bjørn eller løve eller Bjørn eller ulv?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Bjørn eller menneske",
+     "Bjørn eller hai",
+     "Bjørn eller løve",
+     "Bjørn eller ulv"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Bjørn eller menneske"
+  },
+  {
+   "draw": 13,
+   "doc_index": 76,
+   "doc_fingerprint": "9502350591ca",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p4",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Viss jordkloda var eit soverom, kva kunne vi ha gjort for å smelte isbreane?\nVel rett svar blant desse alternativa:\n A: Nokon kunne ha skrudd opp varmen i rommet\n B: Nokon kunne ha skrudd opp varmepumpa\n C: Nokon kunne ha skrudd op musikken\n D: Nokpm kunne ha skrudd på lyset\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Nokon kunne ha skrudd opp varmen i rommet",
+     "Nokon kunne ha skrudd opp varmepumpa",
+     "Nokon kunne ha skrudd op musikken",
+     "Nokpm kunne ha skrudd på lyset"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Nokon kunne ha skrudd opp varmen i rommet)"
+  },
+  {
+   "draw": 14,
+   "doc_index": 26,
+   "doc_fingerprint": "8a03bbcd51db",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva forhold har distansen med krafta som blir utøvd på eit objekt?\n\nAlternativ:\n- Revers\n- Omvendt\n- Lik\n- Direkte\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Revers",
+     "Omvendt",
+     "Lik",
+     "Direkte"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Direkte"
+  },
+  {
+   "draw": 15,
+   "doc_index": 54,
+   "doc_fingerprint": "b0603b714ad2",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva av alternativa ville raskast ha stoppa ein bil?\nVel rett svar blant desse alternativa:\n– Eit hjul med blaute bremseklossar\n– Eit hjul utan bremseklossar\n– Eit hjul med slitte bremseklossar\n– Eit hjul med tørre bremseklossar\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Eit hjul med blaute bremseklossar",
+     "Eit hjul utan bremseklossar",
+     "Eit hjul med slitte bremseklossar",
+     "Eit hjul med tørre bremseklossar"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Eit hjul med tørre bremseklossar"
+  },
+  {
+   "draw": 16,
+   "doc_index": 2,
+   "doc_fingerprint": "735893b1b276",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p0",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva er den primære årsaka til at ei jakke laga av andefjær vil fungere godt i snøvær?\n\nAlternativ:\n A: Fjær sakkar ned varmeoverføring\n B: Funksjonen av den naturlege andevoksen\n C: Ei syntetisk tjukk linje\n D: Små fleksible solcellepanel\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Fjær sakkar ned varmeoverføring",
+     "Funksjonen av den naturlege andevoksen",
+     "Ei syntetisk tjukk linje",
+     "Små fleksible solcellepanel"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Fjær sakkar ned varmeoverføring)"
+  },
+  {
+   "draw": 17,
+   "doc_index": 0,
+   "doc_fingerprint": "3240ad5c6b78",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p3",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Ein snurrande gjenstand kan bli nytta for å lage\n A: straum\n B: varme\n C: vatn\n D: elektrisitet\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "straum",
+     "varme",
+     "vatn",
+     "elektrisitet"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (elektrisitet)"
+  },
+  {
+   "draw": 18,
+   "doc_index": 87,
+   "doc_fingerprint": "db7c79a9aeff",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p2",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "På korleis måte skil dyr seg ut frå plantar?\n A: Dyr er levande vesen\n B: Ingen av alternativa\n C: Dyr kan lukte\n D: Dyr treng næring\n\nEr det rette svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Dyr er levande vesen",
+     "Ingen av alternativa",
+     "Dyr kan lukte",
+     "Dyr treng næring"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Dyr kan lukte)"
+  },
+  {
+   "draw": 19,
+   "doc_index": 73,
+   "doc_fingerprint": "7f31e5b1344d",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p1",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Viss ein fugl er kjøtetar, så er det sannsynleg at den er\n\nSvaralternativ:\n A: eit bytte\n B: eit rovdyr\n C: ein planteetar\n D: ein kanarifugl\n\nKva er rett svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "eit bytte",
+     "eit rovdyr",
+     "ein planteetar",
+     "ein kanarifugl"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (eit rovdyr)"
+  },
+  {
+   "draw": 20,
+   "doc_index": 63,
+   "doc_fingerprint": "027d661ea6d6",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Smidigheita til dette dyret er ei nøkkeltilpassing som let dyret sleppe unna angrep frå rovdyr:\n- Sommarfuglen\n- Dovendyret\n- Knelarar\n- Antilopen\n\nEr det rette svaret Sommarfuglen, Dovendyret, Knelarar eller Antilopen?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Sommarfuglen",
+     "Dovendyret",
+     "Knelarar",
+     "Antilopen"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Antilopen"
+  },
+  {
+   "draw": 21,
+   "doc_index": 60,
+   "doc_fingerprint": "5a30d775136f",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva brukar alle celler celleånding til?\nVel rett svar blant desse alternativa:\n– Fotonsyntesen\n– Å frigjere avfall\n– Å utføre mesiose\n– Å frigjere energi\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Fotonsyntesen",
+     "Å frigjere avfall",
+     "Å utføre mesiose",
+     "Å frigjere energi"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Å frigjere avfall"
+  },
+  {
+   "draw": 22,
+   "doc_index": 51,
+   "doc_fingerprint": "77de8a81a3ea",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kven av desse personane vil ha den verste luftkvaliteta?\n\nSvaralternativ:\n- Ein person som bur ved sidan av ein søøpelfylling\n- Ein person som bur i ein by med god luftkvalitet\n- Ingen av desse\n- Ein person som bur i ein flott forstad\n\nKva er rett svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ein person som bur ved sidan av ein søøpelfylling",
+     "Ein person som bur i ein by med god luftkvalitet",
+     "Ingen av desse",
+     "Ein person som bur i ein flott forstad"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Ein person som bur ved sidan av ein søøpelfylling"
+  },
+  {
+   "draw": 23,
+   "doc_index": 59,
+   "doc_fingerprint": "f08ccb7b17ea",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p4",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Konservering\nVel rett svar blant desse alternativa:\n A: fører til meir langvarig tørke av ressursar\n B: fører til meir langvarig tilgjenge av ressursar\n C: fører til større forbruk\n D: fører til mangel på ressursar\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "fører til meir langvarig tørke av ressursar",
+     "fører til meir langvarig tilgjenge av ressursar",
+     "fører til større forbruk",
+     "fører til mangel på ressursar"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (fører til meir langvarig tilgjenge av ressursar)"
+  },
+  {
+   "draw": 24,
+   "doc_index": 1,
+   "doc_fingerprint": "43331323a013",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p3",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kva av alternativa trenger energi for å kunne bevege seg?\n A: Ein ilder\n B: Eit lauvtre\n C: Ein mango\n D: Brennenesle\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ein ilder",
+     "Eit lauvtre",
+     "Ein mango",
+     "Brennenesle"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Ein ilder)"
+  },
+  {
+   "draw": 25,
+   "doc_index": 13,
+   "doc_fingerprint": "eb000b6d69af",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p0",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva av alternativa kan urinere?\n\nAlternativ:\n A: Fly\n B: Bilar\n C: Pattedyr\n D: Båtar\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Fly",
+     "Bilar",
+     "Pattedyr",
+     "Båtar"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Pattedyr)"
+  },
+  {
+   "draw": 26,
+   "doc_index": 61,
+   "doc_fingerprint": "5205b61593e4",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p2",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva av alternativa vil ein gepard som spring heile dagen miste mykje av?\n A: Blod\n B: Vatn\n C: Bytte\n D: Flekkar\n\nEr det rette svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Blod",
+     "Vatn",
+     "Bytte",
+     "Flekkar"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Vatn)"
+  },
+  {
+   "draw": 27,
+   "doc_index": 49,
+   "doc_fingerprint": "d9a54a4f96b0",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva av dette vil du mest sannsynleg kunne finne i ein ørken?\n\nAlternativ:\n- Ein hai\n- Ein aure\n- Ein øgle\n- Ingen av desse\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ein hai",
+     "Ein aure",
+     "Ein øgle",
+     "Ingen av desse"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Ein øgle"
+  },
+  {
+   "draw": 28,
+   "doc_index": 47,
+   "doc_fingerprint": "31185f9f552b",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p1",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Ein kjempekaktus har tilpassingar for eit miljø med\n\nSvaralternativ:\n A: masse snø\n B: masse folk\n C: mindre vatn\n D: meir vatn\n\nKva er rett svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "masse snø",
+     "masse folk",
+     "mindre vatn",
+     "meir vatn"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (mindre vatn)"
+  },
+  {
+   "draw": 29,
+   "doc_index": 52,
+   "doc_fingerprint": "5d52524473ab",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Når eit fly er på himmelen og er fleire mil vekke, er lyset som blir sett knapt synleg, men når det nærmar seg\n- er lyset langt vekke\n- blir lyset meir synleg\n- blir lyset meir fjernt\n- blir lyset lengre vekke\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "er lyset langt vekke",
+     "blir lyset meir synleg",
+     "blir lyset meir fjernt",
+     "blir lyset lengre vekke"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: blir lyset meir synleg"
+  },
+  {
+   "draw": 30,
+   "doc_index": 80,
+   "doc_fingerprint": "6c31df0bcf10",
+   "prompt_variant": "noropenbookqa_no_fact_nno_mcf_p1",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kva er fordelen med ein vindaugsfolie i staden for eit ordinært vindauge?\n\nSvaralternativ:\n A: Vindaugsfolie er enklare å lage\n B: Vindaugsfolie slepp in mindre lys\n C: Vindaugsfolie er billigare å produsere\n D: Vindaugsfolie er mykje sterkare\n\nKva er rett svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Vindaugsfolie er enklare å lage",
+     "Vindaugsfolie slepp in mindre lys",
+     "Vindaugsfolie er billigare å produsere",
+     "Vindaugsfolie er mykje sterkare"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Vindaugsfolie slepp in mindre lys)"
+  },
+  {
+   "draw": 31,
+   "doc_index": 11,
+   "doc_fingerprint": "551a78084914",
+   "prompt_variant": "noropenbookqa_no_fact_nno_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva skjer når ballongar blir varma opp?\n\nAlternativ:\n- Ballongane aukar i storleik\n- Ballongane minkar i storleik\n- Ingenting\n- Ballongane dett ned\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ballongane aukar i storleik",
+     "Ballongane minkar i storleik",
+     "Ingenting",
+     "Ballongane dett ned"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Ballongane aukar i storleik"
+  }
+ ]
+}

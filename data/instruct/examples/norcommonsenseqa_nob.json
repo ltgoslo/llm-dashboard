@@ -1,0 +1,933 @@
+{
+ "task": "norcommonsenseqa_nob",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 758,
+   "doc_fingerprint": "5a8a2362e878",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Gitt alternativene under, hva er svaret på følgende spørsmål: Bård var en astronaut. Hvordan så jorden ut for ham fra verdensrommet?\n\nAlternativer:\n- Mangfoldig\n- Rund\n- Firkantet\n- Oransje\n- Komplisert\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Mangfoldig",
+     "Rund",
+     "Firkantet",
+     "Oransje",
+     "Komplisert"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Rund"
+  },
+  {
+   "draw": 1,
+   "doc_index": 486,
+   "doc_fingerprint": "e6425643718e",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva kalles det når to folk som elsker hverandre får barn?\nVelg riktig svar blant disse alternativene:\n– Å ta et løfte\n– Å formere seg\n– Ekteskap\n– Å glede foreldrene\n– Å leve livet\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Å ta et løfte",
+     "Å formere seg",
+     "Ekteskap",
+     "Å glede foreldrene",
+     "Å leve livet"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Å formere seg"
+  },
+  {
+   "draw": 2,
+   "doc_index": 395,
+   "doc_fingerprint": "a3253a6bc287",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva er revens leveområde?\nHvilket av følgende mulige svar er det riktige?\n- hønsehuset\n- hule\n- California\n- England\n- Fjellene\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "hønsehuset",
+     "hule",
+     "California",
+     "England",
+     "Fjellene"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Fjellene"
+  },
+  {
+   "draw": 3,
+   "doc_index": 274,
+   "doc_fingerprint": "46cf2fb8252f",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvis jeg vil kjøpe en rosebusk, hvor kan jeg bestille den fra?\nVelg riktig svar blant disse alternativene:\n A: i en vase\n B: på et museum\n C: fra et hagesenter\n D: i en formell hage\n E: i hagen\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "i en vase",
+     "på et museum",
+     "fra et hagesenter",
+     "i en formell hage",
+     "i hagen"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (fra et hagesenter)"
+  },
+  {
+   "draw": 4,
+   "doc_index": 944,
+   "doc_fingerprint": "880034dc0bcf",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvilket av følgende er det mest kjente stjernebildet?\n A: Månen\n B: Sola\n C: Guds skapelse\n D: Stjerner\n E: Orion\n\nEr det riktige svaret A, B, C, D eller E?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Månen",
+     "Sola",
+     "Guds skapelse",
+     "Stjerner",
+     "Orion"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: E (Orion)"
+  },
+  {
+   "draw": 5,
+   "doc_index": 144,
+   "doc_fingerprint": "5321a470236e",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Gitt alternativene under, hva er svaret på følgende spørsmål: Når noen snakker og du gikk glipp av noe, hva kan du gjøre for at de skal gjenta det?\n\nAlternativer:\n A: gå\n B: stille spørsmål\n C: tenke\n D: skrive ned spørsmål med fargestift\n E: nyse\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "gå",
+     "stille spørsmål",
+     "tenke",
+     "skrive ned spørsmål med fargestift",
+     "nyse"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (stille spørsmål)"
+  },
+  {
+   "draw": 6,
+   "doc_index": 93,
+   "doc_fingerprint": "e5b0d99c6a4f",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva gjør folk vanligvis mens de spiller gitar?\nHvilket av følgende mulige svar er det riktige?\n A: Gråter\n B: Hører lyder\n C: Synger\n D: Leddgikt\n E: Lager musikk\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Gråter",
+     "Hører lyder",
+     "Synger",
+     "Leddgikt",
+     "Lager musikk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Synger)"
+  },
+  {
+   "draw": 7,
+   "doc_index": 348,
+   "doc_fingerprint": "d57e7e02e6b5",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Hvor er det sannsynlig at en by bygger et minnesmerke?\n\nAlternativer:\n A: I en kommunal park\n B: På et kontor\n C: I en nasjonalpark\n D: På en kirkegård\n E: I en offentlig hage\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "I en kommunal park",
+     "På et kontor",
+     "I en nasjonalpark",
+     "På en kirkegård",
+     "I en offentlig hage"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (I en kommunal park)"
+  },
+  {
+   "draw": 8,
+   "doc_index": 927,
+   "doc_fingerprint": "4299f4af7c90",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvor vil man oftest finne et veldig stort bord?\n- Soverommet\n- Konferanserom\n- Kjøkkenet\n- I en elv\n- På en demonstrasjon\n\nEr det riktige svaret Soverommet, Konferanserom, Kjøkkenet, I en elv eller På en demonstrasjon?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Soverommet",
+     "Konferanserom",
+     "Kjøkkenet",
+     "I en elv",
+     "På en demonstrasjon"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Konferanserom"
+  },
+  {
+   "draw": 9,
+   "doc_index": 96,
+   "doc_fingerprint": "cc6430fe3eb6",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Silje kjedet seg, fordi hun ikke likte skvipet som var på …?\n\nAlternativer:\n- Skuffen\n- Garasjen\n- Skapet\n- Senga\n- TV\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Skuffen",
+     "Garasjen",
+     "Skapet",
+     "Senga",
+     "TV"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: TV"
+  },
+  {
+   "draw": 10,
+   "doc_index": 17,
+   "doc_fingerprint": "954083f47685",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: De kysset hverandre farvel og hadde ingen bekymringer. Hva var forholdet deres basert på?\n\nAlternativer:\n- en partner\n- tillit\n- samarbeid\n- brikker\n- herpes\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "en partner",
+     "tillit",
+     "samarbeid",
+     "brikker",
+     "herpes"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: tillit"
+  },
+  {
+   "draw": 11,
+   "doc_index": 523,
+   "doc_fingerprint": "7524d46498ca",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Gitt alternativene under, hva er svaret på følgende spørsmål: Hvor er et godt sted å oppbevare hefter hjemme eller på kontoret?\n\nAlternativer:\n- På et bibliotek\n- På helseavdelingen\n- I postkassa\n- I en skuff\n- I en bokbutikk\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "På et bibliotek",
+     "På helseavdelingen",
+     "I postkassa",
+     "I en skuff",
+     "I en bokbutikk"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: I en skuff"
+  },
+  {
+   "draw": 12,
+   "doc_index": 362,
+   "doc_fingerprint": "06a7f9714765",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva ville du gjort med fjellsiden når du klatrer opp en klippe?\nHvilket av følgende mulige svar er det riktige?\n A: Gripe den\n B: Se ned\n C: Kaste den\n D: Falle\n E: Muligens falle\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Gripe den",
+     "Se ned",
+     "Kaste den",
+     "Falle",
+     "Muligens falle"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Gripe den)"
+  },
+  {
+   "draw": 13,
+   "doc_index": 529,
+   "doc_fingerprint": "643cd1b60e34",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvor kan man finne mange klesbutikker?\nVelg riktig svar blant disse alternativene:\n A: I butikken\n B: På kjøpesenteret\n C: I et varehus\n D: I en skuff\n E: På biblioteket\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "I butikken",
+     "På kjøpesenteret",
+     "I et varehus",
+     "I en skuff",
+     "På biblioteket"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (På kjøpesenteret)"
+  },
+  {
+   "draw": 14,
+   "doc_index": 625,
+   "doc_fingerprint": "6cabf5ec7b37",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvilken kjøpesenterbutikk selger dongeribukser til en grei pris?\n- Klesbutikk\n- Soverommet\n- En bruktbutikk\n- En leilighet\n- H&M\n\nEr det riktige svaret Klesbutikk, Soverommet, En bruktbutikk, En leilighet eller H&M?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Klesbutikk",
+     "Soverommet",
+     "En bruktbutikk",
+     "En leilighet",
+     "H&M"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: H&M"
+  },
+  {
+   "draw": 15,
+   "doc_index": 330,
+   "doc_fingerprint": "c94d7977b167",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Gitt alternativene under, hva er svaret på følgende spørsmål: Hvorfor leste Håkon lesestoff utenfor komfortsonen sin?\n\nAlternativer:\n A: For å få nye perspektiver\n B: For å bli underholdt\n C: For å forstå\n D: På grunn av sult\n E: På grunn av slitne øyne\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "For å få nye perspektiver",
+     "For å bli underholdt",
+     "For å forstå",
+     "På grunn av sult",
+     "På grunn av slitne øyne"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (For å få nye perspektiver)"
+  },
+  {
+   "draw": 16,
+   "doc_index": 333,
+   "doc_fingerprint": "bc19fcb85f57",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Hva slags turistattraksjon er noen ganger så stor at du trenger et kart for å finne deg fram?\n\nAlternativer:\n A: Fornøyelsespark\n B: Hvileplass\n C: McDonalds\n D: Ryggsekk\n E: Klasserom\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Fornøyelsespark",
+     "Hvileplass",
+     "McDonalds",
+     "Ryggsekk",
+     "Klasserom"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Fornøyelsespark)"
+  },
+  {
+   "draw": 17,
+   "doc_index": 497,
+   "doc_fingerprint": "841cd22f0a08",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvorfor må man noen ganger sette seg ned rett etter at man reiste seg?\nVelg riktig svar blant disse alternativene:\n– Tog\n– Det er anstrengende\n– Dårlig balanse\n– Føtter\n– Muskler\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Tog",
+     "Det er anstrengende",
+     "Dårlig balanse",
+     "Føtter",
+     "Muskler"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Dårlig balanse"
+  },
+  {
+   "draw": 18,
+   "doc_index": 947,
+   "doc_fingerprint": "64980b54664c",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvilket land er kjent for å ha en god og rask motorvei uten fartsgrense?\n A: Norge\n B: England\n C: Tyrkia\n D: Tyskland\n E: Nederland\n\nEr det riktige svaret A, B, C, D eller E?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Norge",
+     "England",
+     "Tyrkia",
+     "Tyskland",
+     "Nederland"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Tyskland)"
+  },
+  {
+   "draw": 19,
+   "doc_index": 609,
+   "doc_fingerprint": "0ff9cb068c2b",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Læreren tok en pinne fra Robert fordi han lekte med den i timen. Hun ville være sikkert på at han ikke kunne nå den. Hvor puttet hun den?\nHvilket av følgende mulige svar er det riktige?\n- I en skuff under lærerpulten\n- I en kjøkkenskuff\n- I klasserommet\n- I lomma\n- På kontoret\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "I en skuff under lærerpulten",
+     "I en kjøkkenskuff",
+     "I klasserommet",
+     "I lomma",
+     "På kontoret"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: I en skuff under lærerpulten"
+  },
+  {
+   "draw": 20,
+   "doc_index": 554,
+   "doc_fingerprint": "a3cd4541ebc9",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva sier foreldre til barna at de må gjøre i helgen?\nVelg riktig svar blant disse alternativene:\n– Studere\n– Begynne skole\n– Gå ut å leke\n– Robåt\n– Rydde rom\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Studere",
+     "Begynne skole",
+     "Gå ut å leke",
+     "Robåt",
+     "Rydde rom"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Gå ut å leke"
+  },
+  {
+   "draw": 21,
+   "doc_index": 465,
+   "doc_fingerprint": "816c23ad1bc8",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Gitt alternativene under, hva er svaret på følgende spørsmål: Kunstneren satt stille og undret, men begynte å male når han ble truffet av\n\nAlternativer:\n- tristhet\n- angst\n- inspirasjon\n- ubehag\n- innsikt\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "tristhet",
+     "angst",
+     "inspirasjon",
+     "ubehag",
+     "innsikt"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: inspirasjon"
+  },
+  {
+   "draw": 22,
+   "doc_index": 846,
+   "doc_fingerprint": "7a8642587f43",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Hva kan gjøre at en person med en mental lidelse kan leve et relativt normalt liv?\n\nAlternativer:\n- administrasjon\n- effektiv behandling\n- tilbakefall\n- vrangforestillinger\n- illusjoner\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "administrasjon",
+     "effektiv behandling",
+     "tilbakefall",
+     "vrangforestillinger",
+     "illusjoner"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: effektiv behandling"
+  },
+  {
+   "draw": 23,
+   "doc_index": 33,
+   "doc_fingerprint": "aa2d50915e9a",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Hva er solen hovedsakelig ansvarlig for?\n\nAlternativer:\n A: Sommerferie\n B: Solbrun\n C: Lys\n D: Liv på jorden\n E: Solseng\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Sommerferie",
+     "Solbrun",
+     "Lys",
+     "Liv på jorden",
+     "Solseng"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Liv på jorden)"
+  },
+  {
+   "draw": 24,
+   "doc_index": 202,
+   "doc_fingerprint": "3d5853b80c9a",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Gitt alternativene under, hva er svaret på følgende spørsmål: Hva kan du kjøpe i en butikk for å oppbevare de ubrukte tingene dine?\n\nAlternativer:\n A: En kjeller\n B: En pappeske\n C: En havbunn\n D: En videregående skole\n E: En oppbevaringsboks\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "En kjeller",
+     "En pappeske",
+     "En havbunn",
+     "En videregående skole",
+     "En oppbevaringsboks"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: E (En oppbevaringsboks)"
+  },
+  {
+   "draw": 25,
+   "doc_index": 804,
+   "doc_fingerprint": "87d795dc7ea4",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Lampen lyste ikke fordi den ikke hadde blitt koblet til\n- Internett\n- Strømnettet\n- Nettverket\n- Samtiden\n- Havet\n\nEr det riktige svaret Internett, Strømnettet, Nettverket, Samtiden eller Havet?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Internett",
+     "Strømnettet",
+     "Nettverket",
+     "Samtiden",
+     "Havet"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Strømnettet"
+  },
+  {
+   "draw": 26,
+   "doc_index": 739,
+   "doc_fingerprint": "b6d0564e1775",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva består av mennesker?\n A: Bygninger\n B: Publikum\n C: Leiligheter\n D: Klasserom\n E: Fall\n\nEr det riktige svaret A, B, C, D eller E?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Bygninger",
+     "Publikum",
+     "Leiligheter",
+     "Klasserom",
+     "Fall"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Publikum)"
+  },
+  {
+   "draw": 27,
+   "doc_index": 913,
+   "doc_fingerprint": "61b33653f081",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva ville du gjort hvis du var nysgjerrig, men var blind og paralysert?\nHvilket av følgende mulige svar er det riktige?\n A: Se på nyheter\n B: Analysere\n C: Gå et sted\n D: Eksaminere en ting\n E: Se på favorittshowet ditt\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Se på nyheter",
+     "Analysere",
+     "Gå et sted",
+     "Eksaminere en ting",
+     "Se på favorittshowet ditt"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Analysere)"
+  },
+  {
+   "draw": 28,
+   "doc_index": 733,
+   "doc_fingerprint": "487af875a2cf",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Når en person tilstår sine tabber, hva gjør de?\nVelg riktig svar blant disse alternativene:\n A: et uhell\n B: de lærer å svømme\n C: takker Gud\n D: føler lettelse\n E: oppfører seg ansvarlig\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "et uhell",
+     "de lærer å svømme",
+     "takker Gud",
+     "føler lettelse",
+     "oppfører seg ansvarlig"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: E (oppfører seg ansvarlig)"
+  },
+  {
+   "draw": 29,
+   "doc_index": 721,
+   "doc_fingerprint": "6a63839f3e5c",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva er oftest sant om en person som har et armbåndsur?\nHvilket av følgende mulige svar er det riktige?\n- Han føler seg viktig\n- Han stoler på seg selv\n- Han eier bolig\n- Elektrisk krets\n- Han vet hvilken tid det er\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Han føler seg viktig",
+     "Han stoler på seg selv",
+     "Han eier bolig",
+     "Elektrisk krets",
+     "Han vet hvilken tid det er"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Han vet hvilken tid det er"
+  },
+  {
+   "draw": 30,
+   "doc_index": 276,
+   "doc_fingerprint": "46bfbde88309",
+   "prompt_variant": "norcommonsenseqa_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Soldaten ble bedt om å komme til møtepunktet, hva skulle han der?\n\nAlternativer:\n A: Bekjempe fienden\n B: Gå i krig\n C: Kjempe for frihet\n D: Vente på ordre\n E: Følge instrukser\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Bekjempe fienden",
+     "Gå i krig",
+     "Kjempe for frihet",
+     "Vente på ordre",
+     "Følge instrukser"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Vente på ordre)"
+  },
+  {
+   "draw": 31,
+   "doc_index": 275,
+   "doc_fingerprint": "20c2c8edfe23",
+   "prompt_variant": "norcommonsenseqa_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Læreren mente at ildere kunne være veldig rampete og at de sannsynligvis ikke ville være gode kjæledyr. Hvem sa de dette høyt for?\n- Dårlig humør\n- Et kaninbur\n- Klasserommet\n- Et buksepar\n- Et år\n\nEr det riktige svaret Dårlig humør, Et kaninbur, Klasserommet, Et buksepar eller Et år?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Dårlig humør",
+     "Et kaninbur",
+     "Klasserommet",
+     "Et buksepar",
+     "Et år"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Klasserommet"
+  }
+ ]
+}

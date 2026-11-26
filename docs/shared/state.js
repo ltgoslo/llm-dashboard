@@ -12,6 +12,9 @@ export const state = {
   currentPromptAgg: "max",
   currentNormalization: "baseline",
   currentMetric: null,        // null = use the benchmark's main_metric
+  decimals: 1,                // places of a displayed score (scoreDecimals: z-scores get 2); /instruct's 0–5 mean grades 2
+  scoreTop: 100,              // a perfect displayed score: 100 (scores shown ×100), 5 (/instruct's top grade)
+  categoryOrder: null,        // the page's order of the task categories (null: CATEGORY_ORDER, NorEval's)
   showCIBands: true,          // false hides CI bands (multisynt toggle)
   // Multisynt / prelude selectors; null = inactive (other dashboards never set them).
   currentFormulation: null,   // "max" | "mean" | "cf" | "mcf" | "hybrid"

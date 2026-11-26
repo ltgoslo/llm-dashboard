@@ -1,0 +1,890 @@
+{
+ "task": "noropenbookqa_no_fact_nob",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 68,
+   "doc_fingerprint": "ca5e688d2b30",
+   "prompt_variant": "noropenbookqa_no_fact_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Når du forsøker å trekke en rose ut fra bakken, hva er det som gir motstand?\n\nAlternativer:\n- Røtter\n- Strekkfasthet\n- Plantens temperatur\n- Plantens farge\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Røtter",
+     "Strekkfasthet",
+     "Plantens temperatur",
+     "Plantens farge"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Røtter"
+  },
+  {
+   "draw": 1,
+   "doc_index": 313,
+   "doc_fingerprint": "bbeb4172b064",
+   "prompt_variant": "noropenbookqa_no_fact_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Hva skjer alltid før en regnbue oppstår?\n\nSvaralternativer:\n- En brann\n- En tornado\n- Nedbør\n- Kornblanding\n\nHva er riktig svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "En brann",
+     "En tornado",
+     "Nedbør",
+     "Kornblanding"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Nedbør"
+  },
+  {
+   "draw": 2,
+   "doc_index": 194,
+   "doc_fingerprint": "7c5b0767e81b",
+   "prompt_variant": "noropenbookqa_no_fact_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Det trengs mer vann for å fylle et badekar enn\nVelg riktig svar blant disse alternativene:\n– en innsjø\n– et basseng\n– en mage\n– en oppbevaringstank\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "en innsjø",
+     "et basseng",
+     "en mage",
+     "en oppbevaringstank"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: en mage"
+  },
+  {
+   "draw": 3,
+   "doc_index": 312,
+   "doc_fingerprint": "c4730a79283f",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva leder elektrisitet best?\nVelg riktig svar blant disse alternativene:\n A: fliser på gulvet\n B: menneskekjøtt\n C: hockeykøller\n D: en biffkniv\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "fliser på gulvet",
+     "menneskekjøtt",
+     "hockeykøller",
+     "en biffkniv"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (en biffkniv)"
+  },
+  {
+   "draw": 4,
+   "doc_index": 119,
+   "doc_fingerprint": "b9be9fd98605",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva kan være grunnen til at det er færre fugler ved et gitt hus enn tidligere?\n\nAlternativer:\n A: Det er en fuglemater ved dette huset.\n B: Fuglene er ikke lenger interessert i fuglematere.\n C: Fuglemateren ved huset er feil størrelse.\n D: Det er en fuglemater ved et annet hus.\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Det er en fuglemater ved dette huset.",
+     "Fuglene er ikke lenger interessert i fuglematere.",
+     "Fuglemateren ved huset er feil størrelse.",
+     "Det er en fuglemater ved et annet hus."
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Det er en fuglemater ved et annet hus.)"
+  },
+  {
+   "draw": 5,
+   "doc_index": 339,
+   "doc_fingerprint": "cd0749d62c7b",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvis jorda var en stue, hva kan gjøres for å smelte isbreene?\n A: Noen skrur opp varmen\n B: Noen vil skru tempraturen ned\n C: Noen vil skru opp musikken\n D: Noen ville skru på lysene\n\nEr det riktige svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Noen skrur opp varmen",
+     "Noen vil skru tempraturen ned",
+     "Noen vil skru opp musikken",
+     "Noen ville skru på lysene"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Noen skrur opp varmen)"
+  },
+  {
+   "draw": 6,
+   "doc_index": 290,
+   "doc_fingerprint": "e04e3a4e1673",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: En plante etterlatt i mørke\n A: produserer frukt\n B: vokser kjappere\n C: klare ikke vokse\n D: blir grønnere\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "produserer frukt",
+     "vokser kjappere",
+     "klare ikke vokse",
+     "blir grønnere"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (klare ikke vokse)"
+  },
+  {
+   "draw": 7,
+   "doc_index": 334,
+   "doc_fingerprint": "0c729cdb5a9f",
+   "prompt_variant": "noropenbookqa_no_fact_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva er månen kjent for å ha?\n- Frosne elver og bekker\n- Store, skålformede kratre\n- Huler som har blitt formet av solvind\n- Klynger med trær\n\nEr det riktige svaret Frosne elver og bekker, Store, skålformede kratre, Huler som har blitt formet av solvind eller Klynger med trær?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Frosne elver og bekker",
+     "Store, skålformede kratre",
+     "Huler som har blitt formet av solvind",
+     "Klynger med trær"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Store, skålformede kratre"
+  },
+  {
+   "draw": 8,
+   "doc_index": 206,
+   "doc_fingerprint": "543dcad7fdfb",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Grunnen til at jorda er så stødig er fordi\n\nSvaralternativer:\n A: Den er laget av stein\n B: Den spiser tre måltider om dagen\n C: Den har en familie som er glad i den\n D: Den er laget av metall\n\nHva er riktig svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Den er laget av stein",
+     "Den spiser tre måltider om dagen",
+     "Den har en familie som er glad i den",
+     "Den er laget av metall"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Den er laget av stein)"
+  },
+  {
+   "draw": 9,
+   "doc_index": 165,
+   "doc_fingerprint": "e1634abb134d",
+   "prompt_variant": "noropenbookqa_no_fact_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Menneskelig reproduksjon krever\n- egg med skall\n- reirinkubasjon\n- et rede\n- en livmor\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "egg med skall",
+     "reirinkubasjon",
+     "et rede",
+     "en livmor"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: en livmor"
+  },
+  {
+   "draw": 10,
+   "doc_index": 207,
+   "doc_fingerprint": "79fb1213028b",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva er det som kan få folk til å kræsje bilen?\n\nAlternativer:\n A: Å se en solformøkelse\n B: Å bruke blinklysene\n C: Å holde fartsgrensen\n D: Å følge med på veien\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Å se en solformøkelse",
+     "Å bruke blinklysene",
+     "Å holde fartsgrensen",
+     "Å følge med på veien"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Å se en solformøkelse)"
+  },
+  {
+   "draw": 11,
+   "doc_index": 237,
+   "doc_fingerprint": "f87ff03b6df3",
+   "prompt_variant": "noropenbookqa_no_fact_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Bonden sanker frø fra avlinger for å plante de på nytt. Når disse frøene plantes inneholder de\n\nAlternativer:\n- sin egen jord\n- sitt eget sollys\n- masse sand\n- all nødvendig næring\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "sin egen jord",
+     "sitt eget sollys",
+     "masse sand",
+     "all nødvendig næring"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: all nødvendig næring"
+  },
+  {
+   "draw": 12,
+   "doc_index": 157,
+   "doc_fingerprint": "3278cd15a9d9",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "En plante vil gro bra når den har\n A: kjærlighet\n B: varme\n C: jord\n D: sand\n\nEr det riktige svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "kjærlighet",
+     "varme",
+     "jord",
+     "sand"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (jord)"
+  },
+  {
+   "draw": 13,
+   "doc_index": 145,
+   "doc_fingerprint": "684e886528b0",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Planter vil ikke kunne vokse om de ikke har tilgang til\nVelg riktig svar blant disse alternativene:\n A: kjølig vind\n B: fersk jord med gjødsel\n C: konstant tilgang på saltvann\n D: nødvendige ressurser for å lage klorofyll\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "kjølig vind",
+     "fersk jord med gjødsel",
+     "konstant tilgang på saltvann",
+     "nødvendige ressurser for å lage klorofyll"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (nødvendige ressurser for å lage klorofyll)"
+  },
+  {
+   "draw": 14,
+   "doc_index": 115,
+   "doc_fingerprint": "b81263bbe761",
+   "prompt_variant": "noropenbookqa_no_fact_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Hvilken av disse inneholder mye saltvann?\n\nSvaralternativer:\n- Amazonaselven\n- Nilen\n- Det indiske hav\n- Mississippieleven\n\nHva er riktig svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Amazonaselven",
+     "Nilen",
+     "Det indiske hav",
+     "Mississippieleven"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Det indiske hav"
+  },
+  {
+   "draw": 15,
+   "doc_index": 198,
+   "doc_fingerprint": "be518e0c1f55",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Øyne lar mennesker\n\nSvaralternativer:\n A: merke når trafikklyset endrer seg\n B: merke sur smak på godteri\n C: høre musikk på konserter\n D: merke skarpe lukter i lufta\n\nHva er riktig svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "merke når trafikklyset endrer seg",
+     "merke sur smak på godteri",
+     "høre musikk på konserter",
+     "merke skarpe lukter i lufta"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (merke når trafikklyset endrer seg)"
+  },
+  {
+   "draw": 16,
+   "doc_index": 311,
+   "doc_fingerprint": "c07ea5613341",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Lars kjørte på motorveien da han kolliderte med en annen bil bakfra fordi han ikke så den før han bare var 30 cm unna. Dette kan ha skjedd på grunn av\n A: rapporter om tornadoer i området\n B: en hund som løp over motorveien bak Lars sin bil\n C: en plutselig tåke som kom inn over området\n D: isdannelse på veien\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "rapporter om tornadoer i området",
+     "en hund som løp over motorveien bak Lars sin bil",
+     "en plutselig tåke som kom inn over området",
+     "isdannelse på veien"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (en plutselig tåke som kom inn over området)"
+  },
+  {
+   "draw": 17,
+   "doc_index": 326,
+   "doc_fingerprint": "9b2e953c7f84",
+   "prompt_variant": "noropenbookqa_no_fact_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "En fugl som er kjøtteter er mest sannsynlig\nVelg riktig svar blant disse alternativene:\n– byttedyr\n– rovdyr\n– planteeter\n– kanarifugl\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "byttedyr",
+     "rovdyr",
+     "planteeter",
+     "kanarifugl"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: rovdyr"
+  },
+  {
+   "draw": 18,
+   "doc_index": 91,
+   "doc_fingerprint": "ec4eff2b9fd0",
+   "prompt_variant": "noropenbookqa_no_fact_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva forklarer alle kratrene på månen?\n- Rester av gamle dammer\n- Mange kollisjoner som har inntruffet\n- Vulkansk aktivitet\n- Synkehull\n\nEr det riktige svaret Rester av gamle dammer, Mange kollisjoner som har inntruffet, Vulkansk aktivitet eller Synkehull?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Rester av gamle dammer",
+     "Mange kollisjoner som har inntruffet",
+     "Vulkansk aktivitet",
+     "Synkehull"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Mange kollisjoner som har inntruffet"
+  },
+  {
+   "draw": 19,
+   "doc_index": 143,
+   "doc_fingerprint": "bfecb6dc955b",
+   "prompt_variant": "noropenbookqa_no_fact_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Å lyse gjennom en diamant kan\n- få mange lyse lys til å skinne\n- skape en glimrende bølge av farger\n- varme opp et rom\n- skape mye penger\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "få mange lyse lys til å skinne",
+     "skape en glimrende bølge av farger",
+     "varme opp et rom",
+     "skape mye penger"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: skape en glimrende bølge av farger"
+  },
+  {
+   "draw": 20,
+   "doc_index": 71,
+   "doc_fingerprint": "09ace75c8bb3",
+   "prompt_variant": "noropenbookqa_no_fact_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Hva skjer når ressurser minsker i et miljø?\n\nSvaralternativer:\n- Organismer bruker flere av ressursene sine\n- Ressursbruk øker\n- Fødselsraten går opp\n- Organismer blir mer sparsomme med ressursene sine\n\nHva er riktig svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Organismer bruker flere av ressursene sine",
+     "Ressursbruk øker",
+     "Fødselsraten går opp",
+     "Organismer blir mer sparsomme med ressursene sine"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Organismer blir mer sparsomme med ressursene sine"
+  },
+  {
+   "draw": 21,
+   "doc_index": 269,
+   "doc_fingerprint": "4ec8709eefae",
+   "prompt_variant": "noropenbookqa_no_fact_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "En gepard som løper hele dagen vil miste\n- mye blod\n- mye vann\n- mange byttedyr\n- mange flekker\n\nEr det riktige svaret mye blod, mye vann, mange byttedyr eller mange flekker?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "mye blod",
+     "mye vann",
+     "mange byttedyr",
+     "mange flekker"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: mye vann"
+  },
+  {
+   "draw": 22,
+   "doc_index": 317,
+   "doc_fingerprint": "6777dc709a9f",
+   "prompt_variant": "noropenbookqa_no_fact_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Etter massevis av regn utover en uke, ser en mann at dammen i hagen er\n- smeltet\n- dehydrert\n- oppblåst\n- saltet\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "smeltet",
+     "dehydrert",
+     "oppblåst",
+     "saltet"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: oppblåst"
+  },
+  {
+   "draw": 23,
+   "doc_index": 116,
+   "doc_fingerprint": "43fbd63a8bc8",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Medlemmer av rockeband opptrer ofte med\n\nAlternativer:\n A: fløyter\n B: sandaler\n C: ørepropper\n D: hansker\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "fløyter",
+     "sandaler",
+     "ørepropper",
+     "hansker"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (ørepropper)"
+  },
+  {
+   "draw": 24,
+   "doc_index": 346,
+   "doc_fingerprint": "9cd07aff04b8",
+   "prompt_variant": "noropenbookqa_no_fact_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Mennesker, katter, hunder og elefanter er pattedyr fordi de føder levende unger. Andre klasser av dyr får unger\nVelg riktig svar blant disse alternativene:\n– som er gamle\n– som er døde\n– i egg\n– som er store\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "som er gamle",
+     "som er døde",
+     "i egg",
+     "som er store"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: i egg"
+  },
+  {
+   "draw": 25,
+   "doc_index": 141,
+   "doc_fingerprint": "0f384917b2ce",
+   "prompt_variant": "noropenbookqa_no_fact_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Man viser en tillært egenskap når man\n\nAlternativer:\n- Kniper øynene i sterkt lys\n- Puster inn og ut når man sover\n- Blunker og svelger luft\n- Henger opp et bilde\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Kniper øynene i sterkt lys",
+     "Puster inn og ut når man sover",
+     "Blunker og svelger luft",
+     "Henger opp et bilde"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Henger opp et bilde"
+  },
+  {
+   "draw": 26,
+   "doc_index": 241,
+   "doc_fingerprint": "39e0e6e4229a",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvordan dannes elektrisitet fra havet?\nVelg riktig svar blant disse alternativene:\n A: organisk materiale fra sjølivet\n B: energi bli tilgjengelig under vann forårsaket av tidevann\n C: driller for å få tilgang til olje\n D: en kjemisk reaksjon produsert fra saltet i vannet\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "organisk materiale fra sjølivet",
+     "energi bli tilgjengelig under vann forårsaket av tidevann",
+     "driller for å få tilgang til olje",
+     "en kjemisk reaksjon produsert fra saltet i vannet"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (energi bli tilgjengelig under vann forårsaket av tidevann)"
+  },
+  {
+   "draw": 27,
+   "doc_index": 31,
+   "doc_fingerprint": "2ce6dfb69b52",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva er et eksempel på at flammer avgir lys?\n A: En ovn er forhåndsvarmet og varsellampen lyser\n B: En fyrstikk tennes for å tenne en sigarett\n C: Et tent stearinlys i et vindu signaliserer til noen\n D: En brann som ble slukket for å sende røyksignaler\n\nEr det riktige svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "En ovn er forhåndsvarmet og varsellampen lyser",
+     "En fyrstikk tennes for å tenne en sigarett",
+     "Et tent stearinlys i et vindu signaliserer til noen",
+     "En brann som ble slukket for å sende røyksignaler"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Et tent stearinlys i et vindu signaliserer til noen)"
+  },
+  {
+   "draw": 28,
+   "doc_index": 47,
+   "doc_fingerprint": "1fef16327662",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Hvilke dyr spiser planter?\n\nSvaralternativer:\n A: ørn\n B: rødstruper\n C: ugler\n D: leoparder\n\nHva er riktig svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "ørn",
+     "rødstruper",
+     "ugler",
+     "leoparder"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (rødstruper)"
+  },
+  {
+   "draw": 29,
+   "doc_index": 342,
+   "doc_fingerprint": "3ca673976d89",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Hva er et eksempel på reproduksjon?\n A: Landbruk\n B: Å legge egg\n C: Å fly\n D: Å gå\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Landbruk",
+     "Å legge egg",
+     "Å fly",
+     "Å gå"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Å legge egg)"
+  },
+  {
+   "draw": 30,
+   "doc_index": 128,
+   "doc_fingerprint": "be58c79b6e26",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva kan en seismograf beskrive helt nøyaktig?\nVelg riktig svar blant disse alternativene:\n A: Hvor ujevnt underlaget vil være\n B: Hvor dårlig været vil være\n C: Hvor stabil bakken vil være\n D: Hvor ustødig hesten vil være\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Hvor ujevnt underlaget vil være",
+     "Hvor dårlig været vil være",
+     "Hvor stabil bakken vil være",
+     "Hvor ustødig hesten vil være"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Hvor stabil bakken vil være)"
+  },
+  {
+   "draw": 31,
+   "doc_index": 354,
+   "doc_fingerprint": "68c6eba75012",
+   "prompt_variant": "noropenbookqa_no_fact_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Hva vil det bli mer av i atmosfæren etterhvert som regnskogen hogges ned?\n\nSvaralternativer:\n A: Oksygen\n B: Nitrogen\n C: Karbon\n D: Regn\n\nHva er riktig svar?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Oksygen",
+     "Nitrogen",
+     "Karbon",
+     "Regn"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Karbon)"
+  }
+ ]
+}

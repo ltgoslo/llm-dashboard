@@ -1,0 +1,874 @@
+{
+ "task": "nrk_quiz_qa_nno",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 564,
+   "doc_fingerprint": "ddbb35cf0850",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p1",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "AKP (m-l), som er ei forkorting for Arbeidaranes kommunistparti (marxist-leninistane), stilte rett nok aldri til val under eige namn, men eksisterte som parti mellom 1973 og 2007. I 2007 gjekk dei inn i eit nytt parti, som i dag er representert på Stortinget. Kva parti snakkar vi om?\n\nSvaralternativ:\n A. SV\n B. MDG\n C. Raudt\n D. Frp\n\nKva er rett svar?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "SV",
+     "MDG",
+     "Raudt",
+     "Frp"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Raudt)"
+  },
+  {
+   "draw": 1,
+   "doc_index": 648,
+   "doc_fingerprint": "e67168dd9f2a",
+   "prompt_variant": "nrk_quiz_qa_nno_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kven var statsminister i Noreg i 2020?\n- Erna Solberg\n- Siv Jensen\n- Trine Skei Grande\n- Jonas Gahr Støre\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Erna Solberg",
+     "Siv Jensen",
+     "Trine Skei Grande",
+     "Jonas Gahr Støre"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Erna Solberg"
+  },
+  {
+   "draw": 2,
+   "doc_index": 598,
+   "doc_fingerprint": "eab5fe814853",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p0",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Som i VM 1994 scora Norge berre eitt mål i EM 2000, sjølv om dei tok fire poeng og var nær avansement. Norge sitt eine mål kom i 1–0-sigeren mot Spania. Men kven scora?\n\nAlternativ:\n A. Tore André Flo\n B. Ole Gunnar Solskjær\n C. Vidar Riseth\n D. Steffen Iversen\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Tore André Flo",
+     "Ole Gunnar Solskjær",
+     "Vidar Riseth",
+     "Steffen Iversen"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Steffen Iversen)"
+  },
+  {
+   "draw": 3,
+   "doc_index": 119,
+   "doc_fingerprint": "2ad74b7717a5",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p4",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "“Make America great again” var slagordet til Donald Trump under valkampen. Det har vore brukt i presidentvalkamp før – men av kven?\nVel rett svar blant desse alternativa:\n A. Michael Dukakis\n B. Ronald Reagan\n C. George H.W. Bush\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Michael Dukakis",
+     "Ronald Reagan",
+     "George H.W. Bush"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Ronald Reagan)"
+  },
+  {
+   "draw": 4,
+   "doc_index": 506,
+   "doc_fingerprint": "8f19044c22df",
+   "prompt_variant": "nrk_quiz_qa_nno_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kva for ein av desse prisane vann Anne B. Ragde i 2006?\n\nAlternativ:\n- Fritt ord-prisen\n- Årets trønder\n- Nordisk råds litteraturpris\n- Årets namn i Dagbladet\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Fritt ord-prisen",
+     "Årets trønder",
+     "Nordisk råds litteraturpris",
+     "Årets namn i Dagbladet"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Årets trønder"
+  },
+  {
+   "draw": 5,
+   "doc_index": 208,
+   "doc_fingerprint": "35b34a601df8",
+   "prompt_variant": "nrk_quiz_qa_nno_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva norsk artist slo gjennom med «Ut mot havet» i 1988?\nVel rett svar blant desse alternativa:\n- Roar Runde\n- Rune André Roaldsen\n- Rune Rudberg\n- Rasmus Russeberg\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Roar Runde",
+     "Rune André Roaldsen",
+     "Rune Rudberg",
+     "Rasmus Russeberg"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Rune Rudberg"
+  },
+  {
+   "draw": 6,
+   "doc_index": 1140,
+   "doc_fingerprint": "6804f3d247fa",
+   "prompt_variant": "nrk_quiz_qa_nno_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva betyr «CUL8R»?\n\nSvaralternativ:\n- Ser deg seinare\n- Ser deg til middag\n- Skal me gå på kino?\n\nKva er rett svar?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ser deg seinare",
+     "Ser deg til middag",
+     "Skal me gå på kino?"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Ser deg seinare"
+  },
+  {
+   "draw": 7,
+   "doc_index": 1057,
+   "doc_fingerprint": "cbd1a6f14fc0",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p2",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva er kosher?\n A. Mat som er velsigna av ein rabbinar\n B. Øl brygga etter jødiske reglar\n C. Mat som er tillate for jødar å ete\n\nEr det rette svaret A, B eller C?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Mat som er velsigna av ein rabbinar",
+     "Øl brygga etter jødiske reglar",
+     "Mat som er tillate for jødar å ete"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Mat som er tillate for jødar å ete)"
+  },
+  {
+   "draw": 8,
+   "doc_index": 286,
+   "doc_fingerprint": "0d6b08e69c94",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p3",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kven av dei norske landslagsspelarane i 2018 spelar for AZ Alkmaar?\n A. Bjørn Maars Johnsen\n B. Joshua King\n C. Tarik Elyounoussi\n D. Mohamed Elyounoussi\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Bjørn Maars Johnsen",
+     "Joshua King",
+     "Tarik Elyounoussi",
+     "Mohamed Elyounoussi"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Bjørn Maars Johnsen)"
+  },
+  {
+   "draw": 9,
+   "doc_index": 776,
+   "doc_fingerprint": "8cb178826873",
+   "prompt_variant": "nrk_quiz_qa_nno_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "«Alle» veit at Jon Fosse er vestlending, men kva heiter plassen han er frå?\n- Norheimsund\n- Strandebarm\n- Ulvik\n- Austevoll\n\nEr det rette svaret Norheimsund, Strandebarm, Ulvik eller Austevoll?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Norheimsund",
+     "Strandebarm",
+     "Ulvik",
+     "Austevoll"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Strandebarm"
+  },
+  {
+   "draw": 10,
+   "doc_index": 1239,
+   "doc_fingerprint": "2c267301c8e3",
+   "prompt_variant": "nrk_quiz_qa_nno_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kva oppnår du med «å slå eit slag i lufta»?\n- Du gjer noko som ikkje hjelper.\n- Du vil vise at du kan slå frå deg.\n- Du illustrerer ei indre kjensle av stor motstand.\n- Du viser kor handlekraftig du kan vere.\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Du gjer noko som ikkje hjelper.",
+     "Du vil vise at du kan slå frå deg.",
+     "Du illustrerer ei indre kjensle av stor motstand.",
+     "Du viser kor handlekraftig du kan vere."
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Du gjer noko som ikkje hjelper."
+  },
+  {
+   "draw": 11,
+   "doc_index": 148,
+   "doc_fingerprint": "1431bbc2be18",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p2",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva heiter filosofen som er rekna som samfunnsøkonomiens far?\n A. Adam Smith\n B. David Ricardo\n C. Karl Marx\n\nEr det rette svaret A, B eller C?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Adam Smith",
+     "David Ricardo",
+     "Karl Marx"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Adam Smith)"
+  },
+  {
+   "draw": 12,
+   "doc_index": 658,
+   "doc_fingerprint": "ba57c3eb06a9",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p3",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kåre Willoch hadde solid regjerningserfaring då han vart statsminister i 1981. Mellom 1965 og 1970 var han nemleg handelsminister i ei borgarleg regjering. Då denne regjeringa gjekk av i 1971 sa statsministeren at oppgåva hans kunne samanliknast med å bere staur. Kven snakkar vi om?\n A. Per Borten\n B. Kjell Bondevik\n C. Svenn Stray\n D. Helge Seip\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Per Borten",
+     "Kjell Bondevik",
+     "Svenn Stray",
+     "Helge Seip"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Per Borten)"
+  },
+  {
+   "draw": 13,
+   "doc_index": 491,
+   "doc_fingerprint": "b0466b05fb6b",
+   "prompt_variant": "nrk_quiz_qa_nno_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Nokon er flinkare til å multitaske enn andre, altså å gjere fleire ting eller oppgåver på ein gong. Som å sjå TV, gjere lekser og lese bok samtidig. Kva kan eit godt norsk ord for det vere?\n\nSvaralternativ:\n- Fleiroppgåvekøyring\n- Fleirgjeremål\n- Multijobbing\n\nKva er rett svar?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Fleiroppgåvekøyring",
+     "Fleirgjeremål",
+     "Multijobbing"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Fleiroppgåvekøyring"
+  },
+  {
+   "draw": 14,
+   "doc_index": 1189,
+   "doc_fingerprint": "21ece2024881",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p1",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Forfattar Åsne Seierstad fekk Bjørnsonprisen 2023. Den førebels siste boka hennar kom ut i fjor, kva for eit land skreiv ho om?\n\nSvaralternativ:\n A. Irak\n B. Syria\n C. Afghanistan\n D. Tsjetsjenia\n\nKva er rett svar?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Irak",
+     "Syria",
+     "Afghanistan",
+     "Tsjetsjenia"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Afghanistan)"
+  },
+  {
+   "draw": 15,
+   "doc_index": 344,
+   "doc_fingerprint": "4c0b68b22a1c",
+   "prompt_variant": "nrk_quiz_qa_nno_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Ingrid og Kåre Magnus startar reisa i Mongolia, «heimlandet» til Djengis Khan. På 1200-talet grunnla han Mongolriket, som strakte seg frå Stillehavet til... ja, kor langt vest kom han eigentleg?\nVel rett svar blant desse alternativa:\n- Til Kviterussland\n- Til Polen\n- Til Austerrike\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Til Kviterussland",
+     "Til Polen",
+     "Til Austerrike"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Til Austerrike"
+  },
+  {
+   "draw": 16,
+   "doc_index": 270,
+   "doc_fingerprint": "2a2a605cd923",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p4",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva land blir sjangeren country rekna å kome frå?\nVel rett svar blant desse alternativa:\n A. Sverige\n B. Mexico\n C. USA\n D. Storbritannia\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Sverige",
+     "Mexico",
+     "USA",
+     "Storbritannia"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (USA)"
+  },
+  {
+   "draw": 17,
+   "doc_index": 113,
+   "doc_fingerprint": "f42a5266f437",
+   "prompt_variant": "nrk_quiz_qa_nno_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Flatbrødet skjenning har ei søt side; kva er ho pensla med?\n- Eggedosis\n- Sukra mjølk\n- Sukkerlake\n\nEr det rette svaret Eggedosis, Sukra mjølk eller Sukkerlake?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Eggedosis",
+     "Sukra mjølk",
+     "Sukkerlake"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Sukra mjølk"
+  },
+  {
+   "draw": 18,
+   "doc_index": 839,
+   "doc_fingerprint": "a8b760a73455",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p0",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kven av desse tre har flest EM-gull i løping på bane utandørs?\n\nAlternativ:\n A. Jakob Ingebrigtsen\n B. Filip Ingbrigtsen\n C. Henrik Ingebrigtsen\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Jakob Ingebrigtsen",
+     "Filip Ingbrigtsen",
+     "Henrik Ingebrigtsen"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Jakob Ingebrigtsen)"
+  },
+  {
+   "draw": 19,
+   "doc_index": 303,
+   "doc_fingerprint": "3027949911a4",
+   "prompt_variant": "nrk_quiz_qa_nno_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kva er KrF sitt verste valresultat etter andre verdskrig?\n\nAlternativ:\n- 0,9 prosent\n- 2,1 prosent\n- 4,2 prosent\n- 8,6 prosent\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "0,9 prosent",
+     "2,1 prosent",
+     "4,2 prosent",
+     "8,6 prosent"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: 4,2 prosent"
+  },
+  {
+   "draw": 20,
+   "doc_index": 876,
+   "doc_fingerprint": "28ecb28e4ff3",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p3",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Øystein har ein aktiv hund som er 20 kg. Hunden får to måltid kvar dag. Kor mange gram mat skal hunden ha til kvart måltid?\n A. 120 g\n B. 240 g\n C. 260 g\n D. 480 g\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "120 g",
+     "240 g",
+     "260 g",
+     "480 g"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (120 g)"
+  },
+  {
+   "draw": 21,
+   "doc_index": 413,
+   "doc_fingerprint": "c1b440f6af53",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p1",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kven kjøpte Ole Gunnar Solskjær for 200.000 norske kroner framfor 1995-sesongen?\n\nSvaralternativ:\n A. Brann\n B. Molde FK\n C. Rosenborg\n D. Vålerenga\n\nKva er rett svar?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Brann",
+     "Molde FK",
+     "Rosenborg",
+     "Vålerenga"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Molde FK)"
+  },
+  {
+   "draw": 22,
+   "doc_index": 962,
+   "doc_fingerprint": "155efd3301c6",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p2",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Det er berre nokre ord som sluttar på -else som kan bli brukt i nynorsk. Kva av desse orda er riktig?\n A. Nytelse\n B. Vielse\n C. Forelskelse\n D. Betennelse\n\nEr det rette svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Nytelse",
+     "Vielse",
+     "Forelskelse",
+     "Betennelse"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Betennelse)"
+  },
+  {
+   "draw": 23,
+   "doc_index": 611,
+   "doc_fingerprint": "9120636db080",
+   "prompt_variant": "nrk_quiz_qa_nno_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kven er leiar i Arbeidarpartiet?\n- Jonas Gahr Støre\n- Kjersti Stenseng\n- Raymond Johansen\n- Hadia Tajik\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Jonas Gahr Støre",
+     "Kjersti Stenseng",
+     "Raymond Johansen",
+     "Hadia Tajik"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Jonas Gahr Støre"
+  },
+  {
+   "draw": 24,
+   "doc_index": 960,
+   "doc_fingerprint": "68084e030c89",
+   "prompt_variant": "nrk_quiz_qa_nno_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Ei historie frå bladet «Donald Duck & Co» starta ein språkdebatt om nynorsk i 1963. Kva heiter denne historia?\n- Gullhjelmen\n- På frimerkejakt i Corombia\n- Eggmysteriet\n- Cibolas syv byer\n\nEr det rette svaret Gullhjelmen, På frimerkejakt i Corombia, Eggmysteriet eller Cibolas syv byer?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Gullhjelmen",
+     "På frimerkejakt i Corombia",
+     "Eggmysteriet",
+     "Cibolas syv byer"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Eggmysteriet"
+  },
+  {
+   "draw": 25,
+   "doc_index": 696,
+   "doc_fingerprint": "b6177c81727c",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p0",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kva heiter verdas undergang i middelalderdiktet Voluspå?\n\nAlternativ:\n A. Armageddon\n B. Dommedag\n C. Apokalypsen\n D. Ragnarok\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Armageddon",
+     "Dommedag",
+     "Apokalypsen",
+     "Ragnarok"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Ragnarok)"
+  },
+  {
+   "draw": 26,
+   "doc_index": 800,
+   "doc_fingerprint": "d6842e01685d",
+   "prompt_variant": "nrk_quiz_qa_nno_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Boka blei skrive av Hamsun? Skriven av Hamsun? Kva er rett?\n\nSvaralternativ:\n- Romanen blei/vart skriven av Knut Hamsun i 1917.\n- Romanen blei/vart skrive av Knut Hamsun i 1917.\n\nKva er rett svar?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Romanen blei/vart skriven av Knut Hamsun i 1917.",
+     "Romanen blei/vart skrive av Knut Hamsun i 1917."
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Romanen blei/vart skriven av Knut Hamsun i 1917."
+  },
+  {
+   "draw": 27,
+   "doc_index": 218,
+   "doc_fingerprint": "dee16b39e422",
+   "prompt_variant": "nrk_quiz_qa_nno_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Iselin Nybø vart minister då Venstre gjekk inn i førre regjering i januar i 2018. Men kva er ho minister for?\n\nAlternativ:\n- Høgare utdanning\n- Utanriks\n- Forsvaret\n- Landbruk og mat\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Høgare utdanning",
+     "Utanriks",
+     "Forsvaret",
+     "Landbruk og mat"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Høgare utdanning"
+  },
+  {
+   "draw": 28,
+   "doc_index": 1146,
+   "doc_fingerprint": "1e2fa02b32c6",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p4",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva for språk har me ordet ansjos frå?\nVel rett svar blant desse alternativa:\n A. Katalansk\n B. Baskisk\n C. Portugisisk\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Katalansk",
+     "Baskisk",
+     "Portugisisk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Baskisk)"
+  },
+  {
+   "draw": 29,
+   "doc_index": 1251,
+   "doc_fingerprint": "a668a8d57db6",
+   "prompt_variant": "nrk_quiz_qa_nno_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva heiter serien om Gro Harlem Brundtland som hadde premiere på NRK hausten 2023?\nVel rett svar blant desse alternativa:\n- «Gro»\n- «Partikvinnen»\n- «Makta»\n- «Arbeiderpartiet»\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "«Gro»",
+     "«Partikvinnen»",
+     "«Makta»",
+     "«Arbeiderpartiet»"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: «Makta»"
+  },
+  {
+   "draw": 30,
+   "doc_index": 217,
+   "doc_fingerprint": "d32bf82b7d7f",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p2",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva noverande parti på Stortinget heitte «Anders Langes Parti til sterk nedsettelse av skatter, avgifter og offentlige inngrep» då dei vart stifta i 1973?\n A. SV\n B. Frp\n C. Miljøpartiet Dei Grøne\n D. Venstre\n\nEr det rette svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "SV",
+     "Frp",
+     "Miljøpartiet Dei Grøne",
+     "Venstre"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Frp)"
+  },
+  {
+   "draw": 31,
+   "doc_index": 232,
+   "doc_fingerprint": "b17603c4da4e",
+   "prompt_variant": "nrk_quiz_qa_nno_mcf_p0",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Noreg sin første a-landskamp for kvinner vart spelt mot Sverige i 1978. Kven spelte både denne og dei 109 neste landskampane for Norge?\n\nAlternativ:\n A. Hege Riise\n B. Bente Nordby\n C. Linda Medalen\n D. Gunn Nyborg\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Hege Riise",
+     "Bente Nordby",
+     "Linda Medalen",
+     "Gunn Nyborg"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Gunn Nyborg)"
+  }
+ ]
+}

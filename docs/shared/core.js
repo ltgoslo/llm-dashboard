@@ -54,6 +54,7 @@ export const METRIC_DISPLAY = {
   errant: "ERRANT F0.5",
   errant_f05: "ERRANT F0.5",
   norm_loglikelihood_corr: "log-likelihood (correct answer)",
+  judge: "judge score",
 };
 
 export const METRIC_SCALES = {
@@ -73,6 +74,9 @@ export const METRIC_SCALES = {
   // "raw": shown on its native scale (no ×100), may be negative, and is
   // exempt from the random-baseline normalization and the y ≥ 0 axis floor.
   norm_loglikelihood_corr: "raw",
+  // An LLM judge's score (/instruct): the mean grade, from 0 to 5 points,
+  // as the judge gives them.
+  judge: "raw",
 };
 
 /** Whether a metric is displayed on its own raw (possibly negative) scale. */
@@ -121,6 +125,7 @@ export const METRIC_DESCRIPTIONS = {
   errant_f05: "Grammar error correction metric emphasizing precision (F0.5) over recall.",
   mcc: "Matthews correlation coefficient for classification.",
   norm_loglikelihood_corr: "Length-normalized log-likelihood of the correct answer. Raw (negative) scale; higher is better.",
+  judge: "Mean grade an LLM judge gave the model's responses, from 0 (incorrect) to 5 (fully correct).",
 };
 
 // Proper capitalization for dataset/acronym names appearing as the
@@ -154,12 +159,13 @@ export const CATEGORY_ORDER = [
   "translation",
 ];
 
-/** Sort comparator of category names: CATEGORY_ORDER's in its order, then
- *  any other category alphabetically. */
+/** Sort comparator of category names: the page's order (state.categoryOrder,
+ *  else CATEGORY_ORDER), then any other category alphabetically. */
 export function compareCategories(a, b) {
+  const order = state.categoryOrder || CATEGORY_ORDER;
   const rank = (c) => {
-    const i = CATEGORY_ORDER.indexOf(c);
-    return i < 0 ? CATEGORY_ORDER.length : i;
+    const i = order.indexOf(c);
+    return i < 0 ? order.length : i;
   };
   return rank(a) - rank(b) || a.localeCompare(b);
 }
@@ -170,13 +176,17 @@ export function compareCategories(a, b) {
  *  are looked up in TASK_NAME_DISPLAY for proper-noun casing, falling back
  *  to first-letter capitalization when the name already starts lowercase. */
 export function formatTitleWithShot(name, shot) {
-  if (!name) return "(" + shot + ")";
+  if (!name) return shot ? "(" + shot + ")" : "";
+  // (No shot: a page with one setting, which titles don't name. A language
+  // tag stays after the dataset: "… (Belebele) [Bokmål]".)
+  const tag = shot ? null : name.match(/^(.*\))\s*(\[[^\]]*\])$/);
+  if (tag) return formatTitleWithShot(tag[1], shot) + " " + tag[2];
   const m = name.match(/^(.*?)\s*\(([^()]*)\)\s*$/);
-  if (!m) return name + " (" + shot + ")";
+  if (!m) return shot ? name + " (" + shot + ")" : name;
   const inner = m[2];
   const display = TASK_NAME_DISPLAY[inner.toLowerCase()]
     || (/^[a-z]/.test(inner) ? inner.charAt(0).toUpperCase() + inner.slice(1) : inner);
-  return m[1] + " (" + display + "; " + shot + ")";
+  return m[1] + " (" + display + (shot ? "; " + shot : "") + ")";
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -568,14 +578,28 @@ export function normNeedsAllValues() {
   return ["minmax", "zscore", "percentile"].includes(state.currentNormalization);
 }
 
-/** Decimal places for displayed scores (z-scores get an extra digit). */
+/** Decimal places for displayed scores: the page's (state.decimals), and
+ *  2 for z-scores. */
 export function scoreDecimals() {
-  return state.currentNormalization === "zscore" ? 2 : 1;
+  return state.currentNormalization === "zscore" ? 2 : state.decimals;
 }
 
 // ─────────────────────────────────────────────────────────────
 // Y-axis labels
 // ─────────────────────────────────────────────────────────────
+
+/** What a chart's scores are, in words (the JSON export's "y"). */
+export function scoreScaleText() {
+  if (state.currentPromptAgg === "stdev") return "standard deviation of the score over the prompts";
+  const scales = {
+    baseline: "score, rescaled from random guessing (0) to a perfect score (100)",
+    minmax: "score, rescaled from the lowest (0) to the highest (100) shown",
+    zscore: "z-score",
+    percentile: "percentile rank",
+    none: "score",
+  };
+  return scales[state.currentNormalization] || getNormYLabel();
+}
 
 export function getNormYLabel() {
   if (state.currentPromptAgg === "stdev") return "prompt stdev";

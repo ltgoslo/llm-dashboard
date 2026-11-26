@@ -1,0 +1,934 @@
+{
+ "task": "slide_nob_nno_swe_dan",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 1838,
+   "doc_fingerprint": "aa5c1dbddb44",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Den här typen av uttalanden förekommer i press och veckotidningar vecka efter vecka.\n\nIdentifiser språket i teksten. Velg alternativet som passer best.\n\nAlternativer:\n- A. Bokmål\n- B. Nynorsk\n- C. Dansk\n- D. Svensk\n- E. Et annet språk\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (svensk)"
+  },
+  {
+   "draw": 1,
+   "doc_index": 6232,
+   "doc_fingerprint": "e7b4ec385c64",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Blakemore hadde tidlegare det kontoret som eg no sit og intervjuar Stein i.\n\nIdentifiser språket i teksten. Velg alternativet som passer best.\n\nAlternativer:\n- bokmål\n- nynorsk\n- dansk\n- svensk\n- et annet språk\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: nynorsk"
+  },
+  {
+   "draw": 2,
+   "doc_index": 5734,
+   "doc_fingerprint": "4cf9c0ece15e",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvilket språk er det i følgende setning?\n- Jeg har ikke grunnlag for å si at Bertelsen barrikaderte seg.\nEr det A. bokmål, B. nynorsk, C. dansk, D. svensk eller E. et annet språk?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (bokmål)"
+  },
+  {
+   "draw": 3,
+   "doc_index": 1917,
+   "doc_fingerprint": "827f53395496",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Framsida av medaljen var auka velstand.\nHvilket språk er teksten skrevet på? Er det bokmål, nynorsk, dansk, svensk eller et annet språk?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: nynorsk"
+  },
+  {
+   "draw": 4,
+   "doc_index": 6214,
+   "doc_fingerprint": "5fcef3c47776",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvilket språk er det i følgende setning?\n\" Gott sei Dank , dass PC-Firmen an Privatkunden verkaufen können \" kommentiert Martin Hingley von IDC .\nEr det bokmål, nynorsk, dansk, svensk eller et annet språk?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: et annet språk"
+  },
+  {
+   "draw": 5,
+   "doc_index": 4610,
+   "doc_fingerprint": "ba34b727abb7",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Setning å vurdere: Men ein ting er det å identifisere politikkendringane som innebar demontering av klassiske sosialdemokratiske styringsreiskapar i ein ny type økonomi.\nEr denne setningen skrevet på bokmål, nynorsk, dansk, svensk eller et annet språk? Alternativer:\n- A. Bokmål\n- B. Nynorsk\n- C. Dansk\n- D. Svensk\n- E. Et annet språk\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (nynorsk)"
+  },
+  {
+   "draw": 6,
+   "doc_index": 4811,
+   "doc_fingerprint": "77a7c3bdc177",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Folk skriver på mange språk, som bokmål, nynorsk, dansk, svensk eller på mange andre språk. «* Smrt Odyssea» er et eksempel på en setning skrevet på",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: et annet språk"
+  },
+  {
+   "draw": 7,
+   "doc_index": 5548,
+   "doc_fingerprint": "c1331e9e84f4",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Sosialdemokratiets styringsreiskapar vart utforma for å verke innanfor ein nasjonal kontekst.\nHvilket språk er teksten skrevet på? Alternativer:\n- A) Bokmål\n- B) Nynorsk\n- C) Dansk\n- D) Svensk\n- E) Et annet språk\nRiktig svar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (nynorsk)"
+  },
+  {
+   "draw": 8,
+   "doc_index": 1856,
+   "doc_fingerprint": "c8917bb02453",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Setning å vurdere: .i. nigessamni níi beschotarsne diar nícc\nEr denne setningen skrevet på bokmål, nynorsk, dansk, svensk eller et annet språk? Hvis jeg må velge, vil jeg si at den er skrevet på",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: et annet språk"
+  },
+  {
+   "draw": 9,
+   "doc_index": 1902,
+   "doc_fingerprint": "2c0aeda1fba2",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Folk skriver på mange språk, som bokmål, nynorsk, dansk, svensk eller på mange andre språk. «- Rubrikerna om gifthalterna i bland annat strömming har resulterat i nästan totalstopp för strömmingsförsäljningen i större delen av Sverige, säger direktör John Erik Boork, direktör i Ostkustfisk Centralförening till Aftonbladet.» er et eksempel på en setning skrevet på\nAlternativer:\n- A. Bokmål\n- B. Nynorsk\n- C. Dansk\n- D. Svensk\n- E. Et annet språk\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (svensk)"
+  },
+  {
+   "draw": 10,
+   "doc_index": 292,
+   "doc_fingerprint": "85c7cdb210bd",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Politikken venstresida kan ynskje seg ideologisk, er per i dag for vanskeleg å gjennomføre.\n\nIdentifiser språket i teksten. Velg alternativet som passer best.\n\nAlternativer:\n- A. Bokmål\n- B. Nynorsk\n- C. Dansk\n- D. Svensk\n- E. Et annet språk\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (nynorsk)"
+  },
+  {
+   "draw": 11,
+   "doc_index": 5638,
+   "doc_fingerprint": "868a96231d60",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Met skrivañ eo e oberiantiz pennañ.\n\nIdentifiser språket i teksten. Velg alternativet som passer best.\n\nAlternativer:\n- bokmål\n- nynorsk\n- dansk\n- svensk\n- et annet språk\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: et annet språk"
+  },
+  {
+   "draw": 12,
+   "doc_index": 1076,
+   "doc_fingerprint": "b19b932b7621",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Folk skriver på mange språk, som bokmål, nynorsk, dansk, svensk eller på mange andre språk. «- Det er bare å glede seg til neste lørdag, da er det storslalåm igjen.» er et eksempel på en setning skrevet på\nAlternativer:\n- A. Bokmål\n- B. Nynorsk\n- C. Dansk\n- D. Svensk\n- E. Et annet språk\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (bokmål)"
+  },
+  {
+   "draw": 13,
+   "doc_index": 6667,
+   "doc_fingerprint": "179fdf6a7e70",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvilket språk er det i følgende setning?\nI stora delar av Afrika och Latinamerika slutar mer än varannan elev efter två år.\nEr det bokmål, nynorsk, dansk, svensk eller et annet språk?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: svensk"
+  },
+  {
+   "draw": 14,
+   "doc_index": 1653,
+   "doc_fingerprint": "7c9061973cf3",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: negekygyre erudyre pudyi pobo to\nHvilket språk er teksten skrevet på? Er det bokmål, nynorsk, dansk, svensk eller et annet språk?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: et annet språk"
+  },
+  {
+   "draw": 15,
+   "doc_index": 2375,
+   "doc_fingerprint": "76fa10bc3e7a",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Slet ikke, når det er en medarbejder på mellemlederplan.\nHvilket språk er teksten skrevet på? Alternativer:\n- A) Bokmål\n- B) Nynorsk\n- C) Dansk\n- D) Svensk\n- E) Et annet språk\nRiktig svar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (dansk)"
+  },
+  {
+   "draw": 16,
+   "doc_index": 4076,
+   "doc_fingerprint": "66712d4518dd",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvilket språk er det i følgende setning?\n- Ser vi på tre av dei mest utsette vintermånadane under eitt, så aukar talet melde skadar til forsikringsbransjen med 35 prosent dagleg i høve sommarmånadane, seier Voll vidare.\nEr det A. bokmål, B. nynorsk, C. dansk, D. svensk eller E. et annet språk?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (nynorsk)"
+  },
+  {
+   "draw": 17,
+   "doc_index": 1684,
+   "doc_fingerprint": "687d024fc1e7",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Setning å vurdere: Bland urtene i ei matmølle med salt og olje til ein pasta.\nEr denne setningen skrevet på bokmål, nynorsk, dansk, svensk eller et annet språk? Alternativer:\n- A. Bokmål\n- B. Nynorsk\n- C. Dansk\n- D. Svensk\n- E. Et annet språk\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (nynorsk)"
+  },
+  {
+   "draw": 18,
+   "doc_index": 3089,
+   "doc_fingerprint": "195c0933fe20",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Folk skriver på mange språk, som bokmål, nynorsk, dansk, svensk eller på mange andre språk. «Gaur egingo da udako opor etenaldiaren aurretikako azkenengo ministroen kontseilua, eta hurrengoa, berriz, agorrilaren amaieran egongo da.» er et eksempel på en setning skrevet på",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: et annet språk"
+  },
+  {
+   "draw": 19,
+   "doc_index": 3104,
+   "doc_fingerprint": "ebcf37cf889d",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Setning å vurdere: preveres treplanes iuve krapuvi tre buf fetu\nEr denne setningen skrevet på bokmål, nynorsk, dansk, svensk eller et annet språk? Hvis jeg må velge, vil jeg si at den er skrevet på",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: et annet språk"
+  },
+  {
+   "draw": 20,
+   "doc_index": 554,
+   "doc_fingerprint": "5816411bb29d",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvilket språk er det i følgende setning?\nBåde Bertelsen og hans advokat mener Domstolsadministrasjonen ikke kan ha satt seg skikkelig inn i Barnelovens bestemmelser\nEr det bokmål, nynorsk, dansk, svensk eller et annet språk?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: bokmål"
+  },
+  {
+   "draw": 21,
+   "doc_index": 3794,
+   "doc_fingerprint": "663f121ec4d6",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Kampen afslørede med røntgen-blik, hvor vigtige Peter Schmeichel, Flemming Povlsen, Kim Vilfort og Kim Christofte er for Danmark.\nHvilket språk er teksten skrevet på? Er det bokmål, nynorsk, dansk, svensk eller et annet språk?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: dansk"
+  },
+  {
+   "draw": 22,
+   "doc_index": 3271,
+   "doc_fingerprint": "700755115cc1",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Setning å vurdere: Küssen vleget an den dääts, eynige kryget ouk wat vöär den äärs.\nEr denne setningen skrevet på bokmål, nynorsk, dansk, svensk eller et annet språk? Alternativer:\n- A. Bokmål\n- B. Nynorsk\n- C. Dansk\n- D. Svensk\n- E. Et annet språk\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: E (et annet språk)"
+  },
+  {
+   "draw": 23,
+   "doc_index": 4979,
+   "doc_fingerprint": "757cf391ec4e",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Oprindelig havde hans bekendte Steen Olsen, der arbejder i et kontorvarefirma i København, bestilt programmet for prisen på 100 programmørtimer.\n\nIdentifiser språket i teksten. Velg alternativet som passer best.\n\nAlternativer:\n- bokmål\n- nynorsk\n- dansk\n- svensk\n- et annet språk\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: dansk"
+  },
+  {
+   "draw": 24,
+   "doc_index": 5670,
+   "doc_fingerprint": "695b9e3dd0e6",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: - Nå er kortene lagt - og det ble en større bør å bære for oss enn vi trodde.\nHvilket språk er teksten skrevet på? Alternativer:\n- A) Bokmål\n- B) Nynorsk\n- C) Dansk\n- D) Svensk\n- E) Et annet språk\nRiktig svar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (bokmål)"
+  },
+  {
+   "draw": 25,
+   "doc_index": 5925,
+   "doc_fingerprint": "61aeb8b5062b",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: - Men dette er fortidas kunstuttrykk.\n\nIdentifiser språket i teksten. Velg alternativet som passer best.\n\nAlternativer:\n- A. Bokmål\n- B. Nynorsk\n- C. Dansk\n- D. Svensk\n- E. Et annet språk\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1,
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct options (any one of them):\n- B (nynorsk)\n- A (bokmål)"
+  },
+  {
+   "draw": 26,
+   "doc_index": 2445,
+   "doc_fingerprint": "27406e55e555",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Folk skriver på mange språk, som bokmål, nynorsk, dansk, svensk eller på mange andre språk. «Hemskillnadstiden är till för att ge makarna en prövotid.» er et eksempel på en setning skrevet på",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: svensk"
+  },
+  {
+   "draw": 27,
+   "doc_index": 5007,
+   "doc_fingerprint": "bd37a02e3072",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Setning å vurdere: Men legemiddelet har ikke vært i bruk så lenge, og det er få pasienter som tar det.\nEr denne setningen skrevet på bokmål, nynorsk, dansk, svensk eller et annet språk? Hvis jeg må velge, vil jeg si at den er skrevet på",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: bokmål"
+  },
+  {
+   "draw": 28,
+   "doc_index": 4359,
+   "doc_fingerprint": "1129789e3a5f",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvilket språk er det i følgende setning?\nGuardet a tere,\nEr det A. bokmål, B. nynorsk, C. dansk, D. svensk eller E. et annet språk?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: E (et annet språk)"
+  },
+  {
+   "draw": 29,
+   "doc_index": 5573,
+   "doc_fingerprint": "7b8cc1029633",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Folk skriver på mange språk, som bokmål, nynorsk, dansk, svensk eller på mange andre språk. «Då sa ho «No er jo ikkje dette ein sjukeheim som er driven av kommunen».» er et eksempel på en setning skrevet på\nAlternativer:\n- A. Bokmål\n- B. Nynorsk\n- C. Dansk\n- D. Svensk\n- E. Et annet språk\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (nynorsk)"
+  },
+  {
+   "draw": 30,
+   "doc_index": 5552,
+   "doc_fingerprint": "6c9aa99e080f",
+   "prompt_variant": "slide_nob_nno_swe_dan_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Folk skriver på mange språk, som bokmål, nynorsk, dansk, svensk eller på mange andre språk. «It-tifel kien qed ifisser lil missieru kemm tgħallem bit-Taljan.» er et eksempel på en setning skrevet på",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: et annet språk"
+  },
+  {
+   "draw": 31,
+   "doc_index": 4842,
+   "doc_fingerprint": "aeac111dd73c",
+   "prompt_variant": "slide_nob_nno_swe_dan_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Setning å vurdere: Etter sprinten i går gikk hun ut som nummer to.\nEr denne setningen skrevet på bokmål, nynorsk, dansk, svensk eller et annet språk? Alternativer:\n- A. Bokmål\n- B. Nynorsk\n- C. Dansk\n- D. Svensk\n- E. Et annet språk\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "bokmål",
+     "nynorsk",
+     "dansk",
+     "svensk",
+     "et annet språk"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (bokmål)"
+  }
+ ]
+}

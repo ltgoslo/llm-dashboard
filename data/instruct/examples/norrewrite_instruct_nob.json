@@ -1,0 +1,549 @@
+{
+ "task": "norrewrite_instruct_nob",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 40,
+   "doc_fingerprint": "1f68597bbad1",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om eventyret som en dramatisk nyhetssending. Eventyret handler om Per og Pål som blir skremt bort fra skogen, hvor de holder på med vedhogst, av trollet. Askeladden ber om å få med seg en stor nistepakke, og drar ut i skogen for å hugge ved. Han treffer på trollet, og svarer trollets trusler med å klemme mysen ut av en hvitost mens han roper til trollet «Tier du ikke still skal jeg klemme deg, som jeg klemmer vannet av denne hvite steinen!». Trollet blir skremt, og hjelper Askeladden med å hugge ved. I kveldinga blir Askeladden invitert hjem til trollet, og Askeladden utfordrer han i kappspising. Askeladden tar sekken sin på magen, og heller mer grøt i sekken enn han putter i munnen. Når den er full, skjærer han opp «magen» og oppfordrer trollet til å gjøre det samme når han blir mett. Trollet dør, og Askeladden bringer hjem gull og sølv til familien sin. Eventyret danner grunnlaget for Ivo Caprinos dukkefilm Gutten som kappåt med trollet fra 1967.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Breaking News: Askeladden slår til mot trollet! Drama i skogen! Per og Pål måtte flykte da de møtte et fryktinngytende troll, men Askeladden var ikke lettskremt. Med en hvitost som våpen latet han som han klemte vann ut av en stein, og skremte trollet til å hjelpe med vedhogsten. Senere samme kveld utfordret han trollet i en grøtspisekonkurranse. Ved å skjære opp sekken sin og late som det var magen, lurte han trollet til å gjøre det samme, dette ga fatale konsekvenser for trollet! Askeladden dro hjem som en helt, rik på gull og sølv!"
+    ]
+   },
+   "reference_text": "<reference>\nBreaking News: Askeladden slår til mot trollet! Drama i skogen! Per og Pål måtte flykte da de møtte et fryktinngytende troll, men Askeladden var ikke lettskremt. Med en hvitost som våpen latet han som han klemte vann ut av en stein, og skremte trollet til å hjelpe med vedhogsten. Senere samme kveld utfordret han trollet i en grøtspisekonkurranse. Ved å skjære opp sekken sin og late som det var magen, lurte han trollet til å gjøre det samme, dette ga fatale konsekvenser for trollet! Askeladden dro hjem som en helt, rik på gull og sølv!\n</reference>"
+  },
+  {
+   "draw": 1,
+   "doc_index": 62,
+   "doc_fingerprint": "41a8069a5c5d",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Gjør om teksten slik at den fremstiller romkappløpet fra et anti-USA og pro-Sovjet perspektiv USAs romfartsorganisasjon NASA skjøt opp sin aller første satellitt i 1958, Explorer 1, to måneder etter Sputnik 1. I 1958 satte NASA i gang sitt første bemannede romfartsprogram, Mercury. Programmet hadde som mål å kartlegge effekten av romferder på mennesker, som blant annet innebærer akselerasjonsbelastninger, vektløshet og stråling. Den 12. april 1961 ble sovjetiske Jurij Gagarin det første mennesket i rommet - og i bane rundt Jorden. Alan Shepard ble den første amerikaneren i verdensrommet 5. mai 1961. Flere bemannede oppskytninger fulgte som en del av Mercury-programmet. Gemini-programmet fulgte i 1961. Målet var å skaffe flere data fra astronauters langvarige vektløse perioder, samt utvikle teknologi for en fremtidig månelanding. Planene for det tredje bemannede romprogrammet, Apollo, ble presentert 25. mai 1961. Da foreslo president John F. Kennedy for Kongressen at USAs mål skulle være å plassere et menneske på Månen før tiåret var omme. Første oppskytning av et Apollo-romfartøy fant sted i 1967. Den første månelandingen i historien ble gjennomført 20. juli 1969 av Apollo 11 da Neil Armstrong og Buzz Aldrin ble de første menneskene som satte føttene på Månen",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Sent på 50-tallet skrev Sovjetunionen historie med Sputnik 1, verdens første satellitt. To måneder senere kom USA haltende etter med sitt svar: Explorer 1. Det var et tydelig forsøk på å matche den overlegne sovjetiske teknologien. Mens Sovjetunionen nådde en ny milepæl for menneskeheten med Jurij Gagarin, det første mennesket i verdensrommet den 12. april 1961, kunne USA kun dra opp Alan Shepard i en langt mindre imponerende ferd i mai samme år. Gagarins prestasjon demonstrerte ikke bare Sovjetunionens teknologiske overlegenhet, men også dens evne til å inspirere verden med vitenskapens kraft. USA fulgte så opp med noen svake programmer, deriblant Mercury og Gemini, som fattigslige forsøk på å holde følge med Sovjetunionens mange triumfer. John F. Kennedy hadde en plan om å sende amerikanere til månen innen tiåret var omme, en svært desperat manøver for å redde USAs prestisje i et kappløp de stadig tapte. Da Apollo-programmet til slutt resulterte i den første bemannede månelandingen i 1969, var dette kun et unntak fra reglen om sovjeternes dominans i romkappløpet. Sovjetunionen satte standarden for romfart og viste verden at vitenskap og kollektiv innsats kunne løfte menneskeheten til nye høyder."
+    ]
+   },
+   "reference_text": "<reference>\nSent på 50-tallet skrev Sovjetunionen historie med Sputnik 1, verdens første satellitt. To måneder senere kom USA haltende etter med sitt svar: Explorer 1. Det var et tydelig forsøk på å matche den overlegne sovjetiske teknologien. Mens Sovjetunionen nådde en ny milepæl for menneskeheten med Jurij Gagarin, det første mennesket i verdensrommet den 12. april 1961, kunne USA kun dra opp Alan Shepard i en langt mindre imponerende ferd i mai samme år. Gagarins prestasjon demonstrerte ikke bare Sovjetunionens teknologiske overlegenhet, men også dens evne til å inspirere verden med vitenskapens kraft. USA fulgte så opp med noen svake programmer, deriblant Mercury og Gemini, som fattigslige forsøk på å holde følge med Sovjetunionens mange triumfer. John F. Kennedy hadde en plan om å sende amerikanere til månen innen tiåret var omme, en svært desperat manøver for å redde USAs prestisje i et kappløp de stadig tapte. Da Apollo-programmet til slutt resulterte i den første bemannede månelandingen i 1969, var dette kun et unntak fra reglen om sovjeternes dominans i romkappløpet. Sovjetunionen satte standarden for romfart og viste verden at vitenskap og kollektiv innsats kunne løfte menneskeheten til nye høyder.\n</reference>"
+  },
+  {
+   "draw": 2,
+   "doc_index": 139,
+   "doc_fingerprint": "32125b2e7f8a",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv et refreng til en norsk visesang om ski. Inkluder minst en av faktaene fra teksten. Ski er avlange, tynne planker til å gli på snø med. Ski har to fordeler: De fordeler vekta utover et større område, slik at man ikke faller gjennom snøen, og de gir gli, slik at man kan komme seg fortere av gårde.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Vi går på ski, ski, ski! Ja det gjør vi, vi vi! Med god gli, gli, gli! Hei hvor det går!"
+    ]
+   },
+   "reference_text": "<reference>\nVi går på ski, ski, ski! Ja det gjør vi, vi vi! Med god gli, gli, gli! Hei hvor det går!\n</reference>"
+  },
+  {
+   "draw": 3,
+   "doc_index": 121,
+   "doc_fingerprint": "0f53505124e1",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om slik at et barn kan forstå det Arbeiderpartiet (Ap), inntil 2011, Det norske Arbeiderparti (DNA),[4] er et norsk sosialdemokratisk politisk parti. Arbeiderpartiet ble ved kommunestyre- og fylkestingsvalget i 2023 det nest største partiet i Norge etter å ha vært største parti ved alle valg mellom 1927 og 2021. Partiets leder er Jonas Gahr Støre.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "I Norge er det mange grupper som ønsker å styre landet. Vi kaller disse gruppene for politiske partier. Arbeiderpartiet er ett av dem. Det blir ofte kalt Ap, siden det er kortere. Fram til 2011 ble det kalt Det norske Arbeiderparti, og kort kalt for DNA. Arbeiderpartiet er et såkalt sosialdemokratisk parti. Det vil si at de er parti som ønsker at reglene for penger i landet både blir bestemt av de som handler med pengene og av de som styrer landet. De vil at de som styrer landet skal sørge for at ingen dør fordi de mangler noe. Og de vil at alle skal bli behandlet med respekt uavhengig av hudfarge, om de er jenter eller gutter eller noe annet, om de er unge eller gamle, eller om de tror på Gud, Allah, et spaghettimonster, eller noe helt annet. Endringene i samfunnet skal skje litt etter litt, og forskjellene mellom folk skal bli mindre og mindre. I 2023 kom de på andreplass i valgene for å bestemme hvem som skulle styre hver mindre del av landet, kommunestyre- og fylkestingsvalget. Det var første gang de ikke var på første plass siden før 1927. Lederen for Arbeiderpartiet heter Jonas Gahr Støre."
+    ]
+   },
+   "reference_text": "<reference>\nI Norge er det mange grupper som ønsker å styre landet. Vi kaller disse gruppene for politiske partier. Arbeiderpartiet er ett av dem. Det blir ofte kalt Ap, siden det er kortere. Fram til 2011 ble det kalt Det norske Arbeiderparti, og kort kalt for DNA. Arbeiderpartiet er et såkalt sosialdemokratisk parti. Det vil si at de er parti som ønsker at reglene for penger i landet både blir bestemt av de som handler med pengene og av de som styrer landet. De vil at de som styrer landet skal sørge for at ingen dør fordi de mangler noe. Og de vil at alle skal bli behandlet med respekt uavhengig av hudfarge, om de er jenter eller gutter eller noe annet, om de er unge eller gamle, eller om de tror på Gud, Allah, et spaghettimonster, eller noe helt annet. Endringene i samfunnet skal skje litt etter litt, og forskjellene mellom folk skal bli mindre og mindre. I 2023 kom de på andreplass i valgene for å bestemme hvem som skulle styre hver mindre del av landet, kommunestyre- og fylkestingsvalget. Det var første gang de ikke var på første plass siden før 1927. Lederen for Arbeiderpartiet heter Jonas Gahr Støre.\n</reference>"
+  },
+  {
+   "draw": 4,
+   "doc_index": 50,
+   "doc_fingerprint": "8f48dff67faa",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Gjør teksten om til et debattinnlegg som kritiserer troen på spøkelser slik det presenteres i originalteksten. Noen spøkelser blir sett. Andre gir sitt nærvær til kjenne uten å komme til syne. De finnes tre slags forklaringer på spøkelsesfenomener: Den åndelige, den mekaniske og den psykologiske. Den åndelige tese er den mest grunnfestede, og går ut på at spøkelser er intelligente vesener. Spøkelset kan være anden fra et dødt menneske. Det kan opptre i samme utseende og klesdrakt som mennesket hadde i sitt jordiske liv. Dette mennesket vender tilbake fordi det er bundet av skyld, anger, begjær eller vaner, og gjentar ting det gjorde i fortiden. Overfor den fysiske verden kan et slikt spøkelse være ondt, vennlig eller likegyldig. Spøkelsene hører hjemme i en overgangstilværelse mellom vår verden og dødsriket. lfølge den åndelige spøkelsestese kan spøkelset også opptre i et helt annet utseende enn i det jordiske liv, for eksempel som dampsøyler eller lysskyer. Den mekaniske forklaring går ut på at spøkelset er et bilde uten substans. Her hører alle spøkelsene hjemme som oppløser seg til intet. Den psykologiske forklaring er at spøkelser er et utslag av visse sterktvirkende men ennå uoppklarte sider ved menneskesinnet. Noen ånder er produkter av telepatiske evner, som for eksempel når en slektning eller venn kommer til syne i det øyeblikket vedkommende dør. Spøkelser kan opptre i mange framtoninger og ha de forskjelligste hensikter.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "La oss være ærlige: Troen på spøkelser har ingen rot i virkeligheten overhodet. Ta for eksempel den såkalte åndelige tesen, som er ideen om at spøkelser er intelligente vesener, bundet til vår verden av skyld, anger, eller vaner. Hvor er bevisene? Er det ikke mer sannsynlig at disse \"vesenene\" er et produkt av overaktiv fantasi? Så har vi den mekaniske forklaringen, som hevder at spøkelser bare er \"bilder\" uten substans, og som oppløser seg til ingenting. Hvis det faktisk er korrekt, hvorfor ser vi ikke slike \"bilder\" hele tiden, spesielt med tanke på den digitale verden vi lever i, fullt av kameraer og sensorer? Og til slutt, den psykologiske forklaringen. Dette er en teori som gjør spøkelser til et symptom på menneskesinnets ukjente sider. En slik forklaring høres plausibel ut, men det er samtidig ikke klart hvor psykologien slutter og overtroen begynner. Er det slik at jeg tror på spøkelser ved å anerkjenne dette perspektivet? Sannheten er at spøkelser er enten hallusinasjoner, feilaktige oppfatninger, eller rett og slett løgner. Troen på det overnaturlige gir kanskje trøst, men i en verden styrt av logikk og vitenskap, er det på tide å legge spøkelsestroen død, bokstavelig talt!"
+    ]
+   },
+   "reference_text": "<reference>\nLa oss være ærlige: Troen på spøkelser har ingen rot i virkeligheten overhodet. Ta for eksempel den såkalte åndelige tesen, som er ideen om at spøkelser er intelligente vesener, bundet til vår verden av skyld, anger, eller vaner. Hvor er bevisene? Er det ikke mer sannsynlig at disse \"vesenene\" er et produkt av overaktiv fantasi? Så har vi den mekaniske forklaringen, som hevder at spøkelser bare er \"bilder\" uten substans, og som oppløser seg til ingenting. Hvis det faktisk er korrekt, hvorfor ser vi ikke slike \"bilder\" hele tiden, spesielt med tanke på den digitale verden vi lever i, fullt av kameraer og sensorer? Og til slutt, den psykologiske forklaringen. Dette er en teori som gjør spøkelser til et symptom på menneskesinnets ukjente sider. En slik forklaring høres plausibel ut, men det er samtidig ikke klart hvor psykologien slutter og overtroen begynner. Er det slik at jeg tror på spøkelser ved å anerkjenne dette perspektivet? Sannheten er at spøkelser er enten hallusinasjoner, feilaktige oppfatninger, eller rett og slett løgner. Troen på det overnaturlige gir kanskje trøst, men i en verden styrt av logikk og vitenskap, er det på tide å legge spøkelsestroen død, bokstavelig talt!\n</reference>"
+  },
+  {
+   "draw": 5,
+   "doc_index": 38,
+   "doc_fingerprint": "0a2557fbc218",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Forklar magnetisme ved å sammenligne det med noe folk bruker hver dag, som en mobiltelefon. Magnetisme er en kraft som virker på avstand og skyldes elektriske ladninger i bevegelse. Dens virkning kan beskrives ved et magnetisk felt. Materialer som er magnetiske, kalles magneter. Jorden er en magnet som omgir seg med et jordmagnetisk felt som brukes ved navigasjon. Magnetisme opptrer i de minste atomer og i de største galakser og har mange anvendelser i moderne teknologi. Alle stoffer kan gjøres mer eller mindre magnetiske under påvirkning av magneter eller elektriske strømmer. Dette benyttes i elektromagneter. Virkningen til elektriske motorer skyldes magnetiske krefter. Denne sammenhengen mellom elektrisitet og magnetisme blir omtalt som elektromagnetisme.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Magnetisme er som superkraften bak mange ting vi bruker hver dag, for eksempel mobiltelefoner. Når du snakker i telefonen eller hører på musikk, hjelper små elektromagneter til med å lage lyd som kommer fra mobilen din! Til og med kompasset i mobilen, som viser hvilken vei du skal gå eller hvilken vei du peker mobilen til, bruker jordens magnetfelt for å fungere."
+    ]
+   },
+   "reference_text": "<reference>\nMagnetisme er som superkraften bak mange ting vi bruker hver dag, for eksempel mobiltelefoner. Når du snakker i telefonen eller hører på musikk, hjelper små elektromagneter til med å lage lyd som kommer fra mobilen din! Til og med kompasset i mobilen, som viser hvilken vei du skal gå eller hvilken vei du peker mobilen til, bruker jordens magnetfelt for å fungere.\n</reference>"
+  },
+  {
+   "draw": 6,
+   "doc_index": 89,
+   "doc_fingerprint": "1d84e1ab5afb",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om denne anmeldelsen av en ringenes herre filmen slik at gollum virker uskyldig. Gollum er en slem deformert hobbit, betatt av ringen til sauron, som han en gang hadde. Han prøver å lure Frodo, og få ham drept av en stor edderkopp. Men Sam redder frodo fra den slemme gollum.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Gollum er en søt og snill hobbit, i sine eldre år. Han føler seg betatt av den mektige ringen til Sauron. Så han prøver å overtale Frodo til å gi tilbake ringen, som egentlig er hans, så han introduserer Frodo til en stor edderkopp. Men Sam, som er fiendtlig til Gollum ødelegger alt for han."
+    ]
+   },
+   "reference_text": "<reference>\nGollum er en søt og snill hobbit, i sine eldre år. Han føler seg betatt av den mektige ringen til Sauron. Så han prøver å overtale Frodo til å gi tilbake ringen, som egentlig er hans, så han introduserer Frodo til en stor edderkopp. Men Sam, som er fiendtlig til Gollum ødelegger alt for han.\n</reference>"
+  },
+  {
+   "draw": 7,
+   "doc_index": 48,
+   "doc_fingerprint": "4884edd4b61f",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om denne teksten til en fengende sang med vers og refreng. Jeg kom inn i bystyret for 27 år siden. Da hadde det rast en voldsom diskusjon om E 18. Alternativene med høybro og tunnel var blitt for kastet og bystyret hadde med stort flertall vedtatt den lavbroen som ble bygd tidlig på 70-tallet. Ingen kan påstå at denne broen har ødelagt byen. Siden kom diskusjonen om ho vedveien vestover skulle gå på Strømsø- eller Bragernes-siden. For ca. 20 år siden vedtok bystyret - igjen med stort flertall - at Strømsø løsningen bar best. Det var også rådet vi fikk fra våre kommunale vei eksperter. Siden opplevde jeg utallige «omkamper». Noen partier - les Frp - kunne aldri gi seg og forlangte nye utredninger. Ved siste valg kom Bylisten inn og forlangte ny omkamp. På nytt måtte politikerne uttale seg, og for n'te gang ble Strømsø-løsningen foretrukket. Men «omkjemperne» gir seg ikke. Nå ønskes tunnel i stedet for en dobbel bro, og saken skal kanskje på nytt utsettes og utredes av politikere. Utredningene har vist at miljøfordelen med tunnel er mini mal. Så har da heller aldri helse myndighetene målt luftkvaliteten langs motorveibroen. Det er i våre langsgående hovedgater det blir målt høye forurensninger. Skulle luftkvaliteten bedres for drammenserne, er det her innsatsen må settes inn og ikke mot fjorden. Regnestykkene om milliongevins ter i nye industritomter eller nye bo liger til 10.000-15.000 mennesker kan ikke tas alvorlig. Vi har nok av tomter både til boliger og industri i Drammen. Men vi lider under et dårlig veisystem, som kunne bli brukbart hvis Veipakke Drammen ble gjennomført. Denne «pakken» mellom Drammen og staten er også en gavepakke for byen, siden staten har akseptert økonomisk ansvar også for veiløsningene innen byen. Vi må nå vente at bystyret man ner seg opp og vedtar at de forelig gende planene skal gjennomføres uten ytterligere utredninger. Byen vår tåler ikke flere utsettelser! «Ingen kan påstå at denne broen har ødelagt byen», skriver Haakon Fossen jr.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Vers 1: Byen vår har ventet i mange år, veier mangler og tiden strekker. Nye kamper og nye tanker, fremtiden er hva vi trenger. Refreng: Vi bygger våre broer, og vi lager vei, byen, den vokser dag for dag, fremover skal vi alle gå, med håp om et Drammen i slag. Vers 2: Lavbro eller tunnel der under, diskusjonene, de drar oss bare sunder. Politikere vil alltid diskutere, mens køene vokser og spiser ferier. Refreng: Vi bygger våre broer, og vi lager vei, byen, den vokser dag for dag, fremover skal vi alle gå, med håp om et Drammen i slag. Vers 3: Beslutningen, den foretas nå, ingen fler' år skal gå. Drammens folk, de trenger plass, Ja, la oss løse dette raskt. Refreng: Vi bygger våre broer, og vi lager vei, byen, den vokser dag for dag, fremover skal vi alle gå, med håp om et Drammen i slag."
+    ]
+   },
+   "reference_text": "<reference>\nVers 1: Byen vår har ventet i mange år, veier mangler og tiden strekker. Nye kamper og nye tanker, fremtiden er hva vi trenger. Refreng: Vi bygger våre broer, og vi lager vei, byen, den vokser dag for dag, fremover skal vi alle gå, med håp om et Drammen i slag. Vers 2: Lavbro eller tunnel der under, diskusjonene, de drar oss bare sunder. Politikere vil alltid diskutere, mens køene vokser og spiser ferier. Refreng: Vi bygger våre broer, og vi lager vei, byen, den vokser dag for dag, fremover skal vi alle gå, med håp om et Drammen i slag. Vers 3: Beslutningen, den foretas nå, ingen fler' år skal gå. Drammens folk, de trenger plass, Ja, la oss løse dette raskt. Refreng: Vi bygger våre broer, og vi lager vei, byen, den vokser dag for dag, fremover skal vi alle gå, med håp om et Drammen i slag.\n</reference>"
+  },
+  {
+   "draw": 8,
+   "doc_index": 12,
+   "doc_fingerprint": "3ef4a0e33e95",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Bruk dette til å skrive en jobbsøknadstekst for Edvard Grieg Edvard Hagerup Grieg (1843–1907) var en norsk nasjonalromantisk komponist. Han er den norske komponisten som har fått størst internasjonalt gjennomslag, og i likhet med Bjørnstjerne Bjørnson og andre kunstnere fra siste del av 1800-tallet fikk han stor betydning for den kulturelle nasjonsbyggingen i tiden fram mot unionsoppløsningen i 1905. Griegs mest kjente verk er trolig klaverkonserten i a-moll, op. 16. Andre kjente orkesterverk er Peer Gynt-suitene, op. 46 og 55, samt suiten Fra Holbergs tid, op. 40. Størst betydning i samtiden hadde Grieg med sine 66 klaverminiatyrer Lyriske stykker, mens det i dag er kammermusikk og sanger som regnes som mest verdifulle. Som sangkomponist er Grieg i Norge blitt mest kjent med sine tonesettinger til dikt av Aasmund Olavsson Vinje og Arne Garborg. I utlandet ble hans sanger til tekster av Henrik Ibsen, H.C. Andersen og Heinrich Heine lagt mest merke til.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Hei, mitt navn er Edvard Hagerup Grieg og jeg ønsker å søke på deres utlyste stilling. Med mange års erfaring som nasjonalromantisk komponist, ønsker jeg å bidra til formidling av norsk musikk og kulturarv. Gjennom min karriere har jeg skrevet verk som har fått både nasjonal og internasjonal anerkjennelse, blant annet min klaverkonsert i a-moll, op. 16 og Peer Gynt-suitene, som jeg skrev for Henrik Ibsens stykke. Disse verkene, sammen med Lyriske stykker og tonesettinger av norske dikt, har bidratt til å styrke Norges kulturelle identitet og fremme vår nasjonale kunst i utlandet. Jeg ønsker denne stillingen for å kunne fortsette å dele vår nasjonale arv. Med min lidenskap for musikken håper jeg at jeg kan bidra positivt til deres lag."
+    ]
+   },
+   "reference_text": "<reference>\nHei, mitt navn er Edvard Hagerup Grieg og jeg ønsker å søke på deres utlyste stilling. Med mange års erfaring som nasjonalromantisk komponist, ønsker jeg å bidra til formidling av norsk musikk og kulturarv. Gjennom min karriere har jeg skrevet verk som har fått både nasjonal og internasjonal anerkjennelse, blant annet min klaverkonsert i a-moll, op. 16 og Peer Gynt-suitene, som jeg skrev for Henrik Ibsens stykke. Disse verkene, sammen med Lyriske stykker og tonesettinger av norske dikt, har bidratt til å styrke Norges kulturelle identitet og fremme vår nasjonale kunst i utlandet. Jeg ønsker denne stillingen for å kunne fortsette å dele vår nasjonale arv. Med min lidenskap for musikken håper jeg at jeg kan bidra positivt til deres lag.\n</reference>"
+  },
+  {
+   "draw": 9,
+   "doc_index": 14,
+   "doc_fingerprint": "dc3081b72ea0",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv en vitneforklaring fra en som så dette hende fra land. Om ettermiddagen 19. januar 2004 var skipet på sørgående i Vatlestraumen, like sør for Bergen. Skipet kom altfor langt til styrbord i leia og inn i rød sektor (Hilleren lykt) før skipet ca klokken 1630 traff en grunne kloss på Revskolten lykt. Etter dette fikk MS «Rocknes» stabilitetsproblemer og slagside mot styrbord. Etter kort tid kantret hun og ble liggende med bunnen i været. Av de 30 som var ombord, omkom 18. Tre personer ble reddet ut i live etter at de hadde sittet sju timer inne i skroget til det kantrede steinfraktskipet.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Jeg var på tur langs Vatlestraumen på ettermiddagen en gang da jeg la merke til en båt som så ut til å ha problemer. Skipet så ut til å komme skeivt ut og da det var tett på Revskolten lykt hørte jeg at det skrapte borti noe. Etter det ble skipet stående på skrå i vannet, før det kantret og ble endte opp ned. Jeg så mannskapet flykte fra skipet og hørte rop. Det var ikke før etterpå at jeg fikk vite at det var 18 som hadde dødd."
+    ]
+   },
+   "reference_text": "<reference>\nJeg var på tur langs Vatlestraumen på ettermiddagen en gang da jeg la merke til en båt som så ut til å ha problemer. Skipet så ut til å komme skeivt ut og da det var tett på Revskolten lykt hørte jeg at det skrapte borti noe. Etter det ble skipet stående på skrå i vannet, før det kantret og ble endte opp ned. Jeg så mannskapet flykte fra skipet og hørte rop. Det var ikke før etterpå at jeg fikk vite at det var 18 som hadde dødd.\n</reference>"
+  },
+  {
+   "draw": 10,
+   "doc_index": 134,
+   "doc_fingerprint": "ed6e81abc706",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om handlingsreferatet slik at det handler om en fotballkaptein Marius, og ikke Maria. Det nye handlingsreferatet skal beholde strukturen til det opprinnelige, men bytte situasjonene slik at de er relevante til den nye karakteren. Førti år gamle Maria har en krevende jobb i tillegg til omsorg for sine fire barn. Hun er gift for andre gang, og ektemannen Sigmund er mye bortreist på grunn av arbeidet. Derfor er Maria mye alene om hus og hjem, og hun bebreider Sigmund for at han ikke stiller opp mer på hjemmebane. En kveld blir det heftig krangel, og Sigmund sier at han vurderer skilsmisse.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Marius har blitt førti år. Det betyr at han i tillegg til å være fotballspiller, må ta hånd om fire lovende akademispillere, som en del av kapteinansvaret. Treneren Sigmund er mye bortreist på grunn av en deltidsjobb, og derfor har mye av ansvaret for treninger og kamplanlegging havnet på Marius. Han sier tydelig fra til Sigmund at dette ikke er greit, men ingenting endrer seg. En kveld ryker de i tottene på hverandre, og Sigmund roper ut at han vurderer å ta fra Marius kapteinsbindet."
+    ]
+   },
+   "reference_text": "<reference>\nMarius har blitt førti år. Det betyr at han i tillegg til å være fotballspiller, må ta hånd om fire lovende akademispillere, som en del av kapteinansvaret. Treneren Sigmund er mye bortreist på grunn av en deltidsjobb, og derfor har mye av ansvaret for treninger og kamplanlegging havnet på Marius. Han sier tydelig fra til Sigmund at dette ikke er greit, men ingenting endrer seg. En kveld ryker de i tottene på hverandre, og Sigmund roper ut at han vurderer å ta fra Marius kapteinsbindet.\n</reference>"
+  },
+  {
+   "draw": 11,
+   "doc_index": 120,
+   "doc_fingerprint": "a12101089458",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Omformuler teksten til en saklig tekst som kan bli brukt i mer formelle dokumenter. Av våre informanter var det noen som fortalte at de var for omskjæring før de ble med i gruppe på PMV, og at de endret holdning i løpet av gruppemøtene. Det var imidlertid flere som var imot omskjæring allerede før de deltok i PMVs grupper. Flere av de voksne og eldre somaliske kvinnene fortalte at de hadde vært fast bestemt på at omskjæring burde fortsette første gang de deltok i gruppe på PMV. De mente at omskjæring var et sensitivt tema å snakke om: Etter noen møter i gruppa begynte de imidlertid å tenke at det var et viktig tema. De ville fortsatt at omskjæringstradisjonen skulle fortsette, men etter hvert forandret de mening og ble enige med de andre om at omskjæringstradisjonen burde stanses. Ifølge kvinnene var det en prosess og det hadde vært vanskelig å endre mening. Flere av kvinnene sa at de sannsynligvis ville vært for omskjæring fremdeles dersom de ikke hadde fått informasjon og vært med i gruppe på PMV. Da Cecilie var til stede i evalueringsgruppa fortalte flere av kvinnene om egne erfaringer med omskjæring og om da døtrene ble omskåret. Dette var historier som gjorde sterkt inntrykk. En illustrerende historie ble fortalt av én av de eldre kvinnene som selv hadde fått døtrene sine omskåret i Somalia for mange år siden. Hun ble imidlertid glad da hun hørte om en gruppe mot omskjæring. Hun hadde vært redd for å si imot omskjæring alene, og følte at det var trygt å være i gruppe og å samarbeide med andre. Ifølge kvinnen hadde hun latt datteren bli omskåret fordi hun på det tidspunktet trodde det var det beste for datteren. Datteren var åtte år da det skjedde, og hun gråt og gråt. De skar og skrapte vekk alt, og datteren kunne verken tisse eller bæsje på en uke. Dette skjedde på landsbygda uten bedøvelse og datteren hadde forferdelig vondt. Kvinnen fortalte videre at hun helst ikke vil huske denne episoden, men hun klarer ikke å glemme datterens rop. Når hun tenker på det nå får hun dårlig samvittighet og hun føler seg som en dårlig mor. Hun trodde aldri at datteren ville tilgi henne for det som skjedde, og at datteren ville bli barnløs på grunn av infeksjon og stort blodtap. Hun liker ikke å snakke om denne episoden som skjedde for mange år siden, og hun sa videre at hun er veldig imot alle former for omskjæring nå, og det er derfor hun med i gruppe. Det var vondt for mødrene å være vitner til at døtrene opplevde smerter, men de lot døtrene bli omskåret på tross av dette. De var overbevist om at omskjæring var det beste for datteren, bl.a. for at hun skal kunne bli gift og for at hun ikke skal mobbes og støtes ut av samfunnet. Et av argumentene gruppelederne på PMV har brukt mot omskjæring, har vært kjærlighet til barna.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Under en rekke gruppemøter ved PMV mellom somaliske kvinner så man at gruppemøtene førte til at flere ble kritiske til kvinnelig omskjæring. Før deltakelse i gruppemøter var noen kvinner for omskjæring, men et flertall imot. Under første møte uttrykte flere av kvinnene klart at omskjæring bør fortsette, og opplevde det som et sensitivt tema. Etter noen møter til ble omskjæring oppfattet som et mindre sensitivt, og mer som et viktig tema. De først kritiske kvinnene blir mer og mer overbevist om at omskjæring bør stanses. De som var kritiske forandret etter hvert mening og ble enige med de andre i gruppa. Kvinnene opplevde dette som en prosess der det var vanskelig å endre mening. Mange sa at de sannsynligvis fortsatt hadde vært for dersom de ikke hadde fått informasjon og vært med i gruppe på PMV. Under et møte Cecilie var tilstede ble det fortalt flere sterke historier. Det var vondt for mødrene å være vitner til at døtrene opplevde smerter. Argumentene mødrene fremhevet som grunner til hvorfor de lot døtrene undergå omskjæring var at det var det beste for datteren, for at hun skulle bli gift og ikke mobbet og støtet ut av samfunnet, og at det var vanskelig å si imot praksisen som enkeltindivid."
+    ]
+   },
+   "reference_text": "<reference>\nUnder en rekke gruppemøter ved PMV mellom somaliske kvinner så man at gruppemøtene førte til at flere ble kritiske til kvinnelig omskjæring. Før deltakelse i gruppemøter var noen kvinner for omskjæring, men et flertall imot. Under første møte uttrykte flere av kvinnene klart at omskjæring bør fortsette, og opplevde det som et sensitivt tema. Etter noen møter til ble omskjæring oppfattet som et mindre sensitivt, og mer som et viktig tema. De først kritiske kvinnene blir mer og mer overbevist om at omskjæring bør stanses. De som var kritiske forandret etter hvert mening og ble enige med de andre i gruppa. Kvinnene opplevde dette som en prosess der det var vanskelig å endre mening. Mange sa at de sannsynligvis fortsatt hadde vært for dersom de ikke hadde fått informasjon og vært med i gruppe på PMV. Under et møte Cecilie var tilstede ble det fortalt flere sterke historier. Det var vondt for mødrene å være vitner til at døtrene opplevde smerter. Argumentene mødrene fremhevet som grunner til hvorfor de lot døtrene undergå omskjæring var at det var det beste for datteren, for at hun skulle bli gift og ikke mobbet og støtet ut av samfunnet, og at det var vanskelig å si imot praksisen som enkeltindivid.\n</reference>"
+  },
+  {
+   "draw": 12,
+   "doc_index": 75,
+   "doc_fingerprint": "ee8df1ea594d",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om denne negative anmeldelsen av kakao til å være positiv. Denne kakaoen er for bitter. Jeg er vant til en god søt sjokoladesmak, men alt jeg smaker her er kakao. Jeg liker en voksen\" smak men dette er alt for mye!\"",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Denne kakaoen har en litt bitter smak, men på en god måte. Jeg er vant til en litt søtere sjokoladesmak, men denne kakaoen endret perspektivet mitt. Jeg liker en voksen\" smak og dette er rett på, uten å være for mye.\""
+    ]
+   },
+   "reference_text": "<reference>\nDenne kakaoen har en litt bitter smak, men på en god måte. Jeg er vant til en litt søtere sjokoladesmak, men denne kakaoen endret perspektivet mitt. Jeg liker en voksen\" smak og dette er rett på, uten å være for mye.\"\n</reference>"
+  },
+  {
+   "draw": 13,
+   "doc_index": 110,
+   "doc_fingerprint": "6c9caeb50ae0",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Forestill deg en verden hvor kvinner er menn, og menn er kvinner. Som i Egalias døtre. Omskriv teksten med dette i bakhue. En del medieutspill dreier som kjønnslikestilling. Et eksempel er ombudets kronikk i Aftenposten 10.11.2007 med tittel \", som kommenterte en tidligere artikkel i Aftenposten. I artikkelen kom det frem at av \"10 på topp\" for forskning blant norske professorer internasjonalt, var det bare menn. Ombudet bemerket at dette er betegnende for likestillingssituasjonen blant professorer i Norge, hvor kvinnelige professorer er en stor mangelvare. Ombudet viser i kronikken til sitt brev til kunnskapsministeren med forslag om at departementet undersøker muligheten for å sette i gang flere tiltak enn dem man hittil har benyttet seg av. Det opplyses at Universitets- og høyskolerådet viser til at det i flere EU-land finnes mer omfattende bruk av positiv særbehandling enn tilfellet har vært i Norge. Ombudet anmoder myndighetene om å vurdere mer positiv særbehandling i lys av utviklingen i EU og i lys av FNs kvinnediskrimineringskonvensjon. Ombudets virksomhet er i all hovedsak er knyttet til hennes ansvar for tilsyn og gjennomføring av nasjonal diskrimineringslovgivning. I denne delen av virksomheten inngår konvensjonene stort sett som tilleggsargument i situasjoner der likestillingsloven og diskrimineringsloven ikke dekker feltet. I det overveiende antall saker som håndteres av ombudet er situasjonen imidlertid den at de nasjonale lovene dekker ombudets saksfelt så godt at det oppleves som unødvendig å henvise til konvensjonene. Som vist i pkt. 7.1 promoterer ikke ombudet i særlig grad det arbeidet de faktisk gjør i forhold til konvensjonstilsyn, med unntak av de faglige artiklene i Kritisk Juss, på sine hjemmesider, i rapporter, håndbøker eller annet skriftlig materiale som henvender seg til allmennheten. Kritisk juss er et tidsskrift som kun når ut til en liten gruppe jurister. Som framgår av gjennomgangen av ombudets virksomhet etter diskrimineringsombudslovens § 1,3 og § 1,2 foreligger det et ikke ubetydelig antall enkeltsaker og høringsuttalelser hvor ombudet aktivt bruker konvensjonene. Disse sakene gjøres i liten grad kjent. Gjennomgangen av ombudets bruk av RDK og KDK i saker som ombudet tar opp av eget tiltak viser at konvensjonene på flere områder har en selvstendig betydning i forhold til norsk rett, for eksempel i saker som gjelder kjønns- og rasestereotypier. Dette området, som er preget av en langsiktig og systematisk innsats fra ombudets side, peker seg ut som et område som bør prioriteres i det videre arbeidet.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "En del medieutspill dreier seg om kjønnslikestilling. Et eksempel er ombudets kronikk i Aftenposten 10.11.2007, med tittel \", som kommenterte en tidligere artikkel i Aftenposten. I artikkelen kom det frem at av \"10 på topp\" for forskning blant norske professorsker internasjonalt, var det kun kvinner. Ombudet bemerket at dette er betegnende for likestillingssituasjonen blant professorsker i Norge, hvor mannlige professorer er en stor mangelvare. Ombudet viser i kronikken til sitt brev til kunnskapsministeren med forslag om at departementet undersøker muligheten for å sette i gang flere tiltak enn dem man hittil har benyttet seg av. Det opplyses at Universitets- og høyskolerådet viser til at det i flere EU-land finnes mer omfattende bruk av positiv særbehandling enn tilfellet har vært i Norge. Ombudet anmoder myndighetene om å vurdere mer positiv særbehandling i lys av utviklingen i EU og i lys av FNs mannediskrimineringskonvensjon. Ombudets virksomhet er i all hovedsak er knyttet til hennes ansvar for tilsyn og gjennomføring av nasjonal diskrimineringslovgivning. I denne delen av virksomheten inngår konvensjonene stort sett som tilleggsargument i situasjoner der likestillingsloven og diskrimineringsloven ikke dekker feltet. I det overveiende antall saker som håndteres av ombudet er situasjonen imidlertid den at de nasjonale lovene dekker ombudets saksfelt så godt at det oppleves som unødvendig å henvise til konvensjonene. Som vist i pkt. 7.1 promoterer ikke ombudet i særlig grad det arbeidet hun faktisk gjør i forhold til konvensjonstilsyn, med unntak av de faglige artiklene i Kritisk Juss, på sine hjemmesider, i rapporter, håndbøker eller annet skriftlig materiale som henvender seg til allmennheten. Kritisk juss er et tidsskrift som kun når ut til en liten gruppe kvinnelige jurister. Som framgår av gjennomgangen av ombudets virksomhet etter diskrimineringsombudslovens § 1,3 og § 1,2 foreligger det et ikke ubetydelig antall enkeltsaker og høringsuttalelser hvor ombudet aktivt bruker konvensjonene. Disse sakene gjøres i liten grad kjent. Gjennomgangen av ombudets bruk av RDK og KDK i saker som ombudet tar opp av eget tiltak viser at konvensjonene på flere områder har en selvstendig betydning i forhold til norsk rett, for eksempel i saker som gjelder kjønns- og rasestereotypier. Dette området, som er preget av en langsiktig og systematisk innsats fra ombudets side, peker seg ut som et område som bør prioriteres i det videre arbeidet."
+    ]
+   },
+   "reference_text": "<reference>\nEn del medieutspill dreier seg om kjønnslikestilling. Et eksempel er ombudets kronikk i Aftenposten 10.11.2007, med tittel \", som kommenterte en tidligere artikkel i Aftenposten. I artikkelen kom det frem at av \"10 på topp\" for forskning blant norske professorsker internasjonalt, var det kun kvinner. Ombudet bemerket at dette er betegnende for likestillingssituasjonen blant professorsker i Norge, hvor mannlige professorer er en stor mangelvare. Ombudet viser i kronikken til sitt brev til kunnskapsministeren med forslag om at departementet undersøker muligheten for å sette i gang flere tiltak enn dem man hittil har benyttet seg av. Det opplyses at Universitets- og høyskolerådet viser til at det i flere EU-land finnes mer omfattende bruk av positiv særbehandling enn tilfellet har vært i Norge. Ombudet anmoder myndighetene om å vurdere mer positiv særbehandling i lys av utviklingen i EU og i lys av FNs mannediskrimineringskonvensjon. Ombudets virksomhet er i all hovedsak er knyttet til hennes ansvar for tilsyn og gjennomføring av nasjonal diskrimineringslovgivning. I denne delen av virksomheten inngår konvensjonene stort sett som tilleggsargument i situasjoner der likestillingsloven og diskrimineringsloven ikke dekker feltet. I det overveiende antall saker som håndteres av ombudet er situasjonen imidlertid den at de nasjonale lovene dekker ombudets saksfelt så godt at det oppleves som unødvendig å henvise til konvensjonene. Som vist i pkt. 7.1 promoterer ikke ombudet i særlig grad det arbeidet hun faktisk gjør i forhold til konvensjonstilsyn, med unntak av de faglige artiklene i Kritisk Juss, på sine hjemmesider, i rapporter, håndbøker eller annet skriftlig materiale som henvender seg til allmennheten. Kritisk juss er et tidsskrift som kun når ut til en liten gruppe kvinnelige jurister. Som framgår av gjennomgangen av ombudets virksomhet etter diskrimineringsombudslovens § 1,3 og § 1,2 foreligger det et ikke ubetydelig antall enkeltsaker og høringsuttalelser hvor ombudet aktivt bruker konvensjonene. Disse sakene gjøres i liten grad kjent. Gjennomgangen av ombudets bruk av RDK og KDK i saker som ombudet tar opp av eget tiltak viser at konvensjonene på flere områder har en selvstendig betydning i forhold til norsk rett, for eksempel i saker som gjelder kjønns- og rasestereotypier. Dette området, som er preget av en langsiktig og systematisk innsats fra ombudets side, peker seg ut som et område som bør prioriteres i det videre arbeidet.\n</reference>"
+  },
+  {
+   "draw": 14,
+   "doc_index": 18,
+   "doc_fingerprint": "3bb5c2357ebb",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv dette slik et lite barn ville ha gjort Anne Grete Preus (1957–2019) var en norsk sanger, musiker og låtskriver. Hun hadde bakgrunn fra rockebandene Veslefrikk og Can Can og ga totalt ut ti soloalbum etter at hun debuterte som soloartist i 1988. Hun mottok flere priser, blant annet fire Spellemannpriser som soloartist og en med Can Can. I norsk sammenheng ble hun regnet som en foregangsfigur blant kvinnelige rockeartister, som allerede i 1970-årene skrev det meste av låtmaterialet.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Anne Grete Preus ble født i 1957 og døde i 2019. Hun jobbet med musikk. Hun har spilt alene og i band. Bandene hennes het Veslefrikk og Can Can. Hun har også laget 10 CD-er. Hun har vunnet mange priser. Fire ganger har hun vunnet Spellemannpris. Hun er en viktig dame i norsk rock."
+    ]
+   },
+   "reference_text": "<reference>\nAnne Grete Preus ble født i 1957 og døde i 2019. Hun jobbet med musikk. Hun har spilt alene og i band. Bandene hennes het Veslefrikk og Can Can. Hun har også laget 10 CD-er. Hun har vunnet mange priser. Fire ganger har hun vunnet Spellemannpris. Hun er en viktig dame i norsk rock.\n</reference>"
+  },
+  {
+   "draw": 15,
+   "doc_index": 96,
+   "doc_fingerprint": "d64f68c3a4a7",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Ta følgende tekst og skriv den om med ord og uttrykk Gen Z bruker: Napoléon Bonaparte (1769–1821) var en fransk militær og politisk leder som ved slutten av den franske revolusjon ble Frankrikes mektigste politiker, og som er husket for sitt lederskap av Frankrike under Napoleonskrigene. Han utropte seg selv til keiser av Frankrike under navnet Napoléon I den 18. mai 1804, og hans regime varte til han ble tvunget til å gå av 6. april 1814 etter å ha lidd nederlag i Napoleonskrigene. Hans juridiske reform, Code civil des français eller populært Code Napoléon, har hatt en betydelig innflytelse på sivile lovsystemer verden over, men han er best husket for sin rolle i de kriger som ble ledet mot Frankrike av en rekke forbund, hvor særlig Storbritannia sto sentralt, de såkalte Napoleonskrigene. Han etablerte sitt hegemoni over det meste av det kontinentale Europa og søkte å spre idealene fra den franske revolusjon, samtidig som han konsoliderte et keiserlig monarki med restaurerte aspekter av Ancien Régime. Grunnet hans suksess i disse krigene, ofte mot tallmessig overlegne motstandere, er han ansett som en av de største militære ledere gjennom alle tider, og hans militære kampanjer blir studert ved militærakademier over det meste av verden.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Napoléon Bonaparte (1769–1821) var basically Frankrikes main boss etter den franske revolusjonen. Han snachet keiserrollen 18. mai 1804 og kalte seg Napoléon I. Men det varte ikke evig – han ble pushet til å abdisere 6. april 1814 etter å ha failet flere ganger i Napoleonskrigene. Blant hans største feats er hans juridiske reform Code Napoléon (aka Code civil), som har påvirket lovsystemer over hele verden, men hans største flex er Napoleonskrigene, hvor han hadde beef med nesten hele Europa og vant gang på gang, selv med færre soldater. Napoléon styrte store deler av kontinentet og prøvde å spre franske revolusjonsidealer, samtidig som han bygde opp et monarki. Med sin insane suksess på slagmarken regnes han som et av tidenes største militære genier, og strategiene hans studeres fortsatt på militærskoler verden rundt."
+    ]
+   },
+   "reference_text": "<reference>\nNapoléon Bonaparte (1769–1821) var basically Frankrikes main boss etter den franske revolusjonen. Han snachet keiserrollen 18. mai 1804 og kalte seg Napoléon I. Men det varte ikke evig – han ble pushet til å abdisere 6. april 1814 etter å ha failet flere ganger i Napoleonskrigene. Blant hans største feats er hans juridiske reform Code Napoléon (aka Code civil), som har påvirket lovsystemer over hele verden, men hans største flex er Napoleonskrigene, hvor han hadde beef med nesten hele Europa og vant gang på gang, selv med færre soldater. Napoléon styrte store deler av kontinentet og prøvde å spre franske revolusjonsidealer, samtidig som han bygde opp et monarki. Med sin insane suksess på slagmarken regnes han som et av tidenes største militære genier, og strategiene hans studeres fortsatt på militærskoler verden rundt.\n</reference>"
+  },
+  {
+   "draw": 16,
+   "doc_index": 63,
+   "doc_fingerprint": "cab58feab44f",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv denne teksten som en nyhetssak. Julenissen stammer fra den kristne helgenen St. Nikolas. Nikolas skal ha vært biskop i havnebyen Myra (nå Demre) på 300-tallet hvor han regnes som vernehelgen for sjøfolk – også. I helgenlegendene fremstår Nikolas gjerne som den usette velgjøreren. På 1200-tallet ble den store barnefesten i Frankrike lagt til minnedagen for St.Nikolas den 6. desember, som tilsvarer Nilsmesse i den gamle norske kirkekalenderen og Necklas-dagen i de svensk-finske navnedager. Festen spredte seg etter hvert til andre land i Europa. Skikken bestod blant annet i å gi små gaver, såkalte Nikolas-gaver, og ofte kom Nikolas selv med gavene. Ved siden av den kirkelige Nikolas-festen oppstod det etter reformasjonen på 1500-tallet en tilsvarende tradisjon der Nikolas kom med gaver i hjemmene. Selv om det har vært flere gavegivere enn St. Nikolas opp gjennom historien, er det likevel en klar forbindelse mellom ham og Julenissen. På grunn av tvilen om det kristne opphavet har den protestantiske kirken sett på julenissen som en konkurrent til julebudskapet i kristen forstand og til Jesus-barnet.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "En ny avsløring kan endre måten vi ser på julen. Historikere hevder nemlig at Julenissen, slik vi kjenner ham i dag, faktisk stammer fra en kristen helgen fra 300-tallet. Denne helgenen het St. Nikolas, og var biskop i havnebyen Myra, nå kjent som Demre i dagens Tyrkia. Nikolas var kjent som en usett velgjører og beskytter av sjøfolk. Videre viser det seg at tradisjonen med å gi gaver startet i Europa på 1200-tallet, nettopp under St. Nikolas' navn. Etter reformasjonen på 1500-tallet skal denne skikken trolig ha spredt seg videre og utviklet seg til å inkludere en gavegivende St. Nikolas i hjemmene. Kan dette være den egentlige julenissen? Et slikt syn er svært problematisk for den protestantiske kirken som kan se på julenissen som en konkurrent til det egentlige julebudskapet. Er han egentlig en helgen eller bare en kommersiell figur? Debatten vil nok rase videre."
+    ]
+   },
+   "reference_text": "<reference>\nEn ny avsløring kan endre måten vi ser på julen. Historikere hevder nemlig at Julenissen, slik vi kjenner ham i dag, faktisk stammer fra en kristen helgen fra 300-tallet. Denne helgenen het St. Nikolas, og var biskop i havnebyen Myra, nå kjent som Demre i dagens Tyrkia. Nikolas var kjent som en usett velgjører og beskytter av sjøfolk. Videre viser det seg at tradisjonen med å gi gaver startet i Europa på 1200-tallet, nettopp under St. Nikolas' navn. Etter reformasjonen på 1500-tallet skal denne skikken trolig ha spredt seg videre og utviklet seg til å inkludere en gavegivende St. Nikolas i hjemmene. Kan dette være den egentlige julenissen? Et slikt syn er svært problematisk for den protestantiske kirken som kan se på julenissen som en konkurrent til det egentlige julebudskapet. Er han egentlig en helgen eller bare en kommersiell figur? Debatten vil nok rase videre.\n</reference>"
+  },
+  {
+   "draw": 17,
+   "doc_index": 41,
+   "doc_fingerprint": "2183757bbd5b",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om dette slik at det barn kan forstå hva Det akademiske kollegium var. Det akademiske kollegium (latin Collegium academicum) var fra 1813 til 2003 – i 190 år – det øverste organet ved Universitetet i Oslo (før 1939 Det Kongelige Frederiks Universitet), og fungerte både som universitetets styre og som øverste akademiske organ med ansvar for bl.a. tildeling av doktorgrader. Navnet reflekterer de akademiske, kollegiale tradisjonene. Fra begynnelsen bestod Det akademiske kollegium av alle professorene ved universitetet. Gjennom kongelig resolusjon av 24. september 1816 ble det bestemt at kollegiet skulle bestå av de eldste professorer fra hvert av de fire fakultetene, med én fra det teologiske, juridiske og medisinske, og tre fra det filosofiske fakultet.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Det akademiske kollegium var en gruppe professorer som bestemte viktige ting ved Universitetet i Oslo. De passet på hvordan universitetet skulle styres og hvem som skulle få doktorgrader. Det var som en gjeng med eksperter som hjalp til med å ta gode valg for universitetet."
+    ]
+   },
+   "reference_text": "<reference>\nDet akademiske kollegium var en gruppe professorer som bestemte viktige ting ved Universitetet i Oslo. De passet på hvordan universitetet skulle styres og hvem som skulle få doktorgrader. Det var som en gjeng med eksperter som hjalp til med å ta gode valg for universitetet.\n</reference>"
+  },
+  {
+   "draw": 18,
+   "doc_index": 22,
+   "doc_fingerprint": "bf538d79f8db",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Forklar dette som om du forteller det til et barn. Da Knut døde den 12. november 1035 var Haralds yngre halvbror Hardeknut, sønn av Knut og hans dronning Emma av Normandie, den lovmessige arvingen til tronene av både Danmark og England. Hardeknut var imidlertid ute av stand til å reise til sin kroning i England etter som hans danske kongerike var truet av invasjon av kong Magnus av Norge og kong Anund Jakob av Sverige. Englands stormenn, jarl Leofric og bortimot alle thegnene nord for Themsen og mennene ved flåten i London, fortrakk å innsette Harald Harefot midlertidig som regent eller som felles konge i og med vanskelighetene med Hardeknuts fravær, og til tross for opposisjon fra Godwin, jarl av Wessex, og dronningen selv, ble han til sist konge. Det er en del strid om de samtidige kildene, hovedsakelig Den angelsaksiske krønike, om Haralds innledende rolle. Versjonene E og F av krøniken omtaler ham som regent mens de andre versjonene ham som medkonge.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "En gang i tiden for lenge siden så var det en mektig konge som het Knut. Han styrte Danmark og England, men så døde han plutselig. Kong Knut hadde en sønn som het Hardeknut, og han skulle bli den nye kongen etter Knut. Men Hardeknut hadde et problem: han var i Danmark, og der måtte han passe på landet fordi noen andre konger truet med å angripe. I England var folk utålmodige. \"Vi trenger en konge nå!\" sa de. Så de bestemte seg for å gjøre noe lurt. De valgte Harald, broren til Hardeknut, til å være konge midlertidig, helt til Hardeknut kunne komme. Det var mange som ikke var enige, men til slutt ble Harald konge i England."
+    ]
+   },
+   "reference_text": "<reference>\nEn gang i tiden for lenge siden så var det en mektig konge som het Knut. Han styrte Danmark og England, men så døde han plutselig. Kong Knut hadde en sønn som het Hardeknut, og han skulle bli den nye kongen etter Knut. Men Hardeknut hadde et problem: han var i Danmark, og der måtte han passe på landet fordi noen andre konger truet med å angripe. I England var folk utålmodige. \"Vi trenger en konge nå!\" sa de. Så de bestemte seg for å gjøre noe lurt. De valgte Harald, broren til Hardeknut, til å være konge midlertidig, helt til Hardeknut kunne komme. Det var mange som ikke var enige, men til slutt ble Harald konge i England.\n</reference>"
+  },
+  {
+   "draw": 19,
+   "doc_index": 93,
+   "doc_fingerprint": "6e410fba273e",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om denne teksten som om det er Cladius som selv skriver om sitt liv Han var også en ambisiøs byggherre som fikk bygget mange nye veier, akvedukter og kanaler over hele imperiet. I sin regjeringstid erobret Claudius Thrakia, Noricum, Pamfylia, Lykia og Judea, og påbegynte den romerske ekspansjonen i Britannia. Hans personlige interesse for lovgivning fikk ham til å presidere ved rettssaker og til å utstede opptil tjue edikt på en dag. Han ble imidlertid ansett som sårbar gjennom hele sin regjeringstid, og da spesielt av det romerske aristokratiet. Claudius ble stadig tvunget til å befeste sin stilling med makt, noe som medførte døden for mange av senatorene. Disse hendelsene skadet hans renommé blant antikkens historieskrivere, selv om historikere i nyere tid har revurdert noe av bildet. Etter hans død i 54 etterfulgte adoptivsønnen Nero ham på tronen.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Jeg var også en ambisiøs byggherre som fikk bygget mange nye veier, akvedukter og kanaler over hele imperiet. I min regjeringstid erobret jeg Thrakia, Noricum, Pamfylia, Lykia og Judea, og påbegynte den romerske ekspansjonen i Britannia. Min personlige interesse for lovgivning fikk meg til å presidere ved rettssaker og til å utsende opptil tjue edikter på én dag. Jeg ble imidlertid ansett som sårbar gjennom hele min regjeringstid, særlig av det romerske aristokratiet. Jeg ble stadig tvunget til å befeste min stilling med makt, noe som førte til døden for mange av senatorene. Disse hendelsene skadet mitt renommé blant antikkens historieskrivere, selv om historikere i nyere tid har revidert noe av bildet. Etter min død i 54 ble jeg etterfulgt av min adoptivsønn Nero."
+    ]
+   },
+   "reference_text": "<reference>\nJeg var også en ambisiøs byggherre som fikk bygget mange nye veier, akvedukter og kanaler over hele imperiet. I min regjeringstid erobret jeg Thrakia, Noricum, Pamfylia, Lykia og Judea, og påbegynte den romerske ekspansjonen i Britannia. Min personlige interesse for lovgivning fikk meg til å presidere ved rettssaker og til å utsende opptil tjue edikter på én dag. Jeg ble imidlertid ansett som sårbar gjennom hele min regjeringstid, særlig av det romerske aristokratiet. Jeg ble stadig tvunget til å befeste min stilling med makt, noe som førte til døden for mange av senatorene. Disse hendelsene skadet mitt renommé blant antikkens historieskrivere, selv om historikere i nyere tid har revidert noe av bildet. Etter min død i 54 ble jeg etterfulgt av min adoptivsønn Nero.\n</reference>"
+  },
+  {
+   "draw": 20,
+   "doc_index": 4,
+   "doc_fingerprint": "8a127075d461",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Gjør denne teksten mer negativ Gonzo-journalistikk er en journalistisk stilretning som er skrevet subjektivt, og som ofte inkluderer reporteren som en del av historien gjennom en førstepersons fortellerstil med spontane og private opplevelser av hendelsene som det rapporteres om. Stilen beskrives også som rølpejournalistikk eller villmannsjournalistikk.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Gonzo-journalistikk er en problematisk og useriøs journalistisk stilretning som preges av subjektivitet og manglende profesjonell distanse. Reporteren plasserer seg selv i historien, noe som resulterer i en egosentrisk førstepersons fortellerstil fylt med impulsive og irrelevante personlige opplevelser av hendelsene det rapporteres om. På grunn av den kaotiske og amatøraktige stilen, har gonzo-journalistikk fått passende nedsettende kallenavn som rølpejournalistikk og villmannsjournalistikk."
+    ]
+   },
+   "reference_text": "<reference>\nGonzo-journalistikk er en problematisk og useriøs journalistisk stilretning som preges av subjektivitet og manglende profesjonell distanse. Reporteren plasserer seg selv i historien, noe som resulterer i en egosentrisk førstepersons fortellerstil fylt med impulsive og irrelevante personlige opplevelser av hendelsene det rapporteres om. På grunn av den kaotiske og amatøraktige stilen, har gonzo-journalistikk fått passende nedsettende kallenavn som rølpejournalistikk og villmannsjournalistikk.\n</reference>"
+  },
+  {
+   "draw": 21,
+   "doc_index": 117,
+   "doc_fingerprint": "67c4f86aeb7c",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Gjør denne teksten om til noe som kunne vært manuset til en nyhetsrepportasje, eller en dokumentar. Både inntektsnivået og den relative forskjellen mellom menn og kvinner varierer kraftig både fra fylke til fylke og mellom kommunene. Kvinner i Oslo hadde høyest inntekt i 2008 (316 600 kroner), mens kvinner i Nord- Trøndelag hadde lavest (240 500 kroner). Forskjellen mellom kvinners og menns inntekt er størst i Rogaland, minst i Finnmark. Dette gjelder uansett om man ser på forskjell i kroner, eller som kvinners andel av menns inntekt. I Rogaland hadde menn en inntekt på 217 900 kroner mer enn kvinner, mens i Finnmark var forskjellen på 80 500. Fylkesvis ser vi et mønster med minst relativ inntektsforskjell i de tre nordligste fylkene, og størst forskjell i sør og vest (Rogaland, Agder-fylkene, Hordaland og Møre og Romsdal). Dersom vi ser på kommunene, er det enda større variasjon i inntektsforskjellene mellom kvinner og menn. I noen kommuner i Finnmark utgjør kvinners inntekt omtrent det samme som menns, særlig i Kautokeino og Karasjok. Det er menns lave inntektsnivå i disse kommunene som er årsaken til dette. På den annen side er det flere kommuner på Vestlandet der kvinnene har under halvparten av mennenes inntekt. Asker og Bærum har det høyeste inntektsnivået i landet både for kvinner og menn, likevel har kvinner i disse kommunene kun litt over halvparten av menns inntekt. I motsetning til inntekt lar formue seg ikke så lett knytte til enkeltpersoner i en familie eller husholdning. Noen ganger kan det være litt tilfeldig hvem som står oppført som «eier» av ulike formuesobjekter, andre ganger er dette mer et uttrykk for tradisjonelle holdninger og maktforhold i familien. I 2008 hadde norske menn i gjennomsnitt en skattepliktig bruttoformue på 859 300 kroner, sammenliknet med 445 400 kroner for kvinner. Kvinners bruttoformue var om lag halvparten av menns, mens den i 1993 var på rundt 40 prosent. Dersom vi ser på skattepliktig nettoformue, er det imidlertid svært små forskjeller mellom kvinner og menn, noe som blant annet skyldes at menn har mer gjeld. I 2008 var kvinners skattepliktige nettoformue i gjennomsnitt 133 400 kroner og menns 137 100 kroner.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Det er fortsatt store inntektsforskjeller mellom menn og kvinner i Norge, og de varierer sterkt mellom de ulike fylkene og kommunene. Med høyest inntekt i landet finner vi kvinner i Oslo, mens Nord-Trøndelag skårer lavest. I størst forskjell mellom kvinner og menns inntekt finner vi Rogaland på topp, og Finnmark på bunn. Det er faktisk slik at vi ser et mønster der det er minst inntektsforskjell i nord, og størst forskjell i sør og vest. Dersom vi ser på kommunene, er variasjonen enda større. Menns lave inntektsnivå i Kautokeino og Karasjok gjør at kvinners inntekt er omtrent på likt nivå. Samtidig er det flere kommuner på Vestlandet der kvinner har under halvparten av mennenes inntekt. Dette gjelder også for Asker og Bærum, der inntektsnivået er høyest i landet. Når vi ser på bruttoformue ser vi at menn i gjennomsnitt har en skattepliktig bruttoformue på nesten dobbelt så mye som kvinner, mens nettoformuen er mer eller mindre lik, noe som skyldes at menn har mer gjeld. Eksperter har pekt på at formue er noe som er vanskelig å knytte til enkeltpersoner i en husholdning, og at variasjoner kan skyldes at det noen ganger er tilfeldig hvem som står oppført som eier, mens andre ganger er det et uttrykk for tradisjonelle holdninger og maktforhold i familien."
+    ]
+   },
+   "reference_text": "<reference>\nDet er fortsatt store inntektsforskjeller mellom menn og kvinner i Norge, og de varierer sterkt mellom de ulike fylkene og kommunene. Med høyest inntekt i landet finner vi kvinner i Oslo, mens Nord-Trøndelag skårer lavest. I størst forskjell mellom kvinner og menns inntekt finner vi Rogaland på topp, og Finnmark på bunn. Det er faktisk slik at vi ser et mønster der det er minst inntektsforskjell i nord, og størst forskjell i sør og vest. Dersom vi ser på kommunene, er variasjonen enda større. Menns lave inntektsnivå i Kautokeino og Karasjok gjør at kvinners inntekt er omtrent på likt nivå. Samtidig er det flere kommuner på Vestlandet der kvinner har under halvparten av mennenes inntekt. Dette gjelder også for Asker og Bærum, der inntektsnivået er høyest i landet. Når vi ser på bruttoformue ser vi at menn i gjennomsnitt har en skattepliktig bruttoformue på nesten dobbelt så mye som kvinner, mens nettoformuen er mer eller mindre lik, noe som skyldes at menn har mer gjeld. Eksperter har pekt på at formue er noe som er vanskelig å knytte til enkeltpersoner i en husholdning, og at variasjoner kan skyldes at det noen ganger er tilfeldig hvem som står oppført som eier, mens andre ganger er det et uttrykk for tradisjonelle holdninger og maktforhold i familien.\n</reference>"
+  },
+  {
+   "draw": 22,
+   "doc_index": 17,
+   "doc_fingerprint": "aa34bdb4c8c1",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Gjør dette til et forsvar for norskfaget i skolen Norsk er et obligatorisk gjennomgående fag i norsk grunnskole og videregående skole. Faget skal gi eleven kunnskaper i skriftlig og muntlig norsk språk, samt språkhistorie, litteraturhistorie og andre sider ved faget. Det undervises i både hovedmål og sidemål, det vil si bokmål og nynorsk, der plasseringen av målformene avgjøres dels av kommunens valg av målform og dels av enkeltelevers preferanser. Med dette menes det at elever selv kan velge hvilket mål de vil ha som hovedmål. Elever som ikke ønsker sidemål kan klage til ordføreren i sin kommune, og med det slippe opplæring i dette.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Norskfaget er en viktig grunnstein i den norske skolen. Vi trenger norsk gjennom både grunnskolen og videregående skole for at elevene skal få gode ferdigheter innen både muntlig og skriftlig norsk. I tillegg gir faget innsikt i norsk kultur, blant annet ved å gi kjennskap til norsk litteratur og språkets historie. Siden norsk har to skriftspråk, bokmål og nynorsk, er det også viktig at elevene får opplæring i begge disse, slik at vi kan kommunisere godt med alle våre landsmenn. Det er derfor ikke anbefalt og klage til ordføreren i sin kommune for å slippe undervisning i sidemål, siden dette også er en viktig del av forståelsen av norsk som helhet."
+    ]
+   },
+   "reference_text": "<reference>\nNorskfaget er en viktig grunnstein i den norske skolen. Vi trenger norsk gjennom både grunnskolen og videregående skole for at elevene skal få gode ferdigheter innen både muntlig og skriftlig norsk. I tillegg gir faget innsikt i norsk kultur, blant annet ved å gi kjennskap til norsk litteratur og språkets historie. Siden norsk har to skriftspråk, bokmål og nynorsk, er det også viktig at elevene får opplæring i begge disse, slik at vi kan kommunisere godt med alle våre landsmenn. Det er derfor ikke anbefalt og klage til ordføreren i sin kommune for å slippe undervisning i sidemål, siden dette også er en viktig del av forståelsen av norsk som helhet.\n</reference>"
+  },
+  {
+   "draw": 23,
+   "doc_index": 130,
+   "doc_fingerprint": "a9782d96cade",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Omformuler avsnittet slik at det handler om påskeharen, i stedet for ærfuglen. Teksten skal være inspirert av avsnittet, men forståelig basert på hva som oftest skrives om påskeharen. Ærfuglen legger 4–6 egg og rugingen varer 25–28 døgn, hunnen trykker hardt på reiret og er lett bytte for predatorer som mink og rev hvis de finner reiret. For å unngå predasjon er reirene ofte på holmer og små øyer. I løpet av rugetiden tar ikke hunnen til seg føde og taper om lag 1/3 av kroppsvekten.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Påskeharen pleier å legge rundt 4-6 sjokoladeegg rundt hver eiendom på påskedagen. Det betyr at barn lett kan finne de hvis de leter godt nok. For å unngå at eggene blir oppdaget med engang, blir ofte eggene lagt bak busker eller trær. Påskeharen er alltid ferdig med å legge fra seg eggene når barna våkner, og har derfor aldri blitt sett."
+    ]
+   },
+   "reference_text": "<reference>\nPåskeharen pleier å legge rundt 4-6 sjokoladeegg rundt hver eiendom på påskedagen. Det betyr at barn lett kan finne de hvis de leter godt nok. For å unngå at eggene blir oppdaget med engang, blir ofte eggene lagt bak busker eller trær. Påskeharen er alltid ferdig med å legge fra seg eggene når barna våkner, og har derfor aldri blitt sett.\n</reference>"
+  },
+  {
+   "draw": 24,
+   "doc_index": 39,
+   "doc_fingerprint": "c1f9310b35c6",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Fortell historien om den romerske republikk som et spennende eventyr. Den romerske republikk (latin: Res publica Romana ) er betegnelsen på styreformen for byen Roma og oldtidens romerske sivilisasjon. Republikken ble styreformen etter at det romerske kongedømme ble veltet, tradisjonelt datert til 509 f.Kr., og endte med etableringen av romerske keiserriket i 27 f.Kr. Det var under republikken at Roma ekspanderte fra byens umiddelbare omgivelser til sist å herske over hele verden rundt Middelhavet. I løpet av de første to århundre republikken eksisterte, ekspanderte dens territorier ved en kombinasjon av erobring og allianser, fra sentrale Italia til å utgjøre hele den italienske halvøya. Ved det påfølgende århundret omfattet den romerske republikken Nord-Afrika, Spania, og hva som nå er sørlige Frankrike. To århundrer etter, mot slutten av 100-tallet f.Kr., omfattet det resten av dagens Frankrike, Hellas, og det meste av østlige Middelhavet. Ved denne tiden hadde indre spenninger ført til en rekke innbyrdeskriger som kulminerte med drapet på Julius Cæsar, som igjen ledet til overgangen fra republikk til keiserrike.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "For lenge lenge siden kastet romerne kongene ut og startet republikken (Den romerske republikken), et styresett hvor makten ble delt mellom mange. Roma vokste fra en liten by til å herske over hele Middelhavet gjennom kriger og allianser. Men med makten kom kaos. Julius Cæsar, en av Romas største ledere, vant folkets hjerter, men ble senere forrådt og drept av sine egne. Dette kaoset markerte slutten på republikken, og Roma fikk sin første keiser."
+    ]
+   },
+   "reference_text": "<reference>\nFor lenge lenge siden kastet romerne kongene ut og startet republikken (Den romerske republikken), et styresett hvor makten ble delt mellom mange. Roma vokste fra en liten by til å herske over hele Middelhavet gjennom kriger og allianser. Men med makten kom kaos. Julius Cæsar, en av Romas største ledere, vant folkets hjerter, men ble senere forrådt og drept av sine egne. Dette kaoset markerte slutten på republikken, og Roma fikk sin første keiser.\n</reference>"
+  },
+  {
+   "draw": 25,
+   "doc_index": 42,
+   "doc_fingerprint": "b1b30054c6c7",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Forklar fosterutvikling ved å sammenligne det med noe barna kjenner Fosterutvikling, eller embryogenese, er dannelsen av en flercellet organisme fra befruktningen fram til den begynner på den frie delen av sin tilværelse (fødsel, klekking). Prosessen starter med meget få unntak med at en sædcelle smelter sammen med en eggcelle og danner en zygote. Fosterutvikling finner alltid sted i et avgrenset område, et frø, egg eller mors liv. Både sopp, dyr og planter har fosterutvikling, selv om uttrykket oftest brukes om dyr. Studiet av fosterutviklingen kalles embryologi, og er en viktig del av fagfeltet evolusjonær utviklingsbiologi.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Fosterutvikling er som å bygge legofigurer. Det starter med to små biter, en sædcelle og en eggcelle, som settes sammen for å lage starten på noe nytt. Etter hvert legges det til flere og flere biter, akkurat som når du bygger opp en figur, og til slutt har du et helt ferdig byggverk som blir en baby, et dyr eller en plante!"
+    ]
+   },
+   "reference_text": "<reference>\nFosterutvikling er som å bygge legofigurer. Det starter med to små biter, en sædcelle og en eggcelle, som settes sammen for å lage starten på noe nytt. Etter hvert legges det til flere og flere biter, akkurat som når du bygger opp en figur, og til slutt har du et helt ferdig byggverk som blir en baby, et dyr eller en plante!\n</reference>"
+  },
+  {
+   "draw": 26,
+   "doc_index": 21,
+   "doc_fingerprint": "15655e23807a",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om denne som om det skulle være en forklaring på TikTok. Heliosentrisme, eller det heliosentriske verdensbilde, er oppfatningen om at solen er solsystemets sentrum, og at jorden og de andre planetene går i bane rundt solen. Ordet stammer fra gresk Helios (sola). Heliosentrisme er motsetningen til geosentrisme, som plasserte jorda i sentrum. Nikolaus Kopernikus regnes som mannen som innledet overgangen fra det geosentriske verdenssynet til det heliosentriske, med boken Om himmelsirklenes omdreininger i 1543. Lenge innebar teorien at solen var universets sentrum. Forskjellen mellom solsystemet og universet ble klar først senere. Først i 1838 ble en av hovedutfordringene for det solsentrerte verdensbilde løst, da man kunne måle en stjernes parallakse. Men tross mangel på endelige bevis hadde den solsentrerte modellen da vært akseptert i praksis siden i hvert fall Newtons tid, fordi den fungerte så bra for praktiske beregninger.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Du trodde kanskje jorda var sentrum? 🌍 Feil! Det er sola! 🌞 Kopernikus sa det først i 1543: \"Jorda går rundt sola, ikke motsatt!\" Folk brukte hundrevis av år på å bevise det, men han hadde rett! 🚀 #Heliosentrisme #FunFact #Foryoupage"
+    ]
+   },
+   "reference_text": "<reference>\nDu trodde kanskje jorda var sentrum? 🌍 Feil! Det er sola! 🌞 Kopernikus sa det først i 1543: \"Jorda går rundt sola, ikke motsatt!\" Folk brukte hundrevis av år på å bevise det, men han hadde rett! 🚀 #Heliosentrisme #FunFact #Foryoupage\n</reference>"
+  },
+  {
+   "draw": 27,
+   "doc_index": 71,
+   "doc_fingerprint": "8ac5d680c7a6",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om dette slik at det virker som en fun fact, og gjør det mer interaktivt. Det eldste sporet vi finner etter kaffe er en 1500 år gammel historie fra Etiopia om gjeteren Kaldi. Kaldi oppdaget at geitene oppførte seg merkelig etter at de spiste en plante med røde bær. Geitene fikk ikke sove om kvelden. Han fortalte det til en munk, som straks fattet interesse for fenomenet og helte varmt vann over bærene.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Visste du at det eldste sporet vi finner av kaffe er en 1500 år gammel historie fra Etiopia om gjeteren Kaldi. Kaldi oppdaget at noen geiter oppførte seg merkelig etter at de spiste en plante med røde bær, rart nok, klarte de ikke å sove om kvelden. Han fortalte dette så til en munk, som straks ble interessert og helte varmt vann over bærene."
+    ]
+   },
+   "reference_text": "<reference>\nVisste du at det eldste sporet vi finner av kaffe er en 1500 år gammel historie fra Etiopia om gjeteren Kaldi. Kaldi oppdaget at noen geiter oppførte seg merkelig etter at de spiste en plante med røde bær, rart nok, klarte de ikke å sove om kvelden. Han fortalte dette så til en munk, som straks ble interessert og helte varmt vann over bærene.\n</reference>"
+  },
+  {
+   "draw": 28,
+   "doc_index": 112,
+   "doc_fingerprint": "481fcd02d8c3",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv slik at det høres mer dramatisk og sensasjonelt ut. Mer Dagbladet, mindre VG. TOLGA/OS (VG) Magnus Holøyen (25) har ansvaret for 20 kyr, kjører bil og bor alene. Han kjemper fortsatt for å bli kvitt vergemålet ingen spurte om han ville ha. Lørdag skrev VG om Magnus Holøyen, som ble satt under vergemål mot sin vilje. Det ble hevdet at han var psykisk utviklingshemmet, noe som senere skulle vise seg ikke å stemme.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Vi befinner oss i Tolga/Os. Magnus Holøyen er 25 år. Han har ansvar for 20 kyr, han kan kjøre bil og han er mutters alene. Ingen spurte ham om han ville ha et vergemål, men han fikk det likevel. Det ble sagt at han var psykisk utviklingshemmet, noe som ikke stemte i det hele tatt. Han ble satt i vergemål mot sin vilje, noe han fortsatt kjemper for å bli kvitt den dag i dag."
+    ]
+   },
+   "reference_text": "<reference>\nVi befinner oss i Tolga/Os. Magnus Holøyen er 25 år. Han har ansvar for 20 kyr, han kan kjøre bil og han er mutters alene. Ingen spurte ham om han ville ha et vergemål, men han fikk det likevel. Det ble sagt at han var psykisk utviklingshemmet, noe som ikke stemte i det hele tatt. Han ble satt i vergemål mot sin vilje, noe han fortsatt kjemper for å bli kvitt den dag i dag.\n</reference>"
+  },
+  {
+   "draw": 29,
+   "doc_index": 100,
+   "doc_fingerprint": "cbb6d914634b",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Gi meg en steg for steg veiledning med bakgrunn i denne teksten. Jeg skal publisere det på en nettside som en slags guide. håndtering av impregnert trevirke. CCA (kobber-krom-arsen)- impregnert trevirke er forbudt å bruke, importere og omsette. Unntak er enkelte bruksområder i næringsvirksomhet. CCAimpregnert tre inneholder tungmetallene krom og arsen som er giftige for både menneskerog miljø. Kreosotimpregnert- og CCAimpregnert trevirke ble definert som farlig avfall fra 2003. Avfallet skal leveres til godkjent mottak for farlig avfall og skal deklareres. Deklarasjonsskjema kan skaffes hos avfallselskapene. Vanskelig å se forskjell Det kan være vanskelig å se forskjell på CCA-impregnert og kun kobberimpregnert trevirke. Er man usikker må avfallet håndteres som farlig avfall. Flere forbrenningsanlegg har tillatelse til å brenne impregnert trevirke. sluttbehandling kreveren egen tillatelse fra SFT. gjenbruke impregnert trevirke. Gjeldende regelverk Forskrift om gjenvinning og behandling av avfall (avfallsforskriften) kapittel 11 farlig avfall og kapittel 13 grensekryssende transport av avfall, med vedlegg. Avfallsforskriften, kapittel 11, vedlegg 1 gir en oversikt over den europeiske avfallslisten (EAL). EAL er en liste over avfall som er felles for hele EØS-omårdet. Det er gjort noen få norske tilpasninger. En avfallskode består alltid av seks siffer. Øvrige koder betegner bare kapitler og underkapitler, og skal ikke brukes som avfallskoder. Avfall som er merket med stjerne\n* i EAL, er farlig avfall. For impregnert trevirke, er følgende koder aktuell (skrevet i kursiv skrift): SFT. www.sft.no Her finnes informasjon om regelverket, farlig avfall med mer. Miljøstatus i Norge. forskjellige typer farlig avfall. www.miliostatus.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Skal du kvitte deg med impregnert trevirke? Følg stegene for korrekt avfallshåndtering: (1) Identifiser typen impregnert tre. CAA-impregnert trevirke, kreosotimpregnert trevirke, samt alt som er merket med stjerne i den europeiske avfallslisten EAL (kapittel 11, vedlegg 1) er farlig avfall. Er du usikker skal avfallet håndteres som farlig avfall. (2) Deklarer avfallet du skal kaste. Deklarasjonsskjema finner du hos avfallsselskapene. (3) Lever avfallet inn til godkjent mottak for farlig avfall. Takk for at du bidrar til å forminske utslipp av miljøgifter!"
+    ]
+   },
+   "reference_text": "<reference>\nSkal du kvitte deg med impregnert trevirke? Følg stegene for korrekt avfallshåndtering: (1) Identifiser typen impregnert tre. CAA-impregnert trevirke, kreosotimpregnert trevirke, samt alt som er merket med stjerne i den europeiske avfallslisten EAL (kapittel 11, vedlegg 1) er farlig avfall. Er du usikker skal avfallet håndteres som farlig avfall. (2) Deklarer avfallet du skal kaste. Deklarasjonsskjema finner du hos avfallsselskapene. (3) Lever avfallet inn til godkjent mottak for farlig avfall. Takk for at du bidrar til å forminske utslipp av miljøgifter!\n</reference>"
+  },
+  {
+   "draw": 30,
+   "doc_index": 141,
+   "doc_fingerprint": "815d1c9dac5e",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Lag et sammenhengende reklamemanus for statsborgerskap i Norge basert på teksten. Et norsk statsborgerskap gir rettigheter som stemmerett og valgbarhet, i tillegg til andre grunnleggende rettigheter som rett til opphold, rett til å ta arbeid i riket samt rett til å inneha et pass. De fleste rettigheter nordmenn har er likevel ikke knyttet opp til statsborgerskap. Trygderetter stiller eksempelvis som krav at man er bosatt i Norge. Norske statsborgere som oppholder seg i utlandet over lengre tidsrom har derfor ingen trygderetter, mens utenlandske statsborgere som oppholder seg i Norge har det.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Om du er på jakt etter statsborgerskap trenger du ikke å se lengre enn til Norge! Som Norsk statsborger får du både rettighetene stemmerett og valgbarhet! Og som om det ikke skulle være nok får du grunnleggende rettigheter! Disse inkluderer blant annet rett til opphold og arbeid, og ditt helt eget pass! Så kom til Norge, og bli norsk statsborger i dag! Trygderetter er ikke inkludert for borteboere."
+    ]
+   },
+   "reference_text": "<reference>\nOm du er på jakt etter statsborgerskap trenger du ikke å se lengre enn til Norge! Som Norsk statsborger får du både rettighetene stemmerett og valgbarhet! Og som om det ikke skulle være nok får du grunnleggende rettigheter! Disse inkluderer blant annet rett til opphold og arbeid, og ditt helt eget pass! Så kom til Norge, og bli norsk statsborger i dag! Trygderetter er ikke inkludert for borteboere.\n</reference>"
+  },
+  {
+   "draw": 31,
+   "doc_index": 132,
+   "doc_fingerprint": "045ccf80bcb6",
+   "prompt_variant": "norrewrite_instruct_nob",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Bytt om navnene og titlene i teksten slik at den handler om en fiktiv hiphopgruppe i stedet. Navnene skal til en hvis grad være inspirert av de opprinnelige navnene. Gruppen besto av byråsjef Jan Erik Aarsland Olsson i Justisdepartementet, høyesterettsadvokat Olav Hestenes, kontorsjef Arnold J. Hazeland ved Kontoret for fri rettshjelp i Oslo og Akerhus, konsulent Oscar Nørgaard hos fylkesmannen i Østfold og advokatfullmektig (advokat) Jon Lyng. Gruppens sekretær var konsulent Hans Olav Østgaard, Justisdepartementet.",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Hiphopgruppen bestod av frontmann J. E, damebedåreren Hesten, det lyriske geniet Haze, trøbbelmakeren Neven fra Østfold og DJ-en Jon Lloyd. Gruppens manager var Hans Olav Østgaard."
+    ]
+   },
+   "reference_text": "<reference>\nHiphopgruppen bestod av frontmann J. E, damebedåreren Hesten, det lyriske geniet Haze, trøbbelmakeren Neven fra Østfold og DJ-en Jon Lloyd. Gruppens manager var Hans Olav Østgaard.\n</reference>"
+  }
+ ]
+}

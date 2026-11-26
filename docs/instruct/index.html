@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NorEval Instruct dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="../shared/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hubot+Sans:wght@200..900&family=Mona+Sans:wght@200..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/style.css">
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+
+    <div class="band band-white">
+        <div class="band-inner">
+            <header class="dashboard-header">
+                <div class="header-titles">
+                    <details class="about-inline">
+                        <summary><h1>NorEval 1.3 Instruct Dashboard</h1><span class="about-hint"> – click here for more information</span></summary>
+                        <div class="about-content">
+                            <div class="about-section">
+                                <h2>About NorEval Instruct</h2>
+                                <p>
+                                    NorEval is a comprehensive evaluation benchmark for Norwegian language models, described in
+                                    <a href="https://aclanthology.org/2025.findings-acl.181/">Mikhailov et al. (2025)</a>.
+                                    This page shows a pilot of its generative version for <strong>instruction-tuned</strong> models (NorEval&nbsp;1.3):
+                                    32 tasks spanning linguistic knowledge, language understanding, world knowledge &amp; reasoning,
+                                    generation &amp; summarization, and translation; each asked as a chat message. The models then answer by freely generating full chat responses.
+                                </p>
+                                <p>
+                                    Each task is evaluated on 1,000 draws: an item of the task's dataset with one of its prompts, both picked at random, and the same draws for every model.
+                                    A model answers each draw once, sampling at temperature 1 (up to 4,096 tokens; 16,384 for a model that reasons first).
+                                    NorEval's minimal-pair tasks (NCB, NoCoLA, MultiBLiMP) are left out, as they have no prompt to answer.
+                                </p>
+                            </div>
+
+                            <div class="about-section">
+                                <h3>The judge</h3>
+                                <p>
+                                    An LLM judge, <a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-0731">DeepSeek V4 Flash</a>, grades every response from 0 (incorrect) to 5 (fully correct)
+                                    against the dataset's reference, with one rubric for all tasks. Before grading, it reads the prompt and the reference, and explains its grade first.
+                                </p>
+                                <details class="about-more">
+                                    <summary>The judge's prompt</summary>
+                                    <pre class="about-citation about-prompt" id="judge-prompt"></pre>
+                                </details>
+                            </div>
+
+                            <div class="about-section">
+                                <h3>Confidence intervals</h3>
+                                <p>Error bars are 95% intervals: the score &plusmn; 1.96 standard errors, with a task's items counted as a sample of all the items the task could have
+                                    (the draws' errors clustered by item). A task with few items stays uncertain however often they are drawn: NorSumm's 33 texts, about 30 draws each, leave about &plusmn;0.2.
+                                    The intervals cover which items and prompts were drawn and the model's and the judge's sampling, not the choice of judge, rubric or prompts.
+                                    Averages over tasks combine the tasks' intervals in quadrature.</p>
+                            </div>
+
+                            <div class="about-section">
+                                <h3>Citation</h3>
+                                <pre class="about-citation">@inproceedings{mikhailov-etal-2025-noreval,
+    title = "{N}or{E}val: A {N}orwegian Language Understanding and Generation Evaluation Benchmark",
+    author = "Mikhailov, Vladislav  and Enstad, Tita  and Samuel, David  and Farseth{\r{a}}s, Hans Christian  and Kutuzov, Andrey  and Velldal, Erik  and {\O}vrelid, Lilja",
+    booktitle = "Findings of the Association for Computational Linguistics: ACL 2025",
+    year = "2025",
+    url = "https://aclanthology.org/2025.findings-acl.181/",
+}</pre>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </header>
+        </div>
+        <div class="flag-line" aria-hidden="true"></div>
+    </div>
+
+    <div class="band band-white">
+        <div class="band-inner">
+            <section class="chart-section">
+                <div class="chart-zone">
+                    <details class="chart-title-details">
+                        <summary><span class="chart-title" id="chart-title">&nbsp;</span></summary>
+                        <div class="chart-description" id="chart-description"></div>
+                    </details>
+                    <div class="controls-bar">
+                        <div class="control-group">
+                            <label for="task-select">Task:</label>
+                            <select id="task-select">
+                                <option value="__all_macro__">All (category average)</option>
+                                <option value="__all__">All (task average)</option>
+                                <option value="__custom__" hidden>Custom (task average)</option>
+                            </select>
+                        </div>
+                        <div class="control-group" id="metric-control" style="display:none;">
+                            <label for="metric-select">Metric:</label>
+                            <select id="metric-select" class="control-select"></select>
+                        </div>
+                    </div>
+                    <div id="chart"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="band band-tint">
+        <div class="band-inner">
+            <section class="modules-section">
+                <div id="task-module" class="module picker-module">
+                    <div class="module-header">
+                        <h3 class="module-title">
+                            <button type="button" class="module-toggle" aria-expanded="true" aria-controls="task-module-body">
+                                <span class="module-name">Tasks</span>
+                                <span class="module-summary" id="task-summary"></span>
+                            </button>
+                        </h3>
+                        <div class="module-actions">
+                            <button id="select-all-btn" class="small-btn">Select all</button>
+                            <button id="select-none-btn" class="small-btn">Select none</button>
+                        </div>
+                    </div>
+                    <div class="module-body" id="task-module-body">
+                        <div id="task-picker" class="task-picker"></div>
+                    </div>
+                </div>
+
+                <div id="model-module" class="module picker-module">
+                    <div class="module-header">
+                        <h3 class="module-title">
+                            <button type="button" class="module-toggle" aria-expanded="true" aria-controls="model-module-body">
+                                <span class="module-name">Models</span>
+                                <span class="module-summary" id="model-summary"></span>
+                            </button>
+                        </h3>
+                        <div class="module-actions">
+                            <input type="search" id="model-search" class="model-search" placeholder="Search models" aria-label="Search models" autocomplete="off" spellcheck="false">
+                            <button id="model-select-all" class="small-btn" title="Select all the models listed">Select all</button>
+                            <button id="model-select-none" class="small-btn" title="Deselect all the models listed">Select none</button>
+                            <button id="model-reset" class="small-btn" title="Select the default set of models again">Reset to default</button>
+                        </div>
+                    </div>
+                    <div class="module-body" id="model-module-body">
+                        <div id="model-picker" class="model-picker"></div>
+                        <p id="model-picker-empty" class="picker-empty" hidden></p>
+                        <button type="button" id="model-show-more" class="picker-more" aria-controls="model-picker" hidden></button>
+                    </div>
+                </div>
+            </section>
+            <footer class="dashboard-footer">
+                <p>Made by <a href="https://www.mn.uio.no/ifi/english/research/groups/ltg/">Language Technology Group</a>, University of Oslo</p>
+            </footer>
+        </div>
+    </div>
+
+    <div id="custom-tooltip" class="custom-tooltip">
+        <div class="tooltip-title" id="tooltip-title"></div>
+        <div class="tooltip-meta" id="tooltip-meta"></div>
+        <div class="tooltip-body" id="tooltip-body"></div>
+        <div class="tooltip-footer" id="tooltip-footer"></div>
+    </div>
+
+    <div class="app-loading" aria-hidden="true">
+        <div class="app-loading-spinner"></div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

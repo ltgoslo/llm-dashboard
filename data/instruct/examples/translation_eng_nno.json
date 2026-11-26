@@ -1,0 +1,549 @@
+{
+ "task": "translation_eng_nno",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 68,
+   "doc_fingerprint": "3baf4d531739",
+   "prompt_variant": "translation_eng_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Gje ei nynorsk omsetjing av denne setninga: He was charged with speeding.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Han vart sikta for å ha brote fartsgrensa."
+    ]
+   },
+   "reference_text": "<reference>\nHan vart sikta for å ha brote fartsgrensa.\n</reference>"
+  },
+  {
+   "draw": 1,
+   "doc_index": 398,
+   "doc_fingerprint": "b25e28796ce8",
+   "prompt_variant": "translation_eng_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Kva blir \"Trang needs fish oil.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Trang treng tran"
+    ]
+   },
+   "reference_text": "<reference>\nTrang treng tran\n</reference>"
+  },
+  {
+   "draw": 2,
+   "doc_index": 449,
+   "doc_fingerprint": "20a99372adb7",
+   "prompt_variant": "translation_eng_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Engelsk: You know I love Mary, do you not?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Du veit at eg elskar Mary, ikkje sant?"
+    ]
+   },
+   "reference_text": "<reference>\nDu veit at eg elskar Mary, ikkje sant?\n</reference>"
+  },
+  {
+   "draw": 3,
+   "doc_index": 344,
+   "doc_fingerprint": "a974ac2eebaa",
+   "prompt_variant": "translation_eng_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Omsett følgande setning til nynorsk: Tom's death came as a surprise.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Tom sin død kom brått."
+    ]
+   },
+   "reference_text": "<reference>\nTom sin død kom brått.\n</reference>"
+  },
+  {
+   "draw": 4,
+   "doc_index": 1,
+   "doc_fingerprint": "d1c33ecf4ebd",
+   "prompt_variant": "translation_eng_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Omsett følgande setning til nynorsk: An ice pack will numb the pain.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Ein ispose vil hemja smerta."
+    ]
+   },
+   "reference_text": "<reference>\nEin ispose vil hemja smerta.\n</reference>"
+  },
+  {
+   "draw": 5,
+   "doc_index": 17,
+   "doc_fingerprint": "d0781422197a",
+   "prompt_variant": "translation_eng_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Gje ei nynorsk omsetjing av denne setninga: Don't touch me.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Ikkje rør meg."
+    ]
+   },
+   "reference_text": "<reference>\nIkkje rør meg.\n</reference>"
+  },
+  {
+   "draw": 6,
+   "doc_index": 446,
+   "doc_fingerprint": "5a9809084670",
+   "prompt_variant": "translation_eng_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Kva blir \"You don't know that.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Det veit ikkje du."
+    ]
+   },
+   "reference_text": "<reference>\nDet veit ikkje du.\n</reference>"
+  },
+  {
+   "draw": 7,
+   "doc_index": 185,
+   "doc_fingerprint": "0081f639c446",
+   "prompt_variant": "translation_eng_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Engelsk: It's really sad.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Det er verkeleg trist."
+    ]
+   },
+   "reference_text": "<reference>\nDet er verkeleg trist.\n</reference>"
+  },
+  {
+   "draw": 8,
+   "doc_index": 390,
+   "doc_fingerprint": "377be7963d41",
+   "prompt_variant": "translation_eng_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Engelsk: Tom works the evening shift.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Tom jobbar kveldsskift."
+    ]
+   },
+   "reference_text": "<reference>\nTom jobbar kveldsskift.\n</reference>"
+  },
+  {
+   "draw": 9,
+   "doc_index": 451,
+   "doc_fingerprint": "744a6e8ad9c8",
+   "prompt_variant": "translation_eng_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Kva blir \"You needn't suffer in silence.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Du lyt ikkje li i togn."
+    ]
+   },
+   "reference_text": "<reference>\nDu lyt ikkje li i togn.\n</reference>"
+  },
+  {
+   "draw": 10,
+   "doc_index": 9,
+   "doc_fingerprint": "fd4b3ef71454",
+   "prompt_variant": "translation_eng_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Gje ei nynorsk omsetjing av denne setninga: Come into my room.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Kom til rommet mitt."
+    ]
+   },
+   "reference_text": "<reference>\nKom til rommet mitt.\n</reference>"
+  },
+  {
+   "draw": 11,
+   "doc_index": 335,
+   "doc_fingerprint": "fe474cff78d6",
+   "prompt_variant": "translation_eng_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Omsett følgande setning til nynorsk: Tom made the right choice.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Tom tok det rette valet."
+    ]
+   },
+   "reference_text": "<reference>\nTom tok det rette valet.\n</reference>"
+  },
+  {
+   "draw": 12,
+   "doc_index": 207,
+   "doc_fingerprint": "6e5457288cd4",
+   "prompt_variant": "translation_eng_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Kva blir \"Kate was forced to read the book.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Kate vart tvingt til å lesa boka."
+    ]
+   },
+   "reference_text": "<reference>\nKate vart tvingt til å lesa boka.\n</reference>"
+  },
+  {
+   "draw": 13,
+   "doc_index": 28,
+   "doc_fingerprint": "9fb610d6eab6",
+   "prompt_variant": "translation_eng_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Omsett følgande setning til nynorsk: Do you want me to tell you a joke?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Skal eg fortelje deg ein vits?"
+    ]
+   },
+   "reference_text": "<reference>\nSkal eg fortelje deg ein vits?\n</reference>"
+  },
+  {
+   "draw": 14,
+   "doc_index": 147,
+   "doc_fingerprint": "d4db87a8f677",
+   "prompt_variant": "translation_eng_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Gje ei nynorsk omsetjing av denne setninga: I'm sure I wasn't followed.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Eg er sikker på at ingen fylgde etter meg."
+    ]
+   },
+   "reference_text": "<reference>\nEg er sikker på at ingen fylgde etter meg.\n</reference>"
+  },
+  {
+   "draw": 15,
+   "doc_index": 63,
+   "doc_fingerprint": "bb491d726415",
+   "prompt_variant": "translation_eng_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Engelsk: Here is the book.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Her er boka."
+    ]
+   },
+   "reference_text": "<reference>\nHer er boka.\n</reference>"
+  },
+  {
+   "draw": 16,
+   "doc_index": 229,
+   "doc_fingerprint": "ad0499628a1a",
+   "prompt_variant": "translation_eng_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Kva blir \"No one has ever complained about that.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Ingen har klaga på det."
+    ]
+   },
+   "reference_text": "<reference>\nIngen har klaga på det.\n</reference>"
+  },
+  {
+   "draw": 17,
+   "doc_index": 34,
+   "doc_fingerprint": "331f41e2b12f",
+   "prompt_variant": "translation_eng_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Gje ei nynorsk omsetjing av denne setninga: Godspeed!\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "God tur!"
+    ]
+   },
+   "reference_text": "<reference>\nGod tur!\n</reference>"
+  },
+  {
+   "draw": 18,
+   "doc_index": 2,
+   "doc_fingerprint": "404bf6e75b59",
+   "prompt_variant": "translation_eng_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Omsett følgande setning til nynorsk: Are you bored here?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Keiar du deg her?"
+    ]
+   },
+   "reference_text": "<reference>\nKeiar du deg her?\n</reference>"
+  },
+  {
+   "draw": 19,
+   "doc_index": 156,
+   "doc_fingerprint": "44d9539a102c",
+   "prompt_variant": "translation_eng_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Engelsk: I need someone to protect me.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Eg treng nokon som kan varde meg."
+    ]
+   },
+   "reference_text": "<reference>\nEg treng nokon som kan varde meg.\n</reference>"
+  },
+  {
+   "draw": 20,
+   "doc_index": 94,
+   "doc_fingerprint": "6658febbe201",
+   "prompt_variant": "translation_eng_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Omsett følgande setning til nynorsk: I didn't realize the difference between them.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Eg innsåg ikkje skilnaden mellom dei."
+    ]
+   },
+   "reference_text": "<reference>\nEg innsåg ikkje skilnaden mellom dei.\n</reference>"
+  },
+  {
+   "draw": 21,
+   "doc_index": 249,
+   "doc_fingerprint": "20573a349e6a",
+   "prompt_variant": "translation_eng_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Engelsk: She has no enemies.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Ho har ingen fiendar."
+    ]
+   },
+   "reference_text": "<reference>\nHo har ingen fiendar.\n</reference>"
+  },
+  {
+   "draw": 22,
+   "doc_index": 123,
+   "doc_fingerprint": "6c6b27cc3545",
+   "prompt_variant": "translation_eng_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Kva blir \"I know we can win.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Eg veit vi kan vinna."
+    ]
+   },
+   "reference_text": "<reference>\nEg veit vi kan vinna.\n</reference>"
+  },
+  {
+   "draw": 23,
+   "doc_index": 164,
+   "doc_fingerprint": "6de51271e23b",
+   "prompt_variant": "translation_eng_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Gje ei nynorsk omsetjing av denne setninga: I recognized your voice right away.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Eg kjende igjen stemma di med ein gong."
+    ]
+   },
+   "reference_text": "<reference>\nEg kjende igjen stemma di med ein gong.\n</reference>"
+  },
+  {
+   "draw": 24,
+   "doc_index": 44,
+   "doc_fingerprint": "99da3330aade",
+   "prompt_variant": "translation_eng_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Gje ei nynorsk omsetjing av denne setninga: He disliked school.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Han likte ikkje å gå på skule."
+    ]
+   },
+   "reference_text": "<reference>\nHan likte ikkje å gå på skule.\n</reference>"
+  },
+  {
+   "draw": 25,
+   "doc_index": 41,
+   "doc_fingerprint": "0a84960d6ae2",
+   "prompt_variant": "translation_eng_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Omsett følgande setning til nynorsk: He brushes his teeth after his meals.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Han pussar tennene etter måltider."
+    ]
+   },
+   "reference_text": "<reference>\nHan pussar tennene etter måltider.\n</reference>"
+  },
+  {
+   "draw": 26,
+   "doc_index": 54,
+   "doc_fingerprint": "98963a75fd8e",
+   "prompt_variant": "translation_eng_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Kva blir \"He knows very well how to deceive people.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Han veit veldig godt korleis ein lurar folk."
+    ]
+   },
+   "reference_text": "<reference>\nHan veit veldig godt korleis ein lurar folk.\n</reference>"
+  },
+  {
+   "draw": 27,
+   "doc_index": 367,
+   "doc_fingerprint": "643e78657af8",
+   "prompt_variant": "translation_eng_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Engelsk: Tom was more than happy.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Tom var meir enn glad."
+    ]
+   },
+   "reference_text": "<reference>\nTom var meir enn glad.\n</reference>"
+  },
+  {
+   "draw": 28,
+   "doc_index": 293,
+   "doc_fingerprint": "4a0a0f47bad7",
+   "prompt_variant": "translation_eng_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Gje ei nynorsk omsetjing av denne setninga: There were two roads in the forest for me to choose between, and I chose the one least trodden, and I made all my choices at that very moment.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Det var to vegar i skogen eg kunne gå, og eg valde den som var tråkka av få, og all ting valde eg der og då."
+    ]
+   },
+   "reference_text": "<reference>\nDet var to vegar i skogen eg kunne gå, og eg valde den som var tråkka av få, og all ting valde eg der og då.\n</reference>"
+  },
+  {
+   "draw": 29,
+   "doc_index": 21,
+   "doc_fingerprint": "ee7104ed81c0",
+   "prompt_variant": "translation_eng_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Kva blir \"Dora is an explorer.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Ho Dora er ein oppdagar."
+    ]
+   },
+   "reference_text": "<reference>\nHo Dora er ein oppdagar.\n</reference>"
+  },
+  {
+   "draw": 30,
+   "doc_index": 201,
+   "doc_fingerprint": "4897466d10d7",
+   "prompt_variant": "translation_eng_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Engelsk: I was home.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Eg var heime."
+    ]
+   },
+   "reference_text": "<reference>\nEg var heime.\n</reference>"
+  },
+  {
+   "draw": 31,
+   "doc_index": 92,
+   "doc_fingerprint": "9ce4bf60be66",
+   "prompt_variant": "translation_eng_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "eng",
+   "prompt": "Omsett følgande setning til nynorsk: Iceland used to belong to Denmark.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Island høyrde før til Danmark."
+    ]
+   },
+   "reference_text": "<reference>\nIsland høyrde før til Danmark.\n</reference>"
+  }
+ ]
+}

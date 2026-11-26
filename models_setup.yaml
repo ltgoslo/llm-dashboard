@@ -46,6 +46,16 @@ norolmo-13b-stage1:
   default: false
   color: "#DD0000"
 
+norprelude-norB_wsm100_minus-sqrt_i0982419:
+  display_name: "NorPrelude 9B"
+  category: norwegian
+  organization: LTG/UiO
+  parameters: 9.1
+  fully_open: false
+  description: "Norwegian continuation of OpenEuroLLM's Prelude 9B by the Language Technology Group at the University of Oslo: Prelude's training run with its final annealing phase done on a data mixture rich in Scandinavian languages. Not released yet."
+  default: true
+  color: "#DD0000"
+
 normistral-7b-warm:
   display_name: "NorMistral 7B"
   category: norwegian

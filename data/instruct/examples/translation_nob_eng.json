@@ -1,0 +1,549 @@
+{
+ "task": "translation_nob_eng",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 3293,
+   "doc_fingerprint": "fcacc119412a",
+   "prompt_variant": "translation_nob_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Hva blir \"De bor på en hvit enebolig med fasadetegl på venstre hjørne i slutten av gaten.\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "They live in a white house with a brick facade on the left at the end of the street."
+    ]
+   },
+   "reference_text": "<reference>\nThey live in a white house with a brick facade on the left at the end of the street.\n</reference>"
+  },
+  {
+   "draw": 1,
+   "doc_index": 2138,
+   "doc_fingerprint": "e6738e2a55a7",
+   "prompt_variant": "translation_nob_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Bokmål: Jeg var ikke ærlig.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "I wasn't honest."
+    ]
+   },
+   "reference_text": "<reference>\nI wasn't honest.\n</reference>"
+  },
+  {
+   "draw": 2,
+   "doc_index": 2624,
+   "doc_fingerprint": "921f4c944765",
+   "prompt_variant": "translation_nob_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Oversett følgende setning til engelsk: Hun avbrøt meg.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "She interrupted me."
+    ]
+   },
+   "reference_text": "<reference>\nShe interrupted me.\n</reference>"
+  },
+  {
+   "draw": 3,
+   "doc_index": 805,
+   "doc_fingerprint": "301ea5bad33f",
+   "prompt_variant": "translation_nob_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Gi en engelsk oversettelse av denne setningen: Han tok meg for gitt.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "He took me for granted."
+    ]
+   },
+   "reference_text": "<reference>\nHe took me for granted.\n</reference>"
+  },
+  {
+   "draw": 4,
+   "doc_index": 325,
+   "doc_fingerprint": "353c02b23e45",
+   "prompt_variant": "translation_nob_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Bokmål: Ikke bli sentimental.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Don't get sentimental."
+    ]
+   },
+   "reference_text": "<reference>\nDon't get sentimental.\n</reference>"
+  },
+  {
+   "draw": 5,
+   "doc_index": 2084,
+   "doc_fingerprint": "474f7321ec37",
+   "prompt_variant": "translation_nob_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Oversett følgende setning til engelsk: Jeg besøkte henne i Tyskland.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "I visited her in Germany."
+    ]
+   },
+   "reference_text": "<reference>\nI visited her in Germany.\n</reference>"
+  },
+  {
+   "draw": 6,
+   "doc_index": 4352,
+   "doc_fingerprint": "ee3916190721",
+   "prompt_variant": "translation_nob_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Gi en engelsk oversettelse av denne setningen: Du vet at dette er ulovlig, ikke sant?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "You know this is illegal, don't you?"
+    ]
+   },
+   "reference_text": "<reference>\nYou know this is illegal, don't you?\n</reference>"
+  },
+  {
+   "draw": 7,
+   "doc_index": 1888,
+   "doc_fingerprint": "e786c4334a18",
+   "prompt_variant": "translation_nob_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Det er dessverre sant.\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "It is unfortunately true."
+    ]
+   },
+   "reference_text": "<reference>\nIt is unfortunately true.\n</reference>"
+  },
+  {
+   "draw": 8,
+   "doc_index": 564,
+   "doc_fingerprint": "069bf26de4fa",
+   "prompt_variant": "translation_nob_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Oversett følgende setning til engelsk: Ha en fin kveld.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Have a nice evening."
+    ]
+   },
+   "reference_text": "<reference>\nHave a nice evening.\n</reference>"
+  },
+  {
+   "draw": 9,
+   "doc_index": 312,
+   "doc_fingerprint": "137c0d66f66b",
+   "prompt_variant": "translation_nob_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Ikke bland Østerrike og Australia.\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Don't confuse Austria with Australia."
+    ]
+   },
+   "reference_text": "<reference>\nDon't confuse Austria with Australia.\n</reference>"
+  },
+  {
+   "draw": 10,
+   "doc_index": 4258,
+   "doc_fingerprint": "c8d3a0f712e3",
+   "prompt_variant": "translation_nob_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Bokmål: Det er telefon til deg.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "You are wanted on the phone."
+    ]
+   },
+   "reference_text": "<reference>\nYou are wanted on the phone.\n</reference>"
+  },
+  {
+   "draw": 11,
+   "doc_index": 699,
+   "doc_fingerprint": "6e61ba7f2677",
+   "prompt_variant": "translation_nob_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Gi en engelsk oversettelse av denne setningen: Han er snill.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "He is kind."
+    ]
+   },
+   "reference_text": "<reference>\nHe is kind.\n</reference>"
+  },
+  {
+   "draw": 12,
+   "doc_index": 2220,
+   "doc_fingerprint": "1ac7708854eb",
+   "prompt_variant": "translation_nob_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Gi en engelsk oversettelse av denne setningen: Jeg har skrevet mange setninger på esperanto.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "I wrote many phrases in Esperanto."
+    ]
+   },
+   "reference_text": "<reference>\nI wrote many phrases in Esperanto.\n</reference>"
+  },
+  {
+   "draw": 13,
+   "doc_index": 1986,
+   "doc_fingerprint": "f5a422e64228",
+   "prompt_variant": "translation_nob_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Det var falsk alarm.\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "It was a false alarm."
+    ]
+   },
+   "reference_text": "<reference>\nIt was a false alarm.\n</reference>"
+  },
+  {
+   "draw": 14,
+   "doc_index": 2655,
+   "doc_fingerprint": "3607c32dc36d",
+   "prompt_variant": "translation_nob_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Oversett følgende setning til engelsk: Hun tok seg av babyen sin.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "She looked after her baby."
+    ]
+   },
+   "reference_text": "<reference>\nShe looked after her baby.\n</reference>"
+  },
+  {
+   "draw": 15,
+   "doc_index": 859,
+   "doc_fingerprint": "2b981df8d0ed",
+   "prompt_variant": "translation_nob_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Bokmål: Hvor imponert jeg blir, når jeg overhører et tysk ord jeg forstår!\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "How charmed I am when I overhear a German word which I understand!"
+    ]
+   },
+   "reference_text": "<reference>\nHow charmed I am when I overhear a German word which I understand!\n</reference>"
+  },
+  {
+   "draw": 16,
+   "doc_index": 1092,
+   "doc_fingerprint": "a55730320f58",
+   "prompt_variant": "translation_nob_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Oversett følgende setning til engelsk: Jeg vil gjerne danse med deg.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "I'd like to dance with you."
+    ]
+   },
+   "reference_text": "<reference>\nI'd like to dance with you.\n</reference>"
+  },
+  {
+   "draw": 17,
+   "doc_index": 3804,
+   "doc_fingerprint": "c7bbd6953531",
+   "prompt_variant": "translation_nob_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Bokmål: Vi skal møtes på stasjonen klokken sju.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "We are to meet at the station at seven."
+    ]
+   },
+   "reference_text": "<reference>\nWe are to meet at the station at seven.\n</reference>"
+  },
+  {
+   "draw": 18,
+   "doc_index": 2416,
+   "doc_fingerprint": "ddf76c3899f2",
+   "prompt_variant": "translation_nob_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Utsett aldri til i morgen det du kan gjøre i overmorgen.\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Never put off until tomorrow what you can do the day after tomorrow."
+    ]
+   },
+   "reference_text": "<reference>\nNever put off until tomorrow what you can do the day after tomorrow.\n</reference>"
+  },
+  {
+   "draw": 19,
+   "doc_index": 3013,
+   "doc_fingerprint": "bafed0d9f996",
+   "prompt_variant": "translation_nob_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Gi en engelsk oversettelse av denne setningen: Hanka på koppen har falt av.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "The handle of the cup has broken off."
+    ]
+   },
+   "reference_text": "<reference>\nThe handle of the cup has broken off.\n</reference>"
+  },
+  {
+   "draw": 20,
+   "doc_index": 3239,
+   "doc_fingerprint": "4c0e1d707acb",
+   "prompt_variant": "translation_nob_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Bokmål: Det blåser fra nord.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "The wind is blowing from the north."
+    ]
+   },
+   "reference_text": "<reference>\nThe wind is blowing from the north.\n</reference>"
+  },
+  {
+   "draw": 21,
+   "doc_index": 2976,
+   "doc_fingerprint": "0e7dd0bf944d",
+   "prompt_variant": "translation_nob_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Oversett følgende setning til engelsk: Døra var åpen, så vi gikk rett inn.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "The door was open, so we came right in."
+    ]
+   },
+   "reference_text": "<reference>\nThe door was open, so we came right in.\n</reference>"
+  },
+  {
+   "draw": 22,
+   "doc_index": 3923,
+   "doc_fingerprint": "eca62cbade7d",
+   "prompt_variant": "translation_nob_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Hva driver du med?\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "What are you doing?"
+    ]
+   },
+   "reference_text": "<reference>\nWhat are you doing?\n</reference>"
+  },
+  {
+   "draw": 23,
+   "doc_index": 3821,
+   "doc_fingerprint": "7e1d88a080d1",
+   "prompt_variant": "translation_nob_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Gi en engelsk oversettelse av denne setningen: Vi snakkes ikke engang lenger.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "We don't even talk anymore."
+    ]
+   },
+   "reference_text": "<reference>\nWe don't even talk anymore.\n</reference>"
+  },
+  {
+   "draw": 24,
+   "doc_index": 3843,
+   "doc_fingerprint": "11dc78eaf49a",
+   "prompt_variant": "translation_nob_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Vi spiste akkurat middag.\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "We just ate dinner."
+    ]
+   },
+   "reference_text": "<reference>\nWe just ate dinner.\n</reference>"
+  },
+  {
+   "draw": 25,
+   "doc_index": 2316,
+   "doc_fingerprint": "fa9cac1a6d1f",
+   "prompt_variant": "translation_nob_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Gi en engelsk oversettelse av denne setningen: Mary drepte kakkerlakken med en sko.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Mary killed the cockroach with a shoe."
+    ]
+   },
+   "reference_text": "<reference>\nMary killed the cockroach with a shoe.\n</reference>"
+  },
+  {
+   "draw": 26,
+   "doc_index": 2567,
+   "doc_fingerprint": "716d0d97e9c9",
+   "prompt_variant": "translation_nob_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Bokmål: God tur.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Safe journey."
+    ]
+   },
+   "reference_text": "<reference>\nSafe journey.\n</reference>"
+  },
+  {
+   "draw": 27,
+   "doc_index": 3768,
+   "doc_fingerprint": "ae835c451bac",
+   "prompt_variant": "translation_nob_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Oversett følgende setning til engelsk: Tony er en høflig gutt.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Tony is a polite boy."
+    ]
+   },
+   "reference_text": "<reference>\nTony is a polite boy.\n</reference>"
+  },
+  {
+   "draw": 28,
+   "doc_index": 2325,
+   "doc_fingerprint": "4728c4bd714a",
+   "prompt_variant": "translation_nob_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Gi en engelsk oversettelse av denne setningen: Kan jeg stille et par spørsmål?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "May I ask a few questions?"
+    ]
+   },
+   "reference_text": "<reference>\nMay I ask a few questions?\n</reference>"
+  },
+  {
+   "draw": 29,
+   "doc_index": 1894,
+   "doc_fingerprint": "149a6f0150e4",
+   "prompt_variant": "translation_nob_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Oversett følgende setning til engelsk: Det er galt å lyge.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "It is wrong to tell lies."
+    ]
+   },
+   "reference_text": "<reference>\nIt is wrong to tell lies.\n</reference>"
+  },
+  {
+   "draw": 30,
+   "doc_index": 3913,
+   "doc_fingerprint": "859e1cc0bd85",
+   "prompt_variant": "translation_nob_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Vi vil ha en stor familie.\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "We want to have a large family."
+    ]
+   },
+   "reference_text": "<reference>\nWe want to have a large family.\n</reference>"
+  },
+  {
+   "draw": 31,
+   "doc_index": 1391,
+   "doc_fingerprint": "a83bcea66cb0",
+   "prompt_variant": "translation_nob_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nob",
+   "prompt": "Bokmål: Jeg var nettopp i dusjen.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "I just took a shower."
+    ]
+   },
+   "reference_text": "<reference>\nI just took a shower.\n</reference>"
+  }
+ ]
+}

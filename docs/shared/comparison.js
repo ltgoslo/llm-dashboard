@@ -13,7 +13,7 @@ import {
   getScore, getCombinedCI, scaleCIDistances, applyNorm,
   getBaseMetric, aggregateScores, isAggregateSelection, isMacroSelection,
   getEffectiveMetric, formatTitleWithShot, capitalize, taskTitleDescription,
-  wantCI, normNeedsAllValues, scoreDecimals, taskBaseMetric, getNormYLabel,
+  wantCI, normNeedsAllValues, scoreDecimals, taskBaseMetric, scoreScaleText, getMetricYLabel, isRawScaleMetric,
   toDisplayScale, METRIC_DISPLAY, TASK_NAME_DISPLAY, compareCategories,
 } from "./core.js";
 import {
@@ -26,7 +26,7 @@ import {
   attachControlTooltips, markAppReady, setChartHeader, defaultTaskDisplayName,
 } from "./ui.js";
 import {
-  setsEqual, getBenchmarksForSelection, autoSetNormalization,
+  setsEqual, getBenchmarksForSelection, autoSetNormalization, setAggregateNormalization,
   populateTaskDropdown, onTaskCheckboxChange, bindTaskControls,
   restoreCheckedTasksFromSelection, syncTaskControlsFromState,
 } from "./selection.js";
@@ -304,6 +304,25 @@ export async function initComparison(config) {
     sizeRangeMin: 1,
     sizeRangeMax: 73,
     filenamePrefix: "comparison-chart",
+    // The prompt aggregation shown (the page's select, if it has one; the
+    // details show it too). A page without the select (/instruct: a task's
+    // score is already a mean over random prompts) fixes it: its data
+    // carries only that aggregate.
+    promptAgg: "max",
+    // The rescaling of the aggregate views and of the details' scores: the
+    // random baseline. A page without the select (/instruct: every task is
+    // graded 0–5 by the same judge) shows its scores as they are ("none").
+    normalization: "baseline",
+    // Decimal places of a score, and a perfect score as shown (/instruct's
+    // scores are mean grades, from 0 to 5, shown with 2 places).
+    decimals: 1,
+    scoreTop: 100,
+    // The order of the task categories (null: NorEval's, CATEGORY_ORDER).
+    categoryOrder: null,
+    // The model details open on its average over all tasks (with a shot
+    // control where the page has shots); false: not (/instruct: the chart
+    // shows it).
+    detailAverage: true,
     // Unchecking tasks in the category-average view keeps averaging by
     // category (a hidden "__custom_macro__" selection, as on the prelude
     // pages), and "Select all" from there returns to the default view.
@@ -313,6 +332,10 @@ export async function initComparison(config) {
   plotlyConfig = makePlotlyConfig(CFG.filenamePrefix, exportMetadata);
   // Scopes the comparison pages' phone layout in style.css.
   document.body.classList.add("comparison-page");
+  state.decimals = CFG.decimals;
+  state.scoreTop = CFG.scoreTop;
+  state.categoryOrder = CFG.categoryOrder;
+  setAggregateNormalization(CFG.normalization);
 
   try {
     const response = await fetch("data.json");
@@ -348,8 +371,10 @@ export async function initComparison(config) {
     if (hasURL) syncControlsFromState();
 
     // The first chart is drawn under the loading overlay, with its results
-    // (and on a phone the font its rows are measured in).
-    await Promise.all([ensureModelsLoaded(getModelList()), useHorizontalBars() && rowFontLoaded()]);
+    // and the font its names are measured in (a page with its results in
+    // data.json, /instruct, would otherwise draw before the font has come,
+    // and redraw differently later).
+    await Promise.all([ensureModelsLoaded(getModelList()), rowFontLoaded()]);
     renderChart();
     markAppReady();
     prefetchDefaultModels();
@@ -379,29 +404,35 @@ function addCustomMacroOption() {
   select.insertBefore(opt, select.querySelector('option[value="__custom__"]'));
 }
 
-/** Metadata of "Export data as JSON": the settings it always carried, plus
- *  what else determines the plotted numbers. The title is drawn outside the
- *  Plotly figure, so the export can't read it from the layout. */
+/** Metadata of "Export data as JSON": the chart's title (drawn outside the
+ *  Plotly figure, so the export can't read it from the layout), what its y
+ *  (and, as a scatter, x) values are, and the settings that determine them
+ *  (only those the page offers). */
 function exportMetadata() {
   const sel = state.currentTaskSelection;
   const aggregate = isAggregateSelection(sel);
+  const judged = !!state.DATA.instruct;
+  // A single task's scores as they are: its metric (0–100 unless a raw one).
+  const metric = aggregate ? null : getEffectiveMetric(sel);
+  const asIs = !aggregate && state.currentNormalization === "none" && state.currentPromptAgg !== "stdev";
   return {
-    shot: state.currentShot + "-shot",
-    task_selection: sel,
-    prompt_aggregation: state.currentPromptAgg,
-    normalization: state.currentNormalization,
-    title: document.getElementById("chart-title")?.textContent.trim() || "",
-    y_axis: getNormYLabel(),
-    metric: aggregate ? "main metric of each task" : getEffectiveMetric(sel),
+    // (A page without the title, /instruct: what it would say.)
+    title: document.getElementById("chart-title")?.textContent.trim() || capitalize(getChartTitleText()),
+    y_axis: judged ? "mean grade from the LLM judge (0–5)"
+      : asIs ? getMetricYLabel(sel, metric) + (isRawScaleMetric(metric) ? "" : " (0–100)")
+      : scoreScaleText(),
+    // (With the size filter off the chart is a scatter by size.)
+    ...(sizeFilterOn ? {} : { x_axis: "parameters (billions)" }),
+    // Only the settings the page offers.
+    ...(hasShots() ? { shot: state.currentShot + "-shot" } : {}),
+    ...(document.getElementById("prompt-agg-select") ? { prompt_aggregation: state.currentPromptAgg } : {}),
+    ...(document.getElementById("norm-select") ? { rescaling: state.currentNormalization } : {}),
+    metric: aggregate ? "main metric of each task" : metric,
     tasks: aggregate ? selectedTasks().sort() : [sel],
-    // null: that end of the size slider is open (see isModelInSizeRange);
-    // all of it null with the size filter off (every size, as a scatter).
-    size_filter: sizeFilterOn,
-    model_size_b: {
-      min: !sizeFilterOn || currentSizeMin <= CFG.sizeRangeMin ? null : currentSizeMin,
-      max: !sizeFilterOn || currentSizeMax >= CFG.sizeRangeMax ? null : currentSizeMax,
-    },
-    fully_open_only: fullyOpenOnly,
+    ...(hasSizeFilter() && sizeFilterOn ? { model_size_b: [currentSizeMin, currentSizeMax] } : {}),
+    ...(hasOpenFilter() ? { fully_open_only: fullyOpenOnly } : {}),
+    // An LLM-judged page's scores: the judge's.
+    ...(judged ? { judge: state.DATA.instruct.judge?.display_name || state.DATA.instruct.judge?.name || "" } : {}),
   };
 }
 
@@ -419,9 +450,9 @@ function selectedTasks() {
 function resetViewState() {
   state.currentShot = CFG.defaultShot;
   state.currentTaskSelection = DEFAULT_SELECTION;
-  state.currentPromptAgg = "max";
+  state.currentPromptAgg = CFG.promptAgg;
   state.currentMetric = null;
-  state.currentNormalization = "baseline";   // replaced by the dynamic default unless the URL sets one
+  state.currentNormalization = CFG.normalization;   // replaced by the dynamic default unless the URL sets one
   currentSizeMin = CFG.defaultSizeMin;
   currentSizeMax = CFG.defaultSizeMax;
   sizeFilterOn = true;
@@ -432,6 +463,7 @@ function resetViewState() {
   urlNormApplied = false;
   detailModel = null;
   detailTask = null;
+  detailExample = 0;
 }
 
 /** Check the data's default model set. */
@@ -508,9 +540,26 @@ function buildModelAliasMaps() {
   }
 }
 
-/** The shots the page offers (its shot buttons). */
+/** The shots the page offers (its shot buttons; a page without them has
+ *  its default shot only: /instruct). */
 function shotValues() {
-  return [...document.querySelectorAll(".shot-btn")].map((b) => b.dataset.shot);
+  const shots = [...document.querySelectorAll(".shot-btn")].map((b) => b.dataset.shot);
+  return shots.length ? shots : [CFG.defaultShot];
+}
+
+/** Whether the page offers shots (a page without has one setting, which
+ *  titles don't name). */
+function hasShots() {
+  return !!document.querySelector(".shot-btn");
+}
+
+/** Whether the page offers the model-size filter / the fully-open filter
+ *  (a page without shows every model: /instruct, for now). */
+function hasSizeFilter() {
+  return !!document.getElementById("size-slider-container");
+}
+function hasOpenFilter() {
+  return !!document.getElementById("fully-open-toggle");
 }
 
 /** The option values of a <select>. */
@@ -553,7 +602,7 @@ function setupUrlState() {
     {
       key: "prompt", get: () => state.currentPromptAgg,
       set: (v) => { if (selectValues("prompt-agg-select").includes(v)) state.currentPromptAgg = v; },
-      default: "max",
+      default: CFG.promptAgg,
     },
     {
       key: "metric",
@@ -574,14 +623,14 @@ function setupUrlState() {
         state.currentNormalization = v;
         urlNormApplied = true;
       },
-      default: () => isAggregateSelection(state.currentTaskSelection) ? "baseline" : "none",
+      default: () => isAggregateSelection(state.currentTaskSelection) ? CFG.normalization : "none",
     },
     {
       key: "size",
       get: () => currentSizeMin + "-" + currentSizeMax,
       set: (v) => {
         const parts = v.split("-");
-        if (parts.length === 2) {
+        if (parts.length === 2 && hasSizeFilter()) {
           // A missing / zero end opens that side, as before; both ends are
           // kept on the track and in order.
           const clamp = (x) => Math.max(CFG.sizeRangeMin, Math.min(CFG.sizeRangeMax, x));
@@ -596,13 +645,13 @@ function setupUrlState() {
     {
       key: "sizefilter",
       get: () => sizeFilterOn ? "1" : "0",
-      set: (v) => sizeFilterOn = v !== "0",
+      set: (v) => { if (hasSizeFilter()) sizeFilterOn = v !== "0"; },
       default: "1",
     },
     {
       key: "open",
       get: () => fullyOpenOnly ? "1" : "0",
-      set: (v) => fullyOpenOnly = v === "1",
+      set: (v) => { if (hasOpenFilter()) fullyOpenOnly = v === "1"; },
       default: "0",
     },
     {
@@ -649,6 +698,16 @@ function setupUrlState() {
       set: (v) => {
         const task = taskAlias._toSel[v] || v;
         detailTask = Object.hasOwn(state.metricsSetup, task) ? task : null;
+      },
+      default: "",
+    },
+    {
+      // The example a judged task's details show (/instruct), from 1.
+      key: "example",
+      get: () => (detailModel && detailTask && detailExample > 0 ? String(detailExample + 1) : ""),
+      set: (v) => {
+        const n = parseInt(v, 10);
+        detailExample = n > 1 ? n - 1 : 0;
       },
       default: "",
     },
@@ -1213,12 +1272,15 @@ function syncPickers() {
 // starts on the first screen. Wider screens show every control, as before
 // (style.css hides the row there).
 
-/** Insert the settings row after the task dropdown; folded on a phone. */
+/** Insert the settings row after the task dropdown; folded on a phone. A
+ *  page with nothing else to fold gets none (/instruct, for now: its only
+ *  other control is the metric's, which its one-metric tasks never show). */
 function buildSettingsToggle() {
   const zone = document.querySelector(".chart-zone");
   const taskGroup = document.getElementById("task-select")?.closest(".control-group");
   if (!zone || !taskGroup || document.getElementById("settings-toggle")) return;
   taskGroup.classList.add("control-task");
+  if (![...zone.querySelectorAll(".control-group")].some((g) => g !== taskGroup && g.id !== "metric-control")) return;
   const button = document.createElement("button");
   button.type = "button";
   button.id = "settings-toggle";
@@ -1251,11 +1313,11 @@ function syncSettingsSummary() {
   };
   const metricShown = document.getElementById("metric-control")?.style.display !== "none";
   const items = [
-    state.currentShot + "-shot",
+    hasShots() ? state.currentShot + "-shot" : "",
     chosen("prompt-agg-select"),
-    state.currentNormalization === "none" ? "no rescaling" : chosen("norm-select"),
+    !document.getElementById("norm-select") ? "" : state.currentNormalization === "none" ? "no rescaling" : chosen("norm-select"),
     metricShown ? chosen("metric-select").replace(/ \(default\)$/, "") : "",
-    sizeFilterOn ? sizeRangeText() || "all sizes" : "all sizes (scatter)",
+    !hasSizeFilter() ? "" : sizeFilterOn ? sizeRangeText() || "all sizes" : "all sizes (scatter)",
     fullyOpenOnly ? "fully open" : "",
   ].filter(Boolean);
   // A line may break between the items, not inside one ("8–20B"), and
@@ -1289,10 +1351,24 @@ let touchInput = false;
 document.addEventListener("pointerdown", (e) => { touchInput = e.pointerType === "touch"; }, { capture: true, passive: true });
 document.addEventListener("pointermove", (e) => { if (e.pointerType === "mouse") touchInput = false; }, { capture: true, passive: true });
 
-/** The chart's tooltip, short: the model, its score, and what a click
- *  does (the model's details have the rest). */
+/** Whether the chart is columns hovered with a mouse: then the bar drawn
+ *  under the pointer (chart.js: magnified and shifted by the hover) is the
+ *  one the tooltip names and a click opens (chartEl._onBarUnder,
+ *  chartEl._barColumnAt), not the one Plotly's hit-test finds — it knows
+ *  only where the bars rest, so near a magnified bar's edge it found
+ *  nothing (no tooltip, a click lost), or a neighbour. */
+function drawnBarHits(chartEl) {
+  const t = chartEl?.data?.[0];
+  return !!t && t.type === "bar" && t.orientation !== "h" && FINE_POINTER.matches && !touchInput
+    && typeof chartEl._barColumnAt === "function";
+}
+
+/** The chart's tooltip, short: the model, its score with its 95% interval
+ *  (where the chart has them), and what a click does (the model's details
+ *  have the rest). */
 function onChartHover(data) {
   if (!data.points || !data.points.length || touchEcho(data.event) || touchInput) return;
+  if (!data.drawn && drawnBarHits(document.getElementById("chart"))) return;   // (Plotly's: see drawnBarHits)
   const pt = data.points[0];
   const cd = pt.customdata;
   const obj = cd != null && typeof cd === "object" ? cd : null;
@@ -1302,8 +1378,17 @@ function onChartHover(data) {
   // final value in customdata.
   const value = obj?.value != null ? obj.value : pt.y;
   if (value == null) return;
+  const fmt = scoreDecimals();
+  // The interval as the error bar draws it: from the score down by loDist,
+  // up by hiDist (not always symmetric).
+  const ci = obj?.ci;
+  let interval = "";
+  if (ci && ci.loDist != null && ci.hiDist != null) {
+    const lo = Number(value) - ci.loDist, hi = Number(value) + ci.hiDist;
+    interval = ` (95% CI ${lo.toFixed(fmt)}${lo < 0 ? " to " : "–"}${hi.toFixed(fmt)})`;
+  }
   const score = (isAggregateSelection(state.currentTaskSelection) ? "Average: " : "Score: ")
-    + Number(value).toFixed(scoreDecimals());
+    + Number(value).toFixed(fmt) + interval;
   // Titled with the model's name (without a model: pt.x, the bar's position
   // or the model's size).
   const modelDir = obj ? obj.modelDir : null;
@@ -1331,7 +1416,8 @@ function showChartTip() {
 function refreshChartTip() {
   if (chartTip && document.getElementById("custom-tooltip").classList.contains("visible")) showChartTip();
 }
-function onChartUnhover() {
+function onChartUnhover(data) {
+  if (data?.points && drawnBarHits(document.getElementById("chart"))) return;   // (Plotly's: see drawnBarHits)
   chartTip = null;
   hideTooltip();
 }
@@ -1367,6 +1453,7 @@ let detailView = null;         // model-detail.js's drawer / panel
 let detailShot = null;         // the shot the details show (null: the page's default)
 let detailCache = null;        // {key, data}: the details' last content
 let detailTask = null;         // the task whose details are open over the model's, or null
+let detailExample = 0;         // the example a judged task's details show (/instruct), from 0
 let taskView = null;           // task-detail.js's view
 let bandModel = null;          // the model whose band the chart shows
 let bandFadingOut = false;     // …still, while the band fades out
@@ -1387,15 +1474,31 @@ function initModelDetail() {
     onClose: () => selectModelDetail(null),
     onShot,
     onTask: openTaskDetail,
-    onTaskIntent: loadTaskFile,
+    onTaskIntent: loadTaskData,
   });
-  taskView = createTaskDetail({ onClose: () => closeTaskDetail(), onShot });
+  taskView = createTaskDetail({ onClose: () => closeTaskDetail(), onShot, onModel: openTaskModel });
   chart._barFollowers = bandFollowers;
   // Across the breakpoint the drawer and the panel swap.
   DRAWER_SCREEN.addEventListener("change", () => {
     if (!detailModel) return;
     holdBarAnimation();
     renderChart();
+  });
+  // A click outside the open drawer closes it: anywhere on the page but on
+  // something that acts itself (a control, a link; a bar, point or name
+  // that picks a model: openFromChart), and not at the end of a drag (a
+  // pan, a selection). Only the drawer: the panel under the chart is the
+  // page's.
+  let pressed = null;
+  document.addEventListener("pointerdown", (e) => { pressed = { x: e.clientX, y: e.clientY }; }, true);
+  document.addEventListener("click", (e) => {
+    const p = pressed;
+    pressed = null;
+    if (!detailModel || !drawerSettled() || performance.now() - pickedAt < 500) return;
+    if (p && Math.hypot(e.clientX - p.x, e.clientY - p.y) > 8) return;
+    const t = e.target;
+    if (!(t instanceof Element) || t.closest(".model-detail, .task-view, " + ACTS_ITSELF)) return;
+    selectModelDetail(null);
   });
   // The drawer's place follows the page's width and the controls' (a view
   // with more of them, a task's longer name).
@@ -1451,19 +1554,69 @@ function barOrder() {
   return gd?.data?.[0]?.type === "bar" && gd._barModels ? gd._barModels : [];
 }
 
-/** After a chart's newPlot: a click on a model's bar or point opens it;
- *  with a mouse, the pointer says the bars can be clicked. */
+/** After a chart's newPlot: a click on a model's bar or point opens it (a
+ *  bar pops as it does: chart.js); with a mouse, the pointer says the bars
+ *  can be clicked. */
 function bindModelDetailClicks(chartEl) {
   if (!chartEl) return;
-  chartEl.on("plotly_click", (data) => { if (!touchEcho(data.event)) openFromChart(data.points?.[0]?.customdata?.modelDir); });
+  chartEl.on("plotly_click", (data) => {
+    if (touchEcho(data.event) || drawnBarHits(chartEl)) return;   // (a mouse on columns: below)
+    const pt = data.points?.[0];
+    // (Columns only: a row's length is its score.)
+    if (pt?.data?.type === "bar" && pt.data.orientation !== "h") chartEl._barPop?.(pt.pointNumber);
+    openFromChart(pt?.customdata?.modelDir);
+  });
   const drag = () => chartEl.querySelector(".nsewdrag");
-  chartEl.on("plotly_hover", () => { if (FINE_POINTER.matches) drag()?.classList.add("bar-clickable"); });
-  chartEl.on("plotly_unhover", () => drag()?.classList.remove("bar-clickable"));
+  chartEl.on("plotly_hover", () => { if (FINE_POINTER.matches && !drawnBarHits(chartEl)) drag()?.classList.add("bar-clickable"); });
+  chartEl.on("plotly_unhover", () => { if (!drawnBarHits(chartEl)) drag()?.classList.remove("bar-clickable"); });
+  // A mouse on columns: the bar drawn under the pointer is hovered (the
+  // tooltip, the pointer cursor) …
+  chartEl._onBarUnder = (col, ev) => {
+    if (!drawnBarHits(chartEl)) return;
+    const trace = chartEl.data[0];
+    if (col < 0 || !trace.customdata?.[col]) {
+      drag()?.classList.remove("bar-clickable");
+      onChartUnhover();
+      return;
+    }
+    drag()?.classList.add("bar-clickable");
+    if (ev) onChartHover({ points: [{ customdata: trace.customdata[col], x: trace.x[col], y: trace.y[col], data: trace }], event: ev, drawn: true });
+  };
+  // … and clicked: a press and release on the chart without a drag (Plotly's
+  // threshold, 8px: more pans a panning chart). (Bound once: the chart's
+  // element outlives its plots.)
+  if (chartEl._drawnClicks) return;
+  chartEl._drawnClicks = true;
+  let press = null;
+  chartEl.addEventListener("pointerdown", (e) => {
+    press = e.pointerType === "mouse" && e.button === 0 ? { x: e.clientX, y: e.clientY } : null;
+  }, true);
+  // (On the document: the release lands on Plotly's cover over the page.)
+  document.addEventListener("pointerup", (e) => {
+    const p = press;
+    press = null;
+    if (!p || e.pointerType !== "mouse" || !drawnBarHits(chartEl)) return;
+    if (Math.hypot(e.clientX - p.x, e.clientY - p.y) > 8) return;
+    const col = chartEl._barColumnAt(e.clientX, e.clientY);
+    const m = col >= 0 ? chartEl.data[0].customdata?.[col]?.modelDir : null;
+    if (!m) return;
+    chartEl._barPop?.(col);
+    openFromChart(m);
+  }, true);
 }
+
+/** What a click on acts on itself (it doesn't close the drawer). */
+const ACTS_ITSELF = "a[href], button, input, select, textarea, label, summary, [role=button], [role=option], "
+  + "[role=listbox], .ui-select, .ui-select-options, .modebar, .range-slider";
+
+/** When the chart last picked a model (a click on a bar, a row, a point, a
+ *  name): the click doesn't also close the drawer. */
+let pickedAt = -Infinity;
 
 /** A click (or tap) on model `m` in the chart. */
 function openFromChart(m) {
   if (!m) return;
+  pickedAt = performance.now();
   if (FINE_POINTER.matches) selectModelDetail(m === detailModel ? null : m);
   else selectModelDetail(m, { tap: true });
 }
@@ -1945,7 +2098,7 @@ function modelDetailData(m) {
   if (detailCache?.key === key) return detailCache.data;
   const tasks = Object.keys(state.metricsSetup);
   const fixed = {
-    currentShot: shot, currentPromptAgg: "max", currentNormalization: "baseline", currentMetric: null,
+    currentShot: shot, currentPromptAgg: CFG.promptAgg, currentNormalization: CFG.normalization, currentMetric: null,
     currentTaskSelection: DEFAULT_SELECTION, checkedTasks: new Set(tasks), showCIBands: false,
     DATA: { ...state.DATA, models: source },
   };
@@ -1957,7 +2110,7 @@ function modelDetailData(m) {
     const mine = (vals) => ({ value: ok(vals[idx]) ? vals[idx] : null, text: text(vals[idx]) });
     // The category average over all tasks at each shot count (the shot
     // shown in the details is one of them: the label says no shot).
-    const headline = { label: capitalize(getChartTitleText().replace(` (${shot}-shot)`, "")) };
+    const headline = CFG.detailAverage ? { label: capitalize(getChartTitleText().replace(` (${shot}-shot)`, "")) } : null;
     const shots = shotValues().map((s) => ({
       shot: s, current: s === shot, text: text(withState({ currentShot: s }, () => aggregateModelResult(m, models)?.score)),
     }));
@@ -1982,7 +2135,7 @@ function modelDetailData(m) {
     const values = groups.flatMap((g) => g.rows.flatMap((r) => r.all)).filter(ok);
     if (!values.length) values.push(0);
     let lo = Math.min(...values), hi = Math.max(...values);
-    if (!(hi > lo)) { lo -= 1; hi += 1; }
+    if (!(hi > lo)) { lo -= state.scoreTop / 100; hi += state.scoreTop / 100; }
     const pad = (hi - lo) * 0.03;
     return { headline, shots, groups, domain: [lo - pad, hi + pad] };
   });
@@ -2037,14 +2190,22 @@ function loadTaskFile(task) {
   return entry.promise;
 }
 
+/** Start loading what task `task`'s details show: its file, and on a
+ *  judged page the open model's responses to its examples. */
+function loadTaskData(task) {
+  if (state.DATA.instruct && detailModel && Object.hasOwn(state.metricsSetup, task)) loadResponses(detailModel, task);
+  return loadTaskFile(task);
+}
+
 /** Open task `task`'s details from its row in the model's details (once
  *  its file is in). */
 async function openTaskDetail(task, row) {
   if (!detailModel) return;
   const token = taskOpening = {};
   detailTask = task;
+  detailExample = 0;
   urlState.save();
-  await loadTaskFile(task);
+  await loadTaskData(task);
   if (taskOpening !== token || detailTask !== task || !detailModel) return;
   taskOpening = null;
   hideTooltip();
@@ -2052,11 +2213,26 @@ async function openTaskDetail(task, row) {
   taskView.show(taskDetailData(detailModel, task), { from, refocusTo: row });
 }
 
+/** Show model `m`'s details of the open task, in place (a click on its row
+ *  in the task's list of models): the model's details under the view, and
+ *  the chart's band, follow it. */
+function openTaskModel(m) {
+  if (!m || m === detailModel || !detailTask || !isKnownModel(m) || !detailView) return;
+  detailModel = m;
+  urlState.save();
+  refreshChartTip();
+  detailView.show(modelDetailData(m));
+  loadDetailScores();
+  moveBand(m)?.play?.();
+  syncTaskDetail();
+}
+
 /** Close the task's details: shrunk back into its row (`animate`), else
  *  at once. */
 function closeTaskDetail({ animate = true } = {}) {
   const task = detailTask;
   detailTask = null;
+  detailExample = 0;
   taskOpening = null;
   urlState.save();
   if (!taskView?.isOpen()) return;
@@ -2122,6 +2298,7 @@ function scoringNote(about, prompts, shot) {
  *  details' shot (task-detail.js): best prompt, random-baseline rescaling,
  *  every model of the dashboard that has results for the task. */
 function taskDetailData(m, task) {
+  if (state.DATA.instruct) return judgedTaskDetailData(m, task);
   const info = state.metricsSetup[task];
   const file = taskFiles.get(task)?.data || null;
   const shot = detailShotNow();
@@ -2135,9 +2312,8 @@ function taskDetailData(m, task) {
   const ids = file ? file.models : [];
   const mi = ids.indexOf(m);
   const known = ids.map((id) => isKnownModel(id));
-  const kinds = { multiple_choice: "multiple choice", generate_until: "generated answers" };
   const url = info.url || (about.dataset ? "https://huggingface.co/datasets/" + about.dataset : "");
-  const fixed = { currentShot: shot, currentPromptAgg: "max", currentNormalization: "baseline", currentMetric: null };
+  const fixed = { currentShot: shot, currentPromptAgg: "max", currentNormalization: CFG.normalization, currentMetric: null };
   const data = withState(fixed, () => {
     const fmt = scoreDecimals();
     const norm = (v) => (v == null || Number.isNaN(v) ? null : normScore(v, task, null));
@@ -2193,15 +2369,8 @@ function taskDetailData(m, task) {
     const rescaled = info.random_baseline > 0 ? ", rescaled from random guessing (0) to a perfect score (100)" : "";
     return {
       task, shot,
-      model: { id: m, title: getModelLabel(m), color },
+      model: { id: m, title: getModelLabel(m), color, badge: () => orgBadge(modelOrg(m), color) },
       title: taskTitle(name), variant: taskVariant(task, name),
-      facts: [
-        // (The category, unless the task's name says it.)
-        name.toLowerCase().startsWith((info.category || "").toLowerCase()) ? "" : capitalize(info.category || ""),
-        kinds[about.output] || "",
-        file?.examples ? file.examples.toLocaleString("en") + " examples" : "",
-        prompts.length ? (prompts.length === 1 ? "1 prompt" : prompts.length + " prompts") : "",
-      ].filter(Boolean),
       link: url ? { href: url, text: shortUrl(url) } : null,
       description: info.description || "",
       headline: { label: capitalize(metric) + (several ? " with its best prompt" : "") + rescaled },
@@ -2214,6 +2383,109 @@ function taskDetailData(m, task) {
         note: `${shot}-shot${several ? ", each with its best prompt" : ""}.`,
         rows: ranked, ci: bestCI, domain: [barLo, barHi + (barHi - barLo) * 0.02],
       },
+    };
+  });
+  taskDetailCache = { key, data };
+  return data;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Judged tasks (/instruct)
+// ─────────────────────────────────────────────────────────────
+// On an LLM-judged page a task's score is the judge's mean grade of the
+// model's responses, from 0 to 5 points, over the task's draws, each draw
+// an item and a prompt variant picked at random
+// (the same for every model). Its view (task-detail.js) shows that score
+// and how the grades fell, every model's score, and the examples: the
+// first draws, each with the model's response and the judge's grade and
+// assessment, and every other model's grade, which unfolds into its
+// response (details/responses/<model>/<task>.json, loaded when shown).
+
+const Z95 = 1.959963984540054;   // a 95% interval: ± this many standard errors
+
+const responseFiles = new Map();   // "model/task" → promise of the file (null if it can't be loaded)
+
+/** Load model `m`'s responses to task `task`'s examples (once): a promise
+ *  of the file, null if it can't be loaded. */
+function loadResponses(m, task) {
+  const key = m + "/" + task;
+  if (!responseFiles.has(key)) {
+    const url = "details/responses/" + encodeURIComponent(m) + "/" + encodeURIComponent(task) + ".json"
+      + (state.DATA.details_version ? "?v=" + state.DATA.details_version : "");
+    responseFiles.set(key, fetch(url)
+      .then((r) => { if (!r.ok) throw new Error(r.status + " " + r.statusText + " (" + url + ")"); return r.json(); })
+      .catch((err) => { console.error(`Could not load the responses of ${m} to ${task}:`, err); return null; }));
+  }
+  return responseFiles.get(key);
+}
+
+/** The task details' content for model `m` on judged task `task` (every
+ *  model of the dashboard that has results for the task), from its file.
+ *  Scores as the page shows them (CFG.normalization: as they are). */
+function judgedTaskDetailData(m, task) {
+  const info = state.metricsSetup[task];
+  const file = taskFiles.get(task)?.data || null;
+  const key = [m, task, !!file].join("|");
+  if (taskDetailCache?.key === key) return taskDetailCache.data;
+  const name = info.pretty_name || task;
+  const ids = file ? file.models : [];
+  const mi = ids.indexOf(m);
+  const known = ids.map((id) => isKnownModel(id));
+  const fixed = { currentShot: CFG.defaultShot, currentPromptAgg: CFG.promptAgg, currentNormalization: CFG.normalization, currentMetric: null };
+  const data = withState(fixed, () => {
+    const fmt = scoreDecimals();
+    const norm = (v) => (v == null || Number.isNaN(v) ? null : normScore(v, task, null));
+    const text = (v) => (v == null ? "–" : v.toFixed(fmt));
+    // A [score, standard error] pair's 95% interval.
+    const ci = (p) => (p ? [norm(Math.max(0, p[0] - Z95 * p[1])), norm(Math.min(state.scoreTop, p[0] + Z95 * p[1]))] : null);
+    const own = mi >= 0 ? file.score[mi] : null;
+    const interval = ci(own);
+    // Every model's score, in order.
+    const ranked = ids.map((id, j) => (known[j] && file.score[j] ? { id, name: getModelLabel(id), value: norm(file.score[j][0]), me: j === mi } : null))
+      .filter((r) => r && r.value != null)
+      .sort((a, b) => b.value - a.value || a.name.localeCompare(b.name));
+    for (const r of ranked) r.text = text(r.value);
+    // The ranking's bars: from 0.
+    const barValues = [0, ...ranked.map((r) => r.value), ...(interval || [])];
+    const barLo = Math.min(...barValues), barHi = Math.max(...barValues);
+    // The examples, and the other models that answered them (in the order
+    // of their scores on the task).
+    const answered = (j) => known[j] && Array.isArray(file.example_points?.[j]);
+    const others = ids.map((id, j) => (j !== mi && answered(j)
+      ? { id, name: getModelLabel(id), color: getModelColor(id), score: file.score[j]?.[0] ?? -Infinity, points: file.example_points[j],
+          maxTokens: state.DATA.model_info?.[id]?.max_tokens || null }
+      : null)).filter(Boolean)
+      .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+    const examples = (file?.examples || []).map((e, i) => ({
+      index: i, prompt: e.prompt, reference: e.reference,
+      points: mi >= 0 && answered(mi) ? file.example_points[mi][i] : null,
+    }));
+    const color = getModelColor(m);
+    return {
+      judged: true, task,
+      model: { id: m, title: getModelLabel(m), color, maxTokens: state.DATA.model_info?.[m]?.max_tokens || null,
+        badge: () => orgBadge(modelOrg(m), color) },
+      title: taskTitle(name), variant: taskVariant(task, name),
+      link: info.url ? { href: info.url, text: shortUrl(info.url) } : null,
+      description: info.description || "",
+      headline: {
+        value: text(own ? norm(own[0]) : null),
+        // (The 95% interval's half-width: the mean ± it.)
+        margin: own ? text(norm(Z95 * own[1])) : "",
+      },
+      grades: mi >= 0 && file.points?.[mi] ? { counts: file.points[mi] } : null,
+      note: file ? "" : "The task's examples and scores could not be loaded.",
+      ranking: {
+        title: ranked.length + " models",
+        note: "",
+        rows: ranked, ci: interval, domain: [barLo, barHi + (barHi - barLo) * 0.02],
+      },
+      examples: examples.length ? {
+        list: examples, others,
+        load: (id) => loadResponses(id, task),
+        index: () => Math.min(detailExample, examples.length - 1),
+        pick: (i) => { if (detailExample !== i) { detailExample = i; urlState.save(); } },
+      } : null,
     };
   });
   taskDetailCache = { key, data };
@@ -2260,7 +2532,6 @@ function renderChart() {
   const useScatter = !sizeFilterOn;
   setBarPan(document.getElementById("chart"), null);
   if (drawerBeside()) setChartCut(0);   // (the renderers cut the chart for the drawer where they need)
-  document.getElementById("chart")._exportFigure = null;   // (renderModelBars may set one)
 
   if (!getModelList().length) {
     renderEmptyState(noModelsMessage());
@@ -2418,9 +2689,10 @@ const ROW_BAND_BLEED_PX = 8;    // and how far it reaches past the chart's sides
 const ROW_FONT = `${ROW_LABEL_WEIGHT} ${ROW_LABEL_FONT}px 'Mona Sans'`;
 const H_MARGIN = { t: 22, r: 10, b: 6 };
 
-/** The rows are laid out from their names' widths, so in the page's font:
- *  the first chart waits for it a while (rowFontLoaded), and one drawn in a
- *  fallback font all the same is drawn again once it has come. */
+/** The bars (a phone's rows) are laid out from their names' widths, so in
+ *  the page's font: the first chart waits for it a while (rowFontLoaded),
+ *  and one drawn in a fallback font all the same is drawn again once it has
+ *  come. */
 function rowFontLoaded(ms = 1500) {
   if (!document.fonts?.load) return Promise.resolve();
   return Promise.race([document.fonts.load(ROW_FONT).catch(() => {}), new Promise((r) => setTimeout(r, ms))]);
@@ -2430,7 +2702,7 @@ function redrawWhenRowFontLoads() {
   if (rowFontAwaited || !document.fonts?.check || document.fonts.check(ROW_FONT)) return;
   rowFontAwaited = true;
   document.fonts.load(ROW_FONT).then(() => {
-    if (!useHorizontalBars() || !document.fonts.check(ROW_FONT)) return;
+    if (!sizeFilterOn || !document.fonts.check(ROW_FONT)) return;
     holdBarAnimation();
     renderChart();
   }, () => {});
@@ -2637,6 +2909,7 @@ function renderModelBars(modelNames, opts) {
   }
   const { values, ciValues, customdata, yRange } = opts;
   clearScatterHooks();
+  redrawWhenRowFontLoads();
   const labels = modelNames.map(getModelLabel);
   const xPositions = computeOrgXPositions(modelNames);
   const fmt = scoreDecimals();
@@ -2675,7 +2948,10 @@ function renderModelBars(modelNames, opts) {
   const view = barView(labels, chartWidth, barNamesShown, barYLabelPx, cut ? asClosed.slotPx : null);
   const { tickAngle, labelShift, margin, lead } = view;
   setChartExtraHeight(margin.b - BAR_MARGIN.b);
-  if (view.panning) barViewStart = Math.min(Math.max(-lead, barViewStart), labels.length - view.visible);
+  // (At the start, barViewStart stays -Infinity: the start of this layout,
+  // whose lead may differ from the last one's.)
+  const viewStart = view.panning ? Math.min(Math.max(-lead, barViewStart), labels.length - view.visible) : -Infinity;
+  if (view.panning) barViewStart = viewStart > -lead + 1e-6 ? viewStart : -Infinity;
   const last = xPositions[xPositions.length - 1];
   // The numbers, right-aligned a gap short of the gridlines, which start
   // 0.1 slot before the first bar (as Plotly's plot did, before the column):
@@ -2704,7 +2980,7 @@ function renderModelBars(modelNames, opts) {
   const layout = getPlotlyLayout({
     yaxis: { ...makeYAxis(yRange), tickvals: yTicks.map((tk) => tk.v), showticklabels: false },
     xaxis: { automargin: false,
-      range: view.panning ? [barViewStart - 0.5, barViewStart - 0.5 + view.visible]
+      range: view.panning ? [viewStart - 0.5, viewStart - 0.5 + view.visible]
         : view.fixed ? [-0.5 - lead, -0.5 - lead + view.visible] : [-0.5 - lead, last + 0.5],
       tickvals: xPositions, ticktext: labels, showticklabels: barNamesShown,
       tickangle: tickAngle, ticklabelshift: labelShift, showgrid: false,
@@ -2749,7 +3025,7 @@ function renderModelBars(modelNames, opts) {
   }
   if (view.panning) {
     setBarPan(chartEl, {
-      total: labels.length, visible: view.visible, start: barViewStart, lead, slotPx: view.slotPx,
+      total: labels.length, visible: view.visible, start: viewStart, lead, slotPx: view.slotPx,
       onChange: (s) => {
         barViewStart = s <= -lead + 1e-6 ? -Infinity : s;
         replayPointerSoon();   // (the bars slid under a still mouse)
@@ -2758,9 +3034,6 @@ function renderModelBars(modelNames, opts) {
   } else {
     barViewStart = -Infinity;
   }
-  // An image export (chart.js) draws every bar with its name, as a wide
-  // page shows bars that all fit, with Plotly's own y-axis numbers.
-  if (chartEl) chartEl._exportFigure = (width) => exportBarFigure(chartEl, labels, [-0.6, last + 0.5], width);
 }
 
 /** The y-axis's ticks on `range`, as Plotly places them (its auto ticks) on
@@ -2779,24 +3052,6 @@ function barYTicks([lo, hi], lengthPx) {
     ticks.push({ v, text: (v < 0 ? "\u2212" : "") + String(+Math.abs(v).toFixed(decimals)) });
   }
   return ticks;
-}
-
-/** The figure of an image export of the bars `width` px wide: all of them,
- *  each with its name, laid out as barView lays out bars that fit, with
- *  Plotly's own y-axis numbers instead of the panning column. */
-function exportBarFigure(gd, labels, xRange, width) {
-  const slotPx = (width - BAR_MARGIN.l - BAR_MARGIN.r) / (labels.length + 0.1);
-  const tickAngle = computeTickAngle(labels, slotPx);
-  const labelShift = rotatedLabelShift(tickAngle, slotPx);
-  const layout = structuredClone(gd.layout);
-  Object.assign(layout.xaxis, { range: xRange, showticklabels: true, tickangle: tickAngle, ticklabelshift: labelShift });
-  layout.yaxis.showticklabels = true;
-  layout.shapes = (layout.shapes || []).filter((s) => s.name !== AXIS_LABELS && s.name !== SELECTED_MARK);
-  layout.xaxis.ticktext = labels;
-  layout.margin = barMargins(labels, tickAngle, slotPx, labelShift);
-  const size = computeAnnotationFontSize(labels.length, width);
-  layout.annotations = layout.annotations.map((a) => ({ ...a, font: { ...a.font, size } }));
-  return { data: structuredClone(gd.data), layout };
 }
 
 /** The bars' geometry: all of them across the plot when each gets at least
@@ -2930,13 +3185,6 @@ function renderModelBarsHorizontal(modelNames, { values, ciValues, customdata })
   chartEl._barModels = modelNames;
   chartEl._barLabels = ticktext;
   bindModelDetailClicks(chartEl);
-  // An image export leaves out the open model's mark.
-  chartEl._exportFigure = () => {
-    const out = structuredClone(chartEl.layout);
-    out.shapes = (out.shapes || []).filter((sh) => sh.name !== SELECTED_MARK);
-    out.yaxis.ticktext = ticktext;
-    return { data: structuredClone(chartEl.data), layout: out };
-  };
 }
 
 /** Logos of the horizontal bars: one per row (a blank one without a logo,
@@ -3137,7 +3385,7 @@ function barYRange(points) {
   const [lo, hi] = computeYRange(tops.map((v) => Math.max(v, 0)));
   if (!negative) return [lo, hi];
   const mn = Math.min(...bottoms);
-  return [mn - Math.max((hi - mn) * 0.05, 0.5), hi];
+  return [mn - Math.max((hi - mn) * 0.05, state.scoreTop * 0.005), hi];
 }
 
 function computeAggregateYRange() {
@@ -3165,19 +3413,21 @@ function computeSingleYRange(benchmark, metric) {
  *    "translation (English → Bokmål; 5-shot)" */
 function getChartTitleText() {
   const sel = state.currentTaskSelection;
-  const shot = state.currentShot + "-shot";
+  // (A page without shots names none: /instruct.)
+  const shot = hasShots() ? state.currentShot + "-shot" : "";
+  const tail = shot ? " (" + shot + ")" : "";
   const prefix = isMacroSelection() ? "Category average" : "Task average";
 
   if (sel === "__all_macro__" || sel === "__all__") {
-    return prefix + " across all NorEval tasks (" + shot + ")";
+    return prefix + " across all NorEval tasks" + tail;
   }
-  if (sel === "__filtered__") return prefix + " across signal-filtered tasks (" + shot + ")";
-  if (sel === "__custom__" || sel === "__custom_macro__") return prefix + " across " + state.checkedTasks.size + " selected tasks (" + shot + ")";
-  if (sel.startsWith("__cat__")) return prefix + " across " + sel.slice(7) + " tasks (" + shot + ")";
-  if (sel.startsWith("__eval__")) return prefix + " across " + sel.slice(8) + " tasks (" + shot + ")";
-  if (sel === "__lang__nob") return prefix + " across Bokmål tasks (" + shot + ")";
-  if (sel === "__lang__nno") return prefix + " across Nynorsk tasks (" + shot + ")";
-  if (sel === "__lang__sme") return prefix + " across Northern Sámi tasks (" + shot + ")";
+  if (sel === "__filtered__") return prefix + " across signal-filtered tasks" + tail;
+  if (sel === "__custom__" || sel === "__custom_macro__") return prefix + " across " + state.checkedTasks.size + " selected tasks" + tail;
+  if (sel.startsWith("__cat__")) return prefix + " across " + sel.slice(7) + " tasks" + tail;
+  if (sel.startsWith("__eval__")) return prefix + " across " + sel.slice(8) + " tasks" + tail;
+  if (sel === "__lang__nob") return prefix + " across Bokmål tasks" + tail;
+  if (sel === "__lang__nno") return prefix + " across Nynorsk tasks" + tail;
+  if (sel === "__lang__sme") return prefix + " across Northern Sámi tasks" + tail;
   if (state.metricsSetup[sel]) return formatTitleWithShot(defaultTaskDisplayName(sel), shot);
   return "";
 }
@@ -3246,7 +3496,7 @@ function getAggregateDescription() {
   };
   const normDesc = normDescs[state.currentNormalization] || "";
   const avgDesc = macro
-    ? " The task scores are then averaged within each category, and the category averages are averaged, which gives equal weight to each category regardless of how many tasks it contains."
+    ? " The task scores are then averaged within each category, and the category averages are then further averaged, which gives equal weight to each category regardless of how many tasks it contains."
     : " The task scores are then averaged.";
   return "Aggregate score across " + scope + ". " + normDesc + avgDesc;
 }

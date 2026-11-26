@@ -1,0 +1,871 @@
+{
+ "task": "nrk_quiz_qa_nob",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 1840,
+   "doc_fingerprint": "420139e47de5",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Twister er spillet hvor man skal se hvem som klarer å holde seg lengst på beina, ved å bli bedt om å plassere armer og bein på forskjellige farger. Hvilke fire farger bruker Twister i spillet?\n A. Lilla, rød, rosa og blå\n B. Oransje, grønn, gul og blå\n C. Rød, blå, brun og gul\n D. Grønn, gul, blå og rød\n\nEr det riktige svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Lilla, rød, rosa og blå",
+     "Oransje, grønn, gul og blå",
+     "Rød, blå, brun og gul",
+     "Grønn, gul, blå og rød"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Grønn, gul, blå og rød)"
+  },
+  {
+   "draw": 1,
+   "doc_index": 2589,
+   "doc_fingerprint": "af7c57fbf3ea",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "I september 2021 måtte Tromsø-politiker Anne Berit Figenschau (H) gå ut og beklage etter at hun ble tatt i å gjøre noe hun selv omtalte som «dumt». – Jeg er lei meg for dette, sa hun. Hva var det hun ble tatt i?\n- Glemte å ta av seg mikrofonen da hun hånet dialekten til Trygve Slagsvold Vedum\n- Brukte en annen politikers historie som sin egen i et valgseminar\n- Fotografert i det hun gjorde grimaser og spyttet ut restene av en soyaburger hun fikk servert fra MDGs valgbod\n- Ordnet det slik at Rødts valgbod havnet under en husvegg full av måkereir, slik at de færreste våget seg bort for å besøke den\n\nEr det riktige svaret Glemte å ta av seg mikrofonen da hun hånet dialekten til Trygve Slagsvold Vedum, Brukte en annen politikers historie som sin egen i et valgseminar, Fotografert i det hun gjorde grimaser og spyttet ut restene av en soyaburger hun fikk servert fra MDGs valgbod eller Ordnet det slik at Rødts valgbod havnet under en husvegg full av måkereir, slik at de færreste våget seg bort for å besøke den?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Glemte å ta av seg mikrofonen da hun hånet dialekten til Trygve Slagsvold Vedum",
+     "Brukte en annen politikers historie som sin egen i et valgseminar",
+     "Fotografert i det hun gjorde grimaser og spyttet ut restene av en soyaburger hun fikk servert fra MDGs valgbod",
+     "Ordnet det slik at Rødts valgbod havnet under en husvegg full av måkereir, slik at de færreste våget seg bort for å besøke den"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Brukte en annen politikers historie som sin egen i et valgseminar"
+  },
+  {
+   "draw": 2,
+   "doc_index": 2473,
+   "doc_fingerprint": "34f82201dfa0",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Agnete Saba (tidligere Johnsen) er den første som har vunnet både Melodi Grand Prix-junior og Melodi Grand Prix. Hva skjedde da hun deltok i Eurovision Song Contest i Stockholm i 2016?\nVelg riktig svar blant disse alternativene:\n- Hun trakk seg fra konkurransen\n- Hun mistet mikrofonen\n- Hun gikk ikke videre til finalen\n- Hun glemte siste del av refrenget\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Hun trakk seg fra konkurransen",
+     "Hun mistet mikrofonen",
+     "Hun gikk ikke videre til finalen",
+     "Hun glemte siste del av refrenget"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Hun gikk ikke videre til finalen"
+  },
+  {
+   "draw": 3,
+   "doc_index": 3162,
+   "doc_fingerprint": "f119b453ce55",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Hva er effektledd som legges til grunn i en strømregning?\n\nAlternativer:\n A. Regnes ut fra hvor lite strøm du bruker.\n B. Regnes ut fra hvor fort du bruker strøm.\n C. Regnes ut fra hvor mye strøm som brukes i øyeblikket.\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Regnes ut fra hvor lite strøm du bruker.",
+     "Regnes ut fra hvor fort du bruker strøm.",
+     "Regnes ut fra hvor mye strøm som brukes i øyeblikket."
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Regnes ut fra hvor mye strøm som brukes i øyeblikket.)"
+  },
+  {
+   "draw": 4,
+   "doc_index": 145,
+   "doc_fingerprint": "2eec02652aa5",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Fredrikstads Per Egil Ahlsen banket ballen i mål fra rundt 30 meter i 84-finalen. Hvem var keeperen som forgjeves strakk seg etter ballen?\n\nSvaralternativer:\n A. Lars Gaute Bø\n B. Erik Thorstvedt\n C. Ola By Rise\n D. Einar Rossbach\n\nHva er riktig svar?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Lars Gaute Bø",
+     "Erik Thorstvedt",
+     "Ola By Rise",
+     "Einar Rossbach"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Erik Thorstvedt)"
+  },
+  {
+   "draw": 5,
+   "doc_index": 2979,
+   "doc_fingerprint": "aec51cf96805",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Oppvarming: D.D.E ga ut «Rompa mi» i 1996. Hvor kommer dette trønderbaserte bandet fra?\n\nAlternativer:\n- Trondheim\n- Steinkjer\n- Namsos\n- Levanger\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Trondheim",
+     "Steinkjer",
+     "Namsos",
+     "Levanger"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Namsos"
+  },
+  {
+   "draw": 6,
+   "doc_index": 2470,
+   "doc_fingerprint": "3e9818f81d30",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Ann Mari Andersen kom på en fjerdeplass da hun deltok i Melodi Grand Prix med låten «Ándagassii», men hvilket år deltok hun?\n\nSvaralternativer:\n- 2011\n- 2004\n- 2008\n- 2003\n\nHva er riktig svar?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "2011",
+     "2004",
+     "2008",
+     "2003"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: 2008"
+  },
+  {
+   "draw": 7,
+   "doc_index": 38,
+   "doc_fingerprint": "189bfcfc740c",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva gjør ribosomene i celler?\nVelg riktig svar blant disse alternativene:\n A. De produserer energi\n B. Søker etter feil i DNA\n C. De lager proteiner\n D. Beskytter mot virus\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "De produserer energi",
+     "Søker etter feil i DNA",
+     "De lager proteiner",
+     "Beskytter mot virus"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (De lager proteiner)"
+  },
+  {
+   "draw": 8,
+   "doc_index": 3412,
+   "doc_fingerprint": "c97551d6d770",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Lil Nas X opptrådte på Slottsfjellfestivalen sommeren som var. Under fjellet ligger byen som i 1971 feiret sitt 1100-årsjubileum. Vi snakker selvfølgelig om Tønsberg, hvor innbyggerne heter\n- Tønsbergborger\n- Tønsing\n- Tønsbergenser\n- Tønsberger\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Tønsbergborger",
+     "Tønsing",
+     "Tønsbergenser",
+     "Tønsberger"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Tønsbergenser"
+  },
+  {
+   "draw": 9,
+   "doc_index": 547,
+   "doc_fingerprint": "5024fb0fc8cd",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Aerosmith ga ut sangen «I Don’t Want to Miss a Thing» til denne filmen i 1998. Hvilken?\n A. Armageddon\n B. Deep Impact\n C. Independence day\n D. Meteor\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Armageddon",
+     "Deep Impact",
+     "Independence day",
+     "Meteor"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Armageddon)"
+  },
+  {
+   "draw": 10,
+   "doc_index": 3254,
+   "doc_fingerprint": "7b17624a9e1c",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "En av verdens dyktigste spillere heter Sander Sagosen. Hvor høy er han?\n- 185\n- 195\n- 205\n\nEr det riktige svaret 185, 195 eller 205?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "185",
+     "195",
+     "205"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: 195"
+  },
+  {
+   "draw": 11,
+   "doc_index": 3030,
+   "doc_fingerprint": "33fc363f5452",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvilken av disse titlene hører til Roxette?\n\nSvaralternativer:\n A. Utan dina andetag\n B. Lay All Your Love On Me\n C. När vi två bli en\n D. How Do You Do!\n\nHva er riktig svar?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Utan dina andetag",
+     "Lay All Your Love On Me",
+     "När vi två bli en",
+     "How Do You Do!"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (How Do You Do!)"
+  },
+  {
+   "draw": 12,
+   "doc_index": 901,
+   "doc_fingerprint": "f43b7de94f2f",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva var spesielt med OL fra 1924 til 1980?\nVelg riktig svar blant disse alternativene:\n- Kombinert sto ikke på programmet\n- Vertslandet kunne stille med så mange deltakere de ønsket\n- OL-vinneren ble også kåret til verdensmester av FIS\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Kombinert sto ikke på programmet",
+     "Vertslandet kunne stille med så mange deltakere de ønsket",
+     "OL-vinneren ble også kåret til verdensmester av FIS"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: OL-vinneren ble også kåret til verdensmester av FIS"
+  },
+  {
+   "draw": 13,
+   "doc_index": 2451,
+   "doc_fingerprint": "884305d1e4fd",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Miss Marple er en kjent og kjær detektiv, som ofte er å se på skjermen i påsken. Hva heter hun til fornavn?\n\nAlternativer:\n- Anne\n- Jane\n- Judy\n- Jill\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Anne",
+     "Jane",
+     "Judy",
+     "Jill"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Jane"
+  },
+  {
+   "draw": 14,
+   "doc_index": 2955,
+   "doc_fingerprint": "fa6eedfb435a",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hva er det Lars Lillo-Stenberg og resten av deLillos mener vi skal gjøre når i møttes «Neste sommer?»\n A. Når du en gang kommer, neste sommer, skal vi atter snakke om gamle ting\n B. Når du en gang kommer, neste sommer, skal vi atter ha det fint\n C. Når du en gang kommer, neste sommer, skal vi atter ligge her\n D. Når du en gang kommer, neste sommer, skal vi atter drikke vin\n\nEr det riktige svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Når du en gang kommer, neste sommer, skal vi atter snakke om gamle ting",
+     "Når du en gang kommer, neste sommer, skal vi atter ha det fint",
+     "Når du en gang kommer, neste sommer, skal vi atter ligge her",
+     "Når du en gang kommer, neste sommer, skal vi atter drikke vin"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Når du en gang kommer, neste sommer, skal vi atter drikke vin)"
+  },
+  {
+   "draw": 15,
+   "doc_index": 268,
+   "doc_fingerprint": "8c3919820724",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Du blir invitert til middag og får sitte ved siden av dronningen. Hva gjør du hvis du ønsker å benytte anledningen til å snakke med henne?\nVelg riktig svar blant disse alternativene:\n A. Venter til hun snakker\n B. Sier først «excuse me»\n C. Forteller om deg selv\n D. Utbringer en skål\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Venter til hun snakker",
+     "Sier først «excuse me»",
+     "Forteller om deg selv",
+     "Utbringer en skål"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Venter til hun snakker)"
+  },
+  {
+   "draw": 16,
+   "doc_index": 3406,
+   "doc_fingerprint": "2a9b9f5f288c",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Hva tror du skjer med en astronauts høyde i verdensrommet?\n\nAlternativer:\n A. Det skjer ingenting.\n B. De blir litt lavere.\n C. De blir litt høyere.\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Det skjer ingenting.",
+     "De blir litt lavere.",
+     "De blir litt høyere."
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (De blir litt høyere.)"
+  },
+  {
+   "draw": 17,
+   "doc_index": 1799,
+   "doc_fingerprint": "9d6b1e1ebfde",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Hva er den offisielle definisjonen på feminisme?\n- Ideen om kvinners frihet til å velge hva de vil\n- Ideen om politisk, økonomisk og sosial likhet mellom kjønnene.\n- Ideen om at kvinner bør ha mer makt enn menn i samfunnet\n- Ideen om at kvinner skal få flere fordeler fordi de har det vanskeligere.\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ideen om kvinners frihet til å velge hva de vil",
+     "Ideen om politisk, økonomisk og sosial likhet mellom kjønnene.",
+     "Ideen om at kvinner bør ha mer makt enn menn i samfunnet",
+     "Ideen om at kvinner skal få flere fordeler fordi de har det vanskeligere."
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Ideen om politisk, økonomisk og sosial likhet mellom kjønnene."
+  },
+  {
+   "draw": 18,
+   "doc_index": 2371,
+   "doc_fingerprint": "ec48d7c45c07",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Martin Johnsrud Sundby var i 2021 ikke aktuell for å gå andre VM-distanser i Oberstdorf enn den han har personlig friplass for. Hvor stor var troppen som var tatt ut?\n\nSvaralternativer:\n- Åtte herreløpere\n- 12 herreløpere\n- 20 herreløpere\n\nHva er riktig svar?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Åtte herreløpere",
+     "12 herreløpere",
+     "20 herreløpere"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: 12 herreløpere"
+  },
+  {
+   "draw": 19,
+   "doc_index": 540,
+   "doc_fingerprint": "ac9800fbf6e6",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Hvilken Lene Marlin-sang var med i filmen Schpaa fra 1998? Dette var hennes første hit.\n A. You Weren’t There\n B. Unforgivable Sinner\n C. Sitting Down Here\n D. Another day\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "You Weren’t There",
+     "Unforgivable Sinner",
+     "Sitting Down Here",
+     "Another day"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Unforgivable Sinner)"
+  },
+  {
+   "draw": 20,
+   "doc_index": 557,
+   "doc_fingerprint": "14508bef8126",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Artist Norah Jones har solgt i bøtter og spann og har vunnet en haug med priser. Faren hennes var også en kjent musiker i sin tid. Hva het han?\n\nSvaralternativer:\n- Quincy Jones\n- Phil Lynott\n- Ravi Shankar\n- James Brown\n\nHva er riktig svar?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Quincy Jones",
+     "Phil Lynott",
+     "Ravi Shankar",
+     "James Brown"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Ravi Shankar"
+  },
+  {
+   "draw": 21,
+   "doc_index": 962,
+   "doc_fingerprint": "578d69c9f10c",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: Tom’s Restaurant er en kafé som ligger på Manhattan i New York. Den er inspirasjonskilden til sangen «Tom’s Diner». Hva heter hun som har laget sangen?\n A. Neneh Cherry\n B. Tracy Chapman\n C. Tanita Tikaram\n D. Suzanne Vega\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Neneh Cherry",
+     "Tracy Chapman",
+     "Tanita Tikaram",
+     "Suzanne Vega"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Suzanne Vega)"
+  },
+  {
+   "draw": 22,
+   "doc_index": 1202,
+   "doc_fingerprint": "9d6032f75362",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: På hvilken øy har den spiondømte nordmannen Arne Treholt bodd i lange perioder siden 1999?\n- Kypros\n- Sicilia\n- Lanzarote\n- Kreta\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Kypros",
+     "Sicilia",
+     "Lanzarote",
+     "Kreta"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Kypros"
+  },
+  {
+   "draw": 23,
+   "doc_index": 2261,
+   "doc_fingerprint": "c0e0d8bd13f0",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: En DAB-radio står på lista over saker du bør ha som del av din egen beredskap. Hvorfor anbefales det å ha en DAB-radio?\n\nAlternativer:\n- Det er hyggelig å kunne høre på musikk\n- Det er nødvendig for å få med seg viktig informasjon\n- Trengs ikke, for jeg hører så lite på radioen uansett\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Det er hyggelig å kunne høre på musikk",
+     "Det er nødvendig for å få med seg viktig informasjon",
+     "Trengs ikke, for jeg hører så lite på radioen uansett"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Det er nødvendig for å få med seg viktig informasjon"
+  },
+  {
+   "draw": 24,
+   "doc_index": 377,
+   "doc_fingerprint": "8e364e0b14f6",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Björn Ulvaeus skrev de fleste av tekstene til ABBAs sanger, noen av dem er av den kuriøse sorten. Hvilken av følgende titler er IKKE navnet på en ABBA-sang?\n A. Sammy Superstar\n B. King Kong Song\n C. Nina Pretty Ballerina\n D. Dum Dum Diddle\n\nEr det riktige svaret A, B, C eller D?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Sammy Superstar",
+     "King Kong Song",
+     "Nina Pretty Ballerina",
+     "Dum Dum Diddle"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Sammy Superstar)"
+  },
+  {
+   "draw": 25,
+   "doc_index": 2083,
+   "doc_fingerprint": "746de46771dd",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "«Nessun Dorma» er en av de mest kjente ariene fra operaens verden, særlig kjent med tenoren Luciano Pavarotti. Hva betyr «Nessun Dorma»?\nVelg riktig svar blant disse alternativene:\n- Ingen søvn\n- Gå og legg deg\n- Slapp helt av\n- Sov Godt\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ingen søvn",
+     "Gå og legg deg",
+     "Slapp helt av",
+     "Sov Godt"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Ingen søvn"
+  },
+  {
+   "draw": 26,
+   "doc_index": 2679,
+   "doc_fingerprint": "c522b21ff865",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Ronny blir plutselig helt glassaktig i blikket, og sitter og klemmer noe. Hvorfor oppfører han seg så rart?\nVelg riktig svar blant disse alternativene:\n A. Han har fått i seg kjærlighetseliksir\n B. Han har spist noe rart til middag\n C. Han har fått et kjærlighetsbrev av Hermine/Hermione\n D. Han har nettopp sett filmen «The Notebook»\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Han har fått i seg kjærlighetseliksir",
+     "Han har spist noe rart til middag",
+     "Han har fått et kjærlighetsbrev av Hermine/Hermione",
+     "Han har nettopp sett filmen «The Notebook»"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Han har fått i seg kjærlighetseliksir)"
+  },
+  {
+   "draw": 27,
+   "doc_index": 544,
+   "doc_fingerprint": "6946c4cf4c64",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Spørsmål: I filmen The Breakfast Club hører vi sangen «Don’t You (Forget About Me)» som ble laget til denne filmen. Hvem fremfører den?\n\nAlternativer:\n A. Billy Idol\n B. Simple Minds\n C. Depeche Mode\n D. Duran Duran\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Billy Idol",
+     "Simple Minds",
+     "Depeche Mode",
+     "Duran Duran"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Simple Minds)"
+  },
+  {
+   "draw": 28,
+   "doc_index": 1365,
+   "doc_fingerprint": "40b785de1946",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvorfor hadde vikingskip dragehoder i stavnen?\n\nSvaralternativer:\n A. Det var skipsbyggerens signatur\n B. Det markerte høvdingstatus\n C. Det viste hvor skipet kom fra\n\nHva er riktig svar?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Det var skipsbyggerens signatur",
+     "Det markerte høvdingstatus",
+     "Det viste hvor skipet kom fra"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Det markerte høvdingstatus)"
+  },
+  {
+   "draw": 29,
+   "doc_index": 2196,
+   "doc_fingerprint": "edd1982765d8",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "I hvilken setning er komma satt rett?\n- Etter en lang deilig sommer, var det helt greit å begynne på jobb igjen.\n- På grunn av faren for skogbrann, tente vi bålet helt nede i vannkanten.\n- Du må pugge alle kommareglene, sa norsklæreren.\n\nEr det riktige svaret Etter en lang deilig sommer, var det helt greit å begynne på jobb igjen., På grunn av faren for skogbrann, tente vi bålet helt nede i vannkanten. eller Du må pugge alle kommareglene, sa norsklæreren.?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Etter en lang deilig sommer, var det helt greit å begynne på jobb igjen.",
+     "På grunn av faren for skogbrann, tente vi bålet helt nede i vannkanten.",
+     "Du må pugge alle kommareglene, sa norsklæreren."
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Du må pugge alle kommareglene, sa norsklæreren."
+  },
+  {
+   "draw": 30,
+   "doc_index": 3152,
+   "doc_fingerprint": "7f7e82251af8",
+   "prompt_variant": "nrk_quiz_qa_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvilken liga spiller Manchester United i?\n\nSvaralternativer:\n- Bondes liga\n- Premier League\n- Ligue 1\n\nHva er riktig svar?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Bondes liga",
+     "Premier League",
+     "Ligue 1"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Premier League"
+  },
+  {
+   "draw": 31,
+   "doc_index": 3510,
+   "doc_fingerprint": "f345b5786f9c",
+   "prompt_variant": "nrk_quiz_qa_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "En utøver fra Buskerud vant tre OL-gull i Chamonix i 1924. Hvem var det?\nVelg riktig svar blant disse alternativene:\n A. Thorleif Haug\n B. Jacob Tullin Thams\n C. Johan Grøttumsbråten\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Thorleif Haug",
+     "Jacob Tullin Thams",
+     "Johan Grøttumsbråten"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Thorleif Haug)"
+  }
+ ]
+}

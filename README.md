@@ -4,12 +4,13 @@ Interactive evaluation dashboards for language models, maintained by the
 [Language Technology Group](https://www.mn.uio.no/ifi/english/research/groups/ltg/)
 at the University of Oslo.
 
-Six independent dashboards live under one repository:
+Seven independent dashboards live under one repository:
 
 | URL | Source data | Purpose |
 | --- | --- | --- |
 | [`/noreval`](https://ltgoslo.github.io/llm-dashboard/noreval/) | `data/noreval/` | Base-model comparison on the NorEval benchmark |
 | [`/noreval-gen`](https://ltgoslo.github.io/llm-dashboard/noreval-gen/) | `data/noreval-gen/` | Instruction-tuned model comparison on NorEval |
+| [`/instruct`](https://ltgoslo.github.io/llm-dashboard/instruct/) | `data/instruct/` | NorEval Instruct: instruction-tuned models on generative NorEval, graded by an LLM judge, with their responses |
 | [`/norolmo`](https://ltgoslo.github.io/llm-dashboard/norolmo/) | `data/norolmo/` | NorOLMo 13B training-progress + ablations |
 | [`/multisynt`](https://ltgoslo.github.io/llm-dashboard/multisynt/) | `data/multisynt/` | Multilingual training progress (Spanish, French, Finnish, Norwegian) |
 | [`/prelude`](https://ltgoslo.github.io/llm-dashboard/prelude/) | `data/prelude/` | OpenEuroLLM Prelude 9B training progress on NorEval 1.2 |
@@ -25,10 +26,12 @@ by each dashboard via ES modules.
 ```
 llm-dashboard/
 ├── README.md
-├── build_data.py                 ← single script, builds all 6 data.json files
+├── build_data.py                 ← single script, builds all 7 data.json files
 ├── metrics_setup.yaml            ← NorEval benchmark configs (used by 3 dashboards)
 ├── models_setup.yaml             ← NorEval base-model metadata
-├── models_instruct_setup.yaml    ← NorEval instruct-model metadata
+├── models_instruct_setup.yaml    ← NorEval instruct-model metadata (/noreval-gen)
+├── instruct_tasks.yaml           ← NorEval Instruct task names and descriptions (/instruct)
+├── instruct_models.yaml          ← NorEval Instruct model metadata (/instruct)
 ├── multisynt_tasks.yaml          ← MultiSynt task configs
 ├── multisynt_models.yaml         ← MultiSynt model display names + colors
 ├── noreval12_setup.yaml          ← NorEval 1.2 benchmark configs (prelude + norprelude dashboards)
@@ -36,9 +39,11 @@ llm-dashboard/
 ├── check_corrupt.py              ← finds corrupt result JSON files
 ├── merge_errant_scores.py        ← merges external ERRANT scores into ask_gec results
 ├── import_prelude_results.py     ← fans a Prelude results JSONL out into data/prelude/
+├── import_instruct_results.py    ← extracts a NorEval Instruct run export (Parquet) into data/instruct/
 ├── data/                         ← evaluation result JSONs (input to build_data.py)
 │   ├── noreval/results/<model>/<bench>/<N-shot>/.../results_*.json
 │   ├── noreval-gen/results/<model>/<bench>/<N-shot>/.../results_*.json
+│   ├── instruct/{run.json, draws.json, examples/<task>.json, results/<model>.json, responses/<model>/<task>.json}
 │   ├── norolmo/progress/NorOLMo-step-<N>/<bench>/<N-shot>/.../results_*.json
 │   ├── multisynt/results/<Lang>/<model>_<N>shot_checkpoints/<ckpt>/<bench>/p<N>/results.json
 │   ├── prelude/progress/<branch>/<bench>/results_*.json  (+ prelude/checkpoints.json)
@@ -53,16 +58,20 @@ llm-dashboard/
     │   ├── ui.js                 ← tooltip, task-checkbox grid (progress pages), metric selector
     │   ├── pickers.js            ← Tasks / Models sections of noreval + noreval-gen: task picker, info cards
     │   ├── bar-pan.js            ← sideways panning of a bar chart with more models than fit (noreval + noreval-gen)
-    │   ├── model-detail.js       ← model details opened by a click on a bar: drawer beside the chart, or panel under it (noreval + noreval-gen)
+    │   ├── model-detail.js       ← model details opened by a click on a bar: drawer beside the chart, or panel under it (noreval + noreval-gen + instruct)
+    │   ├── task-detail.js        ← a task's details, opened from its row in the model details
+    │   ├── task-examples.js      ← a judged task's examples in its details, as in a messaging app: prompts, responses, judgments (instruct)
+    │   ├── markdown.js           ← Markdown of the responses as DOM nodes, never HTML (instruct)
     │   ├── dropdown.js           ← custom <select> dropdown (same look on every system)
     │   ├── segmented.js          ← sliding thumb of the shot / error-band button groups
     │   ├── selection.js          ← task-selection logic + shared control listeners
     │   ├── signals.js            ← FineWeb2 signal measures of the plotted curves (multisynt)
     │   ├── url-state.js          ← URL hash/search save/restore
-    │   ├── comparison.js         ← bar-chart logic shared by noreval + noreval-gen
+    │   ├── comparison.js         ← bar-chart logic shared by noreval + noreval-gen + instruct
     │   └── progress.js           ← line-chart logic shared by norolmo + multisynt
     ├── noreval/{index.html, app.js, data.json, models/}
-    ├── noreval-gen/{index.html, app.js, data.json}
+    ├── noreval-gen/{index.html, app.js, data.json, details/}
+    ├── instruct/{index.html, app.js, data.json, details/}
     ├── norolmo/{index.html, app.js, data.json}
     ├── multisynt/{index.html, app.js, data.json}
     ├── prelude/{index.html, app.js, data.json}
@@ -73,7 +82,7 @@ llm-dashboard/
 
 ```bash
 pip install pyyaml scipy
-python3 build_data.py             # regenerates all six data.json files
+python3 build_data.py             # regenerates all seven data.json files
 python3 -m http.server 8000 -d docs   # serves at http://localhost:8000/noreval/
 ```
 
@@ -98,6 +107,42 @@ files; commit them together with `data.json`.
 
 For an instruction-tuned model, swap `data/noreval-gen/results/` and
 `models_instruct_setup.yaml`.
+
+### … model (or run) to NorEval Instruct
+
+NorEval Instruct (`/instruct`) is generative NorEval 1.3 for
+instruction-tuned models: every task is 1,000 draws (an item and one of
+its prompt variants, picked at random once for the run, so the same for
+every model), each answered once through the model's chat template and
+graded 0–5 by an LLM judge. The evaluation exports one Parquet file per
+model (`export/models/<model>.parquet`: every response and judgment, with
+the run's description and the model's results in the file's metadata).
+Those files are far too large for this repository (up to ~140 MB each, over
+GitHub's 100 MB limit), so the repository keeps an extract:
+
+1. `python3 import_instruct_results.py results-instruct.zip` (or a
+   directory of `.parquet` files, or the files themselves). It writes
+   `data/instruct/`: the run (`run.json`, `draws.json`), each task's first
+   32 draws (`examples/`: prompt and reference), and per model its results
+   as the export computed them from all 1,000 draws plus the judge's grade of
+   every draw (`results/<model>.json`), and its responses to those 32 draws
+   with their judgments (`responses/<model>/<task>.json`, which
+   `build_data.py` copies to the page unchanged, so git stores them once).
+   A model from another run (other draws, judge or rubric) is refused.
+2. Add the model to `instruct_models.yaml` (same fields as
+   `models_setup.yaml`); a model of the run without an entry is shown
+   under its run name, and `build_data.py` warns. A name ending in
+   `-think` is the same checkpoint evaluated with reasoning turned on.
+3. `python3 build_data.py` and commit `data/instruct/` together with
+   `docs/instruct/`.
+
+Every score on the page comes from all 1,000 draws; only the responses
+shown are cut to 32 per task (`--examples` changes it). Scores are the
+judge's mean grades in its own points, from 0 to 5, without rescaling,
+and their 95% intervals count a task's items as a sample of the task's
+(standard errors clustered by item), both computed from the grades
+(`build_data.py` checks them against the export's `score` and
+`se_if_items_were_a_sample`, which are on its points / 5 scale).
 
 ### … new NorEval benchmark
 

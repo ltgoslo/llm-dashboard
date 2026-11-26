@@ -3,17 +3,17 @@
 // it on a phone), over the dimmed page: the task, and the model's results
 // on it.
 //
-// The head, which stays at the top, names the model and the task; under it
-// come the task's facts (category, kind of answers, number of examples and
-// of prompts) and its dataset, and then, in this order:
-// - the task's description;
+// The head, which stays at the top, names the model (its badge, its name)
+// and the task in one title; under it come, in this order:
+// - the task's description and its source dataset;
 // - the model's score at each shot count, with its best prompt, in the
 //   details' segmented control, which picks the shot shown;
 // - its score with each prompt, or in each subtask, beside every other
 //   model's, with its 95% interval, over each prompt's text;
 // - beside all that (under it on a narrow screen), every model's best score
 //   in order: the model's own marked, its interval a band through the
-//   list, which opens on it.
+//   list, which opens on it; another model's row opens its details of the
+//   task in place.
 // Each fact once; the details' three type sizes (style.css).
 //
 // comparison.js computes the content (taskDetailData) from the task's file
@@ -21,9 +21,18 @@
 // the view in step with the details' model and shot. This module lays the
 // content out and runs the motion: the view grows out of the row (its clip
 // from the row's box to its own, the content fading in) and shrinks back
-// into it. A model's generated answers would be a further section here.
+// into it.
+//
+// A judged task (/instruct: every response graded 0–5 by an LLM judge)
+// shows, in place of the shots and the prompts' texts: the model's mean
+// grade ± its 95% interval beside the judge's grades of all its responses
+// (a row per grade, best first: its meaning in the judge's rubric, its
+// share as a bar in a shade of the model's colour); and the examples
+// (task-examples.js): the prompts and the model's responses as in a
+// messaging app, and their judgments. Its type is every task view's.
 
 import { el, position, shotControl, detailMotion } from "./model-detail.js";
+import { createExamples, setModelColors } from "./task-examples.js";
 
 /** Text with its slots ({{expression}}: fields of the task's examples)
  *  appended to `node`, each slot a tag. */
@@ -104,6 +113,50 @@ function buildLegend(d) {
   return lg;
 }
 
+// The grades' meanings, short, from the judge's rubric (0–5).
+const RUBRIC = ["incorrect", "mostly incorrect", "partly correct", "a clear error", "a minor flaw", "fully correct"];
+
+/** A judged task's headline: the model's mean grade ± its 95% interval,
+ *  and beside it the judge's grades of all its responses, a row for each
+ *  grade, best first: its meaning in the judge's rubric, its share as a bar
+ *  in the grade's shade (the examples' tiles'). */
+function buildJudgedHeadline(d) {
+  const box = el("div", "tv-judged");
+  const line = el("div", "tv-score-line");
+  line.append(el("span", "tv-score-value", d.headline.value));
+  if (d.headline.margin) line.append(el("span", "tv-score-ci", "± " + d.headline.margin));
+  const score = el("div", "tv-score");
+  score.append(el("div", "tv-label", "Mean grade"), line);
+  box.append(score);
+  if (!d.grades) return box;
+  const counts = d.grades.counts;
+  const total = counts.reduce((a, b) => a + b, 0) || 1;
+  const shares = counts.map((c) => c / total);
+  const most = Math.max(...shares, 1e-9);
+  const pct = (x) => (x >= 0.005 ? Math.round(x * 100) + "%" : x > 0 ? "<1%" : "0%");
+  const rows = el("div", "tv-rubric");
+  for (let k = 5; k >= 0; k--) {
+    const row = el("div", "tv-rubric-row");
+    row.title = `${k} of 5 (${RUBRIC[k]}): ${counts[k].toLocaleString("en")} of ${total.toLocaleString("en")} responses`;
+    const track = el("span", "tv-rubric-track");
+    const bar = el("span", "tv-rubric-bar");
+    bar.dataset.points = k;
+    bar.style.width = counts[k] ? Math.max(1, (shares[k] / most) * 100).toFixed(1) + "%" : "0";
+    track.append(bar);
+    row.append(el("span", "tv-rubric-grade", String(k)), el("span", "tv-rubric-name", RUBRIC[k]), track, el("span", "tv-rubric-share", pct(shares[k])));
+    rows.append(row);
+  }
+  const fig = el("figure", "tv-grades");
+  fig.append(el("figcaption", "tv-label", "Grades"), rows);
+  box.append(fig);
+  return box;
+}
+
+/** A judged task's note, if any (its file couldn't be loaded). */
+function buildJudgedSections(d) {
+  return d.note ? [el("p", "tv-note", d.note)] : [];
+}
+
 /** The task's prompts: with several, a row of scores over each one's
  *  text; one alone, its text. With subtasks, a row of scores for each. */
 function buildSections(d) {
@@ -128,8 +181,10 @@ function buildSections(d) {
 }
 
 /** Every model's best score in order, as bars: the model's own marked, its
- *  95% interval a band through the list. */
-function buildRanking(d) {
+ *  95% interval a band through the list. Every other model's row is a link
+ *  (its name in the links' colour) to its own details of the task
+ *  (`onModel`). */
+function buildRanking(d, onModel) {
   const r = d.ranking;
   const sec = el("section", "tv-section tv-ranking");
   sec.append(el("h3", "tv-h", r.title));
@@ -138,13 +193,19 @@ function buildRanking(d) {
     const key = el("span", "md-legend-item");
     const band = el("span", "tv-legend-band");
     key.append(band, `${d.model.title}'s 95% interval`);
-    note.append(" ", key);
+    note.append(...(r.note ? [" "] : []), key);
   }
-  sec.append(note);
+  if (note.childNodes.length) sec.append(note);
   const list = el("div", "tv-rank-list");
   const zero = parseFloat(position(0, r.domain));
   for (const m of r.rows) {
-    const row = el("div", "tv-rank-row" + (m.me ? " tv-rank-me" : ""));
+    const link = !m.me && !!onModel;
+    const row = el(link ? "button" : "div", "tv-rank-row" + (m.me ? " tv-rank-me" : ""));
+    if (link) {
+      row.type = "button";
+      row.title = `${m.name} on this task`;
+      row.addEventListener("click", () => onModel(m.id));
+    }
     const track = el("span", "tv-rank-track");
     if (r.ci) {
       const band = el("span", "tv-rank-band");
@@ -157,41 +218,37 @@ function buildRanking(d) {
     bar.style.left = Math.min(zero, x).toFixed(2) + "%";
     bar.style.width = Math.abs(x - zero).toFixed(2) + "%";
     track.append(bar);
-    row.append(el("span", "tv-rank-name", m.name), track, el("span", "tv-rank-value", m.text));
+    const name = el("span", "tv-rank-name");
+    name.append(link ? el("span", "link-text", m.name) : m.name);
+    row.append(name, track, el("span", "tv-rank-value", m.text));
     list.append(row);
   }
   sec.append(list);
   return { sec, list };
 }
 
-/** The head, which stays at the view's top: the model, the task, the
- *  close button. And the task's facts and dataset under it, which scroll
- *  away. */
+/** The task's source dataset: "Source dataset: hf.co/… ↗" (under its
+ *  description). */
+function buildSource(link) {
+  const a = el("a", "md-link");
+  a.href = link.href;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  a.append(el("span", "link-text", link.text), "\u00a0", el("span", "md-link-arrow", "↗"));
+  const source = el("p", "tv-source");
+  source.append("Source dataset: ", a);
+  return source;
+}
+
+/** The head, which stays at the view's top: the model's badge, the model
+ *  and the task as one title ("NorMistral 11B – Idiom completion
+ *  [Bokmål]"), the close button. */
 function buildHead(d, onClose) {
   const head = el("header", "tv-head");
-  const titles = el("div", "tv-titles");
-  const model = el("div", "tv-model");
-  const dot = el("span", "tv-model-dot");
-  dot.style.backgroundColor = d.model.color;
-  model.append(dot, d.model.title);
-  const title = el("h2", "tv-title", d.title);
+  const title = el("h2", "tv-title");
   title.id = "tv-title";
-  if (d.variant) title.append(el("span", "tv-variant", " · " + d.variant));
-  titles.append(model, title);
-  const intro = el("div", "tv-intro");
-  if (d.facts.length) {
-    const meta = el("div", "md-meta");
-    d.facts.forEach((f, i) => meta.append(...(i ? [" · "] : []), el("span", "md-fact", f)));
-    intro.append(meta);
-  }
-  if (d.link) {
-    const a = el("a", "md-link");
-    a.href = d.link.href;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    a.append(el("span", "link-text", d.link.text), "\u00a0", el("span", "md-link-arrow", "↗"));
-    intro.append(a);
-  }
+  title.append(el("span", "tv-title-model", d.model.title), " – ", d.title);
+  if (d.variant) title.append(" [" + d.variant + "]");
   const close = el("button", "md-close");
   close.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">'
     + '<path d="M3.5 3.5l9 9m0-9l-9 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
@@ -199,8 +256,8 @@ function buildHead(d, onClose) {
   close.title = "Close (Esc)";
   close.setAttribute("aria-label", "Close the task's details");
   close.addEventListener("click", onClose);
-  head.append(titles, close);
-  return { head, intro };
+  head.append(d.model.badge(), title, close);
+  return head;
 }
 
 /** Whether a wheel turn `dy` over `target` scrolls something in the view
@@ -215,7 +272,7 @@ function scrollsInside(target, root, dy) {
 
 /** The view's element, hidden until shown (on the body). hooks:
  *  onClose(), onShot(shot). */
-export function createTaskDetail({ onClose, onShot }) {
+export function createTaskDetail({ onClose, onShot, onModel }) {
   const root = el("div", "task-view");
   root.hidden = true;
   root.setAttribute("role", "dialog");
@@ -236,7 +293,7 @@ export function createTaskDetail({ onClose, onShot }) {
   // Tab stays in the view.
   root.addEventListener("keydown", (e) => {
     if (e.key !== "Tab") return;
-    const stops = [...sheet.querySelectorAll("a[href], button:not([disabled])")].filter((x) => x.offsetParent);
+    const stops = [...sheet.querySelectorAll("a[href], button:not([disabled]), summary")].filter((x) => x.offsetParent && x.tabIndex >= 0);
     if (!stops.length) { e.preventDefault(); return; }
     const first = stops[0], last = stops[stops.length - 1], at = document.activeElement;
     if (e.shiftKey && (at === first || at === sheet)) { e.preventDefault(); last.focus(); }
@@ -244,7 +301,8 @@ export function createTaskDetail({ onClose, onShot }) {
   });
 
   const shots = shotControl(onShot);   // (kept: its thumb slides to a picked shot)
-  let parts = null;    // { head, intro, list }
+  const examples = createExamples();   // (a judged task's: kept for the same task)
+  let parts = null;    // { head, list }
   let shown = null;    // the content shown
   let motion = [];     // the running Animations
   let opening = null;  // the opening's token, while its start is held
@@ -276,30 +334,33 @@ export function createTaskDetail({ onClose, onShot }) {
     list.classList.toggle("fade-bottom", list.scrollTop + list.clientHeight < list.scrollHeight - 1);
   }
   window.addEventListener("resize", () => { if (!root.hidden) placeList(false); });
-  // The head's rule shows once the facts under it have scrolled away.
-  const stuck = () => sheet.classList.toggle("tv-stuck", !!parts && sheet.scrollTop > parts.intro.offsetHeight - 1);
-  sheet.addEventListener("scroll", stuck, { passive: true });
-
   function fill(d) {
-    const { head, intro } = buildHead(d, onClose);
+    const head = buildHead(d, onClose);
     const main = el("div", "tv-main");
     if (d.description) main.append(el("p", "tv-desc", d.description));
-    shots.update(d);
-    main.append(shots.el);
-    if (d.prompts.length > 1 || d.parts) main.append(buildLegend(d));
-    main.append(...buildSections(d));
+    if (d.link) main.append(buildSource(d.link));
+    if (d.judged) {
+      main.append(buildJudgedHeadline(d));
+      main.append(...buildJudgedSections(d));
+      if (d.examples) main.append(examples.build(d));
+    } else {
+      shots.update(d);
+      main.append(shots.el);
+      if (d.prompts.length > 1 || d.parts) main.append(buildLegend(d));
+      main.append(...buildSections(d));
+    }
     const side = el("aside", "tv-side");
-    const ranking = buildRanking(d);
+    const ranking = buildRanking(d, onModel);
     ranking.list.addEventListener("scroll", fadeList, { passive: true });
     side.append(ranking.sec);
     const body = el("div", "tv-body");
     body.append(main, side);
     const top = sheet.scrollTop, listTop = parts?.list.scrollTop || 0;
     content.style.setProperty("--tv-me", d.model.color);
-    content.replaceChildren(head, intro, body);
+    if (d.judged) setModelColors(content, d.model.color);
+    content.replaceChildren(head, body);
     sheet.scrollTop = shown?.task === d.task ? top : 0;
-    parts = { head, intro, list: ranking.list };
-    stuck();
+    parts = { head, list: ranking.list };
     const recenter = !shown || shown.task !== d.task || shown.model.id !== d.model.id || shown.shot !== d.shot;
     shown = d;
     placeList(recenter);

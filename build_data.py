@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the six data.json files served by the dashboards.
+"""Build the seven data.json files served by the dashboards.
 
 Reads benchmark/model configs from YAML files at the repo root and result
 JSONs from data/<dashboard>/{results,progress}/, and writes one consolidated
@@ -14,6 +14,13 @@ Outputs:
         chart's data (write_task_details): each task's prompts and every
         model's score with each of them (tasks/<task>.json), and on noreval
         every model's best-prompt scores (best.json)
+    docs/instruct/data.json       — NorEval Instruct: generative NorEval for
+        instruction-tuned models, graded by an LLM judge (from data/instruct/,
+        which import_instruct_results.py writes), and its details/
+        (write_instruct_details): each task's grades, scores per formulation
+        and prompt, and examples (tasks/<task>.json), and each model's
+        responses to the examples with their judgments
+        (responses/<model>/<task>.json)
     docs/norolmo/data.json        — NorOLMo progression + ablations
     docs/multisynt/data.json      — multilingual progression
     docs/prelude/data.json        — OpenEuroLLM Prelude progression (NorEval 1.2)
@@ -51,10 +58,12 @@ BASE_DIR = Path(__file__).parent
 # Input paths
 METRICS_SETUP_YAML = BASE_DIR / "metrics_setup.yaml"
 MODELS_SETUP_YAML = BASE_DIR / "models_setup.yaml"
-INSTRUCT_MODELS_SETUP_YAML = BASE_DIR / "models_instruct_setup.yaml"
+NOREVAL_GEN_MODELS_YAML = BASE_DIR / "models_instruct_setup.yaml"
 MULTISYNT_TASKS_YAML = BASE_DIR / "multisynt_tasks.yaml"
 MULTISYNT_MODELS_YAML = BASE_DIR / "multisynt_models.yaml"
 NOREVAL12_SETUP_YAML = BASE_DIR / "noreval12_setup.yaml"
+INSTRUCT_TASKS_YAML = BASE_DIR / "instruct_tasks.yaml"
+INSTRUCT_MODELS_YAML = BASE_DIR / "instruct_models.yaml"
 
 NOREVAL_RESULTS = BASE_DIR / "data" / "noreval" / "results"
 NOREVAL_GEN_RESULTS = BASE_DIR / "data" / "noreval-gen" / "results"
@@ -62,6 +71,7 @@ NOROLMO_PROGRESS = BASE_DIR / "data" / "norolmo" / "progress"
 MULTISYNT_RESULTS = BASE_DIR / "data" / "multisynt" / "results"
 PRELUDE_PROGRESS = BASE_DIR / "data" / "prelude" / "progress"
 NORPRELUDE_PROGRESS = BASE_DIR / "data" / "norprelude" / "progress"
+INSTRUCT_DATA = BASE_DIR / "data" / "instruct"   # import_instruct_results.py writes it
 
 # Output paths
 NOREVAL_OUT = BASE_DIR / "docs" / "noreval" / "data.json"
@@ -70,6 +80,7 @@ NOROLMO_OUT = BASE_DIR / "docs" / "norolmo" / "data.json"
 MULTISYNT_OUT = BASE_DIR / "docs" / "multisynt" / "data.json"
 PRELUDE_OUT = BASE_DIR / "docs" / "prelude" / "data.json"
 NORPRELUDE_OUT = BASE_DIR / "docs" / "norprelude" / "data.json"
+INSTRUCT_OUT = BASE_DIR / "docs" / "instruct" / "data.json"
 
 SHOT_SETTINGS = ["0", "1", "5"]
 SHOT_DIRS = {"0": "0-shot", "1": "1-shot", "5": "5-shot"}
@@ -2095,6 +2106,331 @@ def write_task_details(page_dir, data, details, best_scores=False):
     print(f"  → wrote {len(blobs)} files to {out_dir.relative_to(BASE_DIR)}/ ({total_kb:.1f} KB)")
 
 
+# ─────────────────────────────────────────────────────────────
+# NorEval Instruct comparison dashboard (LLM-judged)
+# ─────────────────────────────────────────────────────────────
+# Generative NorEval v1.3 for instruction-tuned models: every task is a set
+# of draws (an item and a prompt variant, the same for every model), each
+# answered once (chat template, no system prompt, temperature 1) and graded
+# 0–5 by an LLM judge. A task's score is the mean grade over its draws, in
+# the grades' own points (0–5), so its prompt variants are averaged over,
+# not aggregated: one metric ("judge", shown as it is: metric_scale "raw"),
+# one setting ("0"-shot), the comparison pages' "mean". The input is
+# data/instruct/ (import_instruct_results.py); the page is docs/instruct/.
+#
+# A task's draws cover its dataset's items evenly (each item as often as
+# 1,000 draws allow, or 1,000 different items of a larger one), so its
+# score is close to the whole dataset's mean grade. Its 95% interval counts
+# the items as a sample of the task's (the draws' errors clustered by
+# item): a small dataset leaves its task uncertain however often its items
+# are drawn. (The export's `se` counts the items as fixed; its
+# `se_if_items_were_a_sample` is this one.)
+#
+# The export states its statistics on its own `score` scale, points / 5
+# (0–1). The page does not: a task's mean grade and its standard error are
+# computed from its draws' points (and must equal the export's, in points);
+# only the export's random baselines are given in points (× INSTRUCT_TOP).
+
+# The run's category names → the comparison pages' (CATEGORY_ORDER in core.js).
+INSTRUCT_CATEGORIES = {
+    "linguistic_knowledge": "linguistic knowledge",
+    "language_understanding": "language understanding",
+    "world_knowledge_and_reasoning": "world knowledge & reasoning",
+    "generation_and_summarization": "generation & summarization",
+    "machine_translation": "translation",
+}
+INSTRUCT_METRIC = "judge"
+INSTRUCT_SHOT = "0"
+INSTRUCT_TOP = 5   # the judge's top grade: points run from 0 to 5
+# The judges' names as the page shows them (by the run's name for them).
+INSTRUCT_JUDGE_NAMES = {"deepseek-v4-flash-0731": "DeepSeek V4 Flash"}
+# A task's prompt variants, in this order: <task>_p<N> (open-ended), and for
+# a multiple-choice task <task>_hybrid_p<N> (options without letters) and
+# <task>_mcf_p<N> (options with letters, answered by a letter).
+INSTRUCT_FORMULATIONS = ("gen", "hybrid", "mcf")
+
+
+def read_json(path):
+    with open(path) as f:
+        return json.load(f)
+
+
+def instruct_variant(task, variant):
+    """(formulation, prompt number from 1) of one of `task`'s prompt
+    variants; (gen, None) for a task with one prompt of its own."""
+    m = re.fullmatch(r"(?:(hybrid|mcf)_)?p(\d+)", variant[len(task):].lstrip("_"))
+    if not m:
+        return "gen", None
+    return m.group(1) or "gen", int(m.group(2)) + 1
+
+
+def instruct_grade_stats(grades, items):
+    """The mean of a task's grades (`grades`: the draws' points, a digit
+    each, "-" for a draw without a grade) and its standard error with the
+    draws clustered by item
+    (`items`: each draw's item; CR1: the sum over items of the squared sum
+    of their draws' deviations, × G / (G − 1), over the draws' count
+    squared); None if none of them has a grade."""
+    kept = [(int(g), item) for g, item in zip(grades, items) if g != "-"]
+    if not kept:
+        return None
+    n = len(kept)
+    mean = sum(p for p, _ in kept) / n
+    by_item = {}
+    for p, item in kept:
+        by_item[item] = by_item.get(item, 0.0) + p - mean
+    g = len(by_item)
+    se = math.sqrt(g / (g - 1) * sum(v * v for v in by_item.values())) / n if g > 1 else 0.0
+    return mean, se
+
+
+def instruct_checked_stats(grades, items, stats, label):
+    """instruct_grade_stats, checked against the export's statistics of the
+    same draws (`stats`: its "score" and "se_if_items_were_a_sample", on its
+    points / 5 scale): a build of other numbers than the run's stops."""
+    out = instruct_grade_stats(grades, items)
+    if out is None or not stats or stats.get("score") is None:
+        return out
+    for value, key in zip(out, ("score", "se_if_items_were_a_sample")):
+        if stats.get(key) is not None and abs(value - INSTRUCT_TOP * stats[key]) > 1e-9:
+            raise SystemExit(f"{label}: {value} from the draws' grades is not the export's {key} "
+                             f"{stats[key]} × {INSTRUCT_TOP}")
+    return out
+
+
+def instruct_reference(text):
+    """A reference as the judge saw it (`reference_text`), in parts the task
+    view lays out: {"texts": [...]} for reference texts (<reference>
+    blocks), else {"sections": [{"label", "text"} or {"label", "items"}]}
+    ("Correct option: B (Hval)", "True answers:" and a list of them, …)."""
+    texts = re.findall(r"<reference(?: \d+)?>\n(.*?)\n</reference(?: \d+)?>", text, re.S)
+    if texts:
+        return {"texts": texts}
+    sections = []
+    for line in text.split("\n"):
+        head = re.fullmatch(r"([^:\n-][^:\n]*):(?: (.*))?", line)
+        if line.startswith("- ") and sections and "items" in sections[-1]:
+            sections[-1]["items"].append(line[2:])
+        elif head and head.group(2) is None:
+            sections.append({"label": head.group(1), "items": []})
+        elif head:
+            sections.append({"label": head.group(1), "text": head.group(2)})
+        elif sections and "text" in sections[-1]:
+            sections[-1]["text"] += "\n" + line
+        elif sections and sections[-1]["items"]:
+            sections[-1]["items"][-1] += "\n" + line
+        else:
+            return {"texts": [text]}
+    return {"sections": sections}
+
+
+def build_instruct_data():
+    """The /instruct page's data.json, in the comparison pages' format, and
+    what its details read (returned beside it, for write_instruct_details):
+    None if there is no run (data/instruct/run.json)."""
+    if not (INSTRUCT_DATA / "run.json").exists():
+        return None
+    run = read_json(INSTRUCT_DATA / "run.json")
+    task_cfg = load_yaml(INSTRUCT_TASKS_YAML) or {}
+    model_cfg = load_yaml(INSTRUCT_MODELS_YAML) or {}
+    results = {p.stem: read_json(p) for p in sorted((INSTRUCT_DATA / "results").glob("*.json"))}
+    # The models in the YAML's order, then any others.
+    order = [m for m in model_cfg if m in results] + sorted(m for m in results if m not in model_cfg)
+    results = {m: results[m] for m in order}
+
+    def family(task):
+        """The run's kind of task ("choice", "translation", …)."""
+        return next((doc["results"]["tasks"][task].get("family") for doc in results.values()
+                     if task in doc["results"]["tasks"]), None)
+
+    metrics_setup = {}
+    for task, info in run["run"]["tasks"].items():
+        cfg = task_cfg.get(task)
+        if cfg is None:
+            print(f"  WARNING: {task} has no entry in {INSTRUCT_TASKS_YAML.name}")
+            cfg = {}
+        metrics_setup[task] = {
+            "pretty_name": cfg.get("pretty_name", task),
+            "description": cfg.get("description", ""),
+            "main_metric": INSTRUCT_METRIC,
+            # (The mean grade of random guessing; the page has no use for it.)
+            "random_baseline": round(INSTRUCT_TOP * info.get("random_baseline", 0.0), 6),
+            "max_performance": INSTRUCT_TOP,
+            "category": INSTRUCT_CATEGORIES.get(info["category"], info["category"].replace("_", " ")),
+            # Every answer is generated and judged; the page's task types
+            # are the base page's: multiple choice (classification) or not.
+            "evaluation_type": "classification" if family(task) == "choice" else "generation",
+            "metric_scale": "raw",
+            "url": cfg.get("url", ""),
+            "available_metrics": [INSTRUCT_METRIC],
+        }
+    tasks = list(metrics_setup)
+
+    meta = load_models_yaml(INSTRUCT_MODELS_YAML)
+    for m, doc in results.items():
+        model = doc["model"]
+        if m not in model_cfg:
+            print(f"  WARNING: {m} has no entry in {INSTRUCT_MODELS_YAML.name}: shown as \"{m}\"")
+            size = re.search(r"(\d+(?:\.\d+)?)b(?![a-z])", m.lower())
+            meta["model_display_names"][m] = m
+            meta["model_categories"][m] = "multilingual"
+            meta["model_organizations"][m] = (model.get("repo") or "").split("/")[0]
+            meta["model_parameters"][m] = float(size.group(1)) if size else 0
+            meta["model_fully_open"][m] = False
+            meta["default_models"].append(m)
+        info = meta["model_info"].setdefault(m, {"description": "", "huggingface_url": "", "license": ""})
+        if not info.get("huggingface_url") and model.get("repo"):
+            info["huggingface_url"] = "https://huggingface.co/" + model["repo"]
+        info["max_tokens"] = model.get("max_tokens")
+        # Every name says the model's size (its total parameters: 31B,
+        # 26B-A4B, 8B-E4B, 270M), and a run with thinking turned on says so.
+        name = meta["model_display_names"][m]
+        if not re.search(r"\d(?:\.\d+)?[BM]\b", name):
+            print(f"  WARNING: {m}'s name \"{name}\" has no parameter count")
+        if m.endswith("-think") and not name.endswith(" Thinking"):
+            print(f"  WARNING: {m} reasons before it answers: its name \"{name}\" should end in \" Thinking\"")
+
+    # Each task's mean grade and its 95% interval, from its draws' grades
+    # (the draws clustered by item).
+    plans = read_json(INSTRUCT_DATA / "draws.json")
+    models = {}
+    for m, doc in results.items():
+        scores = {}
+        for task in tasks:
+            r = doc["results"]["tasks"].get(task)
+            stats = instruct_checked_stats(doc.get("points", {}).get(task, ""), plans[task]["doc_index"],
+                                           r, f"{m} on {task}")
+            if stats is None:
+                continue
+            s, se = stats
+            scores[task] = {INSTRUCT_SHOT: {INSTRUCT_METRIC: {
+                "mean": round(s, 6),
+                "mean_ci_lo": round(max(0.0, s - Z_HI * se), 6),
+                "mean_ci_hi": round(min(INSTRUCT_TOP, s + Z_HI * se), 6),
+            }}}
+        models[m] = scores
+
+    nno = sorted(t for t in tasks if "_nno" in t)
+    sme = sorted(t for t in tasks if "_sme" in t)
+    nob_nno = sorted(t for t in tasks if re.fullmatch(r"translation_(nob_nno|nno_nob)", t))
+    shared = sorted(t for t in tasks if t.startswith("slide"))
+    judge = run["judge"]
+    data = {
+        "metrics_setup": metrics_setup,
+        "nno_benchmarks": nno,
+        "sme_benchmarks": sme,
+        "nob_nno_translation_benchmarks": nob_nno,
+        "shared_language_benchmarks": shared,
+        **meta,
+        "models": models,
+        "instruct": {
+            "judge": {"name": judge.get("name", ""), "repo": judge.get("repo", ""),
+                      "display_name": INSTRUCT_JUDGE_NAMES.get(judge.get("name", ""), judge.get("name", ""))},
+            "rubric": run["run"].get("rubric", ""),
+            # What the judge is given: its instructions and examples, the
+            # case (prompt, reference, response) and the output format.
+            "judge_prompt": {k: run["judge_prompt"].get(k, "") for k in ("prefix", "case", "output_format")},
+            "draws": run["run"].get("n"),
+            "noreval": (run["run"].get("noreval") or {}).get("version", ""),
+            "skipped": run["run"].get("skipped", {}),
+        },
+    }
+    return data, {"run": run, "results": results}
+
+
+def write_instruct_details(page_dir, data, source):
+    """Write what the /instruct page's model details show beyond data.json,
+    into <page>/details/, and set data["details_version"] (a hash of these
+    files, which the page appends to their URLs) and data["instruct"]
+    ["examples"]:
+
+      tasks/<task>.json — the task view: the task's draws ("draws", of
+        "items" items) and prompt variants ("variants": formulation and
+        number), every model's ("models", in data order) mean grade and
+        its standard error (clustered by item), in points ("score"), and
+        the judge's grades counted 0–5 ("points"); and the examples (the first draws: prompt, reference, item, variant) with
+        every model's grade of each ("example_points").
+      responses/<model>/<task>.json — the model's responses to the
+        examples (answer, reasoning, length and how it ended) and their
+        judgments: data/instruct/responses/ as it is (one copy in git).
+
+    Files of tasks and models that no longer exist are removed."""
+    out_dir = page_dir / "details"
+    run, results = source["run"], source["results"]
+    plans = read_json(INSTRUCT_DATA / "draws.json")
+    models = list(data["models"])
+    blobs = {}
+    shown = None
+    for task in data["metrics_setup"]:
+        info = run["run"]["tasks"][task]
+        variants = sorted(info["variants"], key=lambda v: (
+            INSTRUCT_FORMULATIONS.index(instruct_variant(task, v)[0]), instruct_variant(task, v)[1] or 0))
+        stats = [results[m]["results"]["tasks"].get(task) for m in models]
+        ex_path = INSTRUCT_DATA / "examples" / f"{task}.json"
+        examples = read_json(ex_path)["examples"] if ex_path.exists() else []
+        # Each model's responses to them: the page reads the file as it is.
+        texts, answered = {}, {}
+        for m in models:
+            path = INSTRUCT_DATA / "responses" / m / f"{task}.json"
+            if path.exists():
+                texts[m] = path.read_text()
+                answered[m] = json.loads(texts[m])["examples"]
+            else:
+                print(f"  WARNING: {m} has no responses to {task}")
+                answered[m] = []
+        n_shown = min([len(examples)] + [len(a) for a in answered.values() if a])
+        for m, a in answered.items():
+            if a and [r["draw"] for r in a[:n_shown]] != [e["draw"] for e in examples[:n_shown]]:
+                raise SystemExit(f"{m}'s responses to {task} are to other draws than data/instruct/examples/{task}.json")
+        shown = n_shown if shown is None else min(shown, n_shown)
+        examples = examples[:n_shown]
+
+        grades = [results[m].get("points", {}).get(task, "") for m in models]
+
+        def pair(j, r):
+            """Model j's [mean grade, standard error] (clustered by item), or None."""
+            stats = instruct_checked_stats(grades[j], plans[task]["doc_index"], r, f"{models[j]} on {task}")
+            return None if stats is None else [round(stats[0], 6), round(stats[1], 6)]
+
+        doc = {
+            "task": task,
+            "items": info.get("n_docs"),
+            "draws": run["run"].get("n"),
+            "variants": [{"form": instruct_variant(task, v)[0], "prompt": instruct_variant(task, v)[1]} for v in variants],
+            "models": models,
+            "score": [pair(j, r) for j, r in enumerate(stats)],
+            "points": [[g.count(str(k)) for k in range(INSTRUCT_TOP + 1)] if g else None for g in grades],
+        }
+        doc["examples"] = [{
+            "draw": e["draw"], "item": e["doc_index"], "variant": variants.index(e["prompt_variant"]),
+            "prompt": e["prompt"], "reference": instruct_reference(e["reference_text"]),
+        } for e in examples]
+        doc["example_points"] = [[r["judge_points"] for r in answered[m][:n_shown]] if answered[m] else None
+                                 for m in models]
+        blobs[f"tasks/{task}.json"] = json.dumps(doc, ensure_ascii=False, separators=(",", ":"))
+        for m, text in texts.items():
+            blobs[f"responses/{m}/{task}.json"] = text
+
+    (out_dir / "tasks").mkdir(parents=True, exist_ok=True)
+    for old in out_dir.rglob("*.json"):
+        if old.relative_to(out_dir).as_posix() not in blobs:
+            old.unlink()
+    for d in sorted((p for p in out_dir.rglob("*") if p.is_dir()), reverse=True):
+        if not any(d.iterdir()):
+            d.rmdir()
+    digest = hashlib.sha1()
+    for name, blob in blobs.items():
+        path = out_dir / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with open(path, "w") as f:
+            f.write(blob)
+        digest.update(f"{name}\t{blob}\n".encode())
+    data["details_version"] = digest.hexdigest()[:12]
+    data["instruct"]["examples"] = shown or 0
+    total_kb = sum(len(b.encode()) for b in blobs.values()) / 1024
+    print(f"  → wrote {len(blobs)} files to {out_dir.relative_to(BASE_DIR)}/ ({total_kb:.1f} KB)")
+
+
 def main():
     metrics_setup = load_yaml(METRICS_SETUP_YAML)
 
@@ -2110,11 +2446,21 @@ def main():
     print("\n=== Building docs/noreval-gen/data.json (instruct models) ===")
     details = {}
     noreval_gen = build_comparison_data(
-        NOREVAL_GEN_RESULTS, INSTRUCT_MODELS_SETUP_YAML, metrics_setup, details
+        NOREVAL_GEN_RESULTS, NOREVAL_GEN_MODELS_YAML, metrics_setup, details
     )
     write_task_details(NOREVAL_GEN_OUT.parent, noreval_gen, details)
     write_data(NOREVAL_GEN_OUT, noreval_gen)
     print(f"  Models: {len(noreval_gen['models'])}")
+
+    print("\n=== Building docs/instruct/data.json (NorEval Instruct, LLM-judged) ===")
+    built = build_instruct_data()
+    if built is None:
+        print(f"  No run in {INSTRUCT_DATA.relative_to(BASE_DIR)}/ (import_instruct_results.py): skipped")
+    else:
+        instruct, source = built
+        write_instruct_details(INSTRUCT_OUT.parent, instruct, source)
+        write_data(INSTRUCT_OUT, instruct)
+        print(f"  Models: {len(instruct['models'])}, tasks: {len(instruct['metrics_setup'])}")
 
     print("\n=== Building docs/norolmo/data.json (NorOLMo progression) ===")
     norolmo = build_norolmo_data(metrics_setup)

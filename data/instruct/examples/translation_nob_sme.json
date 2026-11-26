@@ -1,0 +1,549 @@
+{
+ "task": "translation_nob_sme",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 40,
+   "doc_fingerprint": "8abe8583f424",
+   "prompt_variant": "translation_nob_sme_p0",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Bokmål: Du ville like Tom.\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Don liikošedjet Tomai."
+    ]
+   },
+   "reference_text": "<reference>\nDon liikošedjet Tomai.\n</reference>"
+  },
+  {
+   "draw": 1,
+   "doc_index": 147,
+   "doc_fingerprint": "e3d3c1abae88",
+   "prompt_variant": "translation_nob_sme_p4",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Dárogiella: Fordi jeg elsker deg.\nDavvisámegiella:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Danne mon ráhkistan du."
+    ]
+   },
+   "reference_text": "<reference>\nDanne mon ráhkistan du.\n</reference>"
+  },
+  {
+   "draw": 2,
+   "doc_index": 158,
+   "doc_fingerprint": "7fc4140903d8",
+   "prompt_variant": "translation_nob_sme_p3",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Hva blir \"David er hjemme.\" på samisk?\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Dávvet lea ruovttus."
+    ]
+   },
+   "reference_text": "<reference>\nDávvet lea ruovttus.\n</reference>"
+  },
+  {
+   "draw": 3,
+   "doc_index": 52,
+   "doc_fingerprint": "300e3bef228c",
+   "prompt_variant": "translation_nob_sme_p1",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Oversett følgende setning til samisk: Jeg skal vise deg rommet mitt.\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Mun čájehan mu lanja dudnuide."
+    ]
+   },
+   "reference_text": "<reference>\nMun čájehan mu lanja dudnuide.\n</reference>"
+  },
+  {
+   "draw": 4,
+   "doc_index": 51,
+   "doc_fingerprint": "64bd082b06f6",
+   "prompt_variant": "translation_nob_sme_p2",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Gi en samisk oversettelse av denne setningen: Jeg må vite.\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Galggan diehtit."
+    ]
+   },
+   "reference_text": "<reference>\nGalggan diehtit.\n</reference>"
+  },
+  {
+   "draw": 5,
+   "doc_index": 24,
+   "doc_fingerprint": "86faa55bd51a",
+   "prompt_variant": "translation_nob_sme_p1",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Oversett følgende setning til samisk: Jeg skriver et brev.\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Čálán reivve."
+    ]
+   },
+   "reference_text": "<reference>\nČálán reivve.\n</reference>"
+  },
+  {
+   "draw": 6,
+   "doc_index": 160,
+   "doc_fingerprint": "75b46325cded",
+   "prompt_variant": "translation_nob_sme_p3",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Han går på ungdomsskolen.\" på samisk?\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Son vázzá nuoraidskuvlla."
+    ]
+   },
+   "reference_text": "<reference>\nSon vázzá nuoraidskuvlla.\n</reference>"
+  },
+  {
+   "draw": 7,
+   "doc_index": 114,
+   "doc_fingerprint": "e95b00662b9a",
+   "prompt_variant": "translation_nob_sme_p4",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Dárogiella: Hva er det til middag?\nDavvisámegiella:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Mii odne lea málisin?"
+    ]
+   },
+   "reference_text": "<reference>\nMii odne lea málisin?\n</reference>"
+  },
+  {
+   "draw": 8,
+   "doc_index": 77,
+   "doc_fingerprint": "966ea5493987",
+   "prompt_variant": "translation_nob_sme_p0",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Bokmål: Jeg forstår ikke hva han sier.\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Mun in ipmir maid son dadjá."
+    ]
+   },
+   "reference_text": "<reference>\nMun in ipmir maid son dadjá.\n</reference>"
+  },
+  {
+   "draw": 9,
+   "doc_index": 130,
+   "doc_fingerprint": "57487195e80d",
+   "prompt_variant": "translation_nob_sme_p2",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Gi en samisk oversettelse av denne setningen: Jeg har mange bøker.\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Mus leat ollut girjjit."
+    ]
+   },
+   "reference_text": "<reference>\nMus leat ollut girjjit.\n</reference>"
+  },
+  {
+   "draw": 10,
+   "doc_index": 134,
+   "doc_fingerprint": "c650532bc8d4",
+   "prompt_variant": "translation_nob_sme_p0",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Bokmål: Vi snakkes.\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Oaidnaleapmai."
+    ]
+   },
+   "reference_text": "<reference>\nOaidnaleapmai.\n</reference>"
+  },
+  {
+   "draw": 11,
+   "doc_index": 109,
+   "doc_fingerprint": "38bc00e7d194",
+   "prompt_variant": "translation_nob_sme_p3",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Jeg skal prøve.\" på samisk?\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Mun iskkan."
+    ]
+   },
+   "reference_text": "<reference>\nMun iskkan.\n</reference>"
+  },
+  {
+   "draw": 12,
+   "doc_index": 95,
+   "doc_fingerprint": "9e24d3ff998c",
+   "prompt_variant": "translation_nob_sme_p4",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Dárogiella: Vis meg.\nDavvisámegiella:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Čájet munnje!"
+    ]
+   },
+   "reference_text": "<reference>\nČájet munnje!\n</reference>"
+  },
+  {
+   "draw": 13,
+   "doc_index": 30,
+   "doc_fingerprint": "bd1e3cd897f1",
+   "prompt_variant": "translation_nob_sme_p2",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Gi en samisk oversettelse av denne setningen: Vi eier et hotell.\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Mii oamastit ovtta hotealla."
+    ]
+   },
+   "reference_text": "<reference>\nMii oamastit ovtta hotealla.\n</reference>"
+  },
+  {
+   "draw": 14,
+   "doc_index": 171,
+   "doc_fingerprint": "11e63e9d204f",
+   "prompt_variant": "translation_nob_sme_p1",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Oversett følgende setning til samisk: Jeg spiser ikke kjøtt.\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Mun in bora bierggu."
+    ]
+   },
+   "reference_text": "<reference>\nMun in bora bierggu.\n</reference>"
+  },
+  {
+   "draw": 15,
+   "doc_index": 12,
+   "doc_fingerprint": "b9e07bfa82b9",
+   "prompt_variant": "translation_nob_sme_p4",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Dárogiella: Han røyker ikke.\nDavvisámegiella:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Son ii borggut."
+    ]
+   },
+   "reference_text": "<reference>\nSon ii borggut.\n</reference>"
+  },
+  {
+   "draw": 16,
+   "doc_index": 14,
+   "doc_fingerprint": "9a46693bd204",
+   "prompt_variant": "translation_nob_sme_p1",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Oversett følgende setning til samisk: Jeg er en kvinne.\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Mun lean nissonolmmoš."
+    ]
+   },
+   "reference_text": "<reference>\nMun lean nissonolmmoš.\n</reference>"
+  },
+  {
+   "draw": 17,
+   "doc_index": 49,
+   "doc_fingerprint": "33f515f6b466",
+   "prompt_variant": "translation_nob_sme_p2",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Gi en samisk oversettelse av denne setningen: Jeg skar meg nettopp i fingeren.\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Mun lean easka čuohppan suorpman."
+    ]
+   },
+   "reference_text": "<reference>\nMun lean easka čuohppan suorpman.\n</reference>"
+  },
+  {
+   "draw": 18,
+   "doc_index": 17,
+   "doc_fingerprint": "90676548c90a",
+   "prompt_variant": "translation_nob_sme_p0",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Bokmål: Hvordan går det?\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Movt dat manná?"
+    ]
+   },
+   "reference_text": "<reference>\nMovt dat manná?\n</reference>"
+  },
+  {
+   "draw": 19,
+   "doc_index": 67,
+   "doc_fingerprint": "4d69ff60f349",
+   "prompt_variant": "translation_nob_sme_p3",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Pengene forsvant.\" på samisk?\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Ruđat jávkkaimet."
+    ]
+   },
+   "reference_text": "<reference>\nRuđat jávkkaimet.\n</reference>"
+  },
+  {
+   "draw": 20,
+   "doc_index": 89,
+   "doc_fingerprint": "0c4573c04c74",
+   "prompt_variant": "translation_nob_sme_p0",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Bokmål: Tenk hva du vil.\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Jurddaš maid don háliidat!"
+    ]
+   },
+   "reference_text": "<reference>\nJurddaš maid don háliidat!\n</reference>"
+  },
+  {
+   "draw": 21,
+   "doc_index": 36,
+   "doc_fingerprint": "48de97f38c43",
+   "prompt_variant": "translation_nob_sme_p3",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Faren min er den beste faren i verden.\" på samisk?\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Áhčán lea buoremus áhčči máilmmis."
+    ]
+   },
+   "reference_text": "<reference>\nÁhčán lea buoremus áhčči máilmmis.\n</reference>"
+  },
+  {
+   "draw": 22,
+   "doc_index": 105,
+   "doc_fingerprint": "f77eed966707",
+   "prompt_variant": "translation_nob_sme_p1",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Oversett følgende setning til samisk: Hvorfor det?\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Man dihtii?"
+    ]
+   },
+   "reference_text": "<reference>\nMan dihtii?\n</reference>"
+  },
+  {
+   "draw": 23,
+   "doc_index": 50,
+   "doc_fingerprint": "9f1f9c81435b",
+   "prompt_variant": "translation_nob_sme_p4",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Dárogiella: Ikke skjær deg i fingeren.\nDavvisámegiella:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Ale čuohpa suorpmat."
+    ]
+   },
+   "reference_text": "<reference>\nAle čuohpa suorpmat.\n</reference>"
+  },
+  {
+   "draw": 24,
+   "doc_index": 54,
+   "doc_fingerprint": "48e382d4a420",
+   "prompt_variant": "translation_nob_sme_p2",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Gi en samisk oversettelse av denne setningen: Du må rydde rommet ditt hver dag.\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Don fertet čorget du lanja juohke beaivvi."
+    ]
+   },
+   "reference_text": "<reference>\nDon fertet čorget du lanja juohke beaivvi.\n</reference>"
+  },
+  {
+   "draw": 25,
+   "doc_index": 94,
+   "doc_fingerprint": "82d71a579ebf",
+   "prompt_variant": "translation_nob_sme_p1",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Oversett følgende setning til samisk: Jeg tror ikke på det!\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "In jáhke!"
+    ]
+   },
+   "reference_text": "<reference>\nIn jáhke!\n</reference>"
+  },
+  {
+   "draw": 26,
+   "doc_index": 124,
+   "doc_fingerprint": "b9ec2ac7d6ad",
+   "prompt_variant": "translation_nob_sme_p4",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Dárogiella: Hvor gammel er du nå?\nDavvisámegiella:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Man boaris leat don dál?"
+    ]
+   },
+   "reference_text": "<reference>\nMan boaris leat don dál?\n</reference>"
+  },
+  {
+   "draw": 27,
+   "doc_index": 1,
+   "doc_fingerprint": "9abffba29986",
+   "prompt_variant": "translation_nob_sme_p0",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Bokmål: Hvorfor venter du utenfor?\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Manne don vuorddát olgun?"
+    ]
+   },
+   "reference_text": "<reference>\nManne don vuorddát olgun?\n</reference>"
+  },
+  {
+   "draw": 28,
+   "doc_index": 41,
+   "doc_fingerprint": "2e0e2cee46f4",
+   "prompt_variant": "translation_nob_sme_p2",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Gi en samisk oversettelse av denne setningen: Du drepte Tom.\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Don goddet Toma."
+    ]
+   },
+   "reference_text": "<reference>\nDon goddet Toma.\n</reference>"
+  },
+  {
+   "draw": 29,
+   "doc_index": 113,
+   "doc_fingerprint": "4ce5ce1dbb2d",
+   "prompt_variant": "translation_nob_sme_p3",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Jeg har ikke tid.\" på samisk?\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "In astta."
+    ]
+   },
+   "reference_text": "<reference>\nIn astta.\n</reference>"
+  },
+  {
+   "draw": 30,
+   "doc_index": 165,
+   "doc_fingerprint": "625d6eb82f22",
+   "prompt_variant": "translation_nob_sme_p3",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Vann er liv.\" på samisk?\nSamisk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Čáhci lea eallin."
+    ]
+   },
+   "reference_text": "<reference>\nČáhci lea eallin.\n</reference>"
+  },
+  {
+   "draw": 31,
+   "doc_index": 144,
+   "doc_fingerprint": "fb511721696b",
+   "prompt_variant": "translation_nob_sme_p4",
+   "formulation": "gen",
+   "language": "sme",
+   "source_language": "nob",
+   "prompt": "Dárogiella: Jeg vet.\nDavvisámegiella:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Mun dieđán."
+    ]
+   },
+   "reference_text": "<reference>\nMun dieđán.\n</reference>"
+  }
+ ]
+}

@@ -1,0 +1,549 @@
+{
+ "task": "translation_nno_eng",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 446,
+   "doc_fingerprint": "5a9809084670",
+   "prompt_variant": "translation_nno_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Nynorsk: Det veit ikkje du.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "You don't know that."
+    ]
+   },
+   "reference_text": "<reference>\nYou don't know that.\n</reference>"
+  },
+  {
+   "draw": 1,
+   "doc_index": 308,
+   "doc_fingerprint": "8e8e68547876",
+   "prompt_variant": "translation_nno_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Gje ei engelsk omsetjing av denne setninga: Dei sa at han var ein pratesjuk og pågåande austerlending.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "They said that he was a talkative, noisy Oriental."
+    ]
+   },
+   "reference_text": "<reference>\nThey said that he was a talkative, noisy Oriental.\n</reference>"
+  },
+  {
+   "draw": 2,
+   "doc_index": 205,
+   "doc_fingerprint": "791989639565",
+   "prompt_variant": "translation_nno_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Omsett følgande setning til engelsk: Eg plar ha på den gamle frakken min i slikt vêr.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "I wear my old coat in weather like this."
+    ]
+   },
+   "reference_text": "<reference>\nI wear my old coat in weather like this.\n</reference>"
+  },
+  {
+   "draw": 3,
+   "doc_index": 404,
+   "doc_fingerprint": "6b1740b5ae4c",
+   "prompt_variant": "translation_nno_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Kva blir \"Vi valde eit hotell nær musea.\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "We chose a hotel near the museums."
+    ]
+   },
+   "reference_text": "<reference>\nWe chose a hotel near the museums.\n</reference>"
+  },
+  {
+   "draw": 4,
+   "doc_index": 152,
+   "doc_fingerprint": "94aa6f1f4fa6",
+   "prompt_variant": "translation_nno_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Kva blir \"Eg prøver å lære engelsk.\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "I'm trying to learn English."
+    ]
+   },
+   "reference_text": "<reference>\nI'm trying to learn English.\n</reference>"
+  },
+  {
+   "draw": 5,
+   "doc_index": 160,
+   "doc_fingerprint": "40df81d5fec9",
+   "prompt_variant": "translation_nno_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Omsett følgande setning til engelsk: Jeg pleide ofte å spise pizza.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "I often used to eat pizza."
+    ]
+   },
+   "reference_text": "<reference>\nI often used to eat pizza.\n</reference>"
+  },
+  {
+   "draw": 6,
+   "doc_index": 171,
+   "doc_fingerprint": "63d8c18cad79",
+   "prompt_variant": "translation_nno_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Nynorsk: Er det noko å drikke i kjøleskapet?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Is there anything to drink in the fridge?"
+    ]
+   },
+   "reference_text": "<reference>\nIs there anything to drink in the fridge?\n</reference>"
+  },
+  {
+   "draw": 7,
+   "doc_index": 326,
+   "doc_fingerprint": "0f8a4100d31b",
+   "prompt_variant": "translation_nno_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Gje ei engelsk omsetjing av denne setninga: Tom har allereie gjeve Maria det ho spurde etter.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Tom has already given Mary what she asked for."
+    ]
+   },
+   "reference_text": "<reference>\nTom has already given Mary what she asked for.\n</reference>"
+  },
+  {
+   "draw": 8,
+   "doc_index": 177,
+   "doc_fingerprint": "5cd3bd3dcffb",
+   "prompt_variant": "translation_nno_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Nynorsk: Eg trudde Tom hadde hund.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "I thought Tom had a dog."
+    ]
+   },
+   "reference_text": "<reference>\nI thought Tom had a dog.\n</reference>"
+  },
+  {
+   "draw": 9,
+   "doc_index": 2,
+   "doc_fingerprint": "404bf6e75b59",
+   "prompt_variant": "translation_nno_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Gje ei engelsk omsetjing av denne setninga: Keiar du deg her?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Are you bored here?"
+    ]
+   },
+   "reference_text": "<reference>\nAre you bored here?\n</reference>"
+  },
+  {
+   "draw": 10,
+   "doc_index": 297,
+   "doc_fingerprint": "ceb42f9979e9",
+   "prompt_variant": "translation_nno_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Kva blir \"Symjarane går uti.\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "The swimmers are entering the water."
+    ]
+   },
+   "reference_text": "<reference>\nThe swimmers are entering the water.\n</reference>"
+  },
+  {
+   "draw": 11,
+   "doc_index": 369,
+   "doc_fingerprint": "e8d8d303ae8d",
+   "prompt_variant": "translation_nno_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Omsett følgande setning til engelsk: Tom bestod ikkje på eksamen.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Tom wasn't able to pass the examination."
+    ]
+   },
+   "reference_text": "<reference>\nTom wasn't able to pass the examination.\n</reference>"
+  },
+  {
+   "draw": 12,
+   "doc_index": 307,
+   "doc_fingerprint": "25525a6d07c3",
+   "prompt_variant": "translation_nno_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Nynorsk: Dei vaskar hendene.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "They're washing their hands."
+    ]
+   },
+   "reference_text": "<reference>\nThey're washing their hands.\n</reference>"
+  },
+  {
+   "draw": 13,
+   "doc_index": 7,
+   "doc_fingerprint": "b42156f3444e",
+   "prompt_variant": "translation_nno_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Gje ei engelsk omsetjing av denne setninga: Ring meg!\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Call me!"
+    ]
+   },
+   "reference_text": "<reference>\nCall me!\n</reference>"
+  },
+  {
+   "draw": 14,
+   "doc_index": 194,
+   "doc_fingerprint": "9827d3482839",
+   "prompt_variant": "translation_nno_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Kva blir \"Eg har bestemt meg for å gå.\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "I've made up my mind to go."
+    ]
+   },
+   "reference_text": "<reference>\nI've made up my mind to go.\n</reference>"
+  },
+  {
+   "draw": 15,
+   "doc_index": 270,
+   "doc_fingerprint": "13ffda24f350",
+   "prompt_variant": "translation_nno_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Omsett følgande setning til engelsk: Kalkulatoren på bordet er min.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "The calculator on the table is mine."
+    ]
+   },
+   "reference_text": "<reference>\nThe calculator on the table is mine.\n</reference>"
+  },
+  {
+   "draw": 16,
+   "doc_index": 67,
+   "doc_fingerprint": "62edecd5a6e6",
+   "prompt_variant": "translation_nno_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Nynorsk: Han gjekk kleint ned gata.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "He walked awkwardly down the street."
+    ]
+   },
+   "reference_text": "<reference>\nHe walked awkwardly down the street.\n</reference>"
+  },
+  {
+   "draw": 17,
+   "doc_index": 102,
+   "doc_fingerprint": "db59b4c6ac25",
+   "prompt_variant": "translation_nno_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Kva blir \"Viss du hadde følgd med, hadde du også vore bekymra.\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "If you paid attention, you'd be worried too."
+    ]
+   },
+   "reference_text": "<reference>\nIf you paid attention, you'd be worried too.\n</reference>"
+  },
+  {
+   "draw": 18,
+   "doc_index": 232,
+   "doc_fingerprint": "5ea9cfe7e77e",
+   "prompt_variant": "translation_nno_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Omsett følgande setning til engelsk: Noreg heiter \"Norge\" på bokmål.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Norway is called \"Norge\" in Norwegian."
+    ]
+   },
+   "reference_text": "<reference>\nNorway is called \"Norge\" in Norwegian.\n</reference>"
+  },
+  {
+   "draw": 19,
+   "doc_index": 256,
+   "doc_fingerprint": "2d557a0887c5",
+   "prompt_variant": "translation_nno_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Gje ei engelsk omsetjing av denne setninga: Ho såg misnøgd ut med resultata.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "She seemed disappointed at the result."
+    ]
+   },
+   "reference_text": "<reference>\nShe seemed disappointed at the result.\n</reference>"
+  },
+  {
+   "draw": 20,
+   "doc_index": 213,
+   "doc_fingerprint": "4ab47323343f",
+   "prompt_variant": "translation_nno_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Omsett følgande setning til engelsk: Livet vert stadig meir komplekst.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Life is becoming ever more complex."
+    ]
+   },
+   "reference_text": "<reference>\nLife is becoming ever more complex.\n</reference>"
+  },
+  {
+   "draw": 21,
+   "doc_index": 154,
+   "doc_fingerprint": "387842f189d4",
+   "prompt_variant": "translation_nno_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Gje ei engelsk omsetjing av denne setninga: I tillegg til å vera ein god lærar, var ho òg ein flittig student.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "In addition to being a good teacher, she was a great scholar."
+    ]
+   },
+   "reference_text": "<reference>\nIn addition to being a good teacher, she was a great scholar.\n</reference>"
+  },
+  {
+   "draw": 22,
+   "doc_index": 103,
+   "doc_fingerprint": "9d2e29a2b63c",
+   "prompt_variant": "translation_nno_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Nynorsk: Eg går på skolen kvar dag.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "I go to school every day."
+    ]
+   },
+   "reference_text": "<reference>\nI go to school every day.\n</reference>"
+  },
+  {
+   "draw": 23,
+   "doc_index": 81,
+   "doc_fingerprint": "ea655c79732b",
+   "prompt_variant": "translation_nno_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Kva blir \"Svolten sannkjenner inga lov.\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Hunger knows no law."
+    ]
+   },
+   "reference_text": "<reference>\nHunger knows no law.\n</reference>"
+  },
+  {
+   "draw": 24,
+   "doc_index": 116,
+   "doc_fingerprint": "af355afaba29",
+   "prompt_variant": "translation_nno_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Nynorsk: Eg må skunda meg til stasjonen for å ta det siste toget.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "I have to hurry to the station to take the last train."
+    ]
+   },
+   "reference_text": "<reference>\nI have to hurry to the station to take the last train.\n</reference>"
+  },
+  {
+   "draw": 25,
+   "doc_index": 60,
+   "doc_fingerprint": "02ace6a1f04d",
+   "prompt_variant": "translation_nno_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Kva blir \"Han heldt fingeren opp mot leppa for å bede om togn.\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "He put his finger to his lips as a sign to be quiet."
+    ]
+   },
+   "reference_text": "<reference>\nHe put his finger to his lips as a sign to be quiet.\n</reference>"
+  },
+  {
+   "draw": 26,
+   "doc_index": 265,
+   "doc_fingerprint": "b37f8e3f10c0",
+   "prompt_variant": "translation_nno_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Omsett følgande setning til engelsk: Takk!\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Thanks!"
+    ]
+   },
+   "reference_text": "<reference>\nThanks!\n</reference>"
+  },
+  {
+   "draw": 27,
+   "doc_index": 371,
+   "doc_fingerprint": "9f41681f6854",
+   "prompt_variant": "translation_nno_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Gje ei engelsk omsetjing av denne setninga: Tom var ikkje klar for å døy.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Tom wasn't ready to die."
+    ]
+   },
+   "reference_text": "<reference>\nTom wasn't ready to die.\n</reference>"
+  },
+  {
+   "draw": 28,
+   "doc_index": 403,
+   "doc_fingerprint": "d5a0a017dc11",
+   "prompt_variant": "translation_nno_eng_p2",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Gje ei engelsk omsetjing av denne setninga: Vi åt sverdfisk.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "We ate swordfish."
+    ]
+   },
+   "reference_text": "<reference>\nWe ate swordfish.\n</reference>"
+  },
+  {
+   "draw": 29,
+   "doc_index": 268,
+   "doc_fingerprint": "179877313cb8",
+   "prompt_variant": "translation_nno_eng_p1",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Omsett følgande setning til engelsk: Boki ligg på bordet.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "The book is on the table."
+    ]
+   },
+   "reference_text": "<reference>\nThe book is on the table.\n</reference>"
+  },
+  {
+   "draw": 30,
+   "doc_index": 441,
+   "doc_fingerprint": "6695ca8eb252",
+   "prompt_variant": "translation_nno_eng_p3",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Kva blir \"Skal du bruka dette?\" på engelsk?\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Will you use this?"
+    ]
+   },
+   "reference_text": "<reference>\nWill you use this?\n</reference>"
+  },
+  {
+   "draw": 31,
+   "doc_index": 309,
+   "doc_fingerprint": "23e1b1d3af20",
+   "prompt_variant": "translation_nno_eng_p0",
+   "formulation": "gen",
+   "language": "eng",
+   "source_language": "nno",
+   "prompt": "Nynorsk: Dei seiar at ho var rik.\nEngelsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "They say she was rich."
+    ]
+   },
+   "reference_text": "<reference>\nThey say she was rich.\n</reference>"
+  }
+ ]
+}

@@ -1,6 +1,7 @@
 // Shared Plotly helpers — layout, modebar, export, color utilities, band traces.
 
 import { state } from "./state.js";
+import { isAggregateSelection, getAggregatedTasks, scoreScaleText } from "./core.js";
 
 // ─────────────────────────────────────────────────────────────
 // Color utilities
@@ -34,14 +35,6 @@ export const JSON_DOWNLOAD_ICON = {
   path: "M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z",
 };
 
-// Vector graphics (a curve between two anchor points, as in a pen tool), so
-// the SVG download is told apart from the PNG one (camera) at a glance.
-export const SVG_DOWNLOAD_ICON = {
-  width: 24,
-  height: 24,
-  path: "M3 17h4v4H3zM17 3h4v4h-4zM6.2 17Q6.5 6.5 17 6.2v1.6Q8.1 8.1 7.8 17z",
-};
-
 /** Trigger a client-side download of `data` as a pretty-printed JSON file. */
 export function downloadJSON(data, filename) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
@@ -58,71 +51,97 @@ export function downloadJSON(data, filename) {
 /** The y-axis's tick labels. */
 export const Y_TICK_FONT = { size: 13.6, color: "#64748b", weight: 500 };
 
-/** Export the current chart's data as JSON.
- *  `metadata` provides dashboard-specific fields to include in the export. */
+/** A number as an export gives it: at most 4 decimals (an integer, a token
+ *  count, as it is). */
+function exportNumber(v) {
+  return typeof v === "number" && Number.isFinite(v) && !Number.isInteger(v) ? +v.toFixed(4) : v ?? null;
+}
+
+/** An axis's title, if it has one. */
+function axisTitle(axis) {
+  const t = axis?.title;
+  return (typeof t === "string" ? t : t?.text) || "";
+}
+
+/** Export the current chart's data as JSON: what it shows and how (the
+ *  dashboard, the chart's title, what y and x are, the page's settings:
+ *  `metadata`, from the page), then its values — on a comparison chart a
+ *  record per model ({model, score, ci_95: [low, high]}, and on the scatter
+ *  by size its parameters), on a progress chart a series per line, each a
+ *  list of points ({x, y, ci_95}). Numbers to 4 decimals. */
 export function exportChartDataAsJSON(gd, metadata, filename) {
-  const exportData = {
-    metadata: {
-      ...metadata,
-      // A dashboard may supply these itself (the comparison pages draw their
-      // title outside the Plotly figure, so the layout has none).
-      title: metadata?.title ?? (gd.layout.title?.text || ""),
-      y_axis: metadata?.y_axis ?? (gd.layout.yaxis?.title?.text || gd.layout.yaxis?.title || ""),
-      exported_at: new Date().toISOString(),
-    },
-    series: [],
+  const { title, y_axis, x_axis, ...given } = metadata || {};
+  const out = {
+    dashboard: document.title,
+    url: window.location.href,
+    exported_at: new Date().toISOString(),
+    chart: title ?? (document.getElementById("chart-title")?.textContent.trim() || axisTitle({ title: gd.layout.title })),
+    y: y_axis ?? (axisTitle(gd.layout.yaxis) || scoreScaleText()),
   };
-  for (const trace of gd.data) {
-    if (trace.fill === "toself") continue;  // skip SE band traces
-    const series = {
-      name: trace.name || null,
-      x: Array.from(trace.x),
-      y: Array.from(trace.y),
-    };
-    if (trace.error_y?.array) series.error = Array.from(trace.error_y.array);
-    // The lower half-widths of asymmetric error bars, and the entity behind
-    // each point when the trace's customdata names it (the comparison
-    // charts, whose x is a bar position or a model size).
-    if (trace.error_y?.arrayminus) series.error_minus = Array.from(trace.error_y.arrayminus);
-    if (Array.isArray(trace.customdata) && trace.customdata.some((d) => d?.label != null)) {
-      series.labels = trace.customdata.map((d) => d?.label ?? null);
-    }
-    exportData.series.push(series);
+  const x = x_axis ?? axisTitle(gd.layout.xaxis);
+  if (x) out.x = x;
+  // The page's settings, without the empty ones; a task selection as the
+  // tasks it averages over (or the one task).
+  const settings = {};
+  for (const [k, v] of Object.entries(given)) {
+    if (v == null) continue;
+    if (k === "task_selection") settings.tasks = isAggregateSelection(v) ? getAggregatedTasks().sort() : [v];
+    else settings[k === "normalization" ? "rescaling" : k] = v;
   }
-  downloadJSON(exportData, filename || "chart-data.json");
+  out.settings = settings;
+  const shown = (t) => t.visible !== false && t.visible !== "legendonly";
+  const lines = gd.data.filter((t) => t.fill !== "toself" && shown(t));
+  const bands = gd.data.filter((t) => t.fill === "toself" && shown(t));
+  const ci = (y, hi, lo) => (y == null || hi == null ? undefined : [exportNumber(y - (lo ?? hi)), exportNumber(y + hi)]);
+  const labelled = lines.filter((t) => Array.isArray(t.customdata) && t.customdata.some((d) => d?.label != null));
+  if (labelled.length) {
+    const seen = new Set();
+    out.models = [];
+    for (const t of labelled) {
+      t.customdata.forEach((d, i) => {
+        if (d?.label == null || seen.has(d.label)) return;
+        seen.add(d.label);
+        const y = t.y[i];
+        const rec = { model: d.label, score: exportNumber(y) };
+        if (t.type !== "bar") rec.parameters_b = exportNumber(t.x[i]);
+        const range = ci(y, t.error_y?.array?.[i], t.error_y?.arrayminus?.[i]);
+        if (range) rec.ci_95 = range;
+        out.models.push(rec);
+      });
+    }
+  } else {
+    out.series = lines.map((t) => {
+      // A line's band (its legend group's): its upper edge, then its lower
+      // edge backwards, over the same xs.
+      const band = bands.find((b) => b.legendgroup != null && b.legendgroup === t.legendgroup);
+      const bandAt = new Map();
+      if (band) {
+        const n = band.x.length / 2;
+        for (let i = 0; i < n; i++) bandAt.set(band.x[i], [band.y[2 * n - 1 - i], band.y[i]]);
+      }
+      const points = [];
+      Array.from(t.x).forEach((xv, i) => {
+        const y = t.y[i];
+        if (y == null) return;
+        const p = { x: exportNumber(xv), y: exportNumber(y) };
+        const b = bandAt.get(xv);
+        if (b) p.ci_95 = b.map(exportNumber);
+        points.push(p);
+      });
+      return { name: t.name || null, points };
+    });
+  }
+  downloadJSON(out, filename || "chart-data.json");
 }
 
-/** What an image export `width` px wide draws: the chart as shown, or the
- *  figure its page hands over for it (gd._exportFigure — comparison.js, for
- *  bars shown panned or without their names). */
-function exportFigure(gd, width) {
-  return gd._exportFigure?.(width) ?? gd;
-}
-
-/** Build a Plotly config with the standard PNG/SVG/JSON download buttons.
- *  `filenamePrefix` is used for downloaded chart files.
- *  `getJsonMetadata` is a callback that returns dashboard-specific export metadata. */
+/** Build a Plotly config with the one download button: the chart's data
+ *  as JSON. `filenamePrefix` names the file; `getJsonMetadata` is a
+ *  callback that returns dashboard-specific export metadata. */
 export function makePlotlyConfig(filenamePrefix, getJsonMetadata) {
   return {
     responsive: true,
     displaylogo: false,
     modeBarButtons: [
-      [
-        {
-          name: "Download plot as PNG",
-          icon: Plotly.Icons.camera,
-          click: (gd) => Plotly.downloadImage(exportFigure(gd, 1600), {
-            format: "png", width: 1600, height: 900, scale: 3, filename: filenamePrefix,
-          }),
-        },
-        {
-          name: "Download plot as SVG",
-          icon: SVG_DOWNLOAD_ICON,
-          click: (gd) => Plotly.downloadImage(exportFigure(gd, 1600), {
-            format: "svg", width: 1600, height: 900, filename: filenamePrefix,
-          }),
-        },
-      ],
       [
         {
           name: "Export data as JSON",
@@ -211,6 +230,16 @@ const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 // Peak scale applied to a bar when the cursor is directly on it; matched
 // in style.css's transition.
 const BAR_HOVER_SCALE = 1.75;
+// A click's pop: the clicked bar (its logo with it) grows BAR_POP_GROWTH of
+// its width past its hover width at once (in BAR_POP_RISE_MS, a frame or
+// two) and settles back to it (to rest, with no hover: a tap) over
+// BAR_POP_FALL_MS; the other bars make room as they do for the hover. None
+// where the reader asks for less motion.
+const BAR_POP_GROWTH = 0.35;
+const BAR_POP_RISE_MS = 30;
+const BAR_POP_FALL_MS = 280;
+const easeInOutCubic = (t) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
+const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)");
 // Attention kernel: 1 when the cursor is on (or inside) a bar's rect,
 // decaying smoothly with distance to that rect. Lorentzian: 1/(1+(d/σ)²)
 // over distance in bar-width units.
@@ -488,6 +517,44 @@ function attachBarHoverHighlight(chartEl) {
   // Displayed (eased) state, persisted across frames; rebuilt when the model
   // count changes. Sits at rest (scale 1, shift 0) between interactions.
   let curScale = null, curShift = null, stateN = 0;
+  // A click's pop while it runs: { col: the model column, start: its time }.
+  let pop = null;
+  // The bar drawn under the pointer (its hover scale and shift applied) and
+  // the last mousemove: the bar the page's tooltip names and a click opens
+  // (comparison.js, by chartEl._onBarUnder and chartEl._barColumnAt), not the
+  // one Plotly's hit-test finds — it knows only where the bars rest, so near
+  // a magnified bar's edge it finds nothing, or a neighbour.
+  let drawnBar = null, lastMove = null;
+
+  /** The bar drawn under the point (x, y) as the bars are painted now, or
+   *  null. (A column spans its bar's height; the gaps hit nothing.) */
+  function drawnBarAt(bars, x, y) {
+    for (const b of bars) {
+      const i = b.modelIdx;
+      const half = (b.rect.width / 2) * (curScale?.[i] ?? 1), cx = b.rect.cx + (curShift?.[i] ?? 0);
+      if (x >= cx - half && x <= cx + half && y >= b.rect.top && y <= b.rect.bottom) return b;
+    }
+    return null;
+  }
+
+  /** The bar under the pointer now `b` (or null): the page is told when it
+   *  changes, with the mousemove that moved it there. */
+  function setDrawnBar(b) {
+    if ((b && b.modelIdx) === (drawnBar && drawnBar.modelIdx)) { drawnBar = b; return; }
+    drawnBar = b;
+    chartEl._onBarUnder?.(b ? b.modelIdx : -1, lastMove);
+  }
+
+  /** The pop's added scale at time `now` (0 once it is over, which ends it):
+   *  up at once, then eased back down. */
+  function popBoost(now) {
+    if (!pop) return 0;
+    const t = Math.max(0, now - pop.start);
+    if (t >= BAR_POP_RISE_MS + BAR_POP_FALL_MS) { pop = null; return 0; }
+    return BAR_POP_GROWTH * (t < BAR_POP_RISE_MS
+      ? easeOutCubic(t / BAR_POP_RISE_MS)
+      : 1 - easeInOutCubic((t - BAR_POP_RISE_MS) / BAR_POP_FALL_MS));
+  }
 
   function ensureState(N) {
     if (stateN !== N || !curScale) {
@@ -522,21 +589,27 @@ function attachBarHoverHighlight(chartEl) {
   // The dock shift is the cumulative sum of column growths, sampled at the
   // cursor and subtracted so the cursor is the pivot — same maths as before,
   // but accumulated over MODEL columns so the result is indexed by model.
-  function computeTargets(bars, N, refWidth, cx, cy) {
+  // `cursor`: { x, y }, or null (no hover: every column at rest, but a
+  // popping one, which is then the pivot); `extra`: { col, boost }, a click's
+  // pop on top of the hover, or null.
+  function computeTargets(bars, N, refWidth, cursor, extra) {
     const sumCx = new Array(N).fill(0);
     const cnt = new Array(N).fill(0);
     const scale = new Array(N).fill(1);
     const dist = new Array(N).fill(Infinity);
     let insideBar = null;
     bars.forEach((b) => {
-      const d = distPointToRect(cx, cy, b.rect);
-      const s = 1 + (BAR_HOVER_SCALE - 1) * hoverKernel(d / refWidth);
       const i = b.modelIdx;
       sumCx[i] += b.rect.cx; cnt[i] += 1;
+      if (!cursor) return;
+      const d = distPointToRect(cursor.x, cursor.y, b.rect);
+      const s = 1 + (BAR_HOVER_SCALE - 1) * hoverKernel(d / refWidth);
       if (s > scale[i]) scale[i] = s;
       if (d < dist[i]) dist[i] = d;
       if (d === 0 && !insideBar) insideBar = b;
     });
+    if (extra && extra.col < N) scale[extra.col] += extra.boost;
+    const cx = cursor ? cursor.x : extra && cnt[extra.col] ? sumCx[extra.col] / cnt[extra.col] : 0;
     const order = [];
     for (let i = 0; i < N; i++) if (cnt[i]) order.push(i);
     order.sort((a, b) => sumCx[a] / cnt[a] - sumCx[b] / cnt[b]);
@@ -654,8 +727,10 @@ function attachBarHoverHighlight(chartEl) {
     const { bars, N, refWidth } = got;
     ensureState(N);
 
-    const targets = pointer.active
-      ? computeTargets(bars, N, refWidth, pointer.x, pointer.y)
+    const boost = popBoost(now);
+    const extra = pop ? { col: pop.col, boost } : null;
+    const targets = pointer.active || extra
+      ? computeTargets(bars, N, refWidth, pointer.active ? pointer : null, extra)
       : { scale: new Array(N).fill(1), shift: new Array(N).fill(0), dist: null, insideBar: null };
 
     // Pre-compute the exit alpha once; per-column alpha (active) interpolates
@@ -677,20 +752,24 @@ function attachBarHoverHighlight(chartEl) {
       maxRes = Math.max(maxRes, Math.abs(targets.shift[i] - curShift[i]));
     }
     paint(bars, N);
+    setDrawnBar(pointer.active ? drawnBarAt(bars, pointer.x, pointer.y) : null);
 
     if (pointer.active) {
       chartEl.classList.add("hover-active");
-      updateBold(targets.insideBar, N);
+      updateBold(drawnBar, N);
     }
 
-    if (maxRes < EMA_SETTLE) {
+    if (maxRes < EMA_SETTLE && !pop) {
       // Snap exactly onto target to kill sub-pixel drift, then stop the loop.
       // lastT is reset so the next run (restarted by mousemove) starts fresh.
       for (let i = 0; i < N; i++) { curScale[i] = targets.scale[i]; curShift[i] = targets.shift[i]; }
       lastT = null;
       if (pointer.active) {
         paint(bars, N);   // rest at the hover pose; idle until the next move
+        setDrawnBar(drawnBarAt(bars, pointer.x, pointer.y));
+        updateBold(drawnBar, N);
       } else {
+        setDrawnBar(null);
         clearInline(bars);
         chartEl.querySelectorAll(".bar-hover-bold").forEach((el) =>
           el.classList.remove("bar-hover-bold"));
@@ -719,8 +798,23 @@ function attachBarHoverHighlight(chartEl) {
     ensureLoop();
   };
 
+  /** A click (or tap) on the bar of model column `col`: its pop. */
+  chartEl._barPop = (col) => {
+    if (REDUCED_MOTION.matches || !Number.isInteger(col) || col < 0) return;
+    pop = { col, start: performance.now() };
+    ensureLoop();
+  };
+
+  /** The model column of the bar drawn under (x, y) now, or -1. */
+  chartEl._barColumnAt = (x, y) => {
+    const got = gatherBars();
+    const b = got && drawnBarAt(got.bars, x, y);
+    return b ? b.modelIdx : -1;
+  };
+
   chartEl.addEventListener("mousemove", (ev) => {
     pointer.x = ev.clientX; pointer.y = ev.clientY; pointer.active = true;
+    lastMove = ev;
     ensureLoop();
   });
   chartEl.addEventListener("mouseleave", (ev) => {
@@ -1373,7 +1467,10 @@ export function makeBandTrace(xValues, yValues, ciValues, color, legendGroup) {
  *  `topHeadroom` adds extra space above the max (as a fraction of the data
  *  span), e.g. to clear a top-anchored legend. */
 export function computeYRange(values, tight = false, topHeadroom = 0, unclamped = false) {
-  if (!values.length) return state.currentNormalization === "zscore" ? [-2, 2] : [0, 100];
+  // (The minimum pads and the ceiling on the scale of the scores shown:
+  // 0–100, or 0–5 on /instruct — state.scoreTop.)
+  const top = state.scoreTop;
+  if (!values.length) return state.currentNormalization === "zscore" ? [-2, 2] : [0, top];
   const mx = Math.max(...values);
   const mn = Math.min(...values);
   const extra = (mx - mn) * topHeadroom;
@@ -1384,10 +1481,10 @@ export function computeYRange(values, tight = false, topHeadroom = 0, unclamped 
     return [mn - pad, mx + pad + extra];
   }
   if (tight) {
-    const pad = Math.max((mx - mn) * 0.15, 1);
-    return [Math.max(0, mn - pad), Math.min(mx + pad + extra, 115)];
+    const pad = Math.max((mx - mn) * 0.15, top * 0.01);
+    return [Math.max(0, mn - pad), Math.min(mx + pad + extra, top * 1.15)];
   }
-  return [0, Math.min(mx + Math.max(mx * 0.15, 2) + extra, 115)];
+  return [0, Math.min(mx + Math.max(mx * 0.15, top * 0.02) + extra, top * 1.15)];
 }
 
 /** A y-range fitted to exactly the plotted values: their extent plus 5% of

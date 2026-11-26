@@ -1,0 +1,933 @@
+{
+ "task": "norcommonsenseqa_nno",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 50,
+   "doc_fingerprint": "2ffcfec3025c",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p0",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Ein stinkande mann tok seg eit bad. Kva var det han med dette forsøkte å oppfølgje?\n\nAlternativ:\n A: Hydrering\n B: Å vere tydeleg\n C: Personleg reinsleik\n D: Å drukne\n E: Bruk av vatn\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Hydrering",
+     "Å vere tydeleg",
+     "Personleg reinsleik",
+     "Å drukne",
+     "Bruk av vatn"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Personleg reinsleik)"
+  },
+  {
+   "draw": 1,
+   "doc_index": 93,
+   "doc_fingerprint": "9b2f4f46452b",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Korleis kan ein student lære seg å spele triangel?\nKva av følgande moglege svar er det rette?\n- Ved å gå til ein mattetime\n- Ved hjelp av ein mattebok\n- I pytagoras sitt band\n- I eit orkester\n- I musikktimar\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ved å gå til ein mattetime",
+     "Ved hjelp av ein mattebok",
+     "I pytagoras sitt band",
+     "I eit orkester",
+     "I musikktimar"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: I musikktimar"
+  },
+  {
+   "draw": 2,
+   "doc_index": 13,
+   "doc_fingerprint": "74932b05f4c6",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p2",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Gitt alternativa under, kva er svaret på følgande spørsmål: Kva er kattar kjende for?\n\nAlternativ:\n A: Værhåra deira\n B: Deira skarpe tenner\n C: Malinga deira\n D: Deira fire bein\n E: Dei skarpe klørna deira\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Værhåra deira",
+     "Deira skarpe tenner",
+     "Malinga deira",
+     "Deira fire bein",
+     "Dei skarpe klørna deira"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: E (Dei skarpe klørna deira)"
+  },
+  {
+   "draw": 3,
+   "doc_index": 77,
+   "doc_fingerprint": "9e993066e60d",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva må du gjere for å kunne få utnytte av fjernsynet som allere er skrudd på?\nVel rett svar blant desse alternativa:\n– Bli blaut\n– Opne augene dine\n– Drepe\n– Plugge inn fjernsynet\n– Du må først skru på straumen\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Bli blaut",
+     "Opne augene dine",
+     "Drepe",
+     "Plugge inn fjernsynet",
+     "Du må først skru på straumen"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Opne augene dine"
+  },
+  {
+   "draw": 4,
+   "doc_index": 25,
+   "doc_fingerprint": "bcd1b514cbb3",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Gitt alternativa under, kva er svaret på følgande spørsmål: Kva er det ein person må gjere for noko for å halde seg frisk?\n\nAlternativ:\n- Få feber\n- Ete mat kvar dag\n- Vere glad\n- Få hovudverk\n- Vere uttrykksfull\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Få feber",
+     "Ete mat kvar dag",
+     "Vere glad",
+     "Få hovudverk",
+     "Vere uttrykksfull"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Ete mat kvar dag"
+  },
+  {
+   "draw": 5,
+   "doc_index": 0,
+   "doc_fingerprint": "6528a96a5afe",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p3",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kvar kan du finne ein blyant viss du trenger ein?\nVel rett svar blant desse alternativa:\n A: I ein koffert\n B: I ei skrivebordsskuff\n C: Hjå ein venn\n D: I ei lomme\n E: Ved eit fortau\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "I ein koffert",
+     "I ei skrivebordsskuff",
+     "Hjå ein venn",
+     "I ei lomme",
+     "Ved eit fortau"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Hjå ein venn)"
+  },
+  {
+   "draw": 6,
+   "doc_index": 47,
+   "doc_fingerprint": "e144b87a6faa",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Når du gjer noko og du har det kjekt, så er dette noko du\n- gjer spontant\n- stansar å jobbe for\n- betalar for\n- likar\n- likar godt\n\nEr det rette svaret gjer spontant, stansar å jobbe for, betalar for, likar eller likar godt?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "gjer spontant",
+     "stansar å jobbe for",
+     "betalar for",
+     "likar",
+     "likar godt"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: likar godt"
+  },
+  {
+   "draw": 7,
+   "doc_index": 42,
+   "doc_fingerprint": "8b999772e691",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p4",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "I eit klasserom vart ein blyantkvessar øydelagt. Kvar gjekk så eleven for å finne ein ny kvessar?\n A: Heim\n B: Til biblioteket\n C: Til ein bokhandlar\n D: Til eit skap\n E: Til skrivebordsskuffa i klasserommet\n\nEr det rette svaret A, B, C, D eller E?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Heim",
+     "Til biblioteket",
+     "Til ein bokhandlar",
+     "Til eit skap",
+     "Til skrivebordsskuffa i klasserommet"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Til biblioteket)"
+  },
+  {
+   "draw": 8,
+   "doc_index": 91,
+   "doc_fingerprint": "75c9a615fff4",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kva kan du få om morgonen dagen etter ein kveld med masse drikking?\n\nAlternativ:\n- Du står opp\n- Ubehag\n- Ubehagelegheiter\n- Hovudpine\n- Sjokk\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Du står opp",
+     "Ubehag",
+     "Ubehagelegheiter",
+     "Hovudpine",
+     "Sjokk"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Hovudpine"
+  },
+  {
+   "draw": 9,
+   "doc_index": 37,
+   "doc_fingerprint": "e09bc14cd3fb",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p1",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Å drikke alkohol fører til\nKva av følgande moglege svar er det rette?\n A: at ein har det kjekt\n B: at ein blir berusa\n C: at ein spyr\n D: at ein drikk meir alkohol\n E: at ein blir svimmel\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "at ein har det kjekt",
+     "at ein blir berusa",
+     "at ein spyr",
+     "at ein drikk meir alkohol",
+     "at ein blir svimmel"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (at ein blir berusa)"
+  },
+  {
+   "draw": 10,
+   "doc_index": 57,
+   "doc_fingerprint": "faffb3872287",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kvar er det sannsynleg at ein er dersom ein kjøper seg ein porsjon med svenske kjøtbollar?\nKva av følgande moglege svar er det rette?\n- I England\n- På bygda\n- I eit øde land\n- I Danmark\n- På IKEA\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "I England",
+     "På bygda",
+     "I eit øde land",
+     "I Danmark",
+     "På IKEA"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: På IKEA"
+  },
+  {
+   "draw": 11,
+   "doc_index": 27,
+   "doc_fingerprint": "a7f68fe62456",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p2",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Gitt alternativa under, kva er svaret på følgande spørsmål: Når ein lagar seg frukost, kva er det ein sannsynlegvis vil leggje brødskiva si oppi?\n\nAlternativ:\n A: Ein plastpose\n B: I eit spiskammers\n C: På supermarkedet\n D: I ein brødristar\n E: I fengsel\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ein plastpose",
+     "I eit spiskammers",
+     "På supermarkedet",
+     "I ein brødristar",
+     "I fengsel"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (I ein brødristar)"
+  },
+  {
+   "draw": 12,
+   "doc_index": 4,
+   "doc_fingerprint": "04b48fd3f047",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p1",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Stemma hennar tilhøyrde alt-gruppa. Kva slags gruppe var det ho var medlem i?\nKva av følgande moglege svar er det rette?\n A: Ei symofni-gruppe\n B: Ei konsertgruppe\n C: Eit kor\n D: Ei teatergruppe\n E: Eit musikkorps\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ei symofni-gruppe",
+     "Ei konsertgruppe",
+     "Eit kor",
+     "Ei teatergruppe",
+     "Eit musikkorps"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Eit kor)"
+  },
+  {
+   "draw": 13,
+   "doc_index": 28,
+   "doc_fingerprint": "c7e11f1f2897",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Før Jon kan setje seg ned for å sjå på favoritt tv-serien sin, har han lyst til å få tørka vekk alt av støv i huset sitt. Kvar er det vanskeligst for han å få tørka vekk støvet?\n\nAlternativ:\n- I klesskapet\n- Under senga\n- Tv-en\n- Loftet\n- Dei fleste bygningar\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "I klesskapet",
+     "Under senga",
+     "Tv-en",
+     "Loftet",
+     "Dei fleste bygningar"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Loftet"
+  },
+  {
+   "draw": 14,
+   "doc_index": 7,
+   "doc_fingerprint": "e5b330b6869d",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p4",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva er hovudoppgåva til sola?\n A: Å varme jordkloden\n B: Å sørgje for at folk blir brune\n C: Å gje lys\n D: Å gje liv på jorda\n E: Å gje varme\n\nEr det rette svaret A, B, C, D eller E?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Å varme jordkloden",
+     "Å sørgje for at folk blir brune",
+     "Å gje lys",
+     "Å gje liv på jorda",
+     "Å gje varme"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Å gje liv på jorda)"
+  },
+  {
+   "draw": 15,
+   "doc_index": 45,
+   "doc_fingerprint": "a7aec4545897",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p3",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kvar kan du høyre fiolin og mange andre streng- og blåsinstrumentar?\nVel rett svar blant desse alternativa:\n A: På ein skule\n B: Ved eit strykekvartett\n C: Ved eit orkester\n D: På eit kjøken\n E: I eit musikkrom\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "På ein skule",
+     "Ved eit strykekvartett",
+     "Ved eit orkester",
+     "På eit kjøken",
+     "I eit musikkrom"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Ved eit orkester)"
+  },
+  {
+   "draw": 16,
+   "doc_index": 2,
+   "doc_fingerprint": "e5509cadc9a5",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Korleis kan ein beskrive ein sannsynleg tilstand til ein person dagen derpå?\nVel rett svar blant desse alternativa:\n– Personen blir full\n– Personen har det kjekt\n– Personen får hovudpine\n– Personen får bakrus\n– Personen vil søkje intimitet\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Personen blir full",
+     "Personen har det kjekt",
+     "Personen får hovudpine",
+     "Personen får bakrus",
+     "Personen vil søkje intimitet"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Personen får bakrus"
+  },
+  {
+   "draw": 17,
+   "doc_index": 88,
+   "doc_fingerprint": "7d96bec4965f",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kva slags stad er det som har ein benk plassert kring tre?\n- Ein park\n- Eit bussstopp\n- Ein bussgarasje\n- Ein statue\n- Ein togstasjon\n\nEr det rette svaret Ein park, Eit bussstopp, Ein bussgarasje, Ein statue eller Ein togstasjon?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ein park",
+     "Eit bussstopp",
+     "Ein bussgarasje",
+     "Ein statue",
+     "Ein togstasjon"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Ein park"
+  },
+  {
+   "draw": 18,
+   "doc_index": 87,
+   "doc_fingerprint": "dfb2d0202cea",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p0",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Kva er det dyr prøver å oppnå?\n\nAlternativ:\n A: Å bli sett fast i sand\n B: Å leve lenge\n C: Å forlate heimet sitt\n D: Å kjenne på smerte\n E: Å ete\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Å bli sett fast i sand",
+     "Å leve lenge",
+     "Å forlate heimet sitt",
+     "Å kjenne på smerte",
+     "Å ete"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Å leve lenge)"
+  },
+  {
+   "draw": 19,
+   "doc_index": 35,
+   "doc_fingerprint": "3a46e64f1ce1",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Gitt alternativa under, kva er svaret på følgande spørsmål: Kva er det ein gjer når ein planleggar kor tid ein skal reise på ein fest?\n\nAlternativ:\n- Ein går gjennom eit rituale\n- Ein møter nye folk\n- Ein har det kjekt\n- Ein møter nye menneske\n- Ein planlegg\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Ein går gjennom eit rituale",
+     "Ein møter nye folk",
+     "Ein har det kjekt",
+     "Ein møter nye menneske",
+     "Ein planlegg"
+    ],
+    "labels": null,
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Ein planlegg"
+  },
+  {
+   "draw": 20,
+   "doc_index": 74,
+   "doc_fingerprint": "6fff026a4019",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "I kva slags by vil du truleg kunne finne mange parkeringsplassar?\n- I Chicago\n- I ein stor by\n- I ein stor bybygning\n- I eit miljø\n- På ein høgskule-campus\n\nEr det rette svaret I Chicago, I ein stor by, I ein stor bybygning, I eit miljø eller På ein høgskule-campus?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "I Chicago",
+     "I ein stor by",
+     "I ein stor bybygning",
+     "I eit miljø",
+     "På ein høgskule-campus"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: I Chicago"
+  },
+  {
+   "draw": 21,
+   "doc_index": 51,
+   "doc_fingerprint": "84380919594f",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p3",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Ein kompressor trengde ei ny hageslange. Kvar kan ein reise til for å få tak i dette?\nVel rett svar blant desse alternativa:\n A: Til eit hageskur\n B: Til ein jernvareforretning\n C: Til eit bordell\n D: Til ein garasje\n E: Til eit drivhus\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Til eit hageskur",
+     "Til ein jernvareforretning",
+     "Til eit bordell",
+     "Til ein garasje",
+     "Til eit drivhus"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Til ein jernvareforretning)"
+  },
+  {
+   "draw": 22,
+   "doc_index": 16,
+   "doc_fingerprint": "a3308c3eaa36",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p0",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Ein båtpassasjer forklarte at han var redd for kulefisk. Men kapteinen trudde at han meinte pirajaar, fordi dei var på ei elv i\n\nAlternativ:\n A: Kuba\n B: elva Styx\n C: Atlanterhavet\n D: Frankrike\n E: jungelen\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Kuba",
+     "elva Styx",
+     "Atlanterhavet",
+     "Frankrike",
+     "jungelen"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: E (jungelen)"
+  },
+  {
+   "draw": 23,
+   "doc_index": 32,
+   "doc_fingerprint": "0d34b7110cbe",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p1",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Jon veit at sola produserar ei massiv mengde av energi i to former. Kva ville ha drepe deg først dersom du var på soloverflata?\nKva av følgande moglege svar er det rette?\n A: Havet\n B: Varme\n C: Livet på jorda\n D: Rynkar\n E: Lys\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Havet",
+     "Varme",
+     "Livet på jorda",
+     "Rynkar",
+     "Lys"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Varme)"
+  },
+  {
+   "draw": 24,
+   "doc_index": 61,
+   "doc_fingerprint": "e919128da685",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Viss nokon ler etter at dei blir overraska, har dei ein god sans for\n\nAlternativ:\n- glede\n- slåssing\n- redsle\n- humor\n- latter\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "glede",
+     "slåssing",
+     "redsle",
+     "humor",
+     "latter"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: humor"
+  },
+  {
+   "draw": 25,
+   "doc_index": 40,
+   "doc_fingerprint": "e14434cf311a",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Korleis ser ein tretekstur ut viss den ikkje er jamn?\nKva av følgande moglege svar er det rette?\n- Den ser forgylt ut\n- Den ser porøs ut\n- Den ser solid ut\n- Den ser ut som om den er malt\n- Den ser ut til å vere mindre tett enn vatn\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Den ser forgylt ut",
+     "Den ser porøs ut",
+     "Den ser solid ut",
+     "Den ser ut som om den er malt",
+     "Den ser ut til å vere mindre tett enn vatn"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Den ser porøs ut"
+  },
+  {
+   "draw": 26,
+   "doc_index": 60,
+   "doc_fingerprint": "654355d2f9c0",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Gitt alternativa under, kva er svaret på følgande spørsmål: Kva er det folk plar å ha som mål på jobb?\n\nAlternativ:\n- Å fullføre arbeid\n- Å lære frå kollegaer\n- Å drepe dyr\n- Å bruke hatt\n- Å snakke med andre kollegaer\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Å fullføre arbeid",
+     "Å lære frå kollegaer",
+     "Å drepe dyr",
+     "Å bruke hatt",
+     "Å snakke med andre kollegaer"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Å fullføre arbeid"
+  },
+  {
+   "draw": 27,
+   "doc_index": 43,
+   "doc_fingerprint": "1fe72a1ffee5",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p4",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Å setje opp innramming, fagverk og bjelke er nokre av dei første stega i å lage kva for noko?\n A: Eit nybygg\n B: Eit varehus\n C: Å køyre\n D: Eit tak\n E: Ei bru\n\nEr det rette svaret A, B, C, D eller E?\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Eit nybygg",
+     "Eit varehus",
+     "Å køyre",
+     "Eit tak",
+     "Ei bru"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Eit nybygg)"
+  },
+  {
+   "draw": 28,
+   "doc_index": 78,
+   "doc_fingerprint": "557db2d39b31",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p2",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Gitt alternativa under, kva er svaret på følgande spørsmål: Viss du skulle ha steikt noko kjøt, kva ville du ha sett kjøtet på?\n\nAlternativ:\n A: Olje\n B: Ein frysar\n C: Eit skinkesmørbrød\n D: Ein omn\n E: Ei steikepanne\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Olje",
+     "Ein frysar",
+     "Eit skinkesmørbrød",
+     "Ein omn",
+     "Ei steikepanne"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     4
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: E (Ei steikepanne)"
+  },
+  {
+   "draw": 29,
+   "doc_index": 46,
+   "doc_fingerprint": "b1fb1d5473f8",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Kvar vil ein mest sannsynleg plassere eit bilete på ein horisontal overflate?\nVel rett svar blant desse alternativa:\n– I ein mikrobølgjeomn\n– På eit skrivebord\n– På ei hylle\n– På eit kunst show\n– På veggen\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "I ein mikrobølgjeomn",
+     "På eit skrivebord",
+     "På ei hylle",
+     "På eit kunst show",
+     "På veggen"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: På ei hylle"
+  },
+  {
+   "draw": 30,
+   "doc_index": 62,
+   "doc_fingerprint": "aae6d45d68b0",
+   "prompt_variant": "norcommonsenseqa_nno_mcf_p0",
+   "formulation": "mcf",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Spørsmål: Nokre turgåarar måtte stoppe opp for å drikke. Dei\n\nAlternativ:\n A: hadde nettopp hatt fest\n B: var tørste\n C: trong forfrisking\n D: var i ferd med å bli berusa\n E: ville feire\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "hadde nettopp hatt fest",
+     "var tørste",
+     "trong forfrisking",
+     "var i ferd med å bli berusa",
+     "ville feire"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (var tørste)"
+  },
+  {
+   "draw": 31,
+   "doc_index": 54,
+   "doc_fingerprint": "b537ce4238cd",
+   "prompt_variant": "norcommonsenseqa_nno_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nno",
+   "source_language": null,
+   "prompt": "Ein skog opplevde ein kald vinter. Kvar er skogen lokalisert?\nKva av følgande moglege svar er det rette?\n- På jorda\n- I Sør-Amerika\n- I Amazonasbekkenet\n- I eit temperert klima\n- I ein nasjonalpark\n\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "På jorda",
+     "I Sør-Amerika",
+     "I Amazonasbekkenet",
+     "I eit temperert klima",
+     "I ein nasjonalpark"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: I eit temperert klima"
+  }
+ ]
+}

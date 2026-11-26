@@ -1,0 +1,789 @@
+{
+ "task": "norec_sentence_nob",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 272,
+   "doc_fingerprint": "3c330d485651",
+   "prompt_variant": "norec_sentence_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "« Indianeren » er Tore Renberg på sitt beste .\nEr anmeldelsen A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (positiv)"
+  },
+  {
+   "draw": 1,
+   "doc_index": 482,
+   "doc_fingerprint": "0527119a53bf",
+   "prompt_variant": "norec_sentence_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Mer oppfinnsomt er det at han i løpet av det halvannet minutt lange kuttet sneier innom \" San Francisco \" , innspilt av hans egen mor i fjor .\nHva slags sentiment uttrykker anmelderen, \"negativ\" eller \"positiv\"?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: positiv"
+  },
+  {
+   "draw": 2,
+   "doc_index": 240,
+   "doc_fingerprint": "31403cf6b9d8",
+   "prompt_variant": "norec_sentence_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Munken bistro mangler litt på detaljene .\nHva slags sentiment uttrykker anmelderen, A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (negativ)"
+  },
+  {
+   "draw": 3,
+   "doc_index": 141,
+   "doc_fingerprint": "3972f0f4fd58",
+   "prompt_variant": "norec_sentence_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Den kan sette oss i andres sted , og slik gjøre det lettere å forstå komplekse sammenhenger .\nEr denne setningen \"positiv\" eller \"negativ\"?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: positiv"
+  },
+  {
+   "draw": 4,
+   "doc_index": 286,
+   "doc_fingerprint": "a9d2bb83a251",
+   "prompt_variant": "norec_sentence_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Niåringen som skal feire dagen sin ( Filip J. H. Kilter ) imponerer også i de scenene han er med .\nEr sentimentet \"negativ\" eller \"positiv\"?\nSentiment:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: positiv"
+  },
+  {
+   "draw": 5,
+   "doc_index": 366,
+   "doc_fingerprint": "33348c7e9e8f",
+   "prompt_variant": "norec_sentence_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Søvndataene kunne generelt vært mer detaljerte .\nEr sentimentet A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (negativ)"
+  },
+  {
+   "draw": 6,
+   "doc_index": 302,
+   "doc_fingerprint": "951cd7432571",
+   "prompt_variant": "norec_sentence_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Med flotte « Summer In My Hometown » får han meg til å ønske meg vestover .\nEr anmeldelsen \"positiv\" eller \"negativ\"?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: positiv"
+  },
+  {
+   "draw": 7,
+   "doc_index": 86,
+   "doc_fingerprint": "6d7c3479aece",
+   "prompt_variant": "norec_sentence_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Allerede på andre level er det partier som må spilles både to og tre og ti ganger for å komme seg levende fram .\nEr denne setningen positiv eller negativ?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: negativ"
+  },
+  {
+   "draw": 8,
+   "doc_index": 13,
+   "doc_fingerprint": "a8c465c04c00",
+   "prompt_variant": "norec_sentence_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Det hele føles svært solid .\nEr denne setningen A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (positiv)"
+  },
+  {
+   "draw": 9,
+   "doc_index": 408,
+   "doc_fingerprint": "3e588d62e107",
+   "prompt_variant": "norec_sentence_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Det hører liksom med på et Waters-album .\nEr denne setningen A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (positiv)"
+  },
+  {
+   "draw": 10,
+   "doc_index": 525,
+   "doc_fingerprint": "28b4ca04ce9f",
+   "prompt_variant": "norec_sentence_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Men alt løser seg raskt .\nEr sentimentet \"negativ\" eller \"positiv\"?\nSentiment:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: negativ"
+  },
+  {
+   "draw": 11,
+   "doc_index": 206,
+   "doc_fingerprint": "de7f08eb6001",
+   "prompt_variant": "norec_sentence_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Men refrenget er muligens mer rettet mot hitlister enn direkte mot Eurovision-seire , hvilket også sceneopptredenen peker mot .\nEr denne setningen A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (negativ)"
+  },
+  {
+   "draw": 12,
+   "doc_index": 28,
+   "doc_fingerprint": "ed9f86d365dd",
+   "prompt_variant": "norec_sentence_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Man har også muligheten til å utvide funksjonene ytterligere , med tredjepartsapper fra Garmin sin butikk , Connect IQ .\nEr anmeldelsen A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (positiv)"
+  },
+  {
+   "draw": 13,
+   "doc_index": 548,
+   "doc_fingerprint": "54d32c05a105",
+   "prompt_variant": "norec_sentence_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Min favoritt er \" domino \" , som gir deg muligheten til å mentalt sammenbinde skurker slik at man kan rydde flere av veien med eksempelvis bare én bedøvelsespil .\nEr denne setningen \"positiv\" eller \"negativ\"?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: positiv"
+  },
+  {
+   "draw": 14,
+   "doc_index": 329,
+   "doc_fingerprint": "6e1d159466d1",
+   "prompt_variant": "norec_sentence_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "« Don't Kill My Vibe » står fortsatt igjen som platas sterkeste låt , men « Plot Twist » og « Fake Friends » backer overbevisende den uungåelige allsang-faktoren .\nEr denne setningen positiv eller negativ?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: positiv"
+  },
+  {
+   "draw": 15,
+   "doc_index": 224,
+   "doc_fingerprint": "6e17b0720338",
+   "prompt_variant": "norec_sentence_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Den lettheten hun serverer med , er helt nødvendig når man kommer så tett innpå hverandre .\nEr sentimentet A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (positiv)"
+  },
+  {
+   "draw": 16,
+   "doc_index": 36,
+   "doc_fingerprint": "c35cf47e9dd4",
+   "prompt_variant": "norec_sentence_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Man kan aldri få nok batteritid , men tallene er absolutt godkjent , spesielt sett i lys av hvilke tekniske funksjoner som faktisk sitter på innsiden av urkassen .\nHva slags sentiment uttrykker anmelderen, A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (positiv)"
+  },
+  {
+   "draw": 17,
+   "doc_index": 504,
+   "doc_fingerprint": "55846458c759",
+   "prompt_variant": "norec_sentence_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Mannen veksler også den sedvanlige sangstemmen med knekk i - som vi har blitt så glade i - med finfin rapflyt ( “ Comme Des Garcons ” , “ Slide On Me ” ) .\nHva slags sentiment uttrykker anmelderen, \"negativ\" eller \"positiv\"?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: positiv"
+  },
+  {
+   "draw": 18,
+   "doc_index": 71,
+   "doc_fingerprint": "f36c6e1540f6",
+   "prompt_variant": "norec_sentence_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "« Overalt er heftig , bob-e-ler så sexy , bob-e-ler som såpe , bob-e-ler som Pepsi » kunne man ha danset til på repeat i flere minutter .\nEr denne setningen A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (positiv)"
+  },
+  {
+   "draw": 19,
+   "doc_index": 582,
+   "doc_fingerprint": "e0262f312e1b",
+   "prompt_variant": "norec_sentence_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Artiklene har vært publisert på nettsiden abc nyheter .\nEr anmeldelsen \"positiv\" eller \"negativ\"?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: negativ"
+  },
+  {
+   "draw": 20,
+   "doc_index": 249,
+   "doc_fingerprint": "00cc50e448e7",
+   "prompt_variant": "norec_sentence_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Med « Ixcanul » skriver Jayro Bustamante seg inn i rekken av regissører som allerede i sin langfilmdebut viser usedvanlige talenter .\nEr denne setningen A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (positiv)"
+  },
+  {
+   "draw": 21,
+   "doc_index": 125,
+   "doc_fingerprint": "013030b4931b",
+   "prompt_variant": "norec_sentence_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Dessverre har den spanske mesteren vist svært så dårlig dømmekraft med sine siste filmer .\nEr denne setningen positiv eller negativ?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: negativ"
+  },
+  {
+   "draw": 22,
+   "doc_index": 395,
+   "doc_fingerprint": "7f576210a0ba",
+   "prompt_variant": "norec_sentence_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Men så lenge takhøyden er så bra som her , så føles heller ikke bilen liten .\nEr sentimentet \"negativ\" eller \"positiv\"?\nSentiment:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: positiv"
+  },
+  {
+   "draw": 23,
+   "doc_index": 64,
+   "doc_fingerprint": "37a473f97d8f",
+   "prompt_variant": "norec_sentence_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Sist admiralen og onkelen slo P-ene sine sammen var på den forglemmelige « Hatere » for tre år siden .\nEr anmeldelsen A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (negativ)"
+  },
+  {
+   "draw": 24,
+   "doc_index": 93,
+   "doc_fingerprint": "c73fc4d0227c",
+   "prompt_variant": "norec_sentence_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Løvetannbarn har også et mangfold i sin fortelling som gjør at den griper utover Isaks tragiske historie .\nHva slags sentiment uttrykker anmelderen, \"negativ\" eller \"positiv\"?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: positiv"
+  },
+  {
+   "draw": 25,
+   "doc_index": 267,
+   "doc_fingerprint": "2effaeb7d382",
+   "prompt_variant": "norec_sentence_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Om du har et langt og kjærlig forhold til Donkey Kong-spillene – og spesielt Donkey Kong Country Returns fra 2010 – serverer Retro Studios mer av samme oppskrift .\nHva slags sentiment uttrykker anmelderen, A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (positiv)"
+  },
+  {
+   "draw": 26,
+   "doc_index": 2,
+   "doc_fingerprint": "de43f7f41ddc",
+   "prompt_variant": "norec_sentence_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Her har fokuset på funksjoner og indre kvaliteter , for første gang blitt kombinert med en ambisiøs satsning på et ekslusivt ytre .\nEr sentimentet A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (positiv)"
+  },
+  {
+   "draw": 27,
+   "doc_index": 40,
+   "doc_fingerprint": "f5b9be35f2fa",
+   "prompt_variant": "norec_sentence_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Her har “ 24 / 7-brukere ” av treningsklokker , muligheten til en real oppgradering på stilfronten .\nEr anmeldelsen \"positiv\" eller \"negativ\"?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: positiv"
+  },
+  {
+   "draw": 28,
+   "doc_index": 560,
+   "doc_fingerprint": "85e6f12346ce",
+   "prompt_variant": "norec_sentence_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Budskapet når frem uansett .\nEr denne setningen \"positiv\" eller \"negativ\"?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: positiv"
+  },
+  {
+   "draw": 29,
+   "doc_index": 94,
+   "doc_fingerprint": "c0bdd4dd0f08",
+   "prompt_variant": "norec_sentence_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Vi får på smart fortalt vis vite både bakgrunnen til de andre barna , og hvilke skader de sliter aller mest med .\nEr denne setningen A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (positiv)"
+  },
+  {
+   "draw": 30,
+   "doc_index": 301,
+   "doc_fingerprint": "f20f06495029",
+   "prompt_variant": "norec_sentence_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Elg synger engelsk igjen på « Feelosophy » .\nEr denne setningen A. negativ eller B. positiv?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": [
+     "A",
+     "B"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (negativ)"
+  },
+  {
+   "draw": 31,
+   "doc_index": 203,
+   "doc_fingerprint": "ffe650558bc3",
+   "prompt_variant": "norec_sentence_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Dette er låter som kan få deg til å danse som besatt , på dansegulvet så vel som på soverommet .\nEr denne setningen \"positiv\" eller \"negativ\"?\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "negativ",
+     "positiv"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: positiv"
+  }
+ ]
+}

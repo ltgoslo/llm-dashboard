@@ -1,0 +1,885 @@
+{
+ "task": "norbelebele_nob",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 223,
+   "doc_fingerprint": "39a103dba590",
+   "prompt_variant": "norbelebele_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Svar på følgende spørsmål: Hvilke av følgende gjenspeiler langdistanseringing tilbake til jorden\nSvaret skal baseres på følgende tekst:\nNår du ringer til noen som er tusenvis av miles unna, bruker du en satellitt. Satellitten i verdensrommet mottar samtalen og reflekterer den ned nesten umiddelbart. Satellitten ble sendt ut i verdensrommet av en rakett. Forskere bruker teleskoper i rommet fordi jordens atmosfære forvrenger noe av vårt lys og sikt. Det kreves en gigantisk rakett på over 100 fot for å sette en satelitt eller et teleskop i verdensrommet.\nVelg et svar fra denne listen:\n A: Teleskop\n B: Satellitter \n C: Lys\n D: Raketter\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Teleskop",
+     "Satellitter ",
+     "Lys",
+     "Raketter"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Satellitter )"
+  },
+  {
+   "draw": 1,
+   "doc_index": 397,
+   "doc_fingerprint": "82fe6d4b9de8",
+   "prompt_variant": "norbelebele_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Over fire millioner mennesker dro til Roma for å delta i begravelsen. Antall tilstedeværende var så stort at det ikke var mulig for alle å få tilgang til begravelsen på Petersplassen. Flere store TV-skjermer ble installert forskjellige steder i Roma for å la folket se seremonien. I mange andre byer i Italia og i resten av verden, spesielt i Polen, ble det laget lignende oppsett som ble sett på av et stort antall mennesker.\nHvor ble det ikke installert tv-skjermer for begravelsesseremonien?\nHvilket av følgende mulige svar er det riktige?\n- I Roma\n- I ulike italienske byer\n- På visse steder i Polen\n- På Petersplassen\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "I Roma",
+     "I ulike italienske byer",
+     "På visse steder i Polen",
+     "På Petersplassen"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: På Petersplassen"
+  },
+  {
+   "draw": 2,
+   "doc_index": 847,
+   "doc_fingerprint": "f52d501d51e7",
+   "prompt_variant": "norbelebele_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Busser går fra busstasjonen (på andre siden av elven) hele dagen, selv om de fleste, spesielt de som har kurs mot øst og Jakar/Bumthang går mellom 06:30 og 07:30. Siden distriktsbussene ofte er fulle, anbefales det å kjøpe billett noen dager i forveien. De fleste distriktene betjenes av små japanske Coaster-busser, som er komfortable og solide. Delte drosjer er en rask og komfortabel måte å reise til nærliggende steder på, som Paro (Nu 150) og Punakha (Nu 200).\nSpørsmål: Hva ville vært et godt råd for en turist som ønsker å reise østover fra busstasjonen?\n- Busser reiser kun etter 8:30\n- Kjøp en billett på forhånd\n- Mange busser kjører gjennom hele dagen\n- En delt taxi kan være den smarteste måten å reise på\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Busser reiser kun etter 8:30",
+     "Kjøp en billett på forhånd",
+     "Mange busser kjører gjennom hele dagen",
+     "En delt taxi kan være den smarteste måten å reise på"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Kjøp en billett på forhånd"
+  },
+  {
+   "draw": 3,
+   "doc_index": 785,
+   "doc_fingerprint": "0b862b013b06",
+   "prompt_variant": "norbelebele_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hovedstaden i Moldova er Chişinău. Det lokale språket er rumensk, men russisk brukes mye. Moldova er en multietnisk republikk som har lidd under etnisk konflikt. I 1994 førte denne konflikten til opprettelsen av den selverklærte republikken Transnistria øst i Moldova, som har sin egen regjering og valuta, men som ikke er anerkjent av noen av FNs medlemsland. Økonomiske forbindelser har blitt gjenopprettet mellom disse to delene av Moldova, til tross for svikt i de politiske forhandlingene. Den største religionen i Moldova er ortodoks kristendom.\n\nKonflikt over hvilke av følgende førte til opprettelsen av republikken Transnistria?\n\n- Økonomi\n- Etnisitet \n- Språk\n- Religion\n\nEr det riktige svaret Økonomi, Etnisitet , Språk eller Religion?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Økonomi",
+     "Etnisitet ",
+     "Språk",
+     "Religion"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Etnisitet "
+  },
+  {
+   "draw": 4,
+   "doc_index": 345,
+   "doc_fingerprint": "8998816fa4e8",
+   "prompt_variant": "norbelebele_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Bakgrunn: I løpet av de siste tre tiårene, til tross for at den offisielt er en kommunistisk stat, har Kina utviklet en markedsøkonomi. De første økonomiske reformene ble gjort under ledelse av Deng Xiaoping. Siden den gang har Kinas økonomiske størrelse vokst 90 ganger. For første gang eksporterte Kina i fjor flere biler enn Tyskland og overgikk USA som det største markedet for denne industrien. Kinas BNP kan være større enn USAs innen to tiår.\nSpørsmål: Hvilke av følgende utsagn er ikke en nøyaktig gjenspeiling av Kinas økonomi, ifølge avsnittet?\nSvaralternativer:\n A: Kinas økonomi har vokst eksponentielt siden det ble gjort reformer\n B: Kina har et større marked for bileksport enn USA\n C: Kina kan etter hvert ha større brutto nasjonalprodukt enn USA\n D: Kina har aldri eksportert flere bilder enn Tyskland\nRiktig svar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Kinas økonomi har vokst eksponentielt siden det ble gjort reformer",
+     "Kina har et større marked for bileksport enn USA",
+     "Kina kan etter hvert ha større brutto nasjonalprodukt enn USA",
+     "Kina har aldri eksportert flere bilder enn Tyskland"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Kina har aldri eksportert flere bilder enn Tyskland)"
+  },
+  {
+   "draw": 5,
+   "doc_index": 471,
+   "doc_fingerprint": "e23dd0ce11bb",
+   "prompt_variant": "norbelebele_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Svar på følgende spørsmål: Hvilke av følgende kan ende etter den nye ordningen?\nSvaret skal baseres på følgende tekst:\nFrem til nå har AOL vært i stand til å flytte og utvikle IM-markedet i sitt eget tempo, på grunn av dens utbredte bruk i USA: Med denne ordningen på plass kan det være slutt på denne friheten. Antall brukere av Yahoo! og Microsoft-tjenester kombinert vil konkurrere med antall AOL-kunder.\nVelg et svar fra denne listen:\n– Utbredt internettutvikling innenfor USA\n– Bruken av IM-markedet\n– AOLs frihet til å utvikle markedet i sin eget hastighet\n– Samarbeidet mellom Yahoo og Microsoft\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Utbredt internettutvikling innenfor USA",
+     "Bruken av IM-markedet",
+     "AOLs frihet til å utvikle markedet i sin eget hastighet",
+     "Samarbeidet mellom Yahoo og Microsoft"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: AOLs frihet til å utvikle markedet i sin eget hastighet"
+  },
+  {
+   "draw": 6,
+   "doc_index": 482,
+   "doc_fingerprint": "dec3c14eee69",
+   "prompt_variant": "norbelebele_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Nadals rekord i møte mot kanadieren er 7–2. Han tapte nylig mot Raonic i Brisbane Open. Nadal fikk 88% nettopoeng i kampen og vant 76 poeng i den første serven. Etter kampen sa King of Clay: «Jeg er bare glad for å være tilbake i de siste rundene av de viktigste arrangementene. Jeg er her for å prøve å vinne dette.»\n\nHvilket utsagn reflekterer nøyaktig resultatet av Nadal og Raonics kamp under Brisbane, som er nevnt i avsnittet?\n\n A: Raonic slo Nadal\n B: Raonic fikk 88 % nettpoeng\n C: Nadal slo Raonic\n D: Raonic fikk 76 poeng\n\nEr det riktige svaret A, B, C eller D?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Raonic slo Nadal",
+     "Raonic fikk 88 % nettpoeng",
+     "Nadal slo Raonic",
+     "Raonic fikk 76 poeng"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Raonic slo Nadal)"
+  },
+  {
+   "draw": 7,
+   "doc_index": 891,
+   "doc_fingerprint": "d7bc684d4527",
+   "prompt_variant": "norbelebele_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Et av de mest utfordrende motivene for en fotograf er dyreliv, og det krever en kombinasjon av hell, tålmodighet, erfaring og godt utstyr. Ofte blir naturfotografi tatt for gitt, men som i fotografi generelt, kan et bilde si mer enn tusen ord. Naturfotografi krever ofte et langt teleobjektiv, mens man må bruke andre linser på ting som fugleflokker eller små skapninger. Mange eksotiske dyr er vanskelig å finne, og parker har noen ganger regler om å ta bilder for kommersielle formål. Ville dyr kan enten være sjenerte eller aggressive. Miljøet kan være kaldt, varmt eller fiendtlig på andre måter.\nBasert på avsnittet, hvilket scenario kan kreve at naturfotografer bruker en spesiallinse?\nHvilket av følgende mulige svar er det riktige?\n A: Hvis de fotograferer spesielt små dyr\n B: Hvis fotografiene skal brukes i reklameformål\n C: Hvis dyrene som fotograferes er sjenerte\n D: Hvis en park har spesielle regler angående naturfotografi\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Hvis de fotograferer spesielt små dyr",
+     "Hvis fotografiene skal brukes i reklameformål",
+     "Hvis dyrene som fotograferes er sjenerte",
+     "Hvis en park har spesielle regler angående naturfotografi"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Hvis de fotograferer spesielt små dyr)"
+  },
+  {
+   "draw": 8,
+   "doc_index": 96,
+   "doc_fingerprint": "cf07f99495b6",
+   "prompt_variant": "norbelebele_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Ute på savannen er det vanskelig for en primat med et fordøyelsessystem som mennesker å tilfredsstille kravene til aminosyrer fra tilgjengelige planteressurser. Dessuten har det store konsekvenser å mislykkes med dette: vekstdepresjon, underernæring og til slutt død. De mest tilgjengelige planteressursene ville vært proteiner fra blader og belgfrukter, men disse er vanskelige for primater som oss å fordøye uten å tilberede dem først. I kontrast er mat fra dyr (maur, termitter, egg) ikke bare lett fordøyelig, men gir også et høyt antall proteiner som inneholder alle de essensielle aminosyrene. Med tanke på alt dette, bør vi ikke bli overrasket dersom våre egne forfedre løste sine \"proteinproblemer\" på noenlunde samme måte som sjimpansene på savannen gjør i dag.\nSpørsmål: Hvilke av følgende problemer er ikke forårsaket av mangel på essensielle aminosyrer, ifølge avsnittet?\n A: Fordøyelsesproblemer\n B: Feilernæring\n C: Vekstdepresjon\n D: Død\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Fordøyelsesproblemer",
+     "Feilernæring",
+     "Vekstdepresjon",
+     "Død"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: A (Fordøyelsesproblemer)"
+  },
+  {
+   "draw": 9,
+   "doc_index": 599,
+   "doc_fingerprint": "94500ba74c3e",
+   "prompt_variant": "norbelebele_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Bakgrunn: USAs president George W. Bush ankom Singapore morgenen 16. november og begynte en ukeslang tur i Asia. Han ble møtt av Singapores visestatsminister Wong Kan Seng, og diskuterte handels- og terrorproblemer med Singapores statsminister Lee Hsien Loong. Etter en uke med tap i mellomvalget, fortalte Bush publikum om utvidelsen av handelen i Asia.\nSpørsmål: Når snakket presidenten om Asias utbyggelse av handel?\nSvaralternativer:\n- Da han kom til Singapore\n- Med Wong Kan Seng\n- Etter tapene i midterm-valget\n- Gjennom den ukeslange rundturen i Asia\nRiktig svar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Da han kom til Singapore",
+     "Med Wong Kan Seng",
+     "Etter tapene i midterm-valget",
+     "Gjennom den ukeslange rundturen i Asia"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Etter tapene i midterm-valget"
+  },
+  {
+   "draw": 10,
+   "doc_index": 696,
+   "doc_fingerprint": "1704ee5c85e2",
+   "prompt_variant": "norbelebele_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "I varmen på dagtid kan de reisende oppleve luftspeilinger som lurer deg til å tro at du ser vann (eller andre ting). Disse kan være farlige hvis den reisende følger luftspeilingen og på den måten kaster bort dyrebar energi og vann. Selv de varmeste ørkenene kan bli ekstremt kalde om natten. Hypotermi er en reell risiko om man ikke har varme klær.\nHvilket av følgende er ikke nevnt som en potensiell trussel for reisende gjennom ørkenen?\nHvilket av følgende mulige svar er det riktige?\n- Vannmangel \n- Luftspeil\n- Hypotermi\n- Solforbrenning\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Vannmangel ",
+     "Luftspeil",
+     "Hypotermi",
+     "Solforbrenning"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Solforbrenning"
+  },
+  {
+   "draw": 11,
+   "doc_index": 677,
+   "doc_fingerprint": "e0c23c08de3a",
+   "prompt_variant": "norbelebele_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: En av plussidene med Charlotte i Nord-Carolina, er at det finnes en overflod av gode tilbud for familier. Innbyggere fra andre områder oppgir ofte familievennlighet som en hovedårsak til å flytte dit, og besøkende syns ofte byen er er lett å nyte med barn. De siste 20 årene har mengden barnevennlige alternativer i Uptown Charlotte vokst eksponentielt. Drosjer brukes vanligvis ikke av familier i Charlotte, selv om de kan være til nytte under visse omstendigheter. Det er en tilleggsavgift for å ha mer enn 2 passasjerer, så dette alternativet kan være dyrere enn nødvendig.\nSpørsmål: Hva kan føre til en ekstra avgift når man tar taxi i Charlotte?\n- Å bosette seg i et annet område\n- Å ha tre passasjerer\n- Å dra oppover i byen\n- Å være familievennlig\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Å bosette seg i et annet område",
+     "Å ha tre passasjerer",
+     "Å dra oppover i byen",
+     "Å være familievennlig"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Å ha tre passasjerer"
+  },
+  {
+   "draw": 12,
+   "doc_index": 716,
+   "doc_fingerprint": "5f23a1030032",
+   "prompt_variant": "norbelebele_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Å kjøpe mat i supermarkeder er vanligvis den billigste måten å få i seg mat på. Men om man ikke har mulighet til å lage maten selv, er man begrenset til ferdigmat. Supermarkeder får stadig mer variert utvalg av ferdigmat. Noen har til og med en mikrobølgeovn eller andre muligheter til å varme mat. I noen land eller i enkelte typer butikker finnes det minst en restaurant på stedet, ofte ganske uformell med rimelige priser.\nHvilke fasiliteter som visse supermarkeder tilbyr, appellerer til en kunde som kjøper ferdigmat?\nHvilket av følgende mulige svar er det riktige?\n A: Restauranter på stedet\n B: Mindre variert utvalg\n C: Rå mat\n D: En mikrobølgeovn\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Restauranter på stedet",
+     "Mindre variert utvalg",
+     "Rå mat",
+     "En mikrobølgeovn"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (En mikrobølgeovn)"
+  },
+  {
+   "draw": 13,
+   "doc_index": 346,
+   "doc_fingerprint": "e04aa39a91e9",
+   "prompt_variant": "norbelebele_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Svar på følgende spørsmål: Når kan Kinas brutto nasjonalprodukt bli større enn USAs, ifølge avsnittet?\nSvaret skal baseres på følgende tekst:\nI løpet av de siste tre tiårene, til tross for at den offisielt er en kommunistisk stat, har Kina utviklet en markedsøkonomi. De første økonomiske reformene ble gjort under ledelse av Deng Xiaoping. Siden den gang har Kinas økonomiske størrelse vokst 90 ganger. For første gang eksporterte Kina i fjor flere biler enn Tyskland og overgikk USA som det største markedet for denne industrien. Kinas BNP kan være større enn USAs innen to tiår.\nVelg et svar fra denne listen:\n– Etter flere økonomiske reformer\n– I løpet av to tiår\n– Når landet har fått nytt lederskap\n– I løpet av tre tiår\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Etter flere økonomiske reformer",
+     "I løpet av to tiår",
+     "Når landet har fått nytt lederskap",
+     "I løpet av tre tiår"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: I løpet av to tiår"
+  },
+  {
+   "draw": 14,
+   "doc_index": 233,
+   "doc_fingerprint": "008388156aed",
+   "prompt_variant": "norbelebele_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Bakgrunn: Det er forskjellige estimater for hvor mange som snakker hindi. Det anslås å være mellom det andre og fjerde mest talte språket i verden. Antall morsmålstalere varierer avhengig av om man teller med veldig nært beslektede dialekter. Anslagene varierer fra 340 millioner til 500 millioner talere, og så mange som 800 millioner mennesker kan forstå språket. Hindi og urdu er like i ordforråd, men forskjellige i skrift; i hverdagssamtaler kan talere av begge språk vanligvis forstå hverandre.\nSpørsmål: Hvilke av følgende er et sant utsagn om språkene hindi og urdu?\nSvaralternativer:\n A: Det er vanligvis en forskjell mellom talere av begge språk\n B: De har annerledes skrivespråk\n C: De er like både når det gjelder vokabular og skrivespråk\n D: De har ulikt vokabular\nRiktig svar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Det er vanligvis en forskjell mellom talere av begge språk",
+     "De har annerledes skrivespråk",
+     "De er like både når det gjelder vokabular og skrivespråk",
+     "De har ulikt vokabular"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (De har annerledes skrivespråk)"
+  },
+  {
+   "draw": 15,
+   "doc_index": 104,
+   "doc_fingerprint": "a1cfa8d43a5d",
+   "prompt_variant": "norbelebele_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Svar på følgende spørsmål: Hvilken turismekategori vil det å besøke et museum vil falle under?\nSvaret skal baseres på følgende tekst:\nDen kanskje vanligste typen turisme er det folk flest forbinder med å reise: rekreasjonsturisme. Det er når folk drar til et sted som er veldig forskjellig fra deres vanlige daglige liv for å slappe av og ha det gøy. Strender, fornøyelsesparker og campingplasser er ofte stedene rekreasjonsturister vanligvis besøker. Hvis målet med besøket til et bestemt sted er å bli kjent med historien og kulturen der, kaller vi det kulturturisme. Turister kan besøke ulike landemerker i et bestemt land, eller de kan velge å bare fokusere på ett område.\nVelg et svar fra denne listen:\n A: Forretningsturisme\n B: Rekreasjonsturisme\n C: Kulturturisme\n D: Utendørsturisme\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Forretningsturisme",
+     "Rekreasjonsturisme",
+     "Kulturturisme",
+     "Utendørsturisme"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Kulturturisme)"
+  },
+  {
+   "draw": 16,
+   "doc_index": 116,
+   "doc_fingerprint": "41967828d64e",
+   "prompt_variant": "norbelebele_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Innholdsteorier fokuserer på å finne det som motiverer eller appellerer til folk. Disse teoriene tyder på at mennesker har visse behov og/eller ønsker som blir internaliserte etter hvert som vi vokser opp. Disse teoriene ser på hva det er med enkelte personer som gjør at de vil ha tingene de vil ha og hvilke ting i deres miljø som får dem til å gjøre eller ikke gjøre visse ting. To populære innholdsteorier er Maslows behovspyramide og Hertzbergs tofaktorteori.\n\nHvilke av følgende er ikke noe som innholdsteorier fokuserer på?\n\n- Nye ønsker som har materialisert seg i voksenalder\n- Hvordan ting i miljøene deres påvirker handlingene deres\n- Internaliserte behov\n- Forstå hva folk liker\n\nEr det riktige svaret Nye ønsker som har materialisert seg i voksenalder, Hvordan ting i miljøene deres påvirker handlingene deres, Internaliserte behov eller Forstå hva folk liker?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Nye ønsker som har materialisert seg i voksenalder",
+     "Hvordan ting i miljøene deres påvirker handlingene deres",
+     "Internaliserte behov",
+     "Forstå hva folk liker"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Nye ønsker som har materialisert seg i voksenalder"
+  },
+  {
+   "draw": 17,
+   "doc_index": 258,
+   "doc_fingerprint": "b7eb92316aaa",
+   "prompt_variant": "norbelebele_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Bakgrunn: Tidlig i landets uavhengighet bidro Singapore Botanic Gardens ekspertise til å forvandle øya til en tropisk hageby. I 1981 ble Vanda Miss Joaquim, en orkidehybrid, valgt som landets nasjonalblomst.\nSpørsmål: Hva er Vanda Miss Joaquim?\nSvaralternativer:\n- En øy\n- En blomst\n- En botanisk hage\n- Et nasjonalmonument\nRiktig svar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "En øy",
+     "En blomst",
+     "En botanisk hage",
+     "Et nasjonalmonument"
+    ],
+    "labels": null,
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: En blomst"
+  },
+  {
+   "draw": 18,
+   "doc_index": 367,
+   "doc_fingerprint": "22d781185937",
+   "prompt_variant": "norbelebele_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Det er den største anskaffelsen i eBays historie. Selskapet håper å diversifisere sine profittkilder og oppnå popularitet i områder der Skype har en sterk posisjon, som Kina, Øst-Europa og Brasil.\n\nHva ønsker eBay å oppnå med anskaffelsen?\n\n A: Konsolidere inntektene sine\n B: Nå ut til nye territorier\n C: Øke profilen\n D: Tilfredsstille aksjonærene\n\nEr det riktige svaret A, B, C eller D?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Konsolidere inntektene sine",
+     "Nå ut til nye territorier",
+     "Øke profilen",
+     "Tilfredsstille aksjonærene"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Nå ut til nye territorier)"
+  },
+  {
+   "draw": 19,
+   "doc_index": 416,
+   "doc_fingerprint": "f6eef069a2e3",
+   "prompt_variant": "norbelebele_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: En tidligere filippinsk politimann har holdt Hong Kong-turister som gisler ved å kapre bussen deres i Manila, hovedstaden på Filippinene. Rolando Mendoza skjøt sin M16-rifle mot turistene. Flere gisler er reddet, og minst seks er bekreftet omkommet så langt. Seks gisler, inkludert barn og eldre, ble løslatt tidlig, i likhet med de filippinske fotografene. Fotografene tok senere plassen til en eldre dame da hun trengte toalettet. Mendoza ble skutt ned.\nSpørsmål: Hvem ble ikke holdt som fange av Rolando Mendoza, ifølge avsnittet?\n A: Turister\n B: Politimenn\n C: Barn\n D: Fotografer\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Turister",
+     "Politimenn",
+     "Barn",
+     "Fotografer"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Politimenn)"
+  },
+  {
+   "draw": 20,
+   "doc_index": 443,
+   "doc_fingerprint": "4dc2192be670",
+   "prompt_variant": "norbelebele_nob_hybrid_p1",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Bakgrunn: Ifølge Ansa «var politiet bekymret for et par drap på toppnivå som de fryktet kunne utløse en fullstendig arvskrig. Politiet sa at Lo Piccolo hadde overtaket fordi han hadde vært Provenzanos høyre hånd i Palermo, og hans større erfaring vant ham respekten til den eldre generasjonen sjefer da de fulgte Provenzanos retningslinjer om å holde seg så lavt som mulig mens de styrket maktnettverket sitt. Disse sjefene hadde blitt trukket inn av Provenzano da han satte en stopper for den Riina-drevne krigen mot staten som krevde livet til Mafia-korsfarerne Giovanni Falcone og Paolo Borsellino i 1992.»\nSpørsmål: Hvem var årsaken til Falcones død, basert på informasjonen i avsnittet?\nSvaralternativer:\n- Han ble drept under den Riina-drevne krigføringen\n- Han ble drept av politiet\n- Lo Piccolo fikk ordre om å drepe ham\n- Han ble drept av mafia-korsfareren Paolo Borsellino\nRiktig svar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Han ble drept under den Riina-drevne krigføringen",
+     "Han ble drept av politiet",
+     "Lo Piccolo fikk ordre om å drepe ham",
+     "Han ble drept av mafia-korsfareren Paolo Borsellino"
+    ],
+    "labels": null,
+    "gold": [
+     0
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Han ble drept under den Riina-drevne krigføringen"
+  },
+  {
+   "draw": 21,
+   "doc_index": 842,
+   "doc_fingerprint": "d499f68c8cc8",
+   "prompt_variant": "norbelebele_nob_mcf_p0",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Sundarbans er det største mangrovebeltet i verden, og strekker seg 80 km (50 mi) inn i det bangladeshiske og det indiske innlandet fra kysten. Sundarbans står på UNESCOs verdensarvliste. Den delen av skogen som er innenfor indisk territorium heter SUndarbans National Park. Skogene er ikke bare mangrovesumper – de inkluderer noen av de siste gjenværende bestandene til de mektige junglene som en gang dekket Gangessletten. Sundarbans dekker et område på 3.850 km², hvorav omtrent en tredjedel er dekket av vann / myrområder. Sundarbans har vært et naturreservat siden 1966, og det er anslått at det nå er 400 bengaltigre og rundt 30 000 aksishjort i området.\nSpørsmål: Hvilket av følgende utsagn om Sunarbans er ikke sant, ifølge avsnittet?\n A: Det inneholder noen av de få mektige junglene som gjenstår\n B: Halvparten av dens totale område er dekket av myr\n C: Det er den største mangrovebeltet i verden\n D: Det huser flere aksishjort enn bengaltigre\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Det inneholder noen av de få mektige junglene som gjenstår",
+     "Halvparten av dens totale område er dekket av myr",
+     "Det er den største mangrovebeltet i verden",
+     "Det huser flere aksishjort enn bengaltigre"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Halvparten av dens totale område er dekket av myr)"
+  },
+  {
+   "draw": 22,
+   "doc_index": 31,
+   "doc_fingerprint": "81dd4eccd4a3",
+   "prompt_variant": "norbelebele_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Et godt og næringsrikt kosthold gir ikke alene prestasjoner på elitenivå, men det kan ha stor innvirkning på den generelle formen til unge idrettsutøvere. Å opprettholde en sunn energibalanse, ha gode vaner for å tilføre kroppen væske og forstå de ulike aspektene rundt kosttilskudd, kan gjøre at idrettsutøvere presterer bedre og får økt glede fra sporten.\n\nHvilke av følgende kan ikke oppnås utelukkende gjennom ernæringspraksis for en idrettsutøver?\n\n A: Forbedret ytelse\n B: Økt glede \n C: Eliteopptreden\n D: Generell velvære\n\nEr det riktige svaret A, B, C eller D?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Forbedret ytelse",
+     "Økt glede ",
+     "Eliteopptreden",
+     "Generell velvære"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Eliteopptreden)"
+  },
+  {
+   "draw": 23,
+   "doc_index": 71,
+   "doc_fingerprint": "339142c7dd41",
+   "prompt_variant": "norbelebele_nob_hybrid_p3",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Svar på følgende spørsmål: Hvilke av følgende brukes for å beregne en trafikkstrøm matematisk?\nSvaret skal baseres på følgende tekst:\nTrafikkflyt er studiet av bevegelsene til individelle sjåfører og kjøretøy mellom to punker, og samspillet dem imellom. Dessverre er det vanskelig å studere trafikkflyt fordi føreradferd ikke kan forutsies med hundre prosent sikkerhet. Heldigvis kan sjåførers oppførsel som regel plasseres innenfor et rimelig stabilt omåde. Trafikkstrømmer er dermed ofte noenlunde stabile og kan representeres grovt matematisk. For bedre å representere trafikkflyt, har det blitt etablert forhold mellom de tre hovedegenskapene: (1) flyt, (2) tetthet og (3) hastighet. Disse forholdene hjelper til med planlegging, design og drift av veieanlegg.\nVelg et svar fra denne listen:\n– Veidrift\n– Føreratferd\n– Veidesign\n– Trafikktetthet\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Veidrift",
+     "Føreratferd",
+     "Veidesign",
+     "Trafikktetthet"
+    ],
+    "labels": null,
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Trafikktetthet"
+  },
+  {
+   "draw": 24,
+   "doc_index": 604,
+   "doc_fingerprint": "3968b639e40f",
+   "prompt_variant": "norbelebele_nob_hybrid_p4",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Martelly sverget inn et nytt provisorisk valgråd med ni medlemmer i går. Det er faktisk Martellys femte provisoriske valgråd på fire år. Forrige måned anbefalte en presidentkommisjon at det forrige provisoriske valgrådet burde gå av som en del av en tiltakspakke for å lede landet mot nyvalg. Kommisjonen var Martellys svar på omfattende protester mot regimet som startet i oktober. De til tider voldelige protestene ble utløst av manglende avholdelse av valg, noen helt siden 2011.\n\nHvem foreslo at forrige CEP skulle si opp?\n\n- Martelly\n- Demonstranter \n- Presidentkommisjonen\n- Medlemmene av DEP foreslo det selv\n\nEr det riktige svaret Martelly, Demonstranter , Presidentkommisjonen eller Medlemmene av DEP foreslo det selv?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Martelly",
+     "Demonstranter ",
+     "Presidentkommisjonen",
+     "Medlemmene av DEP foreslo det selv"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Presidentkommisjonen"
+  },
+  {
+   "draw": 25,
+   "doc_index": 567,
+   "doc_fingerprint": "4521a2666e3e",
+   "prompt_variant": "norbelebele_nob_mcf_p3",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Svar på følgende spørsmål: Hvorfor oppholdt Jarque seg på laghotellet?\nSvaret skal baseres på følgende tekst:\nJarque trente under førsesongens trening på Coverciano i Italia tidligere på dagen. Han bodde på laghotellet i forkant av en kamp planlagt på søndag mot Bolonia. Han bodde på laghotellet i forkant av en kamp planlagt på søndag mot Bolonia.\nVelg et svar fra denne listen:\n A: Han hadde trening\n B: Han hadde et førsesongsmøte\n C: Han hadde en kamp på søndag\n D: Han trente med Bolonia\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Han hadde trening",
+     "Han hadde et førsesongsmøte",
+     "Han hadde en kamp på søndag",
+     "Han trente med Bolonia"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: C (Han hadde en kamp på søndag)"
+  },
+  {
+   "draw": 26,
+   "doc_index": 331,
+   "doc_fingerprint": "888033fb92e4",
+   "prompt_variant": "norbelebele_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Batten ble rangert som nummer 190 på listen over de 400 rikeste amerikanere i 2008 med en estimert formue på 2,3 milliarder dollar. Han ble uteksaminert fra College of Arts & Sciences ved University of Virginia i 1950 og var en betydelig giver til den institusjonen.\nSpørsmål: Hvilken plass hadde Batten på et tidspunkt på listen over de rikeste amerikanerne, ifølge avsnittet?\n- 400.\n- 20.\n- 190.\n- 23.\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "400.",
+     "20.",
+     "190.",
+     "23."
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: 190."
+  },
+  {
+   "draw": 27,
+   "doc_index": 135,
+   "doc_fingerprint": "77cfe64754f7",
+   "prompt_variant": "norbelebele_nob_hybrid_p2",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Den militaristiske karakteren til det romerske imperiet bidro til utviklingen av medisinske fremskritt. Leger begynte å bli rekruttert av keiser Augustus og dannet til og med det første romerske legekorps for bruk i etterkant av slag. Kirurger hadde kunnskap om forskjellige beroligende midler, inkludert morfin, fra ekstrakter av valmuefrø, og skopolamin fra bulmeurt-frø. De ble dyktige på amputasjon for å redde pasienter fra koldbrann, i tillegg til turniké og arterieklemmer for å stoppe blodtilførselen. Gjennom flere århundrer førte det romerske imperiet til store gevinster innen medisin og dannet mye av kunnskapen vi sitter med i dag.\nHvilke av følgende tilskrives ikke den medisinske utviklingen i det romerske imperiet, ifølge avsnittet?\nHvilket av følgende mulige svar er det riktige?\n- Dannelsen av legekorpset\n- Imperiets aggressive militærpolitikk\n- Dannelsen av læringssykehus\n- Keiserens rekruttering av leger\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Dannelsen av legekorpset",
+     "Imperiets aggressive militærpolitikk",
+     "Dannelsen av læringssykehus",
+     "Keiserens rekruttering av leger"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Dannelsen av læringssykehus"
+  },
+  {
+   "draw": 28,
+   "doc_index": 53,
+   "doc_fingerprint": "e0cbd65ed951",
+   "prompt_variant": "norbelebele_nob_mcf_p1",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Bakgrunn: Maktbalansen var et system der europeiske nasjoner søkte å opprettholde den nasjonale suvereniteten til alle europeiske stater. Konseptet var at alle europeiske nasjoner måtte søke å forhindre at en nasjon ble mektig, og dermed endret nasjonale regjeringer ofte sine allianser for å opprettholde balansen. Krigen om spansk arv markerte den første krigen hvis sentrale problem var maktbalansen. Dette markerte en viktig endring, ettersom europeiske makter ikke lenger ville ha påskudd for å være religiøse kriger. Dermed ville Trettiårskrigen være den siste krigen som ble betegnet som en religiøs krig.\nSpørsmål: I hvilket land var den første krigen i Europa hvor hovedproblemet var sagt å heller være knyttet til maktbalanse enn en religiøs kontekst?\nSvaralternativer:\n A: England\n B: Tyskland\n C: Portugal\n D: Spania\nRiktig svar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "England",
+     "Tyskland",
+     "Portugal",
+     "Spania"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     3
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: D (Spania)"
+  },
+  {
+   "draw": 29,
+   "doc_index": 113,
+   "doc_fingerprint": "c698c41214be",
+   "prompt_variant": "norbelebele_nob_mcf_p2",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Noen mennesker tror at det å oppleve mange kunstig påkalte klare drømmer ofte kan være veldig slitsomt. Hovedgrunnen til dette fenomenet er resultatet av at de klare drømmene øker tiden mellom REM-tilstander. Med mindre REM-søvn per natt, blir tilstanden der du opplever faktisk søvn og kroppen tar seg igjen, så sjelden at det blir et problem. Dette er like utmattende som om du skulle våkne hvert 20. eller 30. minutt og se på TV. Effekten er avhengig av hvor ofte hjernen din prøver å drømme klart om natten.\nHvilke av følgende negative effekter kan det å ofte ha klare drømmer ha på kroppen?\nHvilket av følgende mulige svar er det riktige?\n A: Redusert tid mellom REM-tilstander\n B: Mindre REM-søvn per natt\n C: Avhengighet av klar drømming\n D: Mer REM-søvn per natt\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Redusert tid mellom REM-tilstander",
+     "Mindre REM-søvn per natt",
+     "Avhengighet av klar drømming",
+     "Mer REM-søvn per natt"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Mindre REM-søvn per natt)"
+  },
+  {
+   "draw": 30,
+   "doc_index": 859,
+   "doc_fingerprint": "75922c8e2417",
+   "prompt_variant": "norbelebele_nob_mcf_p4",
+   "formulation": "mcf",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Hvis du reiser i et utviklingsland for første gang - eller i en ny del av verden - ikke undervurder det potensielle kultursjokket. Mange stødige og dyktige reisende har blitt overveldet av alt det nye knyttet til reising i utviklingsland, der mange små kulturelle tilpasninger raskt kan balle på seg. Du kan vurdere å spandere på deg hotell, mat og tjenester i vestlig stil og kvalitet, spesielt de første dagene, for lettere å bli akklimatisert. Ikke sov på madrass eller underlag rett på bakken i områder der du ikke kjenner den lokale faunaen. Hvis du skal sove ute, ta med en feltseng eller hengekøye for å holde deg unna slanger, skorpioner og den slags.\n\nHvilket av følgende er ikke anbefalt råd for reisende som besøker et u-land for første gang?\n\n A: Bli kjent med lokal fauna før du sover på bakken\n B: Unngå å spandere litt ekstra på mat i løpet av de første få dagene\n C: En leirseng eller hengekøye er anbefalt hvis du skal slå leir ute\n D: Invester i et kvalitetshotell når du først kommer dit\n\nEr det riktige svaret A, B, C eller D?",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Bli kjent med lokal fauna før du sover på bakken",
+     "Unngå å spandere litt ekstra på mat i løpet av de første få dagene",
+     "En leirseng eller hengekøye er anbefalt hvis du skal slå leir ute",
+     "Invester i et kvalitetshotell når du først kommer dit"
+    ],
+    "labels": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "gold": [
+     1
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: B (Unngå å spandere litt ekstra på mat i løpet av de første få dagene)"
+  },
+  {
+   "draw": 31,
+   "doc_index": 894,
+   "doc_fingerprint": "5c003cf180af",
+   "prompt_variant": "norbelebele_nob_hybrid_p0",
+   "formulation": "hybrid",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Med mindre du er diplomat, vil arbeid i utlandet stort sett innebære at du må betale inntektsskatt i landet du bor i. Inntektsskatt er strukturert forskjellig i ulike land, og skattesatsene og skattetrinnene varierer mye fra ett land til et annet. I noen føderale land, som USA og Canada, blir inntektsskatt pålagt både på føderalt nivå og på lokalt nivå, slik at satsene og skattetrinnene kan variere fra region til region.\nSpørsmål: Hva vil sannsynligvis forbli konsekvent ved inntektsskatt i ulike land?\n- Satser\n- Strukturer\n- Hvor du betaler hen\n- Klasser\nSvar:",
+   "reference": {
+    "type": "choice",
+    "options": [
+     "Satser",
+     "Strukturer",
+     "Hvor du betaler hen",
+     "Klasser"
+    ],
+    "labels": null,
+    "gold": [
+     2
+    ],
+    "options_shown": true
+   },
+   "reference_text": "Correct option: Hvor du betaler hen"
+  }
+ ]
+}

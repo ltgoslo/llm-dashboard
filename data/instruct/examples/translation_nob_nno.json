@@ -1,0 +1,549 @@
+{
+ "task": "translation_nob_nno",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 64,
+   "doc_fingerprint": "e41a61608dc1",
+   "prompt_variant": "translation_nob_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Bokmål: Norge skal etablere en ny forskningsstasjon på Bouvetøya, som er en av de mest isolerte øyene i verden, litt nord for Antarktis. Det er en ugjestmild øy, hvor over 90% av øya er dekket av is, og det er kraftig vind der hele året. Det er forsøkt å lage forskningsstasjoner der to ganger tidligere, men begge gangene forsvant bygningene. Det er mye sel på øya, og det nye bygget er spesialdesignet for å tåle både selvangrep og møkk. Forskningsstasjonen skal bli fraktet med båt og heist på plass med helikopter. Det skal forskes på krill, noe det er svært lite informasjon om fra før. Stasjonen har plass til seks personer, og er selvforsynt med strøm ved hjelp av tre vindmøller.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Noreg skal etablera ein ny forskingsstasjon på Bouvet-øya, som er eit av dei mest isolerte øyene i verda, litt nord for Antarktis. Det er ei ugjestmild øy, og over 90% av øya er dekka av is, og det er kraftig vind der heile året. Det er forsøkt å laga forskingsstasjonar der to gongar tidlegare, men begge gongane forsvant bygningane. Det er mykje sel på øya, og det nye bygget er spesialdesigna for å tola både selangrep og møkk. Forskingsstasjonen skal bli frakta med båt og montert med helikopter, og dei skal forske på krill, noko det er svært lite informasjon om frå før av. Stasjonen har plass til seks personar, og er sjølvforsynt med straum ved hjelp av tre vindmøller."
+    ]
+   },
+   "reference_text": "<reference>\nNoreg skal etablera ein ny forskingsstasjon på Bouvet-øya, som er eit av dei mest isolerte øyene i verda, litt nord for Antarktis. Det er ei ugjestmild øy, og over 90% av øya er dekka av is, og det er kraftig vind der heile året. Det er forsøkt å laga forskingsstasjonar der to gongar tidlegare, men begge gongane forsvant bygningane. Det er mykje sel på øya, og det nye bygget er spesialdesigna for å tola både selangrep og møkk. Forskingsstasjonen skal bli frakta med båt og montert med helikopter, og dei skal forske på krill, noko det er svært lite informasjon om frå før av. Stasjonen har plass til seks personar, og er sjølvforsynt med straum ved hjelp av tre vindmøller.\n</reference>"
+  },
+  {
+   "draw": 1,
+   "doc_index": 6,
+   "doc_fingerprint": "1ccf5cc32a0c",
+   "prompt_variant": "translation_nob_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Oversett følgende tekst til nynorsk: Det er usikkerhet rundt hvor mye F-35-flyene vil koste. I 2008 forutsatte de rødgrønne i Stortinget øvre kostnadsrammer på 42 milliarder. Kravet er sprengt med 30 milliarder, og mye tyder på at den endelige prislappen blir enda høyere. Statssekretær i Forsvarsdepartementet Roger Ingebriktsen mener at vi ikke er i nærheten av å måtte sette ned foten når det kommer til prisøkningen på flyene. Debatten internt i USA har vært mer nyansert og stadig flere i USA mener at antallet fly som skal produseres må revurderes. F-35-flyene skulle være klar i 2010, men datoen er utsatt til minst 2016 og prisen per fly er mer enn doblet ifølge The Economist.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Det er usikkerhet rundt kor mykje F-35-flya kjem til å kosta. I 2008 sette dei raudgrøne i Stortinget øvre kostnadsrammer på 42 milliardar. Kravet er sprengt med 30 milliardar, og mykje tyder på at den endelege prislappen blir endå høgare. Statssekretær i Forsvarsdepartementet Roger Ingebriktsen meiner at me ikkje er i nærleiken av å måtte setje ned foten når det kjem til prisauken på flya. Debatten internt i USA har vore meir nyansert og stadig fleire i USA meiner at talet på fly som skal produserast må revurderast. F-35-flya skulle vore klare i 2010, men datoen er utsett til minst 2016 og prisen per fly er meir enn dobla, ifølgje The Economist."
+    ]
+   },
+   "reference_text": "<reference>\nDet er usikkerhet rundt kor mykje F-35-flya kjem til å kosta. I 2008 sette dei raudgrøne i Stortinget øvre kostnadsrammer på 42 milliardar. Kravet er sprengt med 30 milliardar, og mykje tyder på at den endelege prislappen blir endå høgare. Statssekretær i Forsvarsdepartementet Roger Ingebriktsen meiner at me ikkje er i nærleiken av å måtte setje ned foten når det kjem til prisauken på flya. Debatten internt i USA har vore meir nyansert og stadig fleire i USA meiner at talet på fly som skal produserast må revurderast. F-35-flya skulle vore klare i 2010, men datoen er utsett til minst 2016 og prisen per fly er meir enn dobla, ifølgje The Economist.\n</reference>"
+  },
+  {
+   "draw": 2,
+   "doc_index": 21,
+   "doc_fingerprint": "596a284cda66",
+   "prompt_variant": "translation_nob_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Gi en nynorsk oversettelse av denne teksten: Flere hundre tusen mennesker demonstrerte i gatene mot den økende privatiseringen i regi av den høyrekonservative regjeringen i Chile. Demonstrantene har bakgrunn i studentforeninger, fagforeninger og offentlige tilsatte, og de krever mer penger til utdanning, helse, og endringer i grunnlova. Siden diktaturet falt i Chile i 1990 har utdannelse vært veien opp og frem, men de chilenske universitetene er blant de dyreste i verden, som gjør at utdanningen er preget av skyhøy ulikhet. Bare 15 prosent av utdanninger er offentlig finansiert, og mange studenter får høy gjeld etter endt studie. Demonstrantene vil også ha ny grunnlov for å gi velgerne mulighet til mer direkte demokrati, i form av folkeavstemninger.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Fleire hundre tusen demonstrerte i gatene mot den aukande privatiseringa i regi av den høgrekonservative regjeringa i Chile. Demonstrantane har bakgrunn i studentforeiningar, fagforeiningar og offentlege tilsette, og dei krev meir pengar til utdanning, helse, og endringar i grunnlova. Sidan diktaturet sitt fall i 1990 har utdanning vore vegen opp og fram, men dei chilenske universiteta er blant dei dyraste i verda, som gjer at utdanninga er prega av skyhøg ulikskap. Berre 15 prosent av utdanninga er offentleg finansiert, og mange studentar får høg gjeld etter endt studie. Demonstrantane vil òg ha ny grunnlov for å gje veljarane høve til meir direktedemokrati i form av folkeavstemmingar."
+    ]
+   },
+   "reference_text": "<reference>\nFleire hundre tusen demonstrerte i gatene mot den aukande privatiseringa i regi av den høgrekonservative regjeringa i Chile. Demonstrantane har bakgrunn i studentforeiningar, fagforeiningar og offentlege tilsette, og dei krev meir pengar til utdanning, helse, og endringar i grunnlova. Sidan diktaturet sitt fall i 1990 har utdanning vore vegen opp og fram, men dei chilenske universiteta er blant dei dyraste i verda, som gjer at utdanninga er prega av skyhøg ulikskap. Berre 15 prosent av utdanninga er offentleg finansiert, og mange studentar får høg gjeld etter endt studie. Demonstrantane vil òg ha ny grunnlov for å gje veljarane høve til meir direktedemokrati i form av folkeavstemmingar.\n</reference>"
+  },
+  {
+   "draw": 3,
+   "doc_index": 149,
+   "doc_fingerprint": "c31db5c3d594",
+   "prompt_variant": "translation_nob_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Norge tapte 6-9 til Sveits på søndag i kamp nummer to i innebandy-VM i Ostrava. Kveldens toppscorer med to mål, Ketil Kronberg sa: «Vi spiller veldig bra i to perioder, men så gjør vi en del dumme feil innimellom, spesielt i starten av tredje periode». De to første periodene var jevne (2-2, 3-3), men Sveits vant tredjeperioden 4-1.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Norge tapte 6-9 til Sveits på sundag i kamp nummer to i innebandy-VM i Ostrava. Kvelden sin toppscorer med to mål, Ketil Kronberg sa: «Me speler veldig bra i to periodar, men så gjer me ein del dumme feil av og til, spesielt i starten av tredje periode». Dei to første periodane var jamne (2-2, 3-3), men Sveits vant tredjeperioden 4-1."
+    ]
+   },
+   "reference_text": "<reference>\nNorge tapte 6-9 til Sveits på sundag i kamp nummer to i innebandy-VM i Ostrava. Kvelden sin toppscorer med to mål, Ketil Kronberg sa: «Me speler veldig bra i to periodar, men så gjer me ein del dumme feil av og til, spesielt i starten av tredje periode». Dei to første periodane var jamne (2-2, 3-3), men Sveits vant tredjeperioden 4-1.\n</reference>"
+  },
+  {
+   "draw": 4,
+   "doc_index": 173,
+   "doc_fingerprint": "5151eae39b7a",
+   "prompt_variant": "translation_nob_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Bokmål: En høyre-politiker etterlyser verdighet i abortdebatten, og oppfordrer medpolitikere til å være tilbakeholden med å vie abortmotstander Ludvig Nessa oppmerksomhet. Nessa har brukt virkemidler som plastfostre og blodige bilder for få abortsaken til å bli en del av valgkampen. Politikeren uttrykker samtidig støtte til dagens abortlov, hvor den gravide kvinnen har rett til selvbestemt abort innenfor de første 12 ukene av svangerskapet.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Ein Høgre-politikar etterlyser verdigheit i abortdebatten, og oppmodar medpolitikarar til å væra tilbakehalden med å gje abortmotstandar Ludvig Nessa merksemd. Nessa har brukt verkemiddel som plastfoster og blodige bilete for få abortsaka til å bli ein del av valkampen. Politikaren uttrykker samtidig støtte til dagens abortlov, kor den gravide kvinna har rett til sjøvbestemt abort innanfor dei første 12 vekene av svangerskapet."
+    ]
+   },
+   "reference_text": "<reference>\nEin Høgre-politikar etterlyser verdigheit i abortdebatten, og oppmodar medpolitikarar til å væra tilbakehalden med å gje abortmotstandar Ludvig Nessa merksemd. Nessa har brukt verkemiddel som plastfoster og blodige bilete for få abortsaka til å bli ein del av valkampen. Politikaren uttrykker samtidig støtte til dagens abortlov, kor den gravide kvinna har rett til sjøvbestemt abort innanfor dei første 12 vekene av svangerskapet.\n</reference>"
+  },
+  {
+   "draw": 5,
+   "doc_index": 147,
+   "doc_fingerprint": "5f6b31082f8f",
+   "prompt_variant": "translation_nob_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Gi en nynorsk oversettelse av denne teksten: Når det sies at museene må fornye seg, stusser jeg litt. Jeg synes de er ganske nye, alle sammen, tidligst fra 1500-tallet. Utenfor museumsbygning befinner jeg meg fortsatt i et museum, synes jeg, i et bymiljø som også er ivaretatt, mer eller mindre nennsomt. Det er blitt ett av kulturbevaringens paradokser at meningen med å fremvise verdensarven trues av arvens egen attraksjon i verden. Enkelte skatter er blitt mer tilgjengelige enn de tåler. Men paradokset er dobbelt: Masseturismen er også den eneste kraft på kloden som «naturlig» genererer penger til bevaring. Museene i verden skriker etter bevilgninger. De er vår hukommelse. De tar vare på fortiden, og må selv tas vare på.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Når musea får melding om å fornya seg, stussar eg over det. Eg synes dei er ganske ny, alle saman, med alder tidlegast frå 1500-talet. Utanfor museumsbygninga er eg framleis i eit museum, synes eg, i eit bymiljø som og er ivaretatt, meir eller mindre nennsamt. Det er blitt eitt av kulturvernet sine paradoks at meininga med å visa fram verdsarven blir truga av arva si eiga attraksjon i verda. Einskilde skattar er blitt meir tilgjengelege enn de toler. Men paradokset er dobbelt: Masseturismen er og den einaste krafta på kloden som «naturleg» genererer pengar til kunstvern. Musea i verda skrik etter løyvingar. Verka er vår hukommelse. Dei tek vare på fortida, og må sjølv takast vare på."
+    ]
+   },
+   "reference_text": "<reference>\nNår musea får melding om å fornya seg, stussar eg over det. Eg synes dei er ganske ny, alle saman, med alder tidlegast frå 1500-talet. Utanfor museumsbygninga er eg framleis i eit museum, synes eg, i eit bymiljø som og er ivaretatt, meir eller mindre nennsamt. Det er blitt eitt av kulturvernet sine paradoks at meininga med å visa fram verdsarven blir truga av arva si eiga attraksjon i verda. Einskilde skattar er blitt meir tilgjengelege enn de toler. Men paradokset er dobbelt: Masseturismen er og den einaste krafta på kloden som «naturleg» genererer pengar til kunstvern. Musea i verda skrik etter løyvingar. Verka er vår hukommelse. Dei tek vare på fortida, og må sjølv takast vare på.\n</reference>"
+  },
+  {
+   "draw": 6,
+   "doc_index": 44,
+   "doc_fingerprint": "c671ac28d203",
+   "prompt_variant": "translation_nob_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Hva blir \"På Ullevål universitetssykehus er det en ny metode som gjør at premature og syke nyfødte kan ligge uforstyrret og hvile mens en sykepleier tar blodprøver. Blodprøver er blant de vanligste testene som blir utført på nyfødte barn. Prøvetakingen kan være smertefull. Sykepleierne på Ullevål mener dette er et viktig satsingsfelt. Den nye metoden krever ett stikk, i huden og blodåren, og det kan stikkes flere ganger i samme vene for å ikke skade huden. Dette skiller seg fra dagens praksis; kapillær hælprøve, som kan være smertefull. Et eksempel er en gutt som ble født for tidlig. Han trengte pustemaskin de første ukene, og kunne ligge uforstyrret samtidig som sykepleier tok blodprøver.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "På Ullevål universitetssjukehus er det ein ny metode som gjer at premature og sjuke nyfødde kan ligga uforstyrra og kvile medan sjukepleiarar tar blodprøvar. Blodprøvar er noko av det som blir gjort oftast på nyfødde ungar, og kan vera smertefullt. Dette er då eit viktig område å satsa på, meiner sjukepleiarane på Ullevål. Den nye metoden krev eit stikk i huden og blodåra, og kan stikkast fleire gongar i same vena for å ikkje skada huden. Dette skil seg frå dagens praksis; kapillær hælprøve, som er vanleg, og kan vera smertefullt. Eit eksempel er ein gut som vart fødd for tidlig. Han trong pustemaskin dei første vekene, og kunne ligge i   uforstyrra samtidig som sjukepleiarar tok blodprøvar."
+    ]
+   },
+   "reference_text": "<reference>\nPå Ullevål universitetssjukehus er det ein ny metode som gjer at premature og sjuke nyfødde kan ligga uforstyrra og kvile medan sjukepleiarar tar blodprøvar. Blodprøvar er noko av det som blir gjort oftast på nyfødde ungar, og kan vera smertefullt. Dette er då eit viktig område å satsa på, meiner sjukepleiarane på Ullevål. Den nye metoden krev eit stikk i huden og blodåra, og kan stikkast fleire gongar i same vena for å ikkje skada huden. Dette skil seg frå dagens praksis; kapillær hælprøve, som er vanleg, og kan vera smertefullt. Eit eksempel er ein gut som vart fødd for tidlig. Han trong pustemaskin dei første vekene, og kunne ligge i   uforstyrra samtidig som sjukepleiarar tok blodprøvar.\n</reference>"
+  },
+  {
+   "draw": 7,
+   "doc_index": 146,
+   "doc_fingerprint": "32763d97f5a4",
+   "prompt_variant": "translation_nob_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Oversett følgende tekst til nynorsk: Øyvind Lofthus er en av de beste bakerne i Norge, og har startet Åpent Bakeri, som har vokst seg stort de siste årene. Han bor i et flott hus med mange designmøbler, og dyre malerier og kjøkkenredskaper. Bakeren ville enten bli fisker eller baker, og jobbet gratis hos profesjonelle i California og København for å lære av de beste. Lofthus elsker å bake brød, da dette er et levende produkt, og han har lite til overs for speltbølgen, og konseptbrødene til kjendiser. Han mener spelt ikke er så sunt, da man trenger litt av alt. Spesielt havre, bygg og rug. Det er mye helse i god smak, mener Lofthus.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Øyvind Lofthus er ein av dei beste bakarane i Noreg, og har starta Åpent Bakeri, som har vekse seg stort dei siste åra. Han bur i eit flott hus med mykje designmøblar og dyre maleri og kjøkkenredskaper. Bakaren ville enten bli fiskar eller bakar, og jobba gratis hjå profesjonelle i California og København for å læra av dei beste. Øyvind elskar å bake brød, då dette er eit levande produkt. Han har lite til overs for speltbølga, og konseptbrød til kjendisar. Han meiner spelt ikkje er så sunt, då ein treng litt av alt. Spesielt havre, bygg og rug. Det er mykje helse i god smak, meiner Lofthus."
+    ]
+   },
+   "reference_text": "<reference>\nØyvind Lofthus er ein av dei beste bakarane i Noreg, og har starta Åpent Bakeri, som har vekse seg stort dei siste åra. Han bur i eit flott hus med mykje designmøblar og dyre maleri og kjøkkenredskaper. Bakaren ville enten bli fiskar eller bakar, og jobba gratis hjå profesjonelle i California og København for å læra av dei beste. Øyvind elskar å bake brød, då dette er eit levande produkt. Han har lite til overs for speltbølga, og konseptbrød til kjendisar. Han meiner spelt ikkje er så sunt, då ein treng litt av alt. Spesielt havre, bygg og rug. Det er mykje helse i god smak, meiner Lofthus.\n</reference>"
+  },
+  {
+   "draw": 8,
+   "doc_index": 51,
+   "doc_fingerprint": "41dc0825294e",
+   "prompt_variant": "translation_nob_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Oversett følgende tekst til nynorsk: 20. februar har filmen Jakten på hukommelsen regissert av Thomas Lien premiere. Filmen handler om Øyvind som var 27 år gammel da han mistet hukommelsen i Kina. Det første Øyvind husker er at han satt seg på et tog i Kina. Alt som skjedde før det i livet er visket bort. Ingen kan med sikkerhet si hva som skjedde med Øyvind. Ulike teorier nevner en dykkerulykke, andre en hjernehinnebetennelse i barneårene, noen en matforgiftning. Åtte år er gått siden Øyvind mistet hukommelsen. Ifølge Lien handler ikke filmen om å miste noe, men om å oppleve livet på nytt. Først nå føler Øyvind at livet hans har ramlet på plass.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "20. februar er det premiere på filmen Jakten på hukommelsen, som er regissert av Thomas Lien. Filmen handlar om Øyvind, som var 27 år gamal då han mista hukommelsen i Kina. Øyvind hugsar at han sat på eit tog i Kina, men alt som skjedde før dette punktet i livet, er viska bort. Ingen veit kva som skjedde med Øyvind. Ulike teoriar omhandlar ei dykkerulykke, hjernehinnebetennelse i barndomen, og matforgifting. Det har gått åtte år sidan Øyvind mista hukommelsen. Ifølgje Lien handlar ikkje filmen om å miste noko, men om å oppleva livet på nytt. Først no kjenner Øyvind at livet har falle på plass."
+    ]
+   },
+   "reference_text": "<reference>\n20. februar er det premiere på filmen Jakten på hukommelsen, som er regissert av Thomas Lien. Filmen handlar om Øyvind, som var 27 år gamal då han mista hukommelsen i Kina. Øyvind hugsar at han sat på eit tog i Kina, men alt som skjedde før dette punktet i livet, er viska bort. Ingen veit kva som skjedde med Øyvind. Ulike teoriar omhandlar ei dykkerulykke, hjernehinnebetennelse i barndomen, og matforgifting. Det har gått åtte år sidan Øyvind mista hukommelsen. Ifølgje Lien handlar ikkje filmen om å miste noko, men om å oppleva livet på nytt. Først no kjenner Øyvind at livet har falle på plass.\n</reference>"
+  },
+  {
+   "draw": 9,
+   "doc_index": 156,
+   "doc_fingerprint": "2880b3564dc3",
+   "prompt_variant": "translation_nob_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Norge er i selskap med land som Iran, Danmark og Saudi-Arabia, og inngår i en liten gruppe nasjoner som blander religion og politikk. Statskirken er et demokratisk dilemma som bør revideres ifølge Gjønnes-utvalget og Kirkemøtet. Utsagnet var en gavepakke til norske politikere, som med Trond Giske, Martin Kolberg og Gerd-Liv Valla i spissen, istedenfor å hoppe på muligheten, bommet på ballen, og endte opp med å diskutere teologi. En diskusjon om hvilken stat vi vil ha, ble til en diskusjon om hvilken kristendom vi vil ha. Dermed er situasjonen forverret for statskirke-tilhengere både i kirken og i politikken. Sist fredag var høringsfrist i saken.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Noreg er i selskap med land som Iran, Danmark og Saudi-Arabia, og inngår i ei liten gruppe nasjonar som blandar religion og politikk. Statskyrkja er eit demokratisk dilemma som bør reviderast ifølge Gjønnes-utvalet og Kyrkjemøtet. Utsagnet var ein gåvepakke til norske politikarar, som med Trond Giske, Martin Kolberg og Gerd-Liv Valla i spissen, istadenfor å hoppa på moglegheita, bomma på ballen, og enda opp med å diskutera teologi. Ein diskusjon om kva stat me vil ha, vart til ein diskusjon om kva kristendom me vil ha. Dermed er situasjonen forverra for statskyrkje-tilhengarar både i kyrkja og i politikken. Sist fredag var høyringsfrist i saka."
+    ]
+   },
+   "reference_text": "<reference>\nNoreg er i selskap med land som Iran, Danmark og Saudi-Arabia, og inngår i ei liten gruppe nasjonar som blandar religion og politikk. Statskyrkja er eit demokratisk dilemma som bør reviderast ifølge Gjønnes-utvalet og Kyrkjemøtet. Utsagnet var ein gåvepakke til norske politikarar, som med Trond Giske, Martin Kolberg og Gerd-Liv Valla i spissen, istadenfor å hoppa på moglegheita, bomma på ballen, og enda opp med å diskutera teologi. Ein diskusjon om kva stat me vil ha, vart til ein diskusjon om kva kristendom me vil ha. Dermed er situasjonen forverra for statskyrkje-tilhengarar både i kyrkja og i politikken. Sist fredag var høyringsfrist i saka.\n</reference>"
+  },
+  {
+   "draw": 10,
+   "doc_index": 112,
+   "doc_fingerprint": "a7764b9e86a6",
+   "prompt_variant": "translation_nob_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Gi en nynorsk oversettelse av denne teksten: Forbruket av frukt og grønt har økt med 20 prosent i Norge de siste ti årene. Likevel falt den norske eksporten, og veksten kommer fra stadig mer import. Siden 1998 har den norske produksjonen falt med 10 prosent, opplyser Nationen. Landbruksministeren sier at kjedene må bli flinkere til å samarbeide med norske produsenter, og at bøndene i større grad må produsere det kundene ønsker.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Forbruket av frukt og grønt har auka med 20 prosent i Noreg dei siste ti åra. Likevel fell den norske eksporten, og veksten kjem frå meir og meir import. Sidan 1998 har nemleg den norske produksjonen falle med 10 prosent, opplyser Nationen. Landbruksministeren seier at kjedene må bli flinkare til å samarbeida med norske produsentar, og at bøndene må i større grad produsera kva kundane ynskjer."
+    ]
+   },
+   "reference_text": "<reference>\nForbruket av frukt og grønt har auka med 20 prosent i Noreg dei siste ti åra. Likevel fell den norske eksporten, og veksten kjem frå meir og meir import. Sidan 1998 har nemleg den norske produksjonen falle med 10 prosent, opplyser Nationen. Landbruksministeren seier at kjedene må bli flinkare til å samarbeida med norske produsentar, og at bøndene må i større grad produsera kva kundane ynskjer.\n</reference>"
+  },
+  {
+   "draw": 11,
+   "doc_index": 174,
+   "doc_fingerprint": "13f65181f608",
+   "prompt_variant": "translation_nob_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Bokmål: Politikere kappes om å være mest positive til å bygge gasskraftverk i Møre og Romsdal, men velgerne er ikke så sikre. En meningsmåling Sentio har utført for Sunnmørsposten viser at det er dødt løp mellom de som vil ha gasskraftverk og de som ikke vil ha det. 43,6 prosent vil vente med å bygge ut gasskraftverk, mens 43,3 prosent vil bygge nå. SVs Bjørn Jacobsen er glad for resultatene av meningsmålingen. Sett i forhold til Jacobsen og SV vil Petter Løvik (H) bygge gasskraft nå og drive med forskning parallelt. Karita Bekkemellem Orheim (A) tolker meningsmålingen likt som Løvik. Undersøkelsen viser at kvinner og de yngste velgerne er mest skeptisk til gasskraft.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Politikarar konkurrerer om å vera mest positive til å bygga gasskraftverk i Møre og Romsdal, men veljarane er ikkje så sikre. Ei meiningsmåling Sentio har utført for Sunnmørsposten viser at det er dødt løp mellom dei som vil ha gasskraftverk og dei som ikkje vil ha det. 43,6 prosent vil venta med å bygga ut gasskraftverk, medan 43,3 prosent vil bygga no. Bjørn Jacobsen i SV er glad for resultata av meiningsmålinga. Sett i forhold til Jacobsen og SV vil Petter Løvik (H) bygga gasskraft no og driva med forskning parallelt. Karita Bekkemellem Orheim (A) tolkar meningsmålinga likt som Løvik. Undersøkinga viser at kvinner og dei yngste veljarane er mest skeptisk til gasskraft."
+    ]
+   },
+   "reference_text": "<reference>\nPolitikarar konkurrerer om å vera mest positive til å bygga gasskraftverk i Møre og Romsdal, men veljarane er ikkje så sikre. Ei meiningsmåling Sentio har utført for Sunnmørsposten viser at det er dødt løp mellom dei som vil ha gasskraftverk og dei som ikkje vil ha det. 43,6 prosent vil venta med å bygga ut gasskraftverk, medan 43,3 prosent vil bygga no. Bjørn Jacobsen i SV er glad for resultata av meiningsmålinga. Sett i forhold til Jacobsen og SV vil Petter Løvik (H) bygga gasskraft no og driva med forskning parallelt. Karita Bekkemellem Orheim (A) tolkar meningsmålinga likt som Løvik. Undersøkinga viser at kvinner og dei yngste veljarane er mest skeptisk til gasskraft.\n</reference>"
+  },
+  {
+   "draw": 12,
+   "doc_index": 101,
+   "doc_fingerprint": "ead3ac68fd27",
+   "prompt_variant": "translation_nob_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Oversett følgende tekst til nynorsk: Øyvind Lofthus er en av Norges beste bakere. Han elsker brød fordi det er et levende produkt. Vestlendingen fra Lofthus var sikker på at han enten skulle bli fisker eller baker. Tilfeldigvis møtte Lofthus den franske bakeren Emmanuel Rang. Familie og venner bladde opp penger for Lofthus og Rang. Øyvind baker med rene, naturlige smaker. Han liker ikke tilsetninger og skyr eggepulver, melkepulver og margarin. Øyvind kan dy seg for «grovebølgen» og mener at butikkjedene gir blaffen i hva som er i brødet så lenge det ser rustikt ut. Bedriften Åpent bakeri kunne vært enda større, men de vil ikke inn på noe kjøpesenter med felles åpningstider og provisjon av salget.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Øyvind Lofthus er ein av Noregs beste bakarar. Han elskar brød fordi det er eit levande produkt. Vestlendingen frå Lofthus var sikker på at han anten skulle bli fiskar eller bakar. Tilfeldigvis møtte Lofthus den franske bakaren Emmanuel Rang. Familie og vener bladde opp pengar for Lofthus og Rang. Øyvind baker med reine, naturlege smaker. Han liker ikkje tilsetningar og skyr eggepulver, mjølkepulver og margarin. Øyvind er ikkje fan av «grovbølgja» og meiner at butikkjedene gir blaffen i kva som er i brødet så lenge det ser rustikt ut. Verksemda Åpent bakeri kunne vore enno større, men dei vil ikkje inn på noko kjøpesenter med felles opningstider og provisjon av salet."
+    ]
+   },
+   "reference_text": "<reference>\nØyvind Lofthus er ein av Noregs beste bakarar. Han elskar brød fordi det er eit levande produkt. Vestlendingen frå Lofthus var sikker på at han anten skulle bli fiskar eller bakar. Tilfeldigvis møtte Lofthus den franske bakaren Emmanuel Rang. Familie og vener bladde opp pengar for Lofthus og Rang. Øyvind baker med reine, naturlege smaker. Han liker ikkje tilsetningar og skyr eggepulver, mjølkepulver og margarin. Øyvind er ikkje fan av «grovbølgja» og meiner at butikkjedene gir blaffen i kva som er i brødet så lenge det ser rustikt ut. Verksemda Åpent bakeri kunne vore enno større, men dei vil ikkje inn på noko kjøpesenter med felles opningstider og provisjon av salet.\n</reference>"
+  },
+  {
+   "draw": 13,
+   "doc_index": 80,
+   "doc_fingerprint": "dd5e9f141454",
+   "prompt_variant": "translation_nob_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Hva blir \"I storslalåm i Beaver Creek fikk Aksel Lund Svindal tredjeplass i kveld. På andreplass, 69 hundredeler foran Svindal, kom Ted Ligety. På førsteplass, en hundredel foran Ligety, kom Benjamin Raich. Til sammen har Aksel Lund Svindal fått to seire og en tredjeplass etter tre renn i Beaver Creek. Et utrolig comeback etter at Svindal forrige sesong falt og ødela seg selv og sesongen i samme bakke. Svindal kom inn fem hundredeler foran Kjetil Jansrud som kom på fjerdeplass og var nest beste nordmann i dag. Dagens resultat gjør at Jansrud får et bedre startnummer neste lørdag enn han hadde i dag.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "I storslalåm i Beaver Creek fekk Aksel Lund Svindal tredjeplass i kveld. På andreplass, 69 hundredeler framfor Svindal, kom Ted Ligety. På førsteplass, ein hundredel framfor Ligety, kom Benjamin Raich. Til sammen har Aksel Lund Svindal fått to sigrar og en tredjeplass etter tre renn i Beaver Creek. Eit utruleg comeback etter at Svindal førre sesong datt og øydela seg sjølv og sesongen i same bakke. Svindal kom inn fem hundredelar framfor Kjetil Jansrud som kom på fjerdeplass og var nest beste nordmann i dag. Dagens resultat gjer at Jansrud får eit betre startnummer neste laurdag enn han hadde i dag."
+    ]
+   },
+   "reference_text": "<reference>\nI storslalåm i Beaver Creek fekk Aksel Lund Svindal tredjeplass i kveld. På andreplass, 69 hundredeler framfor Svindal, kom Ted Ligety. På førsteplass, ein hundredel framfor Ligety, kom Benjamin Raich. Til sammen har Aksel Lund Svindal fått to sigrar og en tredjeplass etter tre renn i Beaver Creek. Eit utruleg comeback etter at Svindal førre sesong datt og øydela seg sjølv og sesongen i same bakke. Svindal kom inn fem hundredelar framfor Kjetil Jansrud som kom på fjerdeplass og var nest beste nordmann i dag. Dagens resultat gjer at Jansrud får eit betre startnummer neste laurdag enn han hadde i dag.\n</reference>"
+  },
+  {
+   "draw": 14,
+   "doc_index": 71,
+   "doc_fingerprint": "2eb885a1fc9a",
+   "prompt_variant": "translation_nob_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Gi en nynorsk oversettelse av denne teksten: «Jeg synes at et skikkelig museum skal være litt kjedelig», skrives det i et leserinnlegg, som en kommentar imot oppfordringen museer har fått til å fornye seg. I historisk sammenheng er museer ganske nye, tidligst fra 1500-tallet. Enkelte fortidsskatter er blitt gjort mer tilgjengelig enn de tåler, og falmer eller tæres ned. Det er et paradoks at masseturismen utløser eksponeringen, samtidig som det er inntektskilden som genererer penger til bevaring av kulturminnene.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "«Eg syns at eit skikkeleg museum skal væra litt kjedeleg», vert det skrive i et leserinnlegg, som ein kommentar i mot oppmodinga museum har fått til å fornya seg. I historisk samanheng er museum ganske nye, tidligast frå 1500-tallet. Enkelte fortidsskattar er blitt gjort meir tilgjengeleg enn dei toler, og falmar eller tærast ned. Det er eit paradoks at masseturismen utløyser eksponeringa, samtidig som det er inntektskjelda som genererer pengar til bevaring av kulturminnene."
+    ]
+   },
+   "reference_text": "<reference>\n«Eg syns at eit skikkeleg museum skal væra litt kjedeleg», vert det skrive i et leserinnlegg, som ein kommentar i mot oppmodinga museum har fått til å fornya seg. I historisk samanheng er museum ganske nye, tidligast frå 1500-tallet. Enkelte fortidsskattar er blitt gjort meir tilgjengeleg enn dei toler, og falmar eller tærast ned. Det er eit paradoks at masseturismen utløyser eksponeringa, samtidig som det er inntektskjelda som genererer pengar til bevaring av kulturminnene.\n</reference>"
+  },
+  {
+   "draw": 15,
+   "doc_index": 66,
+   "doc_fingerprint": "31d764c8fc2d",
+   "prompt_variant": "translation_nob_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Bokmål: Det femte spillet i spillserien “Football Manager” er ute, og bygger videre på de kjente funksjonene i spillet fra 2008. Det går fort mange hundre timer til dette spillet, og mange mener at det er mer en jobb enn et spill. Nytt av året er 3D-kampmotoren, som gjør at man kan se kampene i større detalj. I tillegg har man fått en assistenttrener som er gull verdt, spesielt hvis man er lei de samme spørsmålene fra sportsjournalistene etter hver kamp. Alt i alt er Football Manager 2009 det beste spillet så langt i serien, og mye av det man har ønsket å sette fokus på i tidligere utgaver er tatt hånd om.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Den femte i spelserien “Football Manager” er ute, og bygger vidare på dei kjente funksjonane frå spelet frå 2008. Det går fort mange hundre timar til dette spelet, og mange meiner då at det er meir ein jobb enn eit spel. Nytt av året er 3D-kampmotoren, som gjer at ein kan sjå kampane i større detalj. I tillegg har ein fått ein assistenttrenar som er gull verdt, spesielt viss ein er lei dei same spørsmåla frå sportsjournalistane etter kvar kamp. Alt i alt er Football Manager 2009 det beste spelet sålangt i serien, og mykje av det ein har ynskja å setja fokus på i tidlegare utgvåer er tatt hand om."
+    ]
+   },
+   "reference_text": "<reference>\nDen femte i spelserien “Football Manager” er ute, og bygger vidare på dei kjente funksjonane frå spelet frå 2008. Det går fort mange hundre timar til dette spelet, og mange meiner då at det er meir ein jobb enn eit spel. Nytt av året er 3D-kampmotoren, som gjer at ein kan sjå kampane i større detalj. I tillegg har ein fått ein assistenttrenar som er gull verdt, spesielt viss ein er lei dei same spørsmåla frå sportsjournalistane etter kvar kamp. Alt i alt er Football Manager 2009 det beste spelet sålangt i serien, og mykje av det ein har ynskja å setja fokus på i tidlegare utgvåer er tatt hand om.\n</reference>"
+  },
+  {
+   "draw": 16,
+   "doc_index": 57,
+   "doc_fingerprint": "1aa8244400af",
+   "prompt_variant": "translation_nob_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Oversett følgende tekst til nynorsk: Aksel Lund Svindal knuste konkurrentene i Super-G i Beaver Creek. Seieren var ikke selvsagt, og Svindal hadde en lite ideell start på helgen da han sov lite og med høy puls natt til lørdag, etter å ha vunnet på fredag. Hovedkonkurrenten Hermann Maier måtte se seg slått med 45 hundredeler. Lund Svindal vant verdenscupen i fjor med en voldsom sluttspurt med tre strake sigrar. Nå har han to seiere på rad, og det er lov å drømme om ekte hattrick når det er storslalåm på programmet i morgen. Den nest beste nordmannen var Kjetil Jansrud på 19.plass.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Aksel Lund Svindal knuste konkurrentane i Super-G i Beaver Creek. Sigeren var ikkje sjølvskriven, og Svindal hadde ein lite ideel start på helga då han sov lite og med høg puls natt til laurdag, etter å vunne på fredag. Hovudkonkurrenten Hermann Maier måtte sjå seg slått med 45 hundredelar. Han vant verdscupen i fjor med ein voldsom sluttspurt med tre strake sigrar. No har han to på rad, og det er lov å drauma om ekte hattrick når det er storslalåm på programmet i morgon. Nest beste nordmann vart Kjetil Jansrud på 19.plass."
+    ]
+   },
+   "reference_text": "<reference>\nAksel Lund Svindal knuste konkurrentane i Super-G i Beaver Creek. Sigeren var ikkje sjølvskriven, og Svindal hadde ein lite ideel start på helga då han sov lite og med høg puls natt til laurdag, etter å vunne på fredag. Hovudkonkurrenten Hermann Maier måtte sjå seg slått med 45 hundredelar. Han vant verdscupen i fjor med ein voldsom sluttspurt med tre strake sigrar. No har han to på rad, og det er lov å drauma om ekte hattrick når det er storslalåm på programmet i morgon. Nest beste nordmann vart Kjetil Jansrud på 19.plass.\n</reference>"
+  },
+  {
+   "draw": 17,
+   "doc_index": 115,
+   "doc_fingerprint": "d58d1cd1d420",
+   "prompt_variant": "translation_nob_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Fjerning av bonuspoeng har negativ effekt på konkurransen i flybransjen. Da Norwegian startet opp i Norge, gikk de til styresmaktene og ba dem fjerne bonuspoengordningen til SAS/Braathen, da dette var til stor fordel for SAS sin   konkurransen. Senere søkte Norwegian om å gjøre det samme for hele Skandinavia, men fikk ikke medhold av konkurransetilsynet i alle landene. SAS gikk nylig med solid overskudd, og ifølge sjefen i selskapet er det på grunn av nettopp større konkurranse i nabolandene Danmark og Sverige. Derfor må man innføre bonuspoeng på innenlandsruter igjen, slik at flere aktører blir interessert i det norske innenlandsmarkedet.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Fjerning av bonuspoeng har negativ effekt på konkurransen i flybransjen. Då Norwegian starta opp i Noreg, gjekk dei til styresmaktene og ba dei fjerna bonuspoengordninga til SAS/Braathen, då dette var til stor fordel for konkurransen til SAS. Seinare søkte Norwegian om å gjera det same for heile Skandinavia, men fekk ikkje medhald av konkurransetilsyna i alle landa. SAS gjekk nyleg med solid overskot, og i følge sjefen i selskapet er det på grunn av nettopp meir konkurranse i nabolanda Danmark og Sverige. Derfor må ein innføra bonuspoeng på innanladsruter igjen, sånn at fleire aktørar blir interessert i den norske innanlandsmarknaden."
+    ]
+   },
+   "reference_text": "<reference>\nFjerning av bonuspoeng har negativ effekt på konkurransen i flybransjen. Då Norwegian starta opp i Noreg, gjekk dei til styresmaktene og ba dei fjerna bonuspoengordninga til SAS/Braathen, då dette var til stor fordel for konkurransen til SAS. Seinare søkte Norwegian om å gjera det same for heile Skandinavia, men fekk ikkje medhald av konkurransetilsyna i alle landa. SAS gjekk nyleg med solid overskot, og i følge sjefen i selskapet er det på grunn av nettopp meir konkurranse i nabolanda Danmark og Sverige. Derfor må ein innføra bonuspoeng på innanladsruter igjen, sånn at fleire aktørar blir interessert i den norske innanlandsmarknaden.\n</reference>"
+  },
+  {
+   "draw": 18,
+   "doc_index": 77,
+   "doc_fingerprint": "672ac1a65232",
+   "prompt_variant": "translation_nob_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Bokmål: Nordmenn kjøper mer frukt og grønnsaker, samtidig som de norske bøndene produserer mindre. Frukt- og grønt-forbruket har økt med over 20 prosent de 10 siste årene. Den norske produksjonen har falt med 10 prosent siden 1998. Import av varer dekker den økte etterspørselen i det norske markedet.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Nordmenn kjøper meir frukt og grønnsaker, samtidig som dei norske bøndene produserer mindre. Frukt- og grønt-forbruket har auka med over 20 prosent dei 10 siste åra. Den norske produksjonen har gått ned med 10 prosent sidan 1998. Import av varer dekker den auka etterspørselen i den norske marknaden."
+    ]
+   },
+   "reference_text": "<reference>\nNordmenn kjøper meir frukt og grønnsaker, samtidig som dei norske bøndene produserer mindre. Frukt- og grønt-forbruket har auka med over 20 prosent dei 10 siste åra. Den norske produksjonen har gått ned med 10 prosent sidan 1998. Import av varer dekker den auka etterspørselen i den norske marknaden.\n</reference>"
+  },
+  {
+   "draw": 19,
+   "doc_index": 116,
+   "doc_fingerprint": "5f177d4697bb",
+   "prompt_variant": "translation_nob_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Gi en nynorsk oversettelse av denne teksten: Det kan være taktisk lurt av statsminister Jens Stoltenberg å ikke si hva han vil gjøre hvis de rødgrønne mister flertallet, men risikofritt er det ikke. Ap ønsker ikke å så tvil om at de tror på en ny rødgrønn valgseier. I tillegg må Ap ta hensyn til regjeringspartnerne sine og bruke valgkampkraft på å gå til valg for fire nye år med rødgrønn flertallsregjering. Det er viktig å dempe alle tilbøyeligheter til splittelse regjeringspartiene imellom. Men, det er vanskelig å nå frem til velgerne med to budskap samtidig. Velger som ønsker at Ap styrer alene kan vende Ap ryggen og sette seg i sofaen dersom de får inntrykk av at Ap satser alt på SV og Sp også i fremtiden.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Det kan vera taktisk lurt av statsminister Jens Stoltenberg å ikkje seie kva han vil gjere om dei raudgrøne mister fleirtalet, men risikofritt er det ikkje. Ap ynskjer ikkje å så tvil om at dei trur på ein ny raudgrøn valsiger. I tillegg må Ap ta omsyn til regjeringspartnarane sine og bruke valkampkraft på å gå til val for fire nye år med raudgrøn fleirtalsregjering. Det er viktig å dempe alle tendensar til splitting mellom regjeringspartia. Men, det er vanskeleg å nå fram til veljarane med to bodskap samstundes. Veljarar som ynskjer at Ap styrer åleine kan venda Ap ryggen og setta seg i sofaen om dei får inntrykk av at Ap satsar alt på SV og Sp også i framtida."
+    ]
+   },
+   "reference_text": "<reference>\nDet kan vera taktisk lurt av statsminister Jens Stoltenberg å ikkje seie kva han vil gjere om dei raudgrøne mister fleirtalet, men risikofritt er det ikkje. Ap ynskjer ikkje å så tvil om at dei trur på ein ny raudgrøn valsiger. I tillegg må Ap ta omsyn til regjeringspartnarane sine og bruke valkampkraft på å gå til val for fire nye år med raudgrøn fleirtalsregjering. Det er viktig å dempe alle tendensar til splitting mellom regjeringspartia. Men, det er vanskeleg å nå fram til veljarane med to bodskap samstundes. Veljarar som ynskjer at Ap styrer åleine kan venda Ap ryggen og setta seg i sofaen om dei får inntrykk av at Ap satsar alt på SV og Sp også i framtida.\n</reference>"
+  },
+  {
+   "draw": 20,
+   "doc_index": 85,
+   "doc_fingerprint": "e43aa9f1551b",
+   "prompt_variant": "translation_nob_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Hva blir \"En ny metode på Ullevål universitetssykehus gjør at premature og syke nyfødte nå kan ligge uforstyrret og småsove mens sykepleierne tar blodprøver. Den nye metoden går ut på å ta blod fra lett tilgjengelige vener i hodet på barnet, og erstatter den tradisjonelle kapillære veneprøven, som er mer inngripende og smertefull. Den nye metoden utføres av sykepleierne på avdelingen, slik at tidspunkt kan tilpasses etter når det enkelte barnet er mett og trøtt. Nyfødtintensiven ved Ullevål har bestemt at alle blodprøver på nyfødte skal utføres etter ny metode så sant det er medisinsk mulig, og Rikshospitalet arbeider med å lære opp sine ansatte.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Ein ny metode på Ullevål universitetssjukehus gjer at premature og sjuke nyfødde no kan ligga uforstyrra og småsova medan sjukepleiarane tek blodprøvar. Den nye metoden går ut på å ta blod frå lett tilgjengelege vener i hovudet på barnet, og erstattar den tradisjonelle kapillære veneprøven, som er meir inngripande og smertefull. Den nye metoden blir utført av sjukepleierane på avdelinga, slik at tidspunkt kan tilpassast etter når det enkelte barnet er mett og trøytt. Nyfødtintensiven ved Ullevål har bestemt at alle blodprøvar på nyfødde skal utførast etter ny metode så sant det er medisinsk mogleg, og Rikshospitalet jobbar med å læra opp sine tilsette."
+    ]
+   },
+   "reference_text": "<reference>\nEin ny metode på Ullevål universitetssjukehus gjer at premature og sjuke nyfødde no kan ligga uforstyrra og småsova medan sjukepleiarane tek blodprøvar. Den nye metoden går ut på å ta blod frå lett tilgjengelege vener i hovudet på barnet, og erstattar den tradisjonelle kapillære veneprøven, som er meir inngripande og smertefull. Den nye metoden blir utført av sjukepleierane på avdelinga, slik at tidspunkt kan tilpassast etter når det enkelte barnet er mett og trøytt. Nyfødtintensiven ved Ullevål har bestemt at alle blodprøvar på nyfødde skal utførast etter ny metode så sant det er medisinsk mogleg, og Rikshospitalet jobbar med å læra opp sine tilsette.\n</reference>"
+  },
+  {
+   "draw": 21,
+   "doc_index": 62,
+   "doc_fingerprint": "ebcb63f04018",
+   "prompt_variant": "translation_nob_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Bokmål: Tirsdag morgen landet tidligere president Bill Clinton i Nord-Koreas hovedstad Pyongyang med et mål om å få frigitt to amerikanske journalister, Euna Lee og Laura Ling. De ble fengslet 17. mars i år og i juni dømt til tolv års straffearbeid i en arbeidsleir. 20 timer etter landing i Nord-Korea gikk Clinton og de to journalistene om bord i Clintons privatfly på vei hjem til USA. Clinton hadde et møte med den nordkoreanske lederen, Kim Jong-il. Møtet skal ifølge flere amerikanske medier ha åpnet en kanal for dialog mellom de to landene, som ikke har et spesielt godt forhold. En kilde nær den amerikanske regjering understreker at besøket var et privat oppdrag for menneskerettighetene.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Tysdag morgon landa tidlegare president Bill Clinton i Nord-Koreas hovudstad Pyongyang med et mål om å få frigitt to amerikanske journalistar, Euna Lee og Laura Ling. Dei blei fengsla 17. mars i år, og i juni blei dei dømd til tolv års straffarbeid i ein arbeidsleir. 20 timer etter Clinton landa i Nord-Korea gjekk han og dei to journalistane om bord i Clintons privatfly, og sette kurs på heim til USA. Clinton hadde eit møte med den nordkoreanske leiaren, Kim Jong-il. Møtet skal ifølge fleire amerikanske media ha opna ein kanal for dialog mellom dei to landa, som ikkje har eit spesielt godt forhold. Ei kjelde nær den amerikanske regjeringa understrekar at besøket var eit privat oppdrag for menneskerettigheitene."
+    ]
+   },
+   "reference_text": "<reference>\nTysdag morgon landa tidlegare president Bill Clinton i Nord-Koreas hovudstad Pyongyang med et mål om å få frigitt to amerikanske journalistar, Euna Lee og Laura Ling. Dei blei fengsla 17. mars i år, og i juni blei dei dømd til tolv års straffarbeid i ein arbeidsleir. 20 timer etter Clinton landa i Nord-Korea gjekk han og dei to journalistane om bord i Clintons privatfly, og sette kurs på heim til USA. Clinton hadde eit møte med den nordkoreanske leiaren, Kim Jong-il. Møtet skal ifølge fleire amerikanske media ha opna ein kanal for dialog mellom dei to landa, som ikkje har eit spesielt godt forhold. Ei kjelde nær den amerikanske regjeringa understrekar at besøket var eit privat oppdrag for menneskerettigheitene.\n</reference>"
+  },
+  {
+   "draw": 22,
+   "doc_index": 102,
+   "doc_fingerprint": "0303f838121a",
+   "prompt_variant": "translation_nob_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Oversett følgende tekst til nynorsk: Aftenpostens intervju med en meddommer i samvittighetskval er ikke gravende journalistikk. Oslo tingrett avsa fredag 9. oktober dom i den såkalte serievoldtektssak som Aftenposten har dekket. Dommen er ikke rettskraftig. Dommer Finn Eilertsen avstår fra å «sette ord på» det inntrykk retten for sitt vedkommende måtte ha dannet seg av de handlinger retten finner bevist og av lovovertrederen. Den ene av to meddommere, Espen Thomassen, finner rettens nøkterne tone og saklighetsnivå uforståelig. Gjennom å uttale seg til media blir meddommerens lovbestemte posisjon innen retten utvidet til en ekstern og selvvalgt, etterfølgende forkynnelsesfunksjon om meddommerens egne standpunkt og oppfatninger.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Aftenposten sitt intervju med ein meddommar med samvitskvalar er ikkje gravande journalistikk. Oslo tingrett avsa fredag 9. oktober dom i den såkalla serievaldtektssaka som Aftenposten har dekka. Dommen er ikkje rettskraftig. Dommar Finn Eilertsen avstår frå å «setta ord på» det inntrykk retten for sitt vedkomande måtte ha danna seg av dei handlingar retten finn bevist gjort av tiltalte. Den eine av to meddommarar, Espen Thomassen, fann retten sin nøkterne tone og saklegheitsnivå uforståeleg. Gjennom å uttala seg i media vert meddommaren sin lovbestemte posisjon innan retten utvida til ein ekstern og sjølvvalt, etterfølgjande forkynningsfunksjon av meddommaren sine eigne standpunkt og oppfatningar."
+    ]
+   },
+   "reference_text": "<reference>\nAftenposten sitt intervju med ein meddommar med samvitskvalar er ikkje gravande journalistikk. Oslo tingrett avsa fredag 9. oktober dom i den såkalla serievaldtektssaka som Aftenposten har dekka. Dommen er ikkje rettskraftig. Dommar Finn Eilertsen avstår frå å «setta ord på» det inntrykk retten for sitt vedkomande måtte ha danna seg av dei handlingar retten finn bevist gjort av tiltalte. Den eine av to meddommarar, Espen Thomassen, fann retten sin nøkterne tone og saklegheitsnivå uforståeleg. Gjennom å uttala seg i media vert meddommaren sin lovbestemte posisjon innan retten utvida til ein ekstern og sjølvvalt, etterfølgjande forkynningsfunksjon av meddommaren sine eigne standpunkt og oppfatningar.\n</reference>"
+  },
+  {
+   "draw": 23,
+   "doc_index": 133,
+   "doc_fingerprint": "14bf42ed2db2",
+   "prompt_variant": "translation_nob_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Gi en nynorsk oversettelse av denne teksten: Statsminister Jens Stoltenberg holder kortene tett til brystet når han får spørsmål om hva som skal skje hvis Arbeiderpartiet sammen med Sosialistisk Venstreparti og Senterpartiet mister flertallet etter valget. Han vet at et flertallssamarbeid på borgerlig side ser lite troverdig ut, og sier at rødgrønn side ikke trenger en plan B siden borgerlig side ikke har en plan A. På AUF sin sommerleir på Utøya i sommer, gjorde ungdomspartiet det klart at de ikke kunne undervurdere muligheten for at høgresiden kom til å mobilisere et alternativ. Ap risikerer å gå på samme smell som i 1997, nemleg å spille bort regjeringsmuligheter på grunn av skiftende allianser på Stortinget.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Statsminister Jens Stoltenberg held korta tett til brystet når han får spørsmål om kva som skal skje viss Arbeiderpartiet saman med Sosialistisk Venstreparti og Senterpartiet mister fleirtalet etter valet. Han veit at eit fleirtalssamarbeid på borgarleg side ser lite truverdig ut, og seier at raudgrøn side ikkje treng ein plan B sidan borgarleg side ikkje har ein plan A. På AUF sin sommarleir på Utøya i sommar, gjorde ungdomspartiet det klart at dei ikkje kunne undervudera moglegheita høgresida hadde for å mobilisera eit alternativ. Ap risikerer å gå på same smell som i 1997, nemleg å spela vekk regjeringsmoglegheiter på grunn av skiftande alliansar på Stortinget."
+    ]
+   },
+   "reference_text": "<reference>\nStatsminister Jens Stoltenberg held korta tett til brystet når han får spørsmål om kva som skal skje viss Arbeiderpartiet saman med Sosialistisk Venstreparti og Senterpartiet mister fleirtalet etter valet. Han veit at eit fleirtalssamarbeid på borgarleg side ser lite truverdig ut, og seier at raudgrøn side ikkje treng ein plan B sidan borgarleg side ikkje har ein plan A. På AUF sin sommarleir på Utøya i sommar, gjorde ungdomspartiet det klart at dei ikkje kunne undervudera moglegheita høgresida hadde for å mobilisera eit alternativ. Ap risikerer å gå på same smell som i 1997, nemleg å spela vekk regjeringsmoglegheiter på grunn av skiftande alliansar på Stortinget.\n</reference>"
+  },
+  {
+   "draw": 24,
+   "doc_index": 135,
+   "doc_fingerprint": "5fa81d243809",
+   "prompt_variant": "translation_nob_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Hva blir \"Hundretusenvis av mennesker har tatt til gatene i Chile denne uken, i demonstrasjon mot sentraliserings- og privatiseringspolitikken som regjeringen fører. Det som for tre måneder siden startet som isolerte boikotter utført av studenter som krevde reformer i utdanningssystemet, har spredd seg til å bli en bevegelse av protesterende studentforeninger, fagforeninger, offentlige ansatte og opposisjonspartier. Demonstrantene krever mer penger til utdanning, helsesektor og pensjoner, og de vil endre grunnloven, slik at det blir mulighet for å holde folkeavstemninger. Chilenske universiteter er blant de dyreste i verden, og utdanningssystemet og det chilenske samfunnet preges av skyhøy ulikhet.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Hundretusenvis av menneske har tatt til gatene i Chile denne veka, i demonstrasjon mot sentraliserings- og privatiseringspolitikken som regjeringa fører. Det som for tre månadar sidan starta som isolerte boikottar utført av studentar som kravde reformar i utdanningssystemet, har spreidd seg til å bli ei røyrsle av protesterande studentforeiningar, fagforeiningar, offentlege tilsette og opposisjonsparti. Demonstrantane krevjer meir pengar til utdanning, helsesektor og pensjonar, og dei vil endra grunnlova, slik at det blir mogleg å halda folkeavstemmingar. Chilenske universitet er blant dei dyraste i verda, og utdanningssystemet og det chilenske samfunnet er prega av skyhøg ulikskap."
+    ]
+   },
+   "reference_text": "<reference>\nHundretusenvis av menneske har tatt til gatene i Chile denne veka, i demonstrasjon mot sentraliserings- og privatiseringspolitikken som regjeringa fører. Det som for tre månadar sidan starta som isolerte boikottar utført av studentar som kravde reformar i utdanningssystemet, har spreidd seg til å bli ei røyrsle av protesterande studentforeiningar, fagforeiningar, offentlege tilsette og opposisjonsparti. Demonstrantane krevjer meir pengar til utdanning, helsesektor og pensjonar, og dei vil endra grunnlova, slik at det blir mogleg å halda folkeavstemmingar. Chilenske universitet er blant dei dyraste i verda, og utdanningssystemet og det chilenske samfunnet er prega av skyhøg ulikskap.\n</reference>"
+  },
+  {
+   "draw": 25,
+   "doc_index": 119,
+   "doc_fingerprint": "6b0320896754",
+   "prompt_variant": "translation_nob_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Bokmål: NATO har fått to nye medlemsland i Albania og Kroatia. Alliansen, som ble utvidet på onsdag, består nå av 28 medlemsland. Den albanske ambassadør, Aleksander Sallabanda, og kroatias ambassadør, Kolinda Grabar-Kitarovic, kom begge med uttalelser om at landene var beredt til å ta sin del av ansvaret i arbeidet for global fred. - Albania og Kroatia har jobbet veldig hardt med å møte alliansens demokratiske og militære standarder, og de bidrar til både stabilitet på Balkan og internasjonal sikkerhet, uttalte NATO-talsmann James Appathurai. På fredag starter NATOs jubileumstoppmøte i Badeb-Baden, Tyskland, hvor nye og gamle stats- og regjeringssjefer vil ta del.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "NATO har fått to nye medlemsland i Albania og Kroatia. Alliansen, som vart utvida på onsdag, består no av 28 medlemsland. Den albanske ambassadøren, Aleksander Sallabanda, og den kroatiske ambassadøren, Kolinda Grabar-Kitarovic, kom begge med fråsegn om at landa var budd til å ta sin del av ansvaret i arbeidet for global fred. - Albania og Kroatia har jobba veldig hardt med å møta alliansen sine demokratiske og militære standardar, og dei bidreg til både stabilitet på Balkan og internasjonal tryggleik, uttala NATO-talsmann James Appathurai. På fredag startar NATO sitt jubileumstoppmøte i Baden-Baden, Tyskland, kor nye og gamle stats- og regjeringssjefar vil ta del."
+    ]
+   },
+   "reference_text": "<reference>\nNATO har fått to nye medlemsland i Albania og Kroatia. Alliansen, som vart utvida på onsdag, består no av 28 medlemsland. Den albanske ambassadøren, Aleksander Sallabanda, og den kroatiske ambassadøren, Kolinda Grabar-Kitarovic, kom begge med fråsegn om at landa var budd til å ta sin del av ansvaret i arbeidet for global fred. - Albania og Kroatia har jobba veldig hardt med å møta alliansen sine demokratiske og militære standardar, og dei bidreg til både stabilitet på Balkan og internasjonal tryggleik, uttala NATO-talsmann James Appathurai. På fredag startar NATO sitt jubileumstoppmøte i Baden-Baden, Tyskland, kor nye og gamle stats- og regjeringssjefar vil ta del.\n</reference>"
+  },
+  {
+   "draw": 26,
+   "doc_index": 74,
+   "doc_fingerprint": "1fa4524d6078",
+   "prompt_variant": "translation_nob_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Gi en nynorsk oversettelse av denne teksten: Rusmisbrukere i Hordaland lager farlig narkotisk stoff av bilfelgrens, tilsetter gulfarge og kamuflerer det som Solo-brus. Tre personer ble nylig funnet bevisstløse i Bergen Kino etter en overdose av GHB, og Bergensklinikkene har advart mot tydelig økning i bruken av det livsfarlige stoffet. På torsdag ble en mann i Os kommune pågrepet for besittelse. GHB er enkelt å fremstille hjemme, er et av de billigste rusmidlene som finnes, og blir brukt også av personer utenfor de vanlige rusbelastede miljøene. Det finnes ingen motgift mot GHB, og stoffet har veldig uforutsigbar styrke, slik at faren for overdose er større enn ved bruk av andre narkotiske stoffer.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Rusmisbrukarar i Hordaland lagar farleg narkotisk stoff av bilfelgrens, tilset gulfarge og kamuflerer det som Solo-brus. Tre personar vart nyleg funnen medvitslause i Bergen Kino etter ei overdose av GHB, og Bergensklinikkane har åtvara mot tydeleg auke i bruken av det livsfarlige stoffet. På torsdag vart ein mann i Os kommune pågripen å ha stoffet. GHB er enkelt å fremstilla heime, er eit av de billegaste rusmidla som fins, og blir brukt av personar utanfor dei vanlege rusbelastede miljøa. Det fins ikkje motgift mot GHB, og stoffet har veldig uforutsigbar styrke, slik at faren for overdose er større enn ved bruk av andre narkotiske stoff."
+    ]
+   },
+   "reference_text": "<reference>\nRusmisbrukarar i Hordaland lagar farleg narkotisk stoff av bilfelgrens, tilset gulfarge og kamuflerer det som Solo-brus. Tre personar vart nyleg funnen medvitslause i Bergen Kino etter ei overdose av GHB, og Bergensklinikkane har åtvara mot tydeleg auke i bruken av det livsfarlige stoffet. På torsdag vart ein mann i Os kommune pågripen å ha stoffet. GHB er enkelt å fremstilla heime, er eit av de billegaste rusmidla som fins, og blir brukt av personar utanfor dei vanlege rusbelastede miljøa. Det fins ikkje motgift mot GHB, og stoffet har veldig uforutsigbar styrke, slik at faren for overdose er større enn ved bruk av andre narkotiske stoff.\n</reference>"
+  },
+  {
+   "draw": 27,
+   "doc_index": 63,
+   "doc_fingerprint": "22fff6c1c6b7",
+   "prompt_variant": "translation_nob_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Oversett følgende tekst til nynorsk: Siv Jensen og Høyre sine velgere hjelper Erna Solberg å bli tydeligere i regjeringsspørsmålet. Solberg har allereie sagt at hun er åpen for å slippe til Frp som regjeringspartner, og det må hun holde fast på. Utviklingen i valgkampen gjør at en gjenoppstandelse av Bondevik-regjeringen er mulig, med Solberg som statsminister. Høgre sin drøm om en flertallsregjering med V, Frp og Krf er lagt bort. Hver tredje høyrevelger vil ha en trepartiregjering, og forakten mot Fremskrittspartiet er så stor at flere vil ha en ren Høyre-regjering kontra et samarbeid. Nå avviser Solberg alle spørsmål om samarbeid, og snakker bare om politikk.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Siv Jensen og Høgre sine veljarar hjelper Erna Solberg å bli tydelegare i regjeringsspørsmålet. Solberg har allereie sagt at ho er open for å sleppa til Frp som regjeringspartner, og det må ho halda fast på. Utviklinga i valkampen mogeleggjer ein gjenoppstandelse av Bondevik-regjeringa, med Solberg som statsminister. Høgre sin draum om ein fleirtalsregjering med V, Frp og Krf er lagt vekk. Kvar tredje høgreveljar vil ha ein trepartiregjering, og forakta mot Framstegspartiet er så stor at fleire vil ha ein rein Høgre-regjering kontra eit samarbeid. No avviser Solberg alle spørsmål om samarbeid, og snakkar berre om politikk."
+    ]
+   },
+   "reference_text": "<reference>\nSiv Jensen og Høgre sine veljarar hjelper Erna Solberg å bli tydelegare i regjeringsspørsmålet. Solberg har allereie sagt at ho er open for å sleppa til Frp som regjeringspartner, og det må ho halda fast på. Utviklinga i valkampen mogeleggjer ein gjenoppstandelse av Bondevik-regjeringa, med Solberg som statsminister. Høgre sin draum om ein fleirtalsregjering med V, Frp og Krf er lagt vekk. Kvar tredje høgreveljar vil ha ein trepartiregjering, og forakta mot Framstegspartiet er så stor at fleire vil ha ein rein Høgre-regjering kontra eit samarbeid. No avviser Solberg alle spørsmål om samarbeid, og snakkar berre om politikk.\n</reference>"
+  },
+  {
+   "draw": 28,
+   "doc_index": 67,
+   "doc_fingerprint": "5647010ca72e",
+   "prompt_variant": "translation_nob_nno_p0",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Bokmål: 1000 personer ble evakuert da Glemmen videregående skole i Fredrikstad mottok en bombetrussel. Væpnet politi møtte opp, og en tenåring har blitt pågrepet for trusselen. Ingen flere er mistenkt for å stå bak trusselen. Skolen hadde evakueringsplan klar, og tømmingen av skolebygget tok rundt ti minutter. Skolen fulgte politiets anbefaling, og holdt skolen stengt også neste dag. Elevrådslederen etterlyste mer informasjon, da han opplevde at lærere og skoleledelse var borte da han kom ut av skolebygget, og at det var mange spørsmål elevene ikke fikk svar på.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "1000 personar vart evakuerte då Glemmen vgs i Fredrikstad mottok ein bombetrussel. Væpna politi møtte opp, og ein tenåring har blitt pågripen for trusselen. Ingen andre er mistenkte for trusselen. Det tok skulen rundt ti minutt å evakuera alle saman, då dei har ein evakueringsplan klar for skulen. Etter politiet si tilråding haldt skulen stengd dagen etter òg. Elevrådsleiaren etterlyste derimot meir informasjon, og opplevde at både lærarar og leiinga var forsvunne då dei kom ut frå skulen, og at det var mange spørsmål dei då ikkje fekk svar på."
+    ]
+   },
+   "reference_text": "<reference>\n1000 personar vart evakuerte då Glemmen vgs i Fredrikstad mottok ein bombetrussel. Væpna politi møtte opp, og ein tenåring har blitt pågripen for trusselen. Ingen andre er mistenkte for trusselen. Det tok skulen rundt ti minutt å evakuera alle saman, då dei har ein evakueringsplan klar for skulen. Etter politiet si tilråding haldt skulen stengd dagen etter òg. Elevrådsleiaren etterlyste derimot meir informasjon, og opplevde at både lærarar og leiinga var forsvunne då dei kom ut frå skulen, og at det var mange spørsmål dei då ikkje fekk svar på.\n</reference>"
+  },
+  {
+   "draw": 29,
+   "doc_index": 20,
+   "doc_fingerprint": "5bd4b4acbe4a",
+   "prompt_variant": "translation_nob_nno_p3",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Hva blir \"SV har gått til valg med toleranse og romslighet som høyt profilerte verdisaker, men det finnes tydeligvis ulike forståelser av hva slike begreper betyr. Det synes at SV og Dagbladet har en forståelse av toleranse som et bestemt sett av meninger og holdninger. De som ikke deler de politisk korrekte meningene er intolerante og det er toleranseelitens plikt å slå ned på disse. Kristin Halvorsen angriper de intolerante i et intervju i Dagbladet, representert ved blant andre Dagfinn Høybråten. Halvorsen mener Høybråten er med på å gjøre Norge «trangere og tristere». Halvorsens meningsfelle Øyvind Foss går enda lenger i sin kamp mot friskoler, særlig de kristne.\" på nynorsk?\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "SV har gått til val med toleranse og det å vera romsleg som høgt profilerte verdisaker, men det fins tydelegvis ulike tolkingar av kva slike omgrep betyr. Det syns at SV og Dagbladet har ein forståing av toleranse som eit bestemt sett av meiningar og haldningar. Dei som ikkje deler dei politisk korrekte meiningane er intolerante og det er toleranseeliten si plikt å slå ned på desse. Kristin Halvorsen angrip de intolerante i eit intervju i Dagbladet, representert ved mellom anna Dagfinn Høybråten. Halvorsen meiner Høybråten er med på å gjera Norge «trongare og tristare». Halvorsen si meiningsfelle Øyvind Foss går enda lenger i sin kamp mot friskuler, særlig dei kristne."
+    ]
+   },
+   "reference_text": "<reference>\nSV har gått til val med toleranse og det å vera romsleg som høgt profilerte verdisaker, men det fins tydelegvis ulike tolkingar av kva slike omgrep betyr. Det syns at SV og Dagbladet har ein forståing av toleranse som eit bestemt sett av meiningar og haldningar. Dei som ikkje deler dei politisk korrekte meiningane er intolerante og det er toleranseeliten si plikt å slå ned på desse. Kristin Halvorsen angrip de intolerante i eit intervju i Dagbladet, representert ved mellom anna Dagfinn Høybråten. Halvorsen meiner Høybråten er med på å gjera Norge «trongare og tristare». Halvorsen si meiningsfelle Øyvind Foss går enda lenger i sin kamp mot friskuler, særlig dei kristne.\n</reference>"
+  },
+  {
+   "draw": 30,
+   "doc_index": 10,
+   "doc_fingerprint": "f372627e8dc6",
+   "prompt_variant": "translation_nob_nno_p1",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Oversett følgende tekst til nynorsk: En innbygger i Tafjord har sett seg lei på alle som til enhver pris vil sette en brems på utviklingen i kommunen. Tafjord er preget av mye fraflytting, og da trengs tiltak som gjør at folk blir værende i den lille kommunen. Naturvernforbundet har lagt ned veto mot all berøring av Tafjordfjellene, men dette er ikke en organisasjon som har kontakt med innbyggerne om saken. En tunnel og helårsvei mellom Tafjord og Norddal hadde hatt svært positive ringvirkninger både i Tafjord, og kommunene rundt.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Ein innbyggjar i Tafjord har sett seg lei alle som til ein kvar pris vil setta ein brems på utviklinga i kommunen. Tafjord er prega av mykje fråflytting, og då trengs tiltak som gjer at folk blir verande i den vesle kommunen. Naturvernforbundet har lagt ned veto mot all berøring av Tafjordfjella, men dette er ikkje ein organsiasjon som har kontakt med inbyggjarane om saka. Ein tunnel og heilårsveg mellom Tafjord og Norddal hadde hatt svært positive ringverknadar i både Tafjord, og kommunane rundt."
+    ]
+   },
+   "reference_text": "<reference>\nEin innbyggjar i Tafjord har sett seg lei alle som til ein kvar pris vil setta ein brems på utviklinga i kommunen. Tafjord er prega av mykje fråflytting, og då trengs tiltak som gjer at folk blir verande i den vesle kommunen. Naturvernforbundet har lagt ned veto mot all berøring av Tafjordfjella, men dette er ikkje ein organsiasjon som har kontakt med inbyggjarane om saka. Ein tunnel og heilårsveg mellom Tafjord og Norddal hadde hatt svært positive ringverknadar i både Tafjord, og kommunane rundt.\n</reference>"
+  },
+  {
+   "draw": 31,
+   "doc_index": 166,
+   "doc_fingerprint": "c8d520f4a728",
+   "prompt_variant": "translation_nob_nno_p2",
+   "formulation": "gen",
+   "language": "nno",
+   "source_language": "nob",
+   "prompt": "Gi en nynorsk oversettelse av denne teksten: Dødssyke Hannah Jones (13) har takket nei til hjertetransplantasjon, og vil tilbringe den siste tiden med familien og reise til Disneyland. Hun orker ikke en ny hjerteoperasjon, og vil heller bruke de siste dagene sammen med foreldre og søsken. Den siste drømmen hennes er å reise til USA for å besøke Disneyland, sammen med flere syke barn. Men hun fikk først ikke reiseforsikring, før et selskap meldte seg i siste liten. Faren hennes setter stor pris på all hjelp de har fått, og gleder seg til å se smilet på datteren sin når de kommer fram.\nNynorsk:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Dødssjuke Hannah Jones (13) har takka nei til hjartetransplantasjon, og vil tilbringa den siste tida med familien og reisa til Disneyland. Ho orkar ikkje ein ny hjarteoperasjon, og vil heller bruka dei siste dagane med foreldra og søskena. Den siste draumen hennar er å reisa til USA for å besøka Disneyland, saman med fleire sjuke ungar. Men ho fekk først ikkje reiseforsikring, før eit selskap meldte seg i siste liten. Faren hennar set stor pris på all hjelp dei har fått, og gler seg til å sjå smilet på dottera si når dei kjem fram."
+    ]
+   },
+   "reference_text": "<reference>\nDødssjuke Hannah Jones (13) har takka nei til hjartetransplantasjon, og vil tilbringa den siste tida med familien og reisa til Disneyland. Ho orkar ikkje ein ny hjarteoperasjon, og vil heller bruka dei siste dagane med foreldra og søskena. Den siste draumen hennar er å reisa til USA for å besøka Disneyland, saman med fleire sjuke ungar. Men ho fekk først ikkje reiseforsikring, før eit selskap meldte seg i siste liten. Faren hennar set stor pris på all hjelp dei har fått, og gler seg til å sjå smilet på dottera si når dei kjem fram.\n</reference>"
+  }
+ ]
+}

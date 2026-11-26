@@ -6,11 +6,11 @@
 //
 // The details don't follow the chart's settings: they show the model's
 // category average over all tasks at each shot count, and its score on
-// each task (random-baseline rescaling, best prompt; the tasks under their
-// categories' names) beside every other model's score, at a shot count of
-// their own (the page's default; one
-// picked here stays for the models opened after). Each fact once; three
-// type sizes (style.css). comparison.js computes the content
+// each task (the page's rescaling of its aggregates: the random baseline,
+// none on /instruct; best prompt; the tasks under their categories' names)
+// beside every other model's score, at a shot count of their own (the
+// page's default; one picked here stays for the models opened after).
+// Each fact once; three type sizes (style.css). comparison.js computes the content
 // (modelDetailData) and runs the motion; this module lays the content out
 // and slides the drawer. Opening another model, only the model's own dots
 // move (to its scores) and its numbers change. A task's row opens the
@@ -71,7 +71,8 @@ function buildHead(d, onClose) {
 
 /** The model's category average at each shot count, in the page's
  *  segmented control (.shot-toggle, segmented.js): the shot the details
- *  show is on its thumb, a click on another shows that one. Built once and
+ *  show is on its thumb, a click on another shows that one (a page with
+ *  one setting shows the average alone). Built once and
  *  updated for each content, so the thumb slides to a newly picked shot.
  *  (Its buttons aren't .shot-btn: those are the page's own shots.) The
  *  task details' scores at each shot are the same control. */
@@ -81,13 +82,27 @@ export function shotControl(onShot) {
   const group = el("div", "shot-toggle md-shots");
   group.setAttribute("role", "group");
   group.setAttribute("aria-label", "Shots");
-  h.append(label, group);
+  // A page with one setting (/instruct) has nothing to pick: its score alone.
+  const single = el("div", "md-score");
+  single.hidden = true;
+  h.append(label, group, single);
   enhanceSegmentedControl(group);
   const buttons = new Map();
   return {
     el: h,
     update(d) {
+      // (None: a page whose details don't repeat the chart's average,
+      // /instruct.)
+      h.hidden = !d.headline;
+      if (!d.headline) return;
       label.textContent = d.headline.label;
+      const one = d.shots.length === 1;
+      group.hidden = one;
+      single.hidden = !one;
+      if (one) {
+        single.textContent = d.shots[0].text;
+        return;
+      }
       const shots = d.shots.map((sh) => sh.shot).join(",");
       if (group.dataset.shots !== shots) {
         group.dataset.shots = shots;

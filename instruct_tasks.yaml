@@ -1,0 +1,169 @@
+# NorEval Instruct tasks (/instruct): generative NorEval v1.3 for
+# instruction-tuned models, every response graded by an LLM judge.
+#
+# Display settings only: a task's category, chance level and its items and
+# prompt variants come from the run (data/instruct/run.json). The keys are
+# the run's task names. The names follow metrics_setup.yaml, so the task
+# picker shows a Bokmål/Nynorsk pair or both directions of a translation
+# pair as one row. The description says what the model is asked; how the
+# judge grades it is the same for every task (the page's About section).
+
+ask_gec_nob:
+  pretty_name: "grammar correction"
+  description: "Grammatical error correction based on ASK-GEC, texts written by learners of Norwegian: the model gets a sentence with errors and returns it corrected. The judge compares the correction with a reference correction; errors left in and changes beyond what a correction needs cost points."
+  url: https://huggingface.co/datasets/ltg/ask-gec
+
+noridiom_nob:
+  pretty_name: "idiom completion"
+  description: "Idiom completion based on the Norwegian idioms of Språkbanken: the model gets the beginning of an idiom and completes it. The judge checks the completion against the accepted ones."
+  url: https://huggingface.co/datasets/Sprakbanken/Norwegian_idioms
+
+noridiom_nno:
+  pretty_name: "idiom completion"
+  description: "Idiom completion based on the Norwegian idioms of Språkbanken: the model gets the beginning of an idiom and completes it. The judge checks the completion against the accepted ones."
+  url: https://huggingface.co/datasets/Sprakbanken/Norwegian_idioms
+
+slide_nob_nno_swe_dan:
+  pretty_name: "Scandinavian LID"
+  description: "Language identification based on SLIDE: the model names the language of a sentence, choosing among Bokmål, Nynorsk, Danish, Swedish and another language. Some sentences are correct in more than one of them."
+  url: https://huggingface.co/datasets/ltg/slide
+
+norbelebele_nob:
+  pretty_name: "reading comprehension (belebele)"
+  description: "Reading comprehension based on NorBelebele: a multiple-choice question about a passage."
+  url: https://huggingface.co/datasets/ltg/norbelebele
+
+norec_document_nob:
+  pretty_name: "sentiment analysis (document)"
+  description: "Sentiment analysis of whole reviews from NoReC: the model says whether a review is positive or negative."
+  url: https://huggingface.co/datasets/ltg/norec_document
+
+norec_sentence_nob:
+  pretty_name: "sentiment analysis (sentence)"
+  description: "Sentiment analysis of single sentences from NoReC reviews: the model says whether a sentence is positive or negative."
+  url: https://huggingface.co/datasets/ltg/norec_sentence
+
+noropenbookqa_nob:
+  pretty_name: "reading comprehension (openbookqa)"
+  description: "Reading comprehension based on NorOpenBookQA: a multiple-choice question together with the fact it builds on."
+  url: https://huggingface.co/datasets/ltg/noropenbookqa
+
+noropenbookqa_nno:
+  pretty_name: "reading comprehension (openbookqa)"
+  description: "Reading comprehension based on NorOpenBookQA: a multiple-choice question together with the fact it builds on."
+  url: https://huggingface.co/datasets/ltg/noropenbookqa
+
+norquad_nob:
+  pretty_name: "reading comprehension (norquad)"
+  description: "Reading comprehension based on NorQuAD: a question about a news article, answered by a short passage of it. The judge checks the answer against the reference answer."
+  url: https://huggingface.co/datasets/ltg/norquad
+
+norcommonsenseqa_nob:
+  pretty_name: "multiple-choice QA (commonsense)"
+  description: "Commonsense reasoning based on NorCommonsenseQA: a multiple-choice question that needs everyday knowledge."
+  url: https://huggingface.co/datasets/ltg/norcommonsenseqa
+
+norcommonsenseqa_nno:
+  pretty_name: "multiple-choice QA (commonsense)"
+  description: "Commonsense reasoning based on NorCommonsenseQA: a multiple-choice question that needs everyday knowledge."
+  url: https://huggingface.co/datasets/ltg/norcommonsenseqa
+
+noropenbookqa_no_fact_nob:
+  pretty_name: "multiple-choice QA (openbookqa)"
+  description: "The NorOpenBookQA questions without their facts: the model answers from its own knowledge."
+  url: https://huggingface.co/datasets/ltg/noropenbookqa
+
+noropenbookqa_no_fact_nno:
+  pretty_name: "multiple-choice QA (openbookqa)"
+  description: "The NorOpenBookQA questions without their facts: the model answers from its own knowledge."
+  url: https://huggingface.co/datasets/ltg/noropenbookqa
+
+nortruthfulqa_gen_nob:
+  pretty_name: "generative QA (truthfulqa)"
+  description: "Questions from NorTruthfulQA that some people would answer wrongly because of a misconception, answered freely. The judge checks that the answer agrees with a true answer and asserts no false one."
+  url: https://huggingface.co/datasets/ltg/nortruthfulqa_gen
+
+nortruthfulqa_gen_nno:
+  pretty_name: "generative QA (truthfulqa)"
+  description: "Questions from NorTruthfulQA that some people would answer wrongly because of a misconception, answered freely. The judge checks that the answer agrees with a true answer and asserts no false one."
+  url: https://huggingface.co/datasets/ltg/nortruthfulqa_gen
+
+nortruthfulqa_mc_nob:
+  pretty_name: "multiple-choice QA (truthfulqa)"
+  description: "Questions from NorTruthfulQA that some people would answer wrongly because of a misconception, as multiple choice."
+  url: https://huggingface.co/datasets/ltg/nortruthfulqa_mc
+
+nortruthfulqa_mc_nno:
+  pretty_name: "multiple-choice QA (truthfulqa)"
+  description: "Questions from NorTruthfulQA that some people would answer wrongly because of a misconception, as multiple choice."
+  url: https://huggingface.co/datasets/ltg/nortruthfulqa_mc
+
+nrk_quiz_qa_nob:
+  pretty_name: "multiple-choice QA (nrk-quiz)"
+  description: "Questions from NRK's quizzes about Norwegian society, culture and current events, as multiple choice."
+  url: https://huggingface.co/datasets/ltg/nrk_quiz_qa
+
+nrk_quiz_qa_nno:
+  pretty_name: "multiple-choice QA (nrk-quiz)"
+  description: "Questions from NRK's quizzes about Norwegian society, culture and current events, as multiple choice."
+  url: https://huggingface.co/datasets/ltg/nrk_quiz_qa
+
+norrewrite_instruct_nob:
+  pretty_name: "instruction-following"
+  description: "Instructions from NorRewrite to rewrite a text: for another reader, in another style, from another perspective. The judge grades the rewrite against a reference written by a person."
+  url: https://huggingface.co/datasets/ltg/norrewrite-instruct
+
+norsummarize_instruct_nob:
+  pretty_name: "summarization (instructed)"
+  description: "Instructions from NorSummarize to summarize a text in a given way (in two sentences, as bullet points, …). The judge grades the summary against a reference written by a person."
+  url: https://huggingface.co/datasets/ltg/norsummarize-instruct
+
+norsumm_nob:
+  pretty_name: "summarization (norsumm)"
+  description: "Summarization of news articles from NorSumm. The judge grades the summary against summaries written by people."
+  url: https://huggingface.co/datasets/SamiaT/NorSumm
+
+norsumm_nno:
+  pretty_name: "summarization (norsumm)"
+  description: "Summarization of news articles from NorSumm, into Nynorsk. The judge grades the summary against summaries written by people."
+  url: https://huggingface.co/datasets/SamiaT/NorSumm
+
+translation_eng_nob:
+  pretty_name: "translation (English → Bokmål)"
+  description: "Translation of Tatoeba sentences from English into Bokmål. The judge grades the translation against a reference translation."
+  url: https://huggingface.co/datasets/Helsinki-NLP/tatoeba_mt
+
+translation_nob_eng:
+  pretty_name: "translation (Bokmål → English)"
+  description: "Translation of Tatoeba sentences from Bokmål into English. The judge grades the translation against a reference translation."
+  url: https://huggingface.co/datasets/Helsinki-NLP/tatoeba_mt
+
+translation_eng_nno:
+  pretty_name: "translation (English → Nynorsk)"
+  description: "Translation of Tatoeba sentences from English into Nynorsk. The judge grades the translation against a reference translation."
+  url: https://huggingface.co/datasets/Helsinki-NLP/tatoeba_mt
+
+translation_nno_eng:
+  pretty_name: "translation (Nynorsk → English)"
+  description: "Translation of Tatoeba sentences from Nynorsk into English. The judge grades the translation against a reference translation."
+  url: https://huggingface.co/datasets/Helsinki-NLP/tatoeba_mt
+
+translation_nob_nno:
+  pretty_name: "translation (Bokmål → Nynorsk)"
+  description: "Translation of paragraphs of NorSumm news articles from Bokmål into Nynorsk. The judge grades the translation against a reference translation."
+  url: https://huggingface.co/datasets/ltg/norsumm-nob-nno-translation
+
+translation_nno_nob:
+  pretty_name: "translation (Nynorsk → Bokmål)"
+  description: "Translation of paragraphs of NorSumm news articles from Nynorsk into Bokmål. The judge grades the translation against a reference translation."
+  url: https://huggingface.co/datasets/ltg/norsumm-nob-nno-translation
+
+translation_nob_sme:
+  pretty_name: "translation (Bokmål → Sámi)"
+  description: "Translation of Tatoeba sentences from Bokmål into Northern Sámi. The judge grades the translation against a reference translation."
+  url: https://huggingface.co/datasets/ltg/saami-tatoeba
+
+translation_sme_nob:
+  pretty_name: "translation (Sámi → Bokmål)"
+  description: "Translation of Tatoeba sentences from Northern Sámi into Bokmål. The judge grades the translation against a reference translation."
+  url: https://huggingface.co/datasets/ltg/saami-tatoeba

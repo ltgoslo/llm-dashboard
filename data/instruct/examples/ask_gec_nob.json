@@ -1,0 +1,581 @@
+{
+ "task": "ask_gec_nob",
+ "examples": [
+  {
+   "draw": 0,
+   "doc_index": 339,
+   "doc_fingerprint": "c56b37992258",
+   "prompt_variant": "ask_gec_nob_p3",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Original versjon: Unge mennesker, som bestemte gifte seg først og fremst tenker om karriere, om penger, om utdannelse.\nKorrekturlest og rettet versjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Unge mennesker, som bestemte seg for å gifte seg, tenker først og fremst på karriere, på penger, på utdannelse."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nUnge mennesker, som bestemte seg for å gifte seg, tenker først og fremst på karriere, på penger, på utdannelse.\n</reference>"
+  },
+  {
+   "draw": 1,
+   "doc_index": 1960,
+   "doc_fingerprint": "02cd983651c6",
+   "prompt_variant": "ask_gec_nob_p1",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Om kvelden har de ofte et styremøte på dagsordning splan og videre og videre.\nRettet versjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Om kvelden har de ofte et styremøte på agendaen, og så videre og videre."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nOm kvelden har de ofte et styremøte på agendaen, og så videre og videre.\n</reference>"
+  },
+  {
+   "draw": 2,
+   "doc_index": 2781,
+   "doc_fingerprint": "e98a9995e27c",
+   "prompt_variant": "ask_gec_nob_p4",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Rett opp grammatiske feil i denne teksten: Det er ikke illegale invandre eller kriminalitet.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Det er ikke illegale innvandrere eller kriminalitet."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nDet er ikke illegale innvandrere eller kriminalitet.\n</reference>"
+  },
+  {
+   "draw": 3,
+   "doc_index": 4361,
+   "doc_fingerprint": "1d6f1ba077f8",
+   "prompt_variant": "ask_gec_nob_p2",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om følgende tekst slik at den blir grammatisk korrekt: Det er noen som foretrekker å bo i en stor by og noen liker å bo på landet.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Det er noen som foretrekker å bo i en stor by, og noen liker å bo på landet."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nDet er noen som foretrekker å bo i en stor by, og noen liker å bo på landet.\n</reference>"
+  },
+  {
+   "draw": 4,
+   "doc_index": 2690,
+   "doc_fingerprint": "0468f21f871d",
+   "prompt_variant": "ask_gec_nob_p0",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Hvis man har anledning til å gå på treningssenteret så er det både sunt og nyttig.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Hvis man har anledning til å gå på treningssenter, så er det både sunt og nyttig."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nHvis man har anledning til å gå på treningssenter, så er det både sunt og nyttig.\n</reference>"
+  },
+  {
+   "draw": 5,
+   "doc_index": 4607,
+   "doc_fingerprint": "2817e41c9cb5",
+   "prompt_variant": "ask_gec_nob_p2",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om følgende tekst slik at den blir grammatisk korrekt: For å oppfile disse kravene kan vi benytte oss av barnelitteratur.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "For å oppfylle disse kravene, kan vi benytte oss av barnelitteratur."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nFor å oppfylle disse kravene, kan vi benytte oss av barnelitteratur.\n</reference>"
+  },
+  {
+   "draw": 6,
+   "doc_index": 2978,
+   "doc_fingerprint": "4fffe8e9693c",
+   "prompt_variant": "ask_gec_nob_p1",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Her i Norge har kjæresten min en stor familie som bor i Oslo området.\nRettet versjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Her i Norge har kjæresten min en stor familie som bor i Osloområdet."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nHer i Norge har kjæresten min en stor familie som bor i Osloområdet.\n</reference>"
+  },
+  {
+   "draw": 7,
+   "doc_index": 4209,
+   "doc_fingerprint": "1625373809d0",
+   "prompt_variant": "ask_gec_nob_p0",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Barn elsker å bevege seg.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Barn elsker å bevege seg."
+    ],
+    "source_is_correct": true
+   },
+   "reference_text": "<reference>\nBarn elsker å bevege seg.\n</reference>\n(The reference is identical to the text in the prompt.)"
+  },
+  {
+   "draw": 8,
+   "doc_index": 3707,
+   "doc_fingerprint": "19dcff81372a",
+   "prompt_variant": "ask_gec_nob_p3",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Original versjon: Det finnes en bok som jeg vil gjerne presentere til dere.\nKorrekturlest og rettet versjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Det finnes en bok som jeg gjerne vil presentere for dere."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nDet finnes en bok som jeg gjerne vil presentere for dere.\n</reference>"
+  },
+  {
+   "draw": 9,
+   "doc_index": 3591,
+   "doc_fingerprint": "17f5cf397ef3",
+   "prompt_variant": "ask_gec_nob_p4",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Rett opp grammatiske feil i denne teksten: Jeg liker dem alle svært godt, særlig barna hans.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Jeg liker dem alle svært godt, særlig barna hans."
+    ],
+    "source_is_correct": true
+   },
+   "reference_text": "<reference>\nJeg liker dem alle svært godt, særlig barna hans.\n</reference>\n(The reference is identical to the text in the prompt.)"
+  },
+  {
+   "draw": 10,
+   "doc_index": 4300,
+   "doc_fingerprint": "21d96d47b214",
+   "prompt_variant": "ask_gec_nob_p2",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om følgende tekst slik at den blir grammatisk korrekt: De dyrket jorda og stelte husdyr.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "De dyrket jorda og stelte husdyrene."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nDe dyrket jorda og stelte husdyrene.\n</reference>"
+  },
+  {
+   "draw": 11,
+   "doc_index": 3174,
+   "doc_fingerprint": "cc71d7220fe4",
+   "prompt_variant": "ask_gec_nob_p3",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Original versjon: Vi er en av de største frivillige organisationer i hele verden og vi trenger din hjelp!! Du har mulighet til å hjelpe elder e folk mennesker i deres fritidsaktivitet.\nKorrekturlest og rettet versjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Vi er en av de største frivillige organisasjoner i hele verden, og vi trenger din hjelp!! Du har mulighet til å hjelpe eldre mennesker i deres fritidsaktiviteter."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nVi er en av de største frivillige organisasjoner i hele verden, og vi trenger din hjelp!! Du har mulighet til å hjelpe eldre mennesker i deres fritidsaktiviteter.\n</reference>"
+  },
+  {
+   "draw": 12,
+   "doc_index": 4704,
+   "doc_fingerprint": "d36aa7c4c9fa",
+   "prompt_variant": "ask_gec_nob_p0",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Regjeringen har allerede vedtatt ordningen med papapermisjon.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Regjeringen har allerede vedtatt ordningen med pappapermisjon."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nRegjeringen har allerede vedtatt ordningen med pappapermisjon.\n</reference>"
+  },
+  {
+   "draw": 13,
+   "doc_index": 1841,
+   "doc_fingerprint": "1b7297bf7536",
+   "prompt_variant": "ask_gec_nob_p4",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Rett opp grammatiske feil i denne teksten: Det er helt et annet kultur.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Det er en helt annen kultur."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nDet er en helt annen kultur.\n</reference>"
+  },
+  {
+   "draw": 14,
+   "doc_index": 4123,
+   "doc_fingerprint": "8c97821ec668",
+   "prompt_variant": "ask_gec_nob_p1",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Å smile eller ler er smittende.\nRettet versjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Å smile eller le er smittende."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nÅ smile eller le er smittende.\n</reference>"
+  },
+  {
+   "draw": 15,
+   "doc_index": 4455,
+   "doc_fingerprint": "013e80ea9ef3",
+   "prompt_variant": "ask_gec_nob_p1",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Det er barnas verden.\nRettet versjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Det er barnas verden."
+    ],
+    "source_is_correct": true
+   },
+   "reference_text": "<reference>\nDet er barnas verden.\n</reference>\n(The reference is identical to the text in the prompt.)"
+  },
+  {
+   "draw": 16,
+   "doc_index": 3689,
+   "doc_fingerprint": "156828dd0c4f",
+   "prompt_variant": "ask_gec_nob_p4",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Rett opp grammatiske feil i denne teksten: Jeg føler meg som en dell av det miljø.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Jeg føler meg som en del av miljøet."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nJeg føler meg som en del av miljøet.\n</reference>"
+  },
+  {
+   "draw": 17,
+   "doc_index": 3111,
+   "doc_fingerprint": "5e91e75f9c92",
+   "prompt_variant": "ask_gec_nob_p0",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Men hva er vennskap egentlig? går det an å definere begrepet på en objektiv måte?\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Men hva er vennskap egentlig? Går det an å definere begrepet på en objektiv måte?"
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nMen hva er vennskap egentlig? Går det an å definere begrepet på en objektiv måte?\n</reference>"
+  },
+  {
+   "draw": 18,
+   "doc_index": 177,
+   "doc_fingerprint": "7a34ab72f3e0",
+   "prompt_variant": "ask_gec_nob_p2",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om følgende tekst slik at den blir grammatisk korrekt: Familiens posisjon har forandret seg.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Familiens posisjon har forandret seg."
+    ],
+    "source_is_correct": true
+   },
+   "reference_text": "<reference>\nFamiliens posisjon har forandret seg.\n</reference>\n(The reference is identical to the text in the prompt.)"
+  },
+  {
+   "draw": 19,
+   "doc_index": 2112,
+   "doc_fingerprint": "7c058c120311",
+   "prompt_variant": "ask_gec_nob_p3",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Original versjon: Jeg var svært glad at vi klarte ikke bare å snakke om fortiden, men også om nåtiden og fremtiden.\nKorrekturlest og rettet versjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Jeg var svært glad for at vi klarte å ikke bare snakke om fortiden, men også om nåtiden og fremtiden."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nJeg var svært glad for at vi klarte å ikke bare snakke om fortiden, men også om nåtiden og fremtiden.\n</reference>"
+  },
+  {
+   "draw": 20,
+   "doc_index": 1236,
+   "doc_fingerprint": "827f5e24aec1",
+   "prompt_variant": "ask_gec_nob_p3",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Original versjon: Etter min mening er denne rapporten ikke tilstrekkelig.\nKorrekturlest og rettet versjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Etter min mening er denne rapporten ikke tilstrekkelig."
+    ],
+    "source_is_correct": true
+   },
+   "reference_text": "<reference>\nEtter min mening er denne rapporten ikke tilstrekkelig.\n</reference>\n(The reference is identical to the text in the prompt.)"
+  },
+  {
+   "draw": 21,
+   "doc_index": 2267,
+   "doc_fingerprint": "ffc9dc927ee4",
+   "prompt_variant": "ask_gec_nob_p0",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Netthandelen har økt sterkt i det siste.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Netthandelen har økt sterkt i det siste."
+    ],
+    "source_is_correct": true
+   },
+   "reference_text": "<reference>\nNetthandelen har økt sterkt i det siste.\n</reference>\n(The reference is identical to the text in the prompt.)"
+  },
+  {
+   "draw": 22,
+   "doc_index": 4395,
+   "doc_fingerprint": "4bda107514a7",
+   "prompt_variant": "ask_gec_nob_p1",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Mange forskjellige maskyner og ikke minst datamaskyner har vært en revolusjon slik at vi lever mye bedre enn besteforeldrene våre.\nRettet versjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Mange forskjellige maskiner og ikke minst datamaskiner har vært en stor revolusjon, slik at vi lever mye bedre enn besteforeldrene våre."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nMange forskjellige maskiner og ikke minst datamaskiner har vært en stor revolusjon, slik at vi lever mye bedre enn besteforeldrene våre.\n</reference>"
+  },
+  {
+   "draw": 23,
+   "doc_index": 2733,
+   "doc_fingerprint": "fe8ce7fae337",
+   "prompt_variant": "ask_gec_nob_p2",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om følgende tekst slik at den blir grammatisk korrekt: En liten gåtur hver dag, ta trappa istedenfor heisen Vi kan gjøre noe selv for å holde oss i form.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Vi kan gjøre noe selv for å holde oss i form."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nVi kan gjøre noe selv for å holde oss i form.\n</reference>"
+  },
+  {
+   "draw": 24,
+   "doc_index": 1091,
+   "doc_fingerprint": "ec5816fc00b2",
+   "prompt_variant": "ask_gec_nob_p4",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Rett opp grammatiske feil i denne teksten: Og når alle er avslappet og kan gjøre jobben sin på en god måte, da blir hele samfunnet bedre.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Og når alle er avslappet og kan gjøre jobben sin på en god måte, da blir hele samfunnet bedre."
+    ],
+    "source_is_correct": true
+   },
+   "reference_text": "<reference>\nOg når alle er avslappet og kan gjøre jobben sin på en god måte, da blir hele samfunnet bedre.\n</reference>\n(The reference is identical to the text in the prompt.)"
+  },
+  {
+   "draw": 25,
+   "doc_index": 4111,
+   "doc_fingerprint": "55b2d306e318",
+   "prompt_variant": "ask_gec_nob_p0",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Dette kan bli et dramatisk problem i fremtiden.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Dette kan bli et dramatisk problem i fremtiden."
+    ],
+    "source_is_correct": true
+   },
+   "reference_text": "<reference>\nDette kan bli et dramatisk problem i fremtiden.\n</reference>\n(The reference is identical to the text in the prompt.)"
+  },
+  {
+   "draw": 26,
+   "doc_index": 3038,
+   "doc_fingerprint": "6f527fad1129",
+   "prompt_variant": "ask_gec_nob_p2",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om følgende tekst slik at den blir grammatisk korrekt: I den norske bursdagstradisjonen står det å kose seg med noe godt svært sterkt.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "I den norske bursdagstradisjonen står det å kose seg med noe godt, svært sterkt."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nI den norske bursdagstradisjonen står det å kose seg med noe godt, svært sterkt.\n</reference>"
+  },
+  {
+   "draw": 27,
+   "doc_index": 1688,
+   "doc_fingerprint": "b70cd33d14e1",
+   "prompt_variant": "ask_gec_nob_p3",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Original versjon: - Siste tog går inn på perrong 2 om fem minutter.\nKorrekturlest og rettet versjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "- Siste tog går inn på perrong 2 om fem minutter."
+    ],
+    "source_is_correct": true
+   },
+   "reference_text": "<reference>\n- Siste tog går inn på perrong 2 om fem minutter.\n</reference>\n(The reference is identical to the text in the prompt.)"
+  },
+  {
+   "draw": 28,
+   "doc_index": 1528,
+   "doc_fingerprint": "631791ab0186",
+   "prompt_variant": "ask_gec_nob_p4",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Rett opp grammatiske feil i denne teksten: Jeg er litt optimistisk at framtida blir bedre enn nå, men jeg ønesker at vi har bedre ledere, bedre forskere og bedre samfunn som er mer enige at det finnes en løsning.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Jeg er litt optimistisk om at framtida blir bedre enn nåtida, men jeg ønsker at vi skal ha bedre ledere, bedre forskere og et bedre samfunn, som er mer enig i at det finnes en løsning."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nJeg er litt optimistisk om at framtida blir bedre enn nåtida, men jeg ønsker at vi skal ha bedre ledere, bedre forskere og et bedre samfunn, som er mer enig i at det finnes en løsning.\n</reference>"
+  },
+  {
+   "draw": 29,
+   "doc_index": 2655,
+   "doc_fingerprint": "b23aa17b7a25",
+   "prompt_variant": "ask_gec_nob_p1",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Tekst: Hvordan kan man få lysten til å bli en sånn som bryr seg hvis man må streve for å få nedbetalt studielånet og kjempe for å tilfredstille de grunnleggende behovene som mat, klær osv...\nRettet versjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Hvordan kan man få lyst til å bli en sånn som bryr seg, hvis man må streve for å få nedbetalt studielånet og kjempe for å tilfredstille de grunnleggende behovene som mat, klær osv..."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nHvordan kan man få lyst til å bli en sånn som bryr seg, hvis man må streve for å få nedbetalt studielånet og kjempe for å tilfredstille de grunnleggende behovene som mat, klær osv...\n</reference>"
+  },
+  {
+   "draw": 30,
+   "doc_index": 4273,
+   "doc_fingerprint": "0b1cd8894195",
+   "prompt_variant": "ask_gec_nob_p2",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Skriv om følgende tekst slik at den blir grammatisk korrekt: Hvis vi velger en krevende jobb vi må vite på forhond hvilker ulemper og fordeler den har for oss.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "Hvis vi velger en krevende jobb, må vi vite på forhånd hvilke ulemper og fordeler den har for oss."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nHvis vi velger en krevende jobb, må vi vite på forhånd hvilke ulemper og fordeler den har for oss.\n</reference>"
+  },
+  {
+   "draw": 31,
+   "doc_index": 2668,
+   "doc_fingerprint": "e9e261a6eb58",
+   "prompt_variant": "ask_gec_nob_p4",
+   "formulation": "gen",
+   "language": "nob",
+   "source_language": null,
+   "prompt": "Rett opp grammatiske feil i denne teksten: For meg er Norge en kultur bevisst og natur bevisst folk som liker og leve her.\nKorreksjon:",
+   "reference": {
+    "type": "texts",
+    "references": [
+     "For meg er Norge et kultur-og naturbevisst land med folk som liker å leve her."
+    ],
+    "source_is_correct": false
+   },
+   "reference_text": "<reference>\nFor meg er Norge et kultur-og naturbevisst land med folk som liker å leve her.\n</reference>"
+  }
+ ]
+}
