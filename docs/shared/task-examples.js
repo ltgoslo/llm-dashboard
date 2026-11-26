@@ -182,7 +182,8 @@ function clampedText(text) {
 /** The reference the judge graded against, as labelled parts
  *  ([{label, node}]): its text under "Reference" (several, numbered, under
  *  "References (3, by different writers)"), or each of its labelled
- *  answers ("Correct option": "B (Hval)", "True answers": a list). */
+ *  answers ("Correct option": "B (Hval)", "True answers": a list of
+ *  several, "True answer": one). */
 function referenceParts(ref) {
   if (ref?.texts) {
     const several = ref.texts.length > 1;
@@ -196,16 +197,24 @@ function referenceParts(ref) {
     });
     return [{ label: several ? `References (${ref.texts.length}, by different writers)` : "Reference", node: box }];
   }
+  // A list only of several: one item is a text, under its label in the
+  // singular ("Accepted completion: på" for the judge's "Accepted
+  // completions:" and its one "- på").
   return (ref?.sections || []).map((sec) => {
-    let node;
-    if (sec.items) {
-      node = el("ul", "tx-ref-items");
+    if (sec.items?.length > 1) {
+      const node = el("ul", "tx-ref-items");
       for (const it of sec.items) node.append(el("li", "tx-text", it));
-    } else {
-      node = el("div", "tx-text", sec.text);
+      return { label: sec.label, node };
     }
-    return { label: sec.label, node };
+    if (sec.items) return { label: singular(sec.label), node: el("div", "tx-text", sec.items[0] ?? "") };
+    return { label: sec.label, node: el("div", "tx-text", sec.text) };
   });
+}
+
+/** A list's label for one item of it: "Accepted completions" → "Accepted
+ *  completion", "Correct options (any one of them)" → "Correct option". */
+function singular(label) {
+  return label.replace(/\s*\(.*\)$/, "").replace(/([^s])s$/, "$1");
 }
 
 /** How a response ended, when not by itself: cut at the token limit, or
