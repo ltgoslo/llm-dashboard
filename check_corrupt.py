@@ -4,8 +4,8 @@
 Checks all results_*.json files for:
   1. Empty files (0 bytes)
   2. Invalid JSON (parse errors)
-  3. Missing expected top-level keys (results, config)
-  4. Empty results dict
+  3. Missing or invalid results mapping
+  4. Empty results dict or non-object task entries
 
 Prints a summary suitable for identifying which evaluations need to be re-run.
 """
@@ -29,9 +29,9 @@ def check_results_file(filepath):
         return "empty file (0 bytes)"
 
     try:
-        with open(filepath) as f:
+        with open(filepath, encoding="utf-8") as f:
             data = json.load(f)
-    except json.JSONDecodeError as e:
+    except (json.JSONDecodeError, UnicodeDecodeError) as e:
         return f"invalid JSON: {e}"
 
     if not isinstance(data, dict):
@@ -40,8 +40,15 @@ def check_results_file(filepath):
     if "results" not in data:
         return "missing 'results' key"
 
+    if not isinstance(data["results"], dict):
+        return "unexpected 'results' type: " + type(data["results"]).__name__
+
     if not data["results"]:
         return "empty 'results' dict"
+
+    for task, result in data["results"].items():
+        if not isinstance(result, dict):
+            return f"unexpected result type for {task!r}: {type(result).__name__}"
 
     return None
 
