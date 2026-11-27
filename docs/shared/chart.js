@@ -49,7 +49,7 @@ export function downloadJSON(data, filename) {
 }
 
 /** The y-axis's tick labels. */
-export const Y_TICK_FONT = { size: 13.6, color: "#57657a", weight: 500 };
+export const Y_TICK_FONT = { size: 13.6, color: "#535d6a", weight: 500 };
 
 /** A number as an export gives it: at most 4 decimals (an integer, a token
  *  count, as it is). */
@@ -172,10 +172,10 @@ export function getPlotlyLayout(overrides) {
     autosize: true,
     hovermode: "closest",
   }, overrides);
-  const axisDefaults = { showline: false, zeroline: false, gridcolor: "#d8dce3" };
+  const axisDefaults = { showline: false, zeroline: false, gridcolor: "#e2e8ef" };
   result.xaxis = Object.assign({ automargin: true }, axisDefaults, result.xaxis);
   // Y-axis tick labels match .control-group label styling in shared/style.css:
-  // 0.85rem (≈13.6px), weight 500, --fg-muted colour (#64748b).
+  // 0.85rem (≈13.6px), weight 500, --fg-muted colour (#535d6a).
   result.yaxis = Object.assign({ tickfont: { ...Y_TICK_FONT } }, axisDefaults, result.yaxis);
   return result;
 }
@@ -185,7 +185,7 @@ export function getPlotlyLayout(overrides) {
 export function makeYAxis(range) {
   return {
     title: "", range,
-    showgrid: true, gridcolor: "#d4d8dd", automargin: false, ticks: "", ticklen: 0,
+    showgrid: true, gridcolor: "#e2e8ef", zerolinecolor: "#cbd4df", automargin: false, ticks: "", ticklen: 0,
     zeroline: state.currentNormalization === "zscore",
   };
 }

@@ -1899,7 +1899,7 @@ function replayPointer() {
 /** The band's colour for model `m`, [r, g, b, alpha]. */
 function bandColor(m, alpha) {
   const c = getModelColor(m);
-  return [...(/^#[0-9a-f]{6}$/i.test(c) ? hexToRgb(c) : [99, 102, 241]), alpha];
+  return [...(/^#[0-9a-f]{6}$/i.test(c) ? hexToRgb(c) : [27, 36, 48]), alpha];
 }
 const rgbaText = ([r, g, b, a]) => `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${+a.toFixed(3)})`;
 const rgbText = ([r, g, b]) => `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
@@ -2616,8 +2616,8 @@ function scatterXAxis(xs = []) {
     type: "log",
     range: [Math.log10(lo), Math.log10(hi)],
     automargin: false,
-    title: { text: "Model size (B parameters)", font: { size: 13, color: "#57657a" }, standoff: 12 },
-    showgrid: true, gridcolor: "#d8dce3",
+    title: { text: "Model size (B parameters)", font: { size: 13, color: "#535d6a" }, standoff: 12 },
+    showgrid: true, gridcolor: "#e2e8ef",
     tickvals,
     ticktext: tickvals.map(formatModelSize),
   };
@@ -2980,7 +2980,7 @@ function renderModelBars(modelNames, opts) {
   const edgePx = (v) => (v - yRange[0]) / (yRange[1] - yRange[0]) * plotHeight;
   const yNumbers = [
     { type: "rect", layer: "between", name: AXIS_LABELS, xref: "x", yref: "y",
-      x0: -0.5 - lead, x1: numbersEnd, y0: yRange[0], y1: yRange[1], fillcolor: "#fff", line: { width: 0 } },
+      x0: -0.5 - lead, x1: numbersEnd, y0: yRange[0], y1: yRange[1], fillcolor: "#fdfefe", line: { width: 0 } },
     ...yTicks.map((tk) => ({
       type: "rect", layer: "between", name: AXIS_LABELS, xref: "x", yref: "y",
       x0: -0.5 - lead, x1: numbersEnd - (Y_LABEL_GAP_PX - 3) / view.slotPx, y0: tk.v, y1: tk.v,
@@ -3011,7 +3011,7 @@ function renderModelBars(modelNames, opts) {
       text: values[i] != null ? values[i].toFixed(fmt) : "",
       showarrow: false, yshift: below[i] ? -10 : 10,
       xanchor: "center",
-      font: { size: computeAnnotationFontSize(barsInView(asClosed || view, labels.length)), color: "#000", weight: 500 },
+      font: { size: computeAnnotationFontSize(barsInView(asClosed || view, labels.length)), color: "#161c24", weight: 500 },
     })),
     images: buildOrgImages(modelNames, xPositions, values, yRange),
   });
@@ -3186,11 +3186,11 @@ function renderModelBarsHorizontal(modelNames, { values, ciValues, customdata })
   const plotWidth = Math.max(1, width - margin.l - margin.r);
   const xRange = rowValueRange(values, ciValues, plotWidth);
   const layout = getPlotlyLayout({
-    xaxis: { ...makeYAxis(xRange), gridcolor: ROW_GRID_COLOR, zerolinecolor: ROW_ZERO_COLOR, side: "top", tickfont: { size: 11, color: "#57657a" } },
+    xaxis: { ...makeYAxis(xRange), gridcolor: ROW_GRID_COLOR, zerolinecolor: ROW_ZERO_COLOR, side: "top", tickfont: { size: 11, color: "#535d6a" } },
     yaxis: {
       range: [rows.length - 0.5, -0.5], tickvals: rows, ticktext,
       showgrid: false, automargin: false, ticks: "", ticklen: 0, ticklabelstandoff: ROW_LABEL_GAP_PX - 2,
-      tickfont: { size: ROW_LABEL_FONT, color: "#1e293b", weight: ROW_LABEL_WEIGHT },
+      tickfont: { size: ROW_LABEL_FONT, color: "#161c24", weight: ROW_LABEL_WEIGHT },
     },
     hovermode: "y",
     showlegend: false,
@@ -3201,7 +3201,7 @@ function renderModelBarsHorizontal(modelNames, { values, ciValues, customdata })
       text: v != null ? v.toFixed(fmt) : "",
       showarrow: false,
       xanchor: below[i] ? "right" : "left", xshift: below[i] ? -4 : 4,
-      font: { size: ROW_LABEL_FONT, color: "#000", weight: 500 },
+      font: { size: ROW_LABEL_FONT, color: "#161c24", weight: 500 },
     })),
     images: buildRowLogos(modelNames, values, xRange, plotWidth),
   });
@@ -3279,7 +3279,7 @@ function renderEmptyState(message) {
     annotations: [{
       text: narrow ? message.replace(/ – /, " –<br>") : message,
       xref: "paper", yref: "paper", x: 0.5, y: 0.5,
-      showarrow: false, font: { size: 15, color: "#57657a" },
+      showarrow: false, font: { size: 15, color: "#535d6a" },
     }],
   });
   plotChart([], touchSafe(layout), plotlyConfig, null, hideTooltip);
@@ -3340,36 +3340,6 @@ function renderSingleBenchmarkScatter(benchmark) {
   plotScatter(xs, ys, dirs, colors, cis, computeSingleYRange(benchmark, metric), extras);
 }
 
-/** Upper-left Pareto frontier over (size, score) scatter points: models for
- *  which no smaller-or-equal model achieves a higher score. Drawn as subtle
- *  dashed line shapes below the markers (zero interference with trace indices
- *  or JSON export). */
-function paretoShapes(xs, ys) {
-  const pts = [];
-  for (let i = 0; i < xs.length; i++) {
-    if (xs[i] > 0 && ys[i] != null && Number.isFinite(ys[i])) pts.push({ x: xs[i], y: ys[i] });
-  }
-  pts.sort((a, b) => a.x - b.x || b.y - a.y);
-  const frontier = [];
-  let best = -Infinity;
-  for (const p of pts) {
-    if (p.y > best) {
-      frontier.push(p);
-      best = p.y;
-    }
-  }
-  const shapes = [];
-  for (let i = 0; i + 1 < frontier.length; i++) {
-    shapes.push({
-      type: "line", xref: "x", yref: "y", layer: "below",
-      x0: frontier[i].x, y0: frontier[i].y,
-      x1: frontier[i + 1].x, y1: frontier[i + 1].y,
-      line: { color: "rgba(79, 70, 229, 0.28)", width: 1.5, dash: "4px,4px" },
-    });
-  }
-  return shapes;
-}
-
 /** Build a single-trace scatter chart: one marker per model, org logos
  *  overlaid via layout.images. Used by aggregate and single-benchmark
  *  scatter modes. */
@@ -3417,7 +3387,6 @@ function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
     xaxis,
     showlegend: false,
     margin,
-    shapes: paretoShapes(xs, ys),
     images: composite.images,
   });
   // Stash the image→model mapping so the scatter hover handler (in chart.js)
