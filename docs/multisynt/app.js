@@ -29,6 +29,7 @@ import {
   renderProgressChart, updateProgressTitle,
 } from "../shared/progress.js";
 import { computeSignals, renderSignals } from "../shared/signals.js";
+import { setsEqual } from "../shared/selection.js";
 import { UrlState } from "../shared/url-state.js";
 
 const ALL_SHOTS = ["0", "5"];
@@ -62,6 +63,7 @@ const plotlyConfig = makePlotlyConfig("multisynt-chart", () => ({
 let currentLang = null;
 let urlState;
 let lastSignals = null;
+let restoredTasks = null;
 
 // ─────────────────────────────────────────────────────────────
 // Data helpers
@@ -115,8 +117,8 @@ const chartConfig = {
   // the displayed shot on every render.
   yRangeFit: true,
   // FineWeb2 signal measures of exactly what is plotted, shown under the title.
-  onSeries: (series, baseline) => {
-    lastSignals = computeSignals(series, baseline);
+  onSeries: (series, baseline, opts) => {
+    lastSignals = computeSignals(series, baseline, opts);
     renderSignals(document.getElementById("chart-signals"), lastSignals);
   },
 };
@@ -263,6 +265,11 @@ function bindEventListeners() {
   });
   document.getElementById("select-none-btn").addEventListener("click", () => {
     state.checkedTasks.clear();
+    if (!isAggregateSelection(state.currentTaskSelection)) {
+      state.currentTaskSelection = "__custom__";
+      document.getElementById("task-select").value = state.currentTaskSelection;
+      autoSetNormalization();
+    }
     syncTaskCheckboxStates(checkedTasks);
     render();
   });
@@ -296,9 +303,11 @@ function setLanguage(lang) {
   populateTaskDropdown();
   populateFormulationOptions();
   // Reset selections that don't exist in the new language: unknown individual
-  // tasks, and category subsets that match nothing here.
+  // tasks, custom subsets from the old language, and category subsets that
+  // match nothing here.
   const sel = state.currentTaskSelection;
-  if ((!isAggregateSelection(sel) && !state.metricsSetup[sel])
+  if (sel === "__custom__" || sel === "__custom_macro__"
+      || (!isAggregateSelection(sel) && !Object.hasOwn(state.metricsSetup, sel))
       || ((sel.startsWith("__cat__") || sel.startsWith("__eval__"))
           && getBenchmarksForSelection(sel).length === 0)) {
     state.currentTaskSelection = DEFAULT_SELECTION;
@@ -318,10 +327,11 @@ function setLanguage(lang) {
 // ─────────────────────────────────────────────────────────────
 
 function render() {
-  updateProgressTitle(chartConfig);
   renderProgressChart(chartConfig);
+  updateProgressTitle(chartConfig);
   // After the chart: the single-task metric selector is populated during
-  // the render, and the loglikelihood-normalization control follows it.
+  // the render, and the title/description and loglikelihood-normalization
+  // control follow it.
   updateVariantControlVisibility();
   applyTaskTypeMask();
   urlState.save();
@@ -341,7 +351,7 @@ const LEGACY_METRIC_MODE = { hard: "acc", soft: "prob_correct" };
 function setupUrlState() {
   urlState = new UrlState([
     { key: "lang", get: () => currentLang, set: (v) => currentLang = v, default: null, noDefault: true },
-    { key: "shot", get: () => state.currentShot, set: (v) => state.currentShot = v, default: "5" },
+    { key: "shot", get: () => state.currentShot, set: (v) => { state.currentShot = ALL_SHOTS.includes(v) ? v : "5"; }, default: "5" },
     {
       key: "task",
       get: () => state.currentTaskSelection,
@@ -365,8 +375,18 @@ function setupUrlState() {
     { key: "form", get: () => state.currentFormulation, set: (v) => state.currentFormulation = v, default: DEFAULTS.formulation },
     { key: "anorm", get: () => state.currentAccNorm, set: (v) => state.currentAccNorm = LEGACY_LL_NORM[v] || v, default: DEFAULTS.accNorm },
     { key: "ci", get: () => state.showCIBands ? "1" : "0", set: (v) => state.showCIBands = v !== "0", default: "0" },
-    { key: "norm", get: () => state.currentNormalization, set: (v) => state.currentNormalization = v === "percentile" ? "baseline" : v, default: "baseline" },
+    { key: "norm", get: () => state.currentNormalization, set: (v) => state.currentNormalization = v === "percentile" ? "baseline" : v, default: DEFAULTS.normalization },
     { key: "metric", get: () => state.currentMetric || "", set: (v) => state.currentMetric = v, default: "" },
+    {
+      key: "tasks",
+      get: () => {
+        if (state.checkedTasks.size === 0) return "none";
+        const auto = new Set(getBenchmarksForSelection(state.currentTaskSelection));
+        return setsEqual(state.checkedTasks, auto) ? "" : [...state.checkedTasks].sort().join(",");
+      },
+      set: (v) => { restoredTasks = v; },
+      default: "",
+    },
   ], { mode: "search" });
 }
 
@@ -380,7 +400,7 @@ function syncControlsFromState() {
     if (select.value !== value) select.value = fallback;
     return select.value;
   };
-  setSelect("task-select", state.currentTaskSelection, DEFAULT_SELECTION);
+  state.currentTaskSelection = setSelect("task-select", state.currentTaskSelection, DEFAULT_SELECTION);
   state.taskTypeFilter = setSelect("task-type-select", state.taskTypeFilter, "all");
   state.classificationMetric = setSelect("classification-metric-select", state.classificationMetric, DEFAULTS.classificationMetric);
   state.currentDecoding = setSelect("decoding-select", state.currentDecoding, "sampling");
@@ -413,28 +433,38 @@ async function init() {
     state.currentPromptAgg = DEFAULTS.promptAgg;
     state.currentFormulation = DEFAULTS.formulation;
     state.formulationCombine = true;
-    state.currentAccNorm = "max";
+    state.currentAccNorm = DEFAULTS.accNorm;
     state.llNormScope = "all";
     state.classificationMetric = DEFAULTS.classificationMetric;
     state.taskTypeFilter = "all";
     state.currentDecoding = "sampling";
     setupUrlState();
     const hasURL = urlState.load();
-    if (!state.DATA.languages[currentLang]) {
+    if (!Object.hasOwn(state.DATA.languages, currentLang)) {
       currentLang = languages.includes(DEFAULT_LANGUAGE) ? DEFAULT_LANGUAGE : languages[0];
     }
 
     state.metricsSetup = state.DATA.languages[currentLang].metrics_setup;
-    // A restored task unknown here, or a category subset that is empty here,
-    // falls back to the default aggregate instead of an empty chart.
+    // A restored task unknown here, an unsupported language/eval aggregate, or
+    // a category subset that is empty here falls back to the default aggregate.
     const restored = state.currentTaskSelection;
-    if ((!isAggregateSelection(restored) && !state.metricsSetup[restored])
+    if ((!isAggregateSelection(restored) && !Object.hasOwn(state.metricsSetup, restored))
+        || restored.startsWith("__lang__") || restored.startsWith("__eval__")
         || (restored.startsWith("__cat__") && getBenchmarksForSelection(restored).length === 0)) {
       state.currentTaskSelection = DEFAULT_SELECTION;
     }
-    // A URL-restored category selection means a task subset, not all.
+    // Restore explicit custom task subset if supplied in the URL; otherwise
+    // derive checkedTasks from the active selection.
     const initBenches = getBenchmarksForSelection(state.currentTaskSelection);
-    state.checkedTasks = new Set(initBenches.length ? initBenches : Object.keys(state.metricsSetup));
+    const defaultBenches = initBenches.length ? initBenches : Object.keys(state.metricsSetup);
+    if (restoredTasks === "none") {
+      state.checkedTasks = new Set();
+    } else if (restoredTasks) {
+      const valid = restoredTasks.split(",").filter((t) => Object.hasOwn(state.metricsSetup, t));
+      state.checkedTasks = new Set(valid.length ? valid : defaultBenches);
+    } else {
+      state.checkedTasks = new Set(defaultBenches);
+    }
 
     buildLangTabs(languages);
     populateTaskDropdown();

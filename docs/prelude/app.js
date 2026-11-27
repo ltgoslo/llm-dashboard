@@ -130,8 +130,8 @@ const chartConfig = {
   // FineWeb2 signal measures of exactly what is plotted, shown under the
   // title. Ranking consistency needs several runs, so it is blank until a
   // side run is drawn next to the main line.
-  onSeries: (series, baseline) => {
-    lastSignals = computeSignals(series, baseline);
+  onSeries: (series, baseline, opts) => {
+    lastSignals = computeSignals(series, baseline, opts);
     renderSignals(document.getElementById("chart-signals"), lastSignals);
   },
 };
@@ -197,10 +197,11 @@ function syncVariantControlsFromState() {
 // ─────────────────────────────────────────────────────────────
 
 function render() {
-  updateProgressTitle(chartConfig);
   renderProgressChart(chartConfig);
+  updateProgressTitle(chartConfig);
   // After the chart: the single-task metric selector is populated during
-  // the render, and the loglikelihood-normalization control follows it.
+  // the render, and the title/description and loglikelihood-normalization
+  // control follow it.
   updateVariantControlVisibility();
   applyTaskTypeMask();
   urlState.save();
@@ -260,11 +261,14 @@ function setupUrlState() {
     {
       key: "tasks",
       get: () => {
+        if (state.checkedTasks.size === 0) return "none";
         const auto = new Set(getBenchmarksForSelection(state.currentTaskSelection));
         return setsEqual(state.checkedTasks, auto) ? "" : [...state.checkedTasks].sort().join(",");
       },
       set: (v) => {
-        state.checkedTasks = v ? new Set(v.split(",").filter((t) => t in state.metricsSetup)) : new Set();
+        state.checkedTasks = (v && v !== "none")
+          ? new Set(v.split(",").filter((t) => Object.hasOwn(state.metricsSetup, t)))
+          : new Set();
       },
       default: "",
     },
@@ -312,10 +316,9 @@ async function init() {
     bindModuleActionStopPropagation();
     attachControlTooltips(VARIANT_CONTROL_TOOLTIPS);
 
-    // The `norm` URL field has a dynamic default ("baseline" for aggregate
-    // selections, "none" otherwise) that is only applied on save; apply it
-    // here when `norm` is absent so individual-task URLs don't inherit the
-    // static state.js default.
+    // Apply the page's default normalization ("baseline" for both aggregate
+    // and single-task views, via setSingleTaskNormalization above) when the
+    // URL does not specify `norm`.
     if (!urlState.has("norm")) autoSetNormalization();
 
     syncVariantControlsFromState();

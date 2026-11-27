@@ -98,13 +98,16 @@ export function exportChartDataAsJSON(gd, metadata, filename) {
     const seen = new Set();
     out.models = [];
     for (const t of labelled) {
+      const horiz = t.orientation === "h";
+      const valArr = horiz ? t.x : t.y;
+      const errObj = horiz ? t.error_x : t.error_y;
       t.customdata.forEach((d, i) => {
         if (d?.label == null || seen.has(d.label)) return;
         seen.add(d.label);
-        const y = t.y[i];
-        const rec = { model: d.label, score: exportNumber(y) };
+        const score = valArr[i];
+        const rec = { model: d.label, score: exportNumber(score) };
         if (t.type !== "bar") rec.parameters_b = exportNumber(t.x[i]);
-        const range = ci(y, t.error_y?.array?.[i], t.error_y?.arrayminus?.[i]);
+        const range = ci(score, errObj?.array?.[i], errObj?.arrayminus?.[i]);
         if (range) rec.ci_95 = range;
         out.models.push(rec);
       });
@@ -1257,8 +1260,9 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
     if (t.type !== "bar") return t;
     const start = Object.assign({}, t, { [vk]: t[vk].map(() => 0) });
     if (t[errKey] && t[errKey].array) {
-      start[errKey] = Object.assign({}, t[errKey],
-        { array: t[errKey].array.map(() => 0) });
+      const zeroErr = { array: t[errKey].array.map(() => 0) };
+      if (t[errKey].arrayminus) zeroErr.arrayminus = t[errKey].arrayminus.map(() => 0);
+      start[errKey] = Object.assign({}, t[errKey], zeroErr);
     }
     return start;
   });
@@ -1288,11 +1292,15 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
   const barYTargets = barIndices.map((i) => traces[i][vk]);
   // Indices (into barIndices) of bar traces that actually carry error bars,
   // along with the target arrays — precomputed for the phase-2 loop.
-  const errBarIdx = [], errBarTargets = [];
+  const errBarIdx = [], errBarTargets = [], errBarMinusTargets = [];
+  let hasErrMinus = false;
   barIndices.forEach((traceIdx) => {
     if (traces[traceIdx][errKey] && traces[traceIdx][errKey].array) {
       errBarIdx.push(traceIdx);
       errBarTargets.push(traces[traceIdx][errKey].array);
+      const minus = traces[traceIdx][errKey].arrayminus;
+      if (minus) hasErrMinus = true;
+      errBarMinusTargets.push(minus || null);
     }
   });
 
@@ -1334,6 +1342,10 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
     if (hasErrBars && elapsed >= phase2StartOffset) {
       traceUpdate[errKey + ".array"] = errBarTargets.map(
         (arr) => arr.map((v) => v == null ? 0 : v * e2));
+      if (hasErrMinus) {
+        traceUpdate[errKey + ".arrayminus"] = errBarMinusTargets.map(
+          (arr, j) => (arr || errBarTargets[j]).map((v) => v == null ? 0 : v * e2));
+      }
       if (traceIdx === null) traceIdx = errBarIdx;
     }
 

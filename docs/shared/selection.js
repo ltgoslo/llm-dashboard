@@ -214,6 +214,12 @@ export function bindTaskControls(render, { selectAll = "__all__" } = {}) {
   });
   document.getElementById("select-none-btn").addEventListener("click", () => {
     state.checkedTasks.clear();
+    if (!isAggregateSelection(state.currentTaskSelection)) {
+      state.currentTaskSelection = "__custom__";
+      const selEl = document.getElementById("task-select");
+      if (selEl) selEl.value = state.currentTaskSelection;
+      autoSetNormalization();
+    }
     syncTaskCheckboxStates(() => state.checkedTasks);
     render();
   });

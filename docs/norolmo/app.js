@@ -180,6 +180,7 @@ const chartConfig = {
   xToTokens: (step) => step * TOKENS_PER_STEP,
   xAxisLabel: "tokens",
   allShots: ALL_SHOTS,
+  normAcrossTrajectories: true,
   yRangeSkipFirst: true,
   yMaxHeadroom: 0.25,   // extra top space (× data span) so the legend fits
   xRangeTight: true,
@@ -202,8 +203,8 @@ const chartConfig = {
 // ─────────────────────────────────────────────────────────────
 
 function render() {
-  updateProgressTitle(chartConfig);
   renderProgressChart(chartConfig);
+  updateProgressTitle(chartConfig);
   urlState.save();
 }
 
@@ -213,14 +214,14 @@ function render() {
 
 function setupUrlState() {
   urlState = new UrlState([
-    { key: "shot", get: () => state.currentShot, set: (v) => state.currentShot = v, default: "5" },
+    { key: "shot", get: () => state.currentShot, set: (v) => { state.currentShot = ALL_SHOTS.includes(v) ? v : "5"; }, default: "5" },
     {
       key: "task",
       get: () => state.currentTaskSelection,
       // Unknown values (e.g. "__group__…" pair selections from old URLs)
       // fall back to the default aggregate view instead of an empty chart.
       set: (v) => {
-        state.currentTaskSelection = (v === "__custom__" || getBenchmarksForSelection(v).length > 0)
+        state.currentTaskSelection = (v === "__custom__" || v === "__custom_macro__" || getBenchmarksForSelection(v).length > 0)
           ? v : "__all_macro__";
       },
       default: "__all_macro__",
@@ -241,11 +242,14 @@ function setupUrlState() {
     {
       key: "tasks",
       get: () => {
+        if (state.checkedTasks.size === 0) return "none";
         const auto = new Set(getBenchmarksForSelection(state.currentTaskSelection));
         return setsEqual(state.checkedTasks, auto) ? "" : [...state.checkedTasks].sort().join(",");
       },
       set: (v) => {
-        state.checkedTasks = v ? new Set(v.split(",").filter((t) => t in state.metricsSetup)) : new Set();
+        state.checkedTasks = (v && v !== "none")
+          ? new Set(v.split(",").filter((t) => Object.hasOwn(state.metricsSetup, t)))
+          : new Set();
       },
       default: "",
     },
@@ -283,7 +287,19 @@ async function init() {
     // wrong values for individual-task URLs. Apply the dynamic default here.
     if (!urlState.has("norm")) autoSetNormalization();
 
-    if (hasURL) syncTaskControlsFromState();
+    if (hasURL) {
+      syncTaskControlsFromState();
+      // Reject unknown URL values for <select> controls (fall back to defaults).
+      const promptEl = document.getElementById("prompt-agg-select");
+      if (promptEl && promptEl.value !== state.currentPromptAgg) {
+        state.currentPromptAgg = "max";
+        promptEl.value = state.currentPromptAgg;
+      }
+      const normEl = document.getElementById("norm-select");
+      if (normEl && normEl.value !== state.currentNormalization) {
+        autoSetNormalization();
+      }
+    }
 
     render();
     markAppReady();

@@ -8,7 +8,7 @@ arc_challenge_fi_fbv2:
   - arc_challenge_fi_cf_fbv2
   - arc_challenge_fi_mcf_fbv2
   pretty_name: ARC Challenge (Finnish)
-  random_baseline: 0.25
+  random_baseline: 0.250156
 ask_gec:
   category: linguistic knowledge
   evaluation_type: generation
@@ -52,7 +52,7 @@ copa_es:
   max_performance: 1.0
   metric_scale: unit
   pretty_name: COPA (Spanish)
-  random_baseline: 0.25
+  random_baseline: 0.5
 escola:
   category: linguistic knowledge
   evaluation_type: classification
@@ -95,7 +95,7 @@ finbench_general_knowledge_fbv2:
   - finbench_general_knowledge_cf_fbv2
   - finbench_general_knowledge_mcf_fbv2
   pretty_name: FinnBench General Knowledge
-  random_baseline: 0.133
+  random_baseline: 0.139269
 finbench_hhh_alignment_fbv2:
   category: language understanding
   evaluation_type: classification
@@ -117,7 +117,7 @@ finbench_similarities_abstraction_fbv2:
   - finbench_similarities_abstraction_cf_fbv2
   - finbench_similarities_abstraction_mcf_fbv2
   pretty_name: FinnBench Similarities
-  random_baseline: 0.25
+  random_baseline: 0.242105
 flores_en-es:
   category: translation
   evaluation_type: generation
@@ -149,7 +149,7 @@ french_bench_arc_challenge:
   max_performance: 1.0
   metric_scale: unit
   pretty_name: French Bench ARC Challenge
-  random_baseline: 0.25
+  random_baseline: 0.250157
 french_bench_boolqa:
   category: language understanding
   evaluation_type: classification
@@ -576,7 +576,7 @@ ogx_truthfulqax_mc1_fi_fbv2:
   max_performance: 1.0
   metric_scale: unit
   pretty_name: TruthfulQA MC1 (Finnish)
-  random_baseline: 0.25
+  random_baseline: 0.226056
 ogx_truthfulqax_mc2_fi_fbv2:
   category: world knowledge
   evaluation_type: classification
@@ -584,7 +584,7 @@ ogx_truthfulqax_mc2_fi_fbv2:
   max_performance: 1.0
   metric_scale: unit
   pretty_name: TruthfulQA MC2 (Finnish)
-  random_baseline: 0.5
+  random_baseline: 0.448409
 openbookqa_es:
   category: world knowledge
   evaluation_type: classification
@@ -611,7 +611,7 @@ scandisent_fi_fbv2:
   - scandisent_fi_cf_fbv2
   - scandisent_fi_mcf_fbv2
   pretty_name: ScandiSent (Finnish)
-  random_baseline: 0.333333
+  random_baseline: 0.5
 sib200_fi_fbv2:
   category: language understanding
   evaluation_type: classification
@@ -798,7 +798,7 @@ veritasqa_es_mc1:
   max_performance: 1.0
   metric_scale: unit
   pretty_name: TruthfulQA MC1 (Spanish)
-  random_baseline: 0.243
+  random_baseline: 0.229207
 veritasqa_es_mc2:
   category: world knowledge
   evaluation_type: classification
@@ -806,7 +806,7 @@ veritasqa_es_mc2:
   max_performance: 1.0
   metric_scale: unit
   pretty_name: TruthfulQA MC2 (Spanish)
-  random_baseline: 0.154
+  random_baseline: 0.474902
 wmt14-en-fr:
   category: translation
   evaluation_type: generation

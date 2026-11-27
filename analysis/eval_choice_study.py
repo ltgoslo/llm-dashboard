@@ -12,9 +12,10 @@ three output metrics are computed per task and then averaged over tasks:
   - non-randomness:      max score - random baseline per model, median over models
   - ranking consistency: mean Kendall tau between successive checkpoint rankings
 
-The metric definitions are 1:1 ports of docs/shared/filter.js (HPLT-E filter);
-dimensions that a task does not carry (e.g. formulations on generation tasks)
-fall back to the pooled value, mirroring resolveScoreObj in docs/shared/core.js.
+The metric definitions are 1:1 ports of the former HPLT-E filter (now replaced
+by FineWeb2 signals in docs/shared/signals.js); dimensions that a task does not
+carry (e.g. formulations on generation tasks) fall back to the pooled value,
+mirroring resolveScoreObj in docs/shared/core.js.
 Dimensions absent from a whole language (e.g. formulations and accuracy-norm
 variants in French/Spanish) are dropped from its plots.
 
@@ -39,12 +40,12 @@ sys.path.insert(0, str(BASE_DIR))
 
 import build_data  # reuse the dashboard's extraction helpers
 
-LANGUAGES = ["Norwegian_v2", "Finnish", "French", "Spanish"]
+LANGUAGES = ["Norwegian", "Finnish", "French", "Spanish"]
 RESULTS_DIR = BASE_DIR / "data" / "multisynt" / "results"
 ANALYSIS_DIR = Path(__file__).resolve().parent
 PLOTS_DIR = ANALYSIS_DIR / "plots"
 
-# Same token window as the dashboard's DEFAULT_CRITERIA (filter.js).
+# Token window used for this offline study.
 WINDOW_MIN, WINDOW_MAX = 10, 100
 
 ACC_VARIANTS = ("acc", "acc_norm", "acc_mutual_info")
@@ -57,14 +58,26 @@ NORM_METRIC = {"none": "acc", "character": "acc_norm", "pmi": "acc_mutual_info"}
 # ─────────────────────────────────────────────────────────────
 
 
-def extract_checkpoint(ckpt_path, task_configs):
+def extract_checkpoint(ckpt_path, task_configs, shot="0"):
     """{task: [[form, source_name, {metric: value}], ...]} for one checkpoint."""
     out = {}
     for benchmark, config in task_configs.items():
         partitions = []
         if config.get("aggregator") == "multiblimp":
             bench_path = os.path.join(ckpt_path, config.get("path", benchmark))
-            agg = build_data.multisynt_process_multiblimp(bench_path)
+            parent = bench_path if os.path.isdir(bench_path) else ckpt_path
+            sub_entries = [
+                (os.path.join(parent, d), d)
+                for d in sorted(os.listdir(parent))
+                if d.startswith(f"{benchmark}_")
+                and os.path.isdir(os.path.join(parent, d))
+            ] if os.path.isdir(parent) else []
+            agg = build_data.force_degenerate_pmi(
+                build_data.multisynt_process_multiblimp(
+                    sub_entries, build_data.EXCLUDED_METRICS_PER_BENCHMARK.get(benchmark, set())
+                ),
+                config, shot,
+            )
             if agg:
                 partitions.append([None, benchmark, {m: v for m, (v, _, _) in agg.items()}])
         else:
@@ -81,6 +94,7 @@ def extract_checkpoint(ckpt_path, task_configs):
             search_dirs = []
             for src_dir, src_name, src_form in sources:
                 if not os.path.isdir(src_dir):
+                    search_dirs += build_data.multisynt_flat_variant_dirs(ckpt_path, src_dir, src_form)
                     continue
                 found = [(p, src_name, src_form)
                          for p in build_data.multisynt_partition_dirs(src_dir)]
@@ -98,7 +112,10 @@ def extract_checkpoint(ckpt_path, task_configs):
                 results_file = build_data.find_latest_results_json(path)
                 if results_file is None:
                     continue
-                metrics = build_data.multisynt_extract(results_file, benchmark, config, match_name)
+                metrics = build_data.force_degenerate_pmi(
+                    build_data.multisynt_extract(results_file, benchmark, config, match_name),
+                    config, shot,
+                )
                 if metrics:
                     prompt_id = os.path.basename(path)
                     partitions.append([form, f"{match_name}/{prompt_id}",
@@ -131,7 +148,7 @@ def extract_language(lang):
             tokens_b = build_data.multisynt_parse_checkpoint_name(ckpt_name)
             if tokens_b is None or tokens_b == "main":
                 continue
-            scores = extract_checkpoint(str(ckpt_path), task_configs)
+            scores = extract_checkpoint(str(ckpt_path), task_configs, shot=shot)
             if scores:
                 raw.setdefault(base_model, {}).setdefault(shot, {})[str(tokens_b)] = scores
     return raw

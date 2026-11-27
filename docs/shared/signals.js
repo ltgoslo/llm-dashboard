@@ -106,7 +106,9 @@ function scoredIdx(s) {
  *  its largest scored x) lies in [lo, hi] — the pipeline's _window. */
 function windowIdx(s, [lo, hi]) {
   const idx = scoredIdx(s);
+  if (!idx.length) return [];
   const budget = Math.max(...idx.map((i) => s.xs[i]));
+  if (!(budget > 0)) return [];
   return idx.filter((i) => {
     const share = s.xs[i] / budget;
     return share >= lo - 1e-9 && share <= hi + 1e-9;
@@ -114,13 +116,15 @@ function windowIdx(s, [lo, hi]) {
 }
 
 /** Monotonicity: Spearman(training tokens, score) of each model over all its
- *  checkpoints, averaged over the models. A model with fewer than two
- *  checkpoints or a constant score is left out; null when none remains. */
-export function monotonicity(series) {
+ *  checkpoints, averaged over the models. For lower-is-better metrics (e.g.
+ *  TER), scores are negated so improvement yields positive monotonicity. A
+ *  model with fewer than two checkpoints or a constant score is left out;
+ *  null when none remains. */
+export function monotonicity(series, { lowerIsBetter = false } = {}) {
   const rhos = [];
   for (const s of series) {
     const idx = windowIdx(s, MONOTONICITY_WINDOW);
-    const ys = idx.map((i) => s.ys[i]);
+    const ys = idx.map((i) => (lowerIsBetter ? -s.ys[i] : s.ys[i]));
     if (idx.length < 2 || new Set(ys).size < 2) continue;
     const r = spearman(idx.map((i) => s.xs[i]), ys);
     if (r != null && isFinite(r)) rhos.push(r);
@@ -131,21 +135,30 @@ export function monotonicity(series) {
 /** Ranking consistency: Kendall's τ-b between the models' ranking at
  *  adjacent checkpoint positions, averaged over the adjacent pairs in the
  *  later half of training — the scored checkpoints at ≥ 50 % of each
- *  model's own token budget. A pair needs two models present at both
- *  positions; a τ that is undefined (every pair tied) counts as 0, as in
- *  the pipeline. null without any pair. */
+ *  model's own token budget, aligned from the final checkpoint backwards so
+ *  a model missing an early checkpoint stays aligned with the rest. A pair
+ *  needs two models present at both positions; a τ that is undefined (every
+ *  pair tied) counts as 0, as in the pipeline. null without any pair. */
 export function rankingConsistency(series) {
-  const windows = series.map((s) => new Set(windowIdx(s, RANKING_CONSISTENCY_WINDOW)));
-  const idxs = [...new Set(windows.flatMap((w) => [...w]))].sort((a, b) => a - b);
+  // Map each model's window checkpoints to their 0-based offset from the end
+  // (0 = final checkpoint, 1 = second-to-last, …), then step chronologically.
+  const bySlot = series.map((s) => {
+    const win = windowIdx(s, RANKING_CONSISTENCY_WINDOW);
+    const map = new Map();
+    const last = win.length - 1;
+    win.forEach((idx, pos) => map.set(last - pos, s.ys[idx]));
+    return map;
+  });
+  const slots = [...new Set(bySlot.flatMap((m) => [...m.keys()]))].sort((a, b) => b - a);
   const taus = [];
-  for (let k = 0; k + 1 < idxs.length; k++) {
+  for (let k = 0; k + 1 < slots.length; k++) {
     const a = [], b = [];
-    series.forEach((s, m) => {
-      if (windows[m].has(idxs[k]) && windows[m].has(idxs[k + 1])) {
-        a.push(s.ys[idxs[k]]);
-        b.push(s.ys[idxs[k + 1]]);
+    for (const m of bySlot) {
+      if (m.has(slots[k]) && m.has(slots[k + 1])) {
+        a.push(m.get(slots[k]));
+        b.push(m.get(slots[k + 1]));
       }
-    });
+    }
     if (a.length < 2) continue;
     const tau = kendallTauB(a, b);
     taus.push(tau == null ? 0 : tau);
@@ -157,9 +170,10 @@ export function rankingConsistency(series) {
  *  (where a chance-level model would be plotted), divided by the noise at
  *  the end of training — the standard deviation of each model's scores over
  *  its last 5 scored checkpoints, averaged over the models that have at
- *  least two. null when no model has a final score or such a noise
- *  estimate, or when the scores are constant up to floating-point noise. */
-export function nonRandomness(series, baseline) {
+ *  least two. For lower-is-better metrics without a chance level (e.g. TER),
+ *  returns null. */
+export function nonRandomness(series, baseline, { lowerIsBetter = false, hasBaseline = true } = {}) {
+  if (lowerIsBetter && !hasBaseline) return null;
   const finals = [], sds = [];
   for (const s of series) {
     const idx = scoredIdx(s);
@@ -169,18 +183,19 @@ export function nonRandomness(series, baseline) {
     if (tail.length >= 2) sds.push(stdev(tail));
   }
   if (!finals.length || !sds.length) return null;
-  const best = Math.max(...finals);
+  const best = lowerIsBetter ? Math.min(...finals) : Math.max(...finals);
   const noise = mean(sds);
   if (noise <= 1e-12 * (Math.abs(best) + 1)) return null;
-  return (best - (baseline ?? 0)) / noise;
+  const diff = lowerIsBetter ? ((baseline ?? 0) - best) : (best - (baseline ?? 0));
+  return diff / noise;
 }
 
 /** All measures for the plotted series. */
-export function computeSignals(series, baseline) {
+export function computeSignals(series, baseline, opts = {}) {
   return {
-    monotonicity: monotonicity(series),
+    monotonicity: monotonicity(series, opts),
     rankingConsistency: rankingConsistency(series),
-    nonRandomness: nonRandomness(series, baseline),
+    nonRandomness: nonRandomness(series, baseline, opts),
     nModels: series.length,
   };
 }

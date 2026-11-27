@@ -90,6 +90,7 @@ function positionTooltip(tooltip, event) {
 /** Attach a hover tooltip to a DOM element. `contentFn` returns {title, body, footer, meta}. */
 export function attachTooltip(element, contentFn) {
   element.addEventListener("mouseenter", (e) => {
+    clearTimeout(tooltipTimeout);
     tooltipTimeout = setTimeout(() => {
       const c = contentFn();
       if (c) showTooltip(e, c.title, c.body, c.footer, c.meta);
@@ -449,7 +450,9 @@ export function populateMetricSelector(benchmarks) {
   if (state.currentMetric && metrics.has(state.currentMetric)) {
     select.value = state.currentMetric;
   } else {
-    state.currentMetric = metrics.has(defaultMetric) ? defaultMetric : mainMetric;
+    state.currentMetric = metrics.has(defaultMetric)
+      ? defaultMetric
+      : (metrics.has(mainMetric) ? mainMetric : (orderedBase[0] || mainMetric));
     select.value = state.currentMetric;
   }
   control.style.display = "";

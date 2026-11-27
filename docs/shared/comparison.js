@@ -118,32 +118,6 @@ function buildOrgImages(modelNames, xPositions, values = [], yRange = [0, 1]) {
   });
 }
 
-/** Plotly layout.images entries for scatter mode: one logo per model placed
- *  at its (size, score) point. xref:"x" on a log axis expects coordinates
- *  in log10 space (not raw data), so we convert here. yref:"paper" with
- *  score converted to a paper fraction keeps logos a consistent visual size
- *  regardless of how tight the y-range is. */
-function buildScatterOrgImages(modelDirs, xs, paperYs) {
-  return modelDirs.map((modelDir, i) => {
-    const org = state.DATA.model_organizations?.[modelDir];
-    const filename = org && ORG_LOGO[org];
-    if (!filename) return null;
-    const scale = (org && ORG_LOGO_SCALE[org]) || 1;
-    return {
-      source: `../shared/logos/${filename}`,
-      xref: "x", yref: "paper",
-      x: Math.log10(xs[i]), y: paperYs[i],
-      // Sized to fit inside the 32px scatter markers. sizex is in log10
-      // units (≈ 0.045 ≈ 2% of plot width on the 1–150B range); sizey is
-      // a paper-height fraction.
-      sizex: 0.045 * scale, sizey: 0.045 * scale,
-      xanchor: "center", yanchor: "middle",
-      sizing: "contain",
-      layer: "above",
-    };
-  }).filter(Boolean);
-}
-
 // Scatter glyphs: disk diameter in px (what the former fixed 1B–1T axis drew
 // on a full-width desktop chart) and the logo's share of it.
 const SCATTER_DISK_PX = 24.4;
@@ -509,8 +483,6 @@ function buildTaskAliasMaps() {
   taskAlias._toSel["custom"] = "__custom__";
   taskAlias._toAlias["__custom_macro__"] = "custom-macro";
   taskAlias._toSel["custom-macro"] = "__custom_macro__";
-  taskAlias._toAlias["__filtered__"] = "filtered";
-  taskAlias._toSel["filtered"] = "__filtered__";
 
   const cats = new Set(), evals = new Set();
   for (const info of Object.values(state.metricsSetup)) {
@@ -682,7 +654,7 @@ function setupUrlState() {
       default: "",
     },
     {
-      // The model whose details are open (renderChart drops one not in the chart).
+      // The model whose details are open.
       key: "model",
       get: () => (detailModel ? modelAlias._toAlias[detailModel] || detailModel : ""),
       set: (v) => {
@@ -808,6 +780,14 @@ function updateRangeSliderUI() {
   const pctMax = valueToPercent(currentSizeMax);
   thumbMin.style.left = pctMin + "%";
   thumbMax.style.left = pctMax + "%";
+  thumbMin.setAttribute("aria-valuemin", String(CFG.sizeRangeMin));
+  thumbMin.setAttribute("aria-valuemax", String(currentSizeMax));
+  thumbMin.setAttribute("aria-valuenow", String(currentSizeMin));
+  thumbMin.setAttribute("aria-valuetext", currentSizeMin + "B");
+  thumbMax.setAttribute("aria-valuemin", String(currentSizeMin));
+  thumbMax.setAttribute("aria-valuemax", String(CFG.sizeRangeMax));
+  thumbMax.setAttribute("aria-valuenow", String(currentSizeMax));
+  thumbMax.setAttribute("aria-valuetext", currentSizeMax + "B");
   fill.style.left = pctMin + "%";
   fill.style.right = (100 - pctMax) + "%";
   // Labels are absolutely positioned inside the slider, centred on each
@@ -823,6 +803,10 @@ function initRangeSlider() {
   if (!slider) return;
   const thumbMin = document.getElementById("thumb-min");
   const thumbMax = document.getElementById("thumb-max");
+  thumbMin.setAttribute("role", "slider");
+  thumbMin.setAttribute("aria-label", "Minimum model size");
+  thumbMax.setAttribute("role", "slider");
+  thumbMax.setAttribute("aria-label", "Maximum model size");
 
   updateRangeSliderUI();
 
@@ -854,6 +838,7 @@ function initRangeSlider() {
     urlState.save();
   }
   function onStart(thumb, e) {
+    if (!sizeFilterOn) return;
     e.preventDefault();
     activeThumb = thumb;
     thumb.classList.add("active");
@@ -862,12 +847,37 @@ function initRangeSlider() {
     document.addEventListener("touchmove", onMove, { passive: false });
     document.addEventListener("touchend", onEnd);
   }
+  function onThumbKeydown(thumb, e) {
+    if (!sizeFilterOn) return;
+    const isMin = thumb === thumbMin;
+    const cur = isMin ? currentSizeMin : currentSizeMax;
+    const lo = isMin ? CFG.sizeRangeMin : currentSizeMin;
+    const hi = isMin ? currentSizeMax : CFG.sizeRangeMax;
+    const bigStep = Math.max(5, Math.round(cur * 0.25));
+    let next = null;
+    if (e.key === "ArrowLeft" || e.key === "ArrowDown") next = cur - (e.shiftKey ? bigStep : 1);
+    else if (e.key === "ArrowRight" || e.key === "ArrowUp") next = cur + (e.shiftKey ? bigStep : 1);
+    else if (e.key === "PageDown") next = cur - bigStep;
+    else if (e.key === "PageUp") next = cur + bigStep;
+    else if (e.key === "Home") next = lo;
+    else if (e.key === "End") next = hi;
+    else return;
+    e.preventDefault();
+    next = Math.max(lo, Math.min(hi, next));
+    if (next === cur) return;
+    if (isMin) currentSizeMin = next;
+    else currentSizeMax = next;
+    updateRangeSliderUI();
+    renderChart();
+  }
   thumbMin.addEventListener("mousedown", (e) => onStart(thumbMin, e));
   thumbMin.addEventListener("touchstart", (e) => onStart(thumbMin, e), { passive: false });
+  thumbMin.addEventListener("keydown", (e) => onThumbKeydown(thumbMin, e));
   thumbMax.addEventListener("mousedown", (e) => onStart(thumbMax, e));
   thumbMax.addEventListener("touchstart", (e) => onStart(thumbMax, e), { passive: false });
+  thumbMax.addEventListener("keydown", (e) => onThumbKeydown(thumbMax, e));
   slider.addEventListener("mousedown", (e) => {
-    if (e.target === thumbMin || e.target === thumbMax) return;
+    if (!sizeFilterOn || e.target === thumbMin || e.target === thumbMax) return;
     const pct = getPercentFromEvent(e);
     const val = percentToValue(pct);
     // Move the thumb nearest on the (logarithmic) track, not the one nearest
@@ -1383,8 +1393,8 @@ function onChartHover(data) {
   // up by hiDist (not always symmetric).
   const ci = obj?.ci;
   let interval = "";
-  if (ci && ci.loDist != null && ci.hiDist != null) {
-    const lo = Number(value) - ci.loDist, hi = Number(value) + ci.hiDist;
+  if (ci && (ci.loDist > 0 || ci.hiDist > 0)) {
+    const lo = Number(value) - (ci.loDist ?? 0), hi = Number(value) + (ci.hiDist ?? 0);
     interval = ` (95% CI ${lo.toFixed(fmt)}${lo < 0 ? " to " : "–"}${hi.toFixed(fmt)})`;
   }
   const score = (isAggregateSelection(state.currentTaskSelection) ? "Average: " : "Score: ")
@@ -1589,6 +1599,7 @@ function bindModelDetailClicks(chartEl) {
   chartEl._drawnClicks = true;
   let press = null;
   chartEl.addEventListener("pointerdown", (e) => {
+    if (e.target.closest?.(".modebar")) { press = null; return; }
     press = e.pointerType === "mouse" && e.button === 0 ? { x: e.clientX, y: e.clientY } : null;
   }, true);
   // (On the document: the release lands on Plotly's cover over the page.)
@@ -2471,7 +2482,7 @@ function judgedTaskDetailData(m, task) {
       headline: {
         value: text(own ? norm(own[0]) : null),
         // (The 95% interval's half-width: the mean ± it.)
-        margin: own ? text(norm(Z95 * own[1])) : "",
+        margin: own ? text(normCI({ loDist: Z95 * own[1], hiDist: Z95 * own[1] }, task, undefined, null)?.hiDist) : "",
       },
       grades: mi >= 0 && file.points?.[mi] ? { counts: file.points[mi] } : null,
       note: file ? "" : "The task's examples and scores could not be loaded.",
@@ -2797,7 +2808,7 @@ function bindNarrowScreenListeners() {
     if (x >= fl._size.l || y < 0 || y > fl._size.h) return;
     const i = Math.round(fl.yaxis.p2l(y));
     if (!trace.customdata?.[i]) return;
-    onChartHover({ points: [{ customdata: trace.customdata[i], x: trace.x[i], y: i }], event: e });
+    onChartHover({ points: [{ customdata: trace.customdata[i], x: trace.x[i], y: i, data: trace }], event: e });
     openFromChart(trace.customdata[i].modelDir);
   });
 }
@@ -3421,7 +3432,6 @@ function getChartTitleText() {
   if (sel === "__all_macro__" || sel === "__all__") {
     return prefix + " across all NorEval tasks" + tail;
   }
-  if (sel === "__filtered__") return prefix + " across signal-filtered tasks" + tail;
   if (sel === "__custom__" || sel === "__custom_macro__") return prefix + " across " + state.checkedTasks.size + " selected tasks" + tail;
   if (sel.startsWith("__cat__")) return prefix + " across " + sel.slice(7) + " tasks" + tail;
   if (sel.startsWith("__eval__")) return prefix + " across " + sel.slice(8) + " tasks" + tail;
@@ -3432,18 +3442,6 @@ function getChartTitleText() {
   return "";
 }
 
-function getSubtaskDescription(benchmark, metric) {
-  if (!metric || metric.indexOf(": ") === -1) return null;
-  const info = state.metricsSetup[benchmark];
-  if (!info || !info.subtasks) return null;
-  const base = getBaseMetric(metric);
-  const label = metric.slice(base.length + 2);
-  for (const st of Object.values(info.subtasks)) {
-    if (st.pretty_name === label) return st.description || null;
-  }
-  return null;
-}
-
 /** Build the hover description shown when the user hovers the chart title.
  *  Returns { body, footer }. Body is plain text; footer is an optional URL. */
 function getChartTitleDescription() {
@@ -3452,7 +3450,7 @@ function getChartTitleDescription() {
     return { body: getAggregateDescription(), footer: "" };
   }
   if (state.metricsSetup[sel]) {
-    return taskTitleDescription(sel, getSubtaskDescription);
+    return taskTitleDescription(sel);
   }
   return { body: "", footer: "" };
 }

@@ -34,8 +34,8 @@ import {
   getScore, getCombinedCI, scaleCIDistances, applyNorm,
   aggregateScores, isAggregateSelection, isMacroSelection, getAggregatedTasks,
   getEffectiveMetric, formatTitleWithShot, capitalize, taskTitleDescription,
-  wantCI, normNeedsAllValues, scoreDecimals, isRawScaleMetric, taskRandomBaseline, hasRandomBaseline,
-  taskBaseMetric,
+  wantCI, normNeedsAllValues, scoreDecimals, isRawScaleMetric, isLowerIsBetter,
+  taskRandomBaseline, hasRandomBaseline, taskBaseMetric,
 } from "./core.js";
 import {
   getPlotlyLayout, plotChart,
@@ -446,7 +446,7 @@ function makeHoverHandler(config) {
       ? pt.data.name
       : config.hoverXFormat
         ? config.hoverXFormat(pt.x, pt.data.name)
-        : `${pt.data.name || ""} — ${pt.x}${config.xAxisLabel ? " " + config.xAxisLabel.replace(/^\w/, "") : ""}`;
+        : `${pt.data.name || ""} — ${pt.x}${config.xAxisLabel ? " " + config.xAxisLabel : ""}`;
 
     showTooltip(data.event, title, body, "", "");
   };
@@ -612,7 +612,12 @@ function renderSingleProgress(config, benchmark) {
       : [0, computeYMax(allYVals)];
   const layout = progressLayout(config, trajectories, yRange, trajectories.length > 1);
   plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), onProgressUnhover);
-  if (config.onSeries) config.onSeries(series, baseline ?? 0);
+  if (config.onSeries) {
+    config.onSeries(series, baseline ?? 0, {
+      lowerIsBetter: isLowerIsBetter(metric),
+      hasBaseline: hasRandomBaseline(metric),
+    });
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -641,9 +646,9 @@ function getChartTitleText(config) {
   if (sel === "__custom__" || sel === "__custom_macro__") return lead + avg + " across " + n + " selected " + type + "tasks (" + shot + ")";
   if (sel.startsWith("__cat__")) return lead + avg + " across " + sel.slice(7) + " " + type + "tasks (" + shot + ")";
   if (sel.startsWith("__eval__")) return lead + avg + " across " + sel.slice(8) + " tasks (" + shot + ")";
-  if (sel === "__lang__nob") return lead + avg + " across Bokmål tasks (" + shot + ")";
-  if (sel === "__lang__nno") return lead + avg + " across Nynorsk tasks (" + shot + ")";
-  if (sel === "__lang__sme") return lead + avg + " across Northern Sámi tasks (" + shot + ")";
+  if (sel === "__lang__nob") return lead + avg + " across Bokmål " + type + "tasks (" + shot + ")";
+  if (sel === "__lang__nno") return lead + avg + " across Nynorsk " + type + "tasks (" + shot + ")";
+  if (sel === "__lang__sme") return lead + avg + " across Northern Sámi " + type + "tasks (" + shot + ")";
   if (state.metricsSetup[sel]) return lead + formatTitleWithShot(defaultTaskDisplayName(sel), shot);
   return lead.replace(/ — $/, "");
 }
@@ -683,6 +688,9 @@ function getProgressAggregateDescription() {
   else if (sel === "__custom__" || sel === "__custom_macro__") scope = count + " selected " + type + "tasks" + macroNote;
   else if (sel.startsWith("__cat__")) scope = count + " " + type + "tasks in the \"" + sel.slice(7) + "\" category";
   else if (sel.startsWith("__eval__")) scope = "all " + count + " " + sel.slice(8) + " tasks";
+  else if (sel === "__lang__nob") scope = count + " Bokmål " + type + "tasks";
+  else if (sel === "__lang__nno") scope = count + " Nynorsk " + type + "tasks";
+  else if (sel === "__lang__sme") scope = count + " Northern Sámi " + type + "tasks";
 
   const avgDesc = macro
     ? "Scores are first averaged within each task category, then averaged across categories. This gives equal weight to each category regardless of how many tasks it contains. "

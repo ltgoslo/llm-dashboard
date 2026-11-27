@@ -245,7 +245,7 @@ NORPRELUDE_REFERENCE_COLOR_MAP = {
     "normistral-11b-long": "#111827",      # near-black, dashed
 }
 
-# NorOLMo ablation display names and colors.
+# NorOLMo ablation display names.
 ABLATION_NAME_MAP = {
     "stage2-ablation-no-len-ext-stage1-data": "pretraining data, 1→0 decay",
     "stage2-no-len-ext-stage1-data-half-decay": "pretraining data, 1→½ decay",
@@ -255,18 +255,6 @@ ABLATION_NAME_MAP = {
     "stage3-no-rope-scaling": "midtraining data, 1→0 decay",
     "stage3-rope-scaling": "midtraining data, RoPE scaling, 1→0 decay",
     "stage3-mainline": "midtraining data, RoPE scaling, ½→0 decay",
-}
-# Note: the norolmo frontend currently uses its own RUN_COLOR map
-# (docs/norolmo/app.js) and ignores these colors.
-ABLATION_COLOR_MAP = {
-    "stage2-ablation-no-len-ext-stage1-data": "#e63946",        # red
-    "stage2-no-len-ext-stage1-data-half-decay": "#c70eff",      # magenta
-    "stage2-no-len-ext-stage2-data-half-decay": "#2ca02c",      # green
-    "stage2-newmix": "#9333ea",                                 # violet
-    "stage3-newmix": "#9333ea",                                 # violet
-    "stage3-no-rope-scaling": "#ff7f0e",                        # orange
-    "stage3-rope-scaling": "#d62728",                           # dark red
-    "stage3-mainline": "#5acc2d",                               # light green
 }
 
 # ─────────────────────────────────────────────────────────────
@@ -299,10 +287,80 @@ def find_latest_results_json(directory):
 WILSON_Z = 1.959963984540054
 WILSON_Z2 = WILSON_Z * WILSON_Z
 
-# Metric names treated as Bernoulli proportions for Wilson CI purposes.
+# Metric names treated as Bernoulli proportions for Wilson / Clopper–Pearson CIs.
 # Wilson is computed from (p, n) directly, overriding any harness-supplied
 # bootstrap SE (which is essentially Wald and breaks down near p=0 / p=1).
-PROPORTION_METRIC_NAMES = {"acc", "acc_norm", "em_first", "em"}
+PROPORTION_METRIC_NAMES = {
+    "acc", "acc_norm", "acc_mutual_info",
+    "em_first", "em", "exact", "exact_match", "is_included",
+    "bleu_acc", "rouge1_acc", "rouge2_acc", "rougeL_acc",
+}
+
+# Exponentiated mean log-likelihood metrics: per-prompt CIs are computed in
+# log-space and exponentiated so probability bounds never dip below 0 or > 1.
+LOG_PROB_METRIC_NAMES = {"likelihood_correct", "likelihood_correct_norm"}
+
+# Per-metric native scale (mirrors docs/shared/core.js METRIC_SCALES).
+# Needed because a task with metric_scale="percent" (e.g. nortruthfulqa_gen or
+# norsumm) can also report [0, 1] metrics like bleu_acc or bertscore_f1_max.
+METRIC_SCALES = {
+    "acc": "unit", "acc_norm": "unit", "acc_mutual_info": "unit",
+    "prob_correct": "unit", "prob_correct_norm": "unit", "prob_correct_mutual_info": "unit",
+    "likelihood_correct": "unit", "likelihood_correct_norm": "unit",
+    "f1": "unit", "f1_norm": "unit", "f1_mutual_info": "unit",
+    "em": "unit", "em_first": "unit", "exact": "unit", "exact_match": "unit",
+    "fscore": "unit", "is_included": "unit",
+    "bleu_acc": "unit", "rouge1_acc": "unit", "rouge2_acc": "unit", "rougeL_acc": "unit",
+    "rouge1": "unit",
+    "bertscore_f1_max": "unit", "bertscore_f1_avg": "unit",
+    "errant": "unit", "errant_f05": "unit",
+    "mcc": "unit",
+    "bleu": "percent", "bleu_max": "percent", "bleu_avg": "percent",
+    "chrf": "percent", "ter": "percent",
+    "rougeL_max": "percent", "rougeL_avg": "percent",
+    "rouge1_max": "percent", "rouge2_max": "percent",
+    "norm_loglikelihood_corr": "raw",
+    "judge": "raw",
+}
+
+
+def metric_scale_for(metric_name, fallback_scale="unit"):
+    """Native display scale ('unit', 'percent', or 'raw') for `metric_name`."""
+    base = metric_name.split(": ", 1)[0]
+    return METRIC_SCALES.get(base, fallback_scale)
+
+
+def metric_bounds(metric_name, fallback_scale="unit"):
+    """Valid (lo, hi) domain bounds for `metric_name` (None = unbounded)."""
+    base = metric_name.split(": ", 1)[0]
+    if base == "mcc":
+        return -1.0, 1.0
+    if base == "norm_loglikelihood_corr":
+        return None, 0.0
+    if base == "ter":
+        return 0.0, None
+    if base == "judge":
+        return 0.0, 5.0
+    scale = metric_scale_for(metric_name, fallback_scale)
+    if scale == "percent":
+        return 0.0, 100.0
+    if scale == "unit":
+        return 0.0, 1.0
+    return None, None
+
+
+def clamp_ci(lo, hi, bounds):
+    """Clamp a (lo, hi) CI pair into valid domain `bounds`."""
+    if lo is None or hi is None:
+        return lo, hi
+    b_lo, b_hi = bounds
+    if b_lo is not None:
+        lo = max(b_lo, lo)
+        hi = max(b_lo, hi)
+    if b_hi is not None:
+        lo = min(b_hi, lo)
+        hi = min(b_hi, hi)
+    return lo, hi
 
 
 def wilson_se(value, n_samples, metric_scale):
@@ -331,17 +389,20 @@ def resolve_se(metric_name, value, harness_se, n_samples, metric_scale):
 
     Proportion-like metrics → Wilson, regardless of what the harness supplied.
     Other metrics → trust the harness bootstrap SE when present.
-    Otherwise → Wilson approximation as a fallback (sloppy for non-proportions
-    like F1 / ERRANT-F0.5, but the only thing we can produce without per-item
-    data; see the dashboard 'About' section)."""
+    Otherwise → Wilson approximation as a fallback for bounded non-raw metrics
+    (sloppy for non-proportions like F1 / ERRANT-F0.5, but the only thing we
+    can produce without per-item data; see the dashboard 'About' section)."""
     base = metric_name.split(": ", 1)[0]  # strip subtask suffix if any
+    eff_scale = metric_scale_for(metric_name, metric_scale)
     if base in PROPORTION_METRIC_NAMES:
-        wse = wilson_se(value, n_samples, metric_scale)
+        wse = wilson_se(value, n_samples, eff_scale)
         if wse is not None:
             return wse
     if isinstance(harness_se, (int, float)) and math.isfinite(harness_se):
         return harness_se
-    return wilson_se(value, n_samples, metric_scale)
+    if eff_scale == "raw" or base.startswith("loglikelihood_"):
+        return None
+    return wilson_se(value, n_samples, eff_scale)
 
 
 # ─────────────────────────────────────────────────────────────
@@ -356,8 +417,9 @@ def resolve_se(metric_name, value, harness_se, n_samples, metric_scale):
 # For `max` we use Bonferroni-corrected one-sided bounds:
 #     L = max_i ℓ_i(α/(2k)),    U = max_i u_i(α/2)
 # Per-prompt bounds ℓ_i, u_i use Clopper–Pearson exact binomial for proportion-
-# like metrics and the normal approximation with the harness/Wilson SE
-# otherwise. By union bound, P(L > θ_k) ≤ α/2, and the i*-argument gives
+# like metrics, exponentiated log-space bounds for `likelihood_correct*`, and
+# the normal approximation with the harness/Wilson SE otherwise (clamped to the
+# metric's domain). By union bound, P(L > θ_k) ≤ α/2, and the i*-argument gives
 # P(U < θ_k) ≤ α/2 with no correction on the upper side. CIs are intentionally
 # asymmetric — wider below the point estimate than above.
 #
@@ -372,14 +434,7 @@ def resolve_se(metric_name, value, harness_se, n_samples, metric_scale):
 # the true joint distribution tighter than the Bonferroni bound assumes.
 
 ALPHA = 0.05  # 95% CI
-Z_LO_BONF_K = {}    # cache: k -> z_{1 - α/(2k)}
 Z_HI = _norm_dist.ppf(1 - ALPHA / 2)
-
-
-def _z_lo_bonferroni(k):
-    if k not in Z_LO_BONF_K:
-        Z_LO_BONF_K[k] = _norm_dist.ppf(1 - ALPHA / (2 * k))
-    return Z_LO_BONF_K[k]
 
 
 def _clopper_pearson(c, n, alpha_lo, alpha_hi):
@@ -389,12 +444,14 @@ def _clopper_pearson(c, n, alpha_lo, alpha_hi):
     return lo, hi
 
 
-def _per_prompt_ci(value, se, n, scale, is_proportion, alpha_lo, alpha_hi):
+def _per_prompt_ci(value, se, n, scale, is_proportion, alpha_lo, alpha_hi,
+                   is_log_prob=False, bounds=(None, None)):
     """Per-prompt (lo, hi) for one prompt's μ̂.
 
-    Uses Clopper–Pearson when (proportion-like + n known), otherwise normal
-    approximation with whatever sampling SE we have. Returns values on the
-    original display scale (so percent stays percent)."""
+    Uses Clopper–Pearson when (proportion-like + n known), exponentiated
+    log-space bounds for `likelihood_correct*`, and otherwise the normal
+    approximation with whatever sampling SE we have (clamped to `bounds`).
+    Returns values on the original display scale (so percent stays percent)."""
     if is_proportion and n and n >= 1:
         ceil_ = 100.0 if scale == "percent" else 1.0
         p = max(0.0, min(1.0, value / ceil_))
@@ -404,10 +461,19 @@ def _per_prompt_ci(value, se, n, scale, is_proportion, alpha_lo, alpha_hi):
     z_lo = _norm_dist.ppf(1 - alpha_lo)
     z_hi = _norm_dist.ppf(1 - alpha_hi)
     se_use = se if (isinstance(se, (int, float)) and math.isfinite(se)) else 0.0
-    return value - z_lo * se_use, value + z_hi * se_use
+    if is_log_prob:
+        if value <= 0.0 or se_use <= 0.0:
+            return clamp_ci(value, value, bounds)
+        # Delta-method SE stored in `se` is value * se_log; recover se_log and
+        # exponentiate the log-space CI [log(v) - z_lo·se_log, log(v) + z_hi·se_log].
+        se_log = se_use / value
+        lo = value * math.exp(-min(700.0, z_lo * se_log))
+        hi = value * math.exp(min(700.0, z_hi * se_log))
+        return clamp_ci(lo, hi, bounds)
+    return clamp_ci(value - z_lo * se_use, value + z_hi * se_use, bounds)
 
 
-def bonferroni_max_ci(triples, scale, is_proportion):
+def bonferroni_max_ci(triples, scale, is_proportion, is_log_prob=False, bounds=(None, None)):
     """95% CI for max_{i≤k} μ_i via Bonferroni on the lower bound only.
 
     triples: list of (value, se, n). Returns (lo, hi)."""
@@ -418,12 +484,15 @@ def bonferroni_max_ci(triples, scale, is_proportion):
     alpha_hi = ALPHA / 2         # no correction needed on upper
     los, his = [], []
     for v, se, n in triples:
-        lo, hi = _per_prompt_ci(v, se, n, scale, is_proportion, alpha_lo, alpha_hi)
+        lo, hi = _per_prompt_ci(
+            v, se, n, scale, is_proportion, alpha_lo, alpha_hi,
+            is_log_prob=is_log_prob, bounds=bounds,
+        )
         los.append(lo); his.append(hi)
     return max(los), max(his)
 
 
-def bonferroni_min_ci(triples, scale, is_proportion):
+def bonferroni_min_ci(triples, scale, is_proportion, is_log_prob=False, bounds=(None, None)):
     """95% CI for min_{i≤k} μ_i — mirror of max."""
     k = len(triples)
     if k == 0:
@@ -432,22 +501,27 @@ def bonferroni_min_ci(triples, scale, is_proportion):
     alpha_hi = ALPHA / (2 * k)
     los, his = [], []
     for v, se, n in triples:
-        lo, hi = _per_prompt_ci(v, se, n, scale, is_proportion, alpha_lo, alpha_hi)
+        lo, hi = _per_prompt_ci(
+            v, se, n, scale, is_proportion, alpha_lo, alpha_hi,
+            is_log_prob=is_log_prob, bounds=bounds,
+        )
         los.append(lo); his.append(hi)
     return min(los), min(his)
 
 
-def sampling_ci(value, se, n, scale, is_proportion):
+def sampling_ci(value, se, n, scale, is_proportion, is_log_prob=False, bounds=(None, None)):
     """Plain 95% CI for one prompt's μ̂ (median / first / single-prompt cases).
 
     No Bonferroni — we're not selecting from k."""
-    return _per_prompt_ci(value, se, n, scale, is_proportion, ALPHA / 2, ALPHA / 2)
+    return _per_prompt_ci(
+        value, se, n, scale, is_proportion, ALPHA / 2, ALPHA / 2,
+        is_log_prob=is_log_prob, bounds=bounds,
+    )
 
 
-def welch_mean_ci(triples, scale, is_proportion):
+def welch_mean_ci(triples, scale, is_proportion, bounds=(None, None)):
     """95% CI for the mean over the k prompts, via the Welch–Satterthwaite
-    combination of sampling SE and between-prompt SE. Symmetric — this is the
-    only aggregation where the prompt-template SE is conceptually right."""
+    combination of sampling SE and between-prompt SE, clamped to `bounds`."""
     k = len(triples)
     if k == 0:
         return None, None
@@ -479,7 +553,7 @@ def welch_mean_ci(triples, scale, is_proportion):
         g4 = (79 * z9 + 776 * z7 + 1482 * z5 - 1920 * z3 - 945 * z) / 92160
         t = z + g1 / d + g2 / d ** 2 + g3 / d ** 3 + g4 / d ** 4
     half = t * math.sqrt(Vs + Vp)
-    return mean_v - half, mean_v + half
+    return clamp_ci(mean_v - half, mean_v + half, bounds)
 
 
 def single_prompt_index(task_name):
@@ -517,6 +591,9 @@ def aggregate_prompt_variants(metric_values, metric_scale="unit", single_pick=No
 
         base = metric_name.split(": ", 1)[0]
         is_proportion = base in PROPORTION_METRIC_NAMES
+        is_log_prob = base in LOG_PROB_METRIC_NAMES
+        eff_scale = metric_scale_for(metric_name, metric_scale)
+        bounds = metric_bounds(metric_name, metric_scale)
         values = [v for v, _, _ in triples]
 
         entry = {
@@ -530,11 +607,15 @@ def aggregate_prompt_variants(metric_values, metric_scale="unit", single_pick=No
         entry["max_prompt_idx"] = max_idx
 
         # Confidence intervals — see helpers above for the methodology.
-        lo, hi = bonferroni_max_ci(triples, metric_scale, is_proportion)
+        lo, hi = bonferroni_max_ci(
+            triples, eff_scale, is_proportion, is_log_prob=is_log_prob, bounds=bounds
+        )
         entry["max_ci_lo"], entry["max_ci_hi"] = round(lo, 6), round(hi, 6)
-        lo, hi = bonferroni_min_ci(triples, metric_scale, is_proportion)
+        lo, hi = bonferroni_min_ci(
+            triples, eff_scale, is_proportion, is_log_prob=is_log_prob, bounds=bounds
+        )
         entry["min_ci_lo"], entry["min_ci_hi"] = round(lo, 6), round(hi, 6)
-        lo, hi = welch_mean_ci(triples, metric_scale, is_proportion)
+        lo, hi = welch_mean_ci(triples, eff_scale, is_proportion, bounds=bounds)
         entry["mean_ci_lo"], entry["mean_ci_hi"] = round(lo, 6), round(hi, 6)
 
         # Median: sampling CI of the prompt that achieved it, no Bonferroni.
@@ -549,18 +630,30 @@ def aggregate_prompt_variants(metric_values, metric_scale="unit", single_pick=No
         else:
             order = sorted(range(len(values)), key=lambda i: values[i])
             middle = order[len(values) // 2 - 1: len(values) // 2 + 1]
-        bounds = [sampling_ci(*triples[i], metric_scale, is_proportion) for i in middle]
-        lo = sum(b[0] for b in bounds) / len(bounds)
-        hi = sum(b[1] for b in bounds) / len(bounds)
+        ci_bounds = [
+            sampling_ci(
+                *triples[i], eff_scale, is_proportion,
+                is_log_prob=is_log_prob, bounds=bounds,
+            )
+            for i in middle
+        ]
+        lo = sum(b[0] for b in ci_bounds) / len(ci_bounds)
+        hi = sum(b[1] for b in ci_bounds) / len(ci_bounds)
         entry["median_ci_lo"], entry["median_ci_hi"] = round(lo, 6), round(hi, 6)
         # First: sampling CI of the first prompt, no Bonferroni.
         v_f, se_f, n_f = triples[0]
-        lo, hi = sampling_ci(v_f, se_f, n_f, metric_scale, is_proportion)
+        lo, hi = sampling_ci(
+            v_f, se_f, n_f, eff_scale, is_proportion,
+            is_log_prob=is_log_prob, bounds=bounds,
+        )
         entry["first_ci_lo"], entry["first_ci_hi"] = round(lo, 6), round(hi, 6)
         if single_pick is not None:
             idx = single_pick % len(values)
             v_s, se_s, n_s = triples[idx]
-            lo, hi = sampling_ci(v_s, se_s, n_s, metric_scale, is_proportion)
+            lo, hi = sampling_ci(
+                v_s, se_s, n_s, eff_scale, is_proportion,
+                is_log_prob=is_log_prob, bounds=bounds,
+            )
             entry["single"] = round(v_s, 6)
             entry["single_ci_lo"], entry["single_ci_hi"] = round(lo, 6), round(hi, 6)
             entry["single_prompt_idx"] = idx
@@ -832,8 +925,9 @@ def noreval_extract(results_json_path, benchmark_name, subtasks, metrics_setup_e
 
     zero_fill = ZERO_IF_MISSING_METRICS.get(benchmark_name)
     metric_values = {}  # metric_name -> [(value, stderr_or_None, n), ...]
+    prompt_re = re.compile(rf"^{re.escape(benchmark_name)}_p\d+$")
     for task_key, task_results in results.items():
-        if task_key == benchmark_name or task_key.startswith(f"{benchmark_name}_p"):
+        if task_key == benchmark_name or prompt_re.match(task_key):
             n_samples = get_n_samples(n_samples_dict, task_key)
             collect_prompt_metrics(
                 task_results, n_samples,
@@ -1054,9 +1148,10 @@ def build_norolmo_data(metrics_setup):
             else:
                 # Ablation checkpoint: NorOLMo-<ablation_name>-step-{N}
                 suffix = ckpt_dir[len("NorOLMo-"):]
-                ablation_name = suffix[: suffix.rfind("-step-")]
-                if not ablation_name:
+                step_idx = suffix.rfind("-step-")
+                if step_idx <= 0:
                     continue
+                ablation_name = suffix[:step_idx]
                 print(f"  Ablation {ablation_name}: step {step}")
                 target = ablations.setdefault(ablation_name, {})
             scores, disc = noreval_process_model_dir(str(ckpt_path), metrics_setup)
@@ -1068,7 +1163,6 @@ def build_norolmo_data(metrics_setup):
         n: ABLATION_NAME_MAP.get(n, n.replace("-", " ").title())
         for n in ablations
     }
-    ablation_colors = {n: ABLATION_COLOR_MAP.get(n, "") for n in ablations}
 
     nno, sme, nob_nno, shared = build_noreval_lang_lists(metrics_setup)
 
@@ -1081,7 +1175,6 @@ def build_norolmo_data(metrics_setup):
         "progress": progress,
         "ablations": ablations,
         "ablation_display_names": ablation_display_names,
-        "ablation_colors": ablation_colors,
     }
 
 
@@ -1132,8 +1225,12 @@ def multisynt_extract(results_json_path, benchmark_name, task_config_entry, matc
     """
     if match_name is None:
         match_name = benchmark_name
-    with open(results_json_path) as f:
-        data = json.load(f)
+    try:
+        with open(results_json_path) as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        print(f"  WARNING: corrupt or unreadable JSON, skipping: {results_json_path}")
+        return None
     results = data.get("results", {})
     n_samples_dict = data.get("n-samples", {})
     metric_scale = (
@@ -1144,8 +1241,9 @@ def multisynt_extract(results_json_path, benchmark_name, task_config_entry, matc
     )
 
     metrics = {}
+    prompt_re = re.compile(rf"^{re.escape(match_name)}_p\d+$")
     for task_key, task_results in results.items():
-        if not (task_key == match_name or task_key.startswith(f"{match_name}_p")):
+        if not (task_key == match_name or prompt_re.match(task_key)):
             continue
         metrics.update(extract_task_metrics(
             task_results, get_n_samples(n_samples_dict, task_key),
@@ -1201,8 +1299,12 @@ def multisynt_process_multiblimp(sub_entries, bench_exclusions):
         results_file = find_latest_results_json(sub_path)
         if results_file is None:
             continue
-        with open(results_file) as f:
-            data = json.load(f)
+        try:
+            with open(results_file) as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            print(f"  WARNING: corrupt or unreadable JSON, skipping: {results_file}")
+            continue
         entries.append((
             data.get("results", {}).get(key),
             data.get("n-samples", {}).get(key, {}).get("effective")
@@ -2310,10 +2412,10 @@ def build_instruct_data():
             }}}
         models[m] = scores
 
-    nno = sorted(t for t in tasks if "_nno" in t)
-    sme = sorted(t for t in tasks if "_sme" in t)
     nob_nno = sorted(t for t in tasks if re.fullmatch(r"translation_(nob_nno|nno_nob)", t))
     shared = sorted(t for t in tasks if t.startswith("slide"))
+    nno = sorted(t for t in tasks if "_nno" in t and t not in nob_nno and t not in shared)
+    sme = sorted(t for t in tasks if "_sme" in t)
     judge = run["judge"]
     data = {
         "metrics_setup": metrics_setup,

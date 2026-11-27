@@ -67,8 +67,9 @@ export const METRIC_SCALES = {
   mcc: "unit", is_included: "unit",
   bertscore_f1_max: "unit", bertscore_f1_avg: "unit",
   errant: "unit", errant_f05: "unit",
+  rouge1: "unit",
   bleu: "percent", bleu_max: "percent", bleu_avg: "percent",
-  chrf: "percent", ter: "percent", rouge1: "percent",
+  chrf: "percent", ter: "percent",
   rougeL_max: "percent", rougeL_avg: "percent",
   rouge1_max: "percent", rouge2_max: "percent",
   // "raw": shown on its native scale (no ×100), may be negative, and is
@@ -84,14 +85,22 @@ export function isRawScaleMetric(metric) {
   return METRIC_SCALES[getBaseMetric(metric)] === "raw";
 }
 
+// Base metrics where smaller values are better (e.g. Translation Edit Rate).
+const LOWER_IS_BETTER_METRICS = new Set(["ter"]);
+
+/** Whether smaller values are better for `metric`. */
+export function isLowerIsBetter(metric) {
+  return !!metric && LOWER_IS_BETTER_METRICS.has(getBaseMetric(metric));
+}
+
 // Base metrics without a chance level: a task's random baseline is defined
 // for its main metric (and its soft metric); the probability of generating
-// the correct answer text, like a raw log-likelihood, has none.
-const NO_BASELINE_METRICS = new Set(["likelihood_correct"]);
+// the correct answer text, like a raw log-likelihood or TER, has none.
+const NO_BASELINE_METRICS = new Set(["likelihood_correct", "ter"]);
 
 /** Whether the task's random baseline applies to `metric` — false for the
- *  raw-scale metrics and the probability of the correct answer, which are
- *  shown unnormalized under the random-baseline normalization. */
+ *  raw-scale metrics, TER, and the probability of the correct answer, which
+ *  are shown unnormalized under the random-baseline normalization. */
 export function hasRandomBaseline(metric) {
   if (!metric) return true;
   return !isRawScaleMetric(metric) && !NO_BASELINE_METRICS.has(llNormBase(getBaseMetric(metric)));
@@ -102,18 +111,26 @@ export const METRIC_DESCRIPTIONS = {
   acc_norm: "Accuracy after normalizing answer log-likelihoods by character length.",
   acc_mutual_info: "Accuracy after normalizing answer log-likelihoods by their unconditional (PMI) likelihood.",
   prob_correct: "Conditional probability of the correct answer: the probability mass on it after normalizing the answer likelihoods over the choices (soft accuracy).",
+  prob_correct_norm: "Conditional probability of the correct answer after normalizing answer log-likelihoods by character length.",
+  prob_correct_mutual_info: "Conditional probability of the correct answer after normalizing answer log-likelihoods by their unconditional (PMI) likelihood.",
   likelihood_correct: "Probability of the correct answer text: the exponentiated mean log-likelihood the model assigns to it, not normalized over the choices. Under the character-length normalization this is a per-character probability.",
+  likelihood_correct_norm: "Per-character probability of the correct answer text: the exponentiated character-length-normalized mean log-likelihood the model assigns to it.",
   f1: "Harmonic mean of precision and recall.",
+  f1_norm: "Macro-F1 after normalizing answer log-likelihoods by character length.",
+  f1_mutual_info: "Macro-F1 after normalizing answer log-likelihoods by their unconditional (PMI) likelihood.",
   em: "Proportion of predictions that exactly match the reference.",
   em_first: "Exact match accuracy of the first generated word against the correct completion word.",
   exact: "Proportion of predictions that exactly match the reference.",
   exact_match: "Proportion of predictions that exactly match the reference.",
+  is_included: "Fraction of examples where the reference answer appears in the generated text.",
   fscore: "Token-level overlap between predicted and reference text.",
   bleu: "Measures n-gram overlap between generated and reference text.",
   bleu_max: "Highest BLEU score across multiple reference texts.",
   bleu_avg: "Average BLEU score across multiple reference texts.",
   bleu_acc: "Fraction of examples where the generation is more similar (by BLEU) to correct answers than incorrect ones.",
   chrf: "Character-level F-score between generated and reference text.",
+  ter: "Translation Edit Rate: percentage of edits needed to match the reference translation (lower is better).",
+  rouge1: "Unigram (ROUGE-1) overlap between generated and reference text.",
   rougeL_max: "Longest common subsequence overlap with the best-matching reference.",
   rougeL_avg: "Average longest common subsequence overlap across references.",
   rougeL_acc: "Fraction of examples where the generation is more similar (by ROUGE-L) to correct answers than incorrect ones.",
@@ -121,6 +138,8 @@ export const METRIC_DESCRIPTIONS = {
   rouge1_acc: "Fraction of examples where the generation is more similar (by ROUGE-1) to correct answers than incorrect ones.",
   rouge2_max: "Bigram overlap with the best-matching reference.",
   rouge2_acc: "Fraction of examples where the generation is more similar (by ROUGE-2) to correct answers than incorrect ones.",
+  bertscore_f1_max: "Highest BERTScore F1 semantic similarity across multiple reference texts.",
+  bertscore_f1_avg: "Average BERTScore F1 semantic similarity across multiple reference texts.",
   errant: "Grammar error correction metric emphasizing precision (F0.5) over recall.",
   errant_f05: "Grammar error correction metric emphasizing precision (F0.5) over recall.",
   mcc: "Matthews correlation coefficient for classification.",
@@ -643,7 +662,7 @@ export function getMacroGroups(benchmarks) {
 
 /** Sum scores and squared CI distances over one benchmark set. */
 function accumulateScores(benchmarks, scoreFn) {
-  let sum = 0, count = 0, lo2 = 0, hi2 = 0;
+  let sum = 0, count = 0, lo2 = 0, hi2 = 0, hasCI = false;
   for (const bench of benchmarks) {
     const r = scoreFn(bench);
     if (r === undefined) continue;
@@ -651,10 +670,13 @@ function accumulateScores(benchmarks, scoreFn) {
     if (s === undefined) continue;
     sum += s; count++;
     const ci = (typeof r === "object" && r.ci) ? r.ci : null;
-    const lo = ci?.loDist ?? 0, hi = ci?.hiDist ?? 0;
-    lo2 += lo * lo; hi2 += hi * hi;
+    if (ci) {
+      hasCI = true;
+      const lo = ci.loDist ?? 0, hi = ci.hiDist ?? 0;
+      lo2 += lo * lo; hi2 += hi * hi;
+    }
   }
-  return { sum, count, lo2, hi2 };
+  return { sum, count, lo2, hi2, hasCI };
 }
 
 /** Compute an aggregate score over `benchmarks` using a per-benchmark scoreFn.
@@ -667,13 +689,16 @@ function accumulateScores(benchmarks, scoreFn) {
  *  for SEs, but applied to each side of the asymmetric interval. */
 export function aggregateScores(benchmarks, scoreFn, macro) {
   if (macro) {
-    let groupSum = 0, groupCount = 0, groupLo2 = 0, groupHi2 = 0;
+    let groupSum = 0, groupCount = 0, groupLo2 = 0, groupHi2 = 0, anyCI = false;
     for (const group of getMacroGroups(benchmarks)) {
-      const { sum, count, lo2, hi2 } = accumulateScores(group, scoreFn);
+      const { sum, count, lo2, hi2, hasCI } = accumulateScores(group, scoreFn);
       if (count > 0) {
         groupSum += sum / count;
-        groupLo2 += lo2 / (count * count);
-        groupHi2 += hi2 / (count * count);
+        if (hasCI) {
+          anyCI = true;
+          groupLo2 += lo2 / (count * count);
+          groupHi2 += hi2 / (count * count);
+        }
         groupCount++;
       }
     }
@@ -681,15 +706,15 @@ export function aggregateScores(benchmarks, scoreFn, macro) {
     return {
       score: groupSum / groupCount,
       count: groupCount,
-      ci: { loDist: Math.sqrt(groupLo2) / groupCount, hiDist: Math.sqrt(groupHi2) / groupCount },
+      ci: anyCI ? { loDist: Math.sqrt(groupLo2) / groupCount, hiDist: Math.sqrt(groupHi2) / groupCount } : undefined,
     };
   }
-  const { sum, count, lo2, hi2 } = accumulateScores(benchmarks, scoreFn);
+  const { sum, count, lo2, hi2, hasCI } = accumulateScores(benchmarks, scoreFn);
   if (count === 0) return null;
   return {
     score: sum / count,
     count,
-    ci: { loDist: Math.sqrt(lo2) / count, hiDist: Math.sqrt(hi2) / count },
+    ci: hasCI ? { loDist: Math.sqrt(lo2) / count, hiDist: Math.sqrt(hi2) / count } : undefined,
   };
 }
 
@@ -707,11 +732,26 @@ export function getEffectiveMetric(benchmark) {
   return state.currentMetric || taskBaseMetric(benchmark);
 }
 
+/** Look up a per-subtask description from metrics_setup[benchmark].subtasks
+ *  for a virtual "metric: Subtask" key. */
+export function getSubtaskDescription(benchmark, metric) {
+  if (!metric || metric.indexOf(": ") === -1) return null;
+  const info = state.metricsSetup[benchmark];
+  if (!info || !info.subtasks) return null;
+  const base = getBaseMetric(metric);
+  const label = metric.slice(base.length + 2);
+  for (const st of Object.values(info.subtasks)) {
+    if (st.pretty_name === label) return st.description || null;
+  }
+  return null;
+}
+
 /** Chart-title description for a single benchmark: the task description plus
  *  "Metric: <name>. <metric description>", and the task URL (as footer).
  *  `subtaskDescFn(bench, metric)` may supply a per-subtask description that
- *  overrides the base metric's. Returns { body, footer }. */
-export function taskTitleDescription(benchmark, subtaskDescFn) {
+ *  overrides the base metric's (defaults to getSubtaskDescription).
+ *  Returns { body, footer }. */
+export function taskTitleDescription(benchmark, subtaskDescFn = getSubtaskDescription) {
   const info = state.metricsSetup[benchmark];
   if (!info) return { body: "", footer: "" };
   const metric = getEffectiveMetric(benchmark);
