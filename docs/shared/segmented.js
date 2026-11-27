@@ -16,9 +16,24 @@ export function enhanceSegmentedControls({ root = document } = {}) {
 export function enhanceSegmentedControl(group) {
   if (group.dataset.segmented) return;
   group.dataset.segmented = "true";
+  if (!group.getAttribute("role")) group.setAttribute("role", "group");
+  if (!group.getAttribute("aria-label") && !group.getAttribute("aria-labelledby")) {
+    const lbl = group.closest(".control-group")?.querySelector(":scope > label");
+    if (lbl) {
+      if (!lbl.id) lbl.id = "seg-lbl-" + Math.random().toString(36).slice(2, 8);
+      group.setAttribute("aria-labelledby", lbl.id);
+    }
+  }
 
   const place = () => {
-    const active = group.querySelector(".active");
+    const buttons = group.querySelectorAll("button");
+    let active = null;
+    for (const b of buttons) {
+      const isAct = b.classList.contains("active");
+      if (isAct) active = b;
+      const pressed = String(isAct);
+      if (b.getAttribute("aria-pressed") !== pressed) b.setAttribute("aria-pressed", pressed);
+    }
     group.style.setProperty("--thumb-left", `${active ? active.offsetLeft : 0}px`);
     group.style.setProperty("--thumb-width", `${active ? active.offsetWidth : 0}px`);
   };

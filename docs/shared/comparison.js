@@ -34,7 +34,7 @@ import {
   PHONE_SCREEN, initModuleToggles, initChartJump, buildTaskPicker, syncTaskPicker, attachInfoCard,
   setGroupCheckbox, shortUrl,
 } from "./pickers.js";
-import { setBarPan, buttonFitsBeside, revealBar, refreshBarPan } from "./bar-pan.js";
+import { setBarPan, revealBar, refreshBarPan } from "./bar-pan.js";
 import { UrlState } from "./url-state.js";
 import { createModelDetail, DETAIL_DRAWER, detailMotion } from "./model-detail.js";
 import { createTaskDetail } from "./task-detail.js";
@@ -360,7 +360,12 @@ export async function initComparison(config) {
   } catch (err) {
     console.error("init failed:", err);
     const el = document.getElementById("chart");
-    if (el) el.innerHTML = "<pre style='color:red;padding:1rem;'>" + err.stack + "</pre>";
+    if (el) {
+      const pre = document.createElement("pre");
+      pre.style.cssText = "color:red;padding:1rem;white-space:pre-wrap;";
+      pre.textContent = err?.stack || String(err);
+      el.replaceChildren(pre);
+    }
     markAppReady();
   }
 }
@@ -2611,7 +2616,7 @@ function scatterXAxis(xs = []) {
     type: "log",
     range: [Math.log10(lo), Math.log10(hi)],
     automargin: false,
-    title: { text: "Model size (B parameters)", font: { size: 13, color: "#64748b" }, standoff: 12 },
+    title: { text: "Model size (B parameters)", font: { size: 13, color: "#57657a" }, standoff: 12 },
     showgrid: true, gridcolor: "#d8dce3",
     tickvals,
     ticktext: tickvals.map(formatModelSize),
@@ -2788,7 +2793,8 @@ function bindNarrowScreenListeners() {
     timer = setTimeout(() => {
       if (window.innerWidth === width) return;
       width = window.innerWidth;
-      if (useHorizontalBars() || barPanChanges() || barNamesChange() || drawerBeside()) renderChart();
+      if (useHorizontalBars() || barPanChanges() || barNamesChange() || drawerBeside()
+          || (sizeFilterOn && (width < 1340 || lastBarMarginL > BAR_MARGIN.l))) renderChart();
     }, 200);
   });
   // A touch closes the tooltip wherever it lands (a tap shows none:
@@ -2873,22 +2879,18 @@ function setChartExtraHeight(extra) {
   if (extra) el.style.height = el.clientHeight + extra + "px";
 }
 
-/** Whether the bars carry their names under them: not on a narrow page (a
- *  tablet, a window under about 1260px), whose side padding can't hold the
- *  first names — nor the pan buttons (bar-pan.js buttonFitsBeside). There
- *  the plot spans the column, as on a wide page, instead of leaving room
- *  for the names, and a bar's tooltip (a tap or hover) names it. `left`:
- *  the chart's left edge on the screen (with the drawer open, where it is
- *  without the drawer). */
-function showBarNames(chartEl, left = chartEl.getBoundingClientRect().left) {
-  return buttonFitsBeside(left + BAR_MARGIN.l);
+let lastBarMarginL = 105;
+
+/** Vertical bar charts always display model names — on medium viewports
+ *  (641–1259px) where side padding is tight, barView dynamically expands
+ *  margin.l so the leftmost rotated labels stay inside the viewport. */
+function showBarNames() {
+  return true;
 }
 
-/** Whether a resize crosses that width: the bars gain or lose their names. */
+/** Whether a resize changes name visibility (kept for compatibility). */
 function barNamesChange() {
-  const chart = document.getElementById("chart");
-  return !!chart && sizeFilterOn && !useHorizontalBars()
-    && showBarNames(chart, drawerBeside() ? closedChartFrame().left : undefined) !== barNamesShown;
+  return false;
 }
 
 /** The bars ordered by performance: highest value first (every metric of
@@ -2945,19 +2947,21 @@ function renderModelBars(modelNames, opts) {
   // drawer (bar-pan.js pans to the bars it covers); one whose bars all fit
   // ends at the drawer's edge, panning to those it would cover.
   const closed = drawerBeside() ? closedChartFrame() : null;
-  barNamesShown = chartEl ? showBarNames(chartEl, closed?.left) : true;
+  barNamesShown = showBarNames();
+  const chartLeft = closed ? closed.left : (chartEl?.getBoundingClientRect().left ?? 0);
   // The y-axis's ticks, as Plotly would place them on the plot's height
   // (which stays the stylesheet's chart height less the default margins,
   // whatever the names need: setChartExtraHeight), and their column.
   setChartExtraHeight(0);
   const yTicks = barYTicks(yRange, (chartEl?.clientHeight || 500) - BAR_MARGIN.t - BAR_MARGIN.b);
   barYLabelPx = Math.ceil(Math.max(0, ...measureLabels(yTicks.map((tk) => tk.text), Y_TICK_FONT.size, Y_TICK_FONT.weight))) + Y_LABEL_GAP_PX;
-  const asClosed = closed ? barView(labels, closed.width, barNamesShown, barYLabelPx) : null;
+  const asClosed = closed ? barView(labels, closed.width, barNamesShown, barYLabelPx, null, chartLeft) : null;
   if (closed) setChartCut(asClosed.panning ? 0 : chartCovered());
   const cut = closed ? chartCut() > 0 : false;
   const chartWidth = chartEl?.clientWidth || 1200;
-  const view = barView(labels, chartWidth, barNamesShown, barYLabelPx, cut ? asClosed.slotPx : null);
+  const view = barView(labels, chartWidth, barNamesShown, barYLabelPx, cut ? asClosed.slotPx : null, chartLeft, cut ? asClosed.margin.l : null);
   const { tickAngle, labelShift, margin, lead } = view;
+  lastBarMarginL = margin.l;
   setChartExtraHeight(margin.b - BAR_MARGIN.b);
   // (At the start, barViewStart stays -Infinity: the start of this layout,
   // whose lead may differ from the last one's.)
@@ -3065,54 +3069,77 @@ function barYTicks([lo, hi], lengthPx) {
   return ticks;
 }
 
+/** Left overhang (px past the plot's left edge) of the bar labels. */
+function barLeftOverhang(labels, angleDeg, slotPx, lead, shift) {
+  const rad = Math.abs(angleDeg) * Math.PI / 180;
+  const lineHeight = TICK_FONT_SIZE * 1.2;
+  const widths = measureLabels(labels);
+  return Math.max(0, ...widths.map((w, i) => {
+    const reach = rad === 0 ? w / 2 : w * Math.cos(rad) + (lineHeight / 2) * Math.sin(rad);
+    return reach - (lead + 0.5 + i) * slotPx - shift;
+  }));
+}
+
 /** The bars' geometry: all of them across the plot when each gets at least
- *  BAR_SLOT_MIN_PX (as before); else as many as fit at about BAR_SLOT_PX,
- *  plus a peek of the next, and the chart pans (bar-pan.js; its ‹ › buttons
- *  sit outside the plot, or on top of its edges). The y-axis's numbers take
- *  the first `numbersPx` of the plot, then 0.1 slot, then the first bar;
- *  panned, they go with it. Returns {panning, visible (slots in view, the
- *  peek included), slotPx, lead (the slots before the first bar's: the
- *  numbers' column and the 0.1), tickAngle, labelShift, margin}. The plot
- *  starts at the page column's edge, under the title, whatever the names:
- *  the first ones hang into the page's side padding (one too long even for
- *  that is cut at the window's edge), and the bottom margin fits their
- *  drop. A panning plot also reaches the column's right edge. Without
- *  `names` (showBarNames) the plot needs little room below. */
-function barView(labels, chartWidth, names, numbersPx, fixedSlotPx = null) {
-  if (fixedSlotPx) return fixedBarView(labels, chartWidth, names, numbersPx, fixedSlotPx);
-  const fitWidth = chartWidth - BAR_MARGIN.l - BAR_MARGIN.r - numbersPx;
-  const panning = labels.length * BAR_SLOT_MIN_PX > fitWidth;
-  const r = panning ? 0 : BAR_MARGIN.r;
-  let slotPx, visible;
-  if (panning) {
-    // From the start: the numbers, 0.1 slot, as many bars as fit at about
-    // BAR_SLOT_PX, and BAR_PEEK of the next.
-    const room = chartWidth - BAR_MARGIN.l - numbersPx;
-    slotPx = room / (Math.max(4, Math.floor(room / BAR_SLOT_PX)) + 0.1 + BAR_PEEK);
-    visible = (chartWidth - BAR_MARGIN.l) / slotPx;
-  } else {
-    slotPx = fitWidth / (labels.length + 0.1);
-    visible = labels.length;
+ *  BAR_SLOT_MIN_PX; else as many as fit at about BAR_SLOT_PX, plus a peek
+ *  of the next, and the chart pans. On medium viewports where `#chart`'s
+ *  left edge sits near or left of the viewport edge, `margin.l` expands
+ *  dynamically so rotated labels on the first bars stay inside the screen. */
+function barView(labels, chartWidth, names, numbersPx, fixedSlotPx = null, chartLeft = null, fixedMarginL = null) {
+  if (fixedSlotPx) return fixedBarView(labels, chartWidth, names, numbersPx, fixedSlotPx, fixedMarginL ?? BAR_MARGIN.l);
+  const compute = (marginL, minAngle = 0) => {
+    const fitWidth = Math.max(120, chartWidth - marginL - BAR_MARGIN.r - numbersPx);
+    const panning = labels.length * BAR_SLOT_MIN_PX > fitWidth;
+    const r = panning ? 0 : BAR_MARGIN.r;
+    let slotPx, visible;
+    if (panning) {
+      const room = Math.max(120, chartWidth - marginL - numbersPx);
+      slotPx = room / (Math.max(4, Math.floor(room / BAR_SLOT_PX)) + 0.1 + BAR_PEEK);
+      visible = (chartWidth - marginL) / slotPx;
+    } else {
+      slotPx = fitWidth / (labels.length + 0.1);
+      visible = labels.length;
+    }
+    const lead = numbersPx / slotPx + 0.1;
+    if (!names) {
+      return { panning, visible, slotPx, lead, tickAngle: 0, labelShift: 0, margin: { ...BAR_MARGIN, l: marginL, r, b: BAR_BARE_MARGIN_B } };
+    }
+    let tickAngle = computeTickAngle(labels, slotPx);
+    if (minAngle && tickAngle !== 0 && Math.abs(tickAngle) < minAngle) tickAngle = -minAngle;
+    const labelShift = rotatedLabelShift(tickAngle, slotPx);
+    const { b } = barMargins(labels, tickAngle, slotPx, labelShift);
+    return { panning, visible, slotPx, lead, tickAngle, labelShift, margin: { ...BAR_MARGIN, l: marginL, r, b } };
+  };
+  let view = compute(BAR_MARGIN.l);
+  if (names && chartLeft != null) {
+    const padScreen = 12;
+    const overhang = barLeftOverhang(labels, view.tickAngle, view.slotPx, view.lead, view.labelShift);
+    let deficit = Math.ceil(overhang + padScreen - (chartLeft + BAR_MARGIN.l));
+    if (deficit > 0) {
+      // Steepen shallow angles to at least -45° first so horizontal overhang
+      // shrinks before borrowing horizontal room from the bars.
+      const steeper = compute(BAR_MARGIN.l, 45);
+      const steepOverhang = barLeftOverhang(labels, steeper.tickAngle, steeper.slotPx, steeper.lead, steeper.labelShift);
+      const steepDeficit = Math.ceil(steepOverhang + padScreen - (chartLeft + BAR_MARGIN.l));
+      const useSteep = steepDeficit < deficit;
+      const chosenDeficit = useSteep ? steepDeficit : deficit;
+      const maxExtra = Math.max(0, Math.round(chartWidth * 0.22));
+      const extraL = Math.max(0, Math.min(maxExtra, chosenDeficit));
+      view = compute(BAR_MARGIN.l + extraL, useSteep ? 45 : 0);
+    }
   }
-  const lead = numbersPx / slotPx + 0.1;
-  if (!names) {
-    return { panning, visible, slotPx, lead, tickAngle: 0, labelShift: 0, margin: { ...BAR_MARGIN, r, b: BAR_BARE_MARGIN_B } };
-  }
-  const tickAngle = computeTickAngle(labels, slotPx);
-  const labelShift = rotatedLabelShift(tickAngle, slotPx);
-  const { b } = barMargins(labels, tickAngle, slotPx, labelShift);
-  return { panning, visible, slotPx, lead, tickAngle, labelShift, margin: { ...BAR_MARGIN, r, b } };
+  return view;
 }
 
 /** barView with the drawer open: the bars `slotPx` wide, as without the
  *  drawer, from the plot's left edge on; the plot reaches the drawer, and
  *  pans when they run under it. (`fixed`: the view isn't fitted to the
  *  bars.) */
-function fixedBarView(labels, chartWidth, names, numbersPx, slotPx) {
-  const visible = (chartWidth - BAR_MARGIN.l) / slotPx;
+function fixedBarView(labels, chartWidth, names, numbersPx, slotPx, marginL = BAR_MARGIN.l) {
+  const visible = (chartWidth - marginL) / slotPx;
   const lead = numbersPx / slotPx + 0.1;
   const panning = lead + labels.length > visible + 1e-6;
-  const margin = { ...BAR_MARGIN, r: 0 };
+  const margin = { ...BAR_MARGIN, l: marginL, r: 0 };
   if (!names) return { panning, fixed: true, visible, slotPx, lead, tickAngle: 0, labelShift: 0, margin: { ...margin, b: BAR_BARE_MARGIN_B } };
   const tickAngle = computeTickAngle(labels, slotPx);
   const labelShift = rotatedLabelShift(tickAngle, slotPx);
@@ -3159,7 +3186,7 @@ function renderModelBarsHorizontal(modelNames, { values, ciValues, customdata })
   const plotWidth = Math.max(1, width - margin.l - margin.r);
   const xRange = rowValueRange(values, ciValues, plotWidth);
   const layout = getPlotlyLayout({
-    xaxis: { ...makeYAxis(xRange), gridcolor: ROW_GRID_COLOR, zerolinecolor: ROW_ZERO_COLOR, side: "top", tickfont: { size: 11, color: "#64748b" } },
+    xaxis: { ...makeYAxis(xRange), gridcolor: ROW_GRID_COLOR, zerolinecolor: ROW_ZERO_COLOR, side: "top", tickfont: { size: 11, color: "#57657a" } },
     yaxis: {
       range: [rows.length - 0.5, -0.5], tickvals: rows, ticktext,
       showgrid: false, automargin: false, ticks: "", ticklen: 0, ticklabelstandoff: ROW_LABEL_GAP_PX - 2,
@@ -3252,7 +3279,7 @@ function renderEmptyState(message) {
     annotations: [{
       text: narrow ? message.replace(/ – /, " –<br>") : message,
       xref: "paper", yref: "paper", x: 0.5, y: 0.5,
-      showarrow: false, font: { size: 15, color: "#64748b" },
+      showarrow: false, font: { size: 15, color: "#57657a" },
     }],
   });
   plotChart([], touchSafe(layout), plotlyConfig, null, hideTooltip);
@@ -3313,6 +3340,36 @@ function renderSingleBenchmarkScatter(benchmark) {
   plotScatter(xs, ys, dirs, colors, cis, computeSingleYRange(benchmark, metric), extras);
 }
 
+/** Upper-left Pareto frontier over (size, score) scatter points: models for
+ *  which no smaller-or-equal model achieves a higher score. Drawn as subtle
+ *  dashed line shapes below the markers (zero interference with trace indices
+ *  or JSON export). */
+function paretoShapes(xs, ys) {
+  const pts = [];
+  for (let i = 0; i < xs.length; i++) {
+    if (xs[i] > 0 && ys[i] != null && Number.isFinite(ys[i])) pts.push({ x: xs[i], y: ys[i] });
+  }
+  pts.sort((a, b) => a.x - b.x || b.y - a.y);
+  const frontier = [];
+  let best = -Infinity;
+  for (const p of pts) {
+    if (p.y > best) {
+      frontier.push(p);
+      best = p.y;
+    }
+  }
+  const shapes = [];
+  for (let i = 0; i + 1 < frontier.length; i++) {
+    shapes.push({
+      type: "line", xref: "x", yref: "y", layer: "below",
+      x0: frontier[i].x, y0: frontier[i].y,
+      x1: frontier[i + 1].x, y1: frontier[i + 1].y,
+      line: { color: "rgba(79, 70, 229, 0.28)", width: 1.5, dash: "4px,4px" },
+    });
+  }
+  return shapes;
+}
+
 /** Build a single-trace scatter chart: one marker per model, org logos
  *  overlaid via layout.images. Used by aggregate and single-benchmark
  *  scatter modes. */
@@ -3360,6 +3417,7 @@ function plotScatter(xs, ys, dirs, colors, cis, yRange, extras) {
     xaxis,
     showlegend: false,
     margin,
+    shapes: paretoShapes(xs, ys),
     images: composite.images,
   });
   // Stash the image→model mapping so the scatter hover handler (in chart.js)

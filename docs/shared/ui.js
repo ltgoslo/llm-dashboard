@@ -142,6 +142,11 @@ export function setChartHeader(titleText, desc) {
 // hovering the label OR the input both trigger it.
 const CONTROL_TOOLTIPS = [
   {
+    anchor: "#task-select",
+    title: "Task",
+    body: "Choose an aggregate across all tasks (by category or by task), a category or language subset, or inspect an individual benchmark.",
+  },
+  {
     anchor: ".shot-toggle",
     title: "Shots",
     body: "Number of in-context examples shown to the model before each test question. 0-shot gives no examples; 1-shot gives one; 5-shot gives five. Comparing across shot settings probes the model's in-context learning ability.",
@@ -155,6 +160,16 @@ const CONTROL_TOOLTIPS = [
     anchor: "#norm-select",
     title: "Rescaling",
     body: "How task scores are rescaled before averaging. 'Random baseline' maps the chance score to 0 and a perfect score to 100; 'min-max' and 'percentile' rescale relative to the evaluated models; 'z-score' shows standard deviations from the mean. 'None' keeps raw metric values.",
+  },
+  {
+    anchor: "#metric-select",
+    title: "Metric",
+    body: "Switch between the evaluation metrics (or subtasks) reported for the selected benchmark.",
+  },
+  {
+    anchor: ".ci-btn",
+    title: "Error bands",
+    body: "Show or hide 95% confidence interval bands around each training curve.",
   },
   {
     anchor: "#formulation-select",
@@ -211,7 +226,11 @@ export function attachControlTooltips(overrides = {}) {
     const target = el.classList.contains("control-group")
       ? el
       : el.closest(".control-group") || el;
-    attachTooltip(target, () => ({ title: cfg.title, body: cfg.body }));
+    attachTooltip(target, () => {
+      // Never pop a control tooltip over an open custom dropdown list.
+      if (document.querySelector('.ui-select[aria-expanded="true"]')) return null;
+      return { title: cfg.title, body: cfg.body };
+    });
   }
 }
 

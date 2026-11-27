@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MultiSynt dashboard</title>
+    <title>MultiSynt Dashboard</title>
     <link rel="icon" type="image/svg+xml" href="../shared/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
         <div class="band-inner">
             <header class="dashboard-header">
                 <div class="header-titles">
-                    <h1>MultiSynt dashboard</h1>
+                    <h1>MultiSynt Dashboard</h1>
                 </div>
             </header>
         </div>
@@ -32,17 +32,20 @@
             <section class="chart-section">
                 <div class="chart-zone">
                     <div class="chart-title-block">
-                        <span class="chart-title" id="chart-title">&nbsp;</span>
+                        <details class="chart-title-details">
+                            <summary><span class="chart-title" id="chart-title">&nbsp;</span></summary>
+                            <div class="chart-description" id="chart-description"></div>
+                        </details>
                         <div class="chart-signals" id="chart-signals"></div>
                     </div>
                     <div class="controls-bar">
                         <div class="control-group">
                             <label for="task-select">Task:</label>
                             <select id="task-select">
-                                <option value="__all_macro__" selected title="Scores averaged within categories, then averaged across categories">All (category-average)</option>
-                                <option value="__all__" title="Simple average across all tasks">All (task-average)</option>
-                                <option value="__custom_macro__" hidden>Custom (category-average)</option>
-                                <option value="__custom__" hidden>Custom (task-average)</option>
+                                <option value="__all_macro__" selected title="Scores averaged within categories, then averaged across categories">All (category average)</option>
+                                <option value="__all__" title="Simple average across all tasks">All (task average)</option>
+                                <option value="__custom_macro__" hidden>Custom (category average)</option>
+                                <option value="__custom__" hidden>Custom (task average)</option>
                             </select>
                         </div>
 

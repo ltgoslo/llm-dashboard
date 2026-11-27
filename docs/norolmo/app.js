@@ -182,12 +182,12 @@ const chartConfig = {
   allShots: ALL_SHOTS,
   normAcrossTrajectories: true,
   yRangeSkipFirst: true,
-  yMaxHeadroom: 0.25,   // extra top space (× data span) so the legend fits
+  yMaxHeadroom: 0.04,   // slight top breathing room (legend sits above the chart)
   xRangeTight: true,
   legendColumns: [
-    { title: "Stage 1", x: 0.01 },
-    { title: "Stage 2", x: 0.22 },
-    { title: "Stage 3", x: 0.5 },
+    { title: "Stage 1" },
+    { title: "Stage 2" },
+    { title: "Stage 3" },
   ],
   plotlyConfig,
   hoverXFormat: (xTokens, traceName) => {
@@ -306,7 +306,12 @@ async function init() {
   } catch (err) {
     console.error("init failed:", err);
     const el = document.getElementById("chart");
-    if (el) el.innerHTML = "<pre style='color:red;padding:1rem;'>" + err.stack + "</pre>";
+    if (el) {
+      const pre = document.createElement("pre");
+      pre.style.cssText = "color:red;padding:1rem;white-space:pre-wrap;";
+      pre.textContent = err?.stack || String(err);
+      el.replaceChildren(pre);
+    }
     markAppReady();
   }
 }

@@ -203,6 +203,7 @@ export function enhanceSelect(select, { tooltip = null } = {}) {
 
   function open() {
     if (!list.hidden || select.disabled || items.length === 0) return;
+    if (tooltip) tooltip.hide();
     document.body.appendChild(list);
     list.hidden = false;
     root.setAttribute("aria-expanded", "true");

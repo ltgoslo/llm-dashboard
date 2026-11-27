@@ -49,7 +49,7 @@ export function downloadJSON(data, filename) {
 }
 
 /** The y-axis's tick labels. */
-export const Y_TICK_FONT = { size: 13.6, color: "#64748b", weight: 500 };
+export const Y_TICK_FONT = { size: 13.6, color: "#57657a", weight: 500 };
 
 /** A number as an export gives it: at most 4 decimals (an integer, a token
  *  count, as it is). */
@@ -445,32 +445,28 @@ function applyLegendTitleGap(chartEl) {
   });
 }
 
-const LINE_CLIP_WIDTH = "99999";   // sentinel marking an already-widened rect
+const LINE_CLIP_PAD = 10;   // px beyond each side of the plot rect so edge markers aren't half-clipped
 
 /** Line-mode clipping: keep Plotly's plot-area clip vertically (so traces
- *  never spill above/under a fixed y-range) but open it horizontally (so
- *  markers at the first/last x-position aren't half-clipped at the plot
- *  edges, nor at the page margin). CSS can't express this on SVG <g>
- *  elements — `clip-path: inset()` resolves against the content bbox, not
- *  the plot rect — so widen the actual <clipPath> rect that the trace layer
- *  references. Plotly REUSES this rect node across redraws/resizes and
- *  resets its x/width back to the tight plot bounds, so we must re-widen on
- *  every plotly_afterplot. Guard on the live width attribute (not a one-shot
- *  flag on the node, which goes stale once Plotly resets the geometry). */
+ *  never spill above/under a fixed y-range) and pad it by LINE_CLIP_PAD px
+ *  horizontally so markers at the first/last x-position aren't half-clipped
+ *  while zoomed traces still stay clipped inside the plot box. Plotly
+ *  REUSES this rect node across redraws/resizes/zooms and resets its
+ *  x/width back to the tight plot bounds, so we re-apply on every
+ *  plotly_afterplot, guarding against double-padding. */
 function widenLineModeClip(chartEl) {
-  // Plotly's plot-area clipPath carries class "plotclip" and an id ending in
-  // "plot" (e.g. "clip1a2b3xyplot"); its rect's width/height = the plot box.
-  // Target it directly — the older "walk .plot's clip-path url to the rect"
-  // chain was fragile and silently matched nothing. Axis/tick clips end in
-  // x/y/xy, so the id-suffix selector won't touch them.
   const rects = chartEl.querySelectorAll(
     'clipPath.plotclip > rect, clipPath[id$="plot"] > rect'
   );
   rects.forEach((rect) => {
-    if (rect.getAttribute("width") !== LINE_CLIP_WIDTH) {
-      rect.setAttribute("x", "-9999");
-      rect.setAttribute("width", LINE_CLIP_WIDTH);
-    }
+    const w = parseFloat(rect.getAttribute("width"));
+    const x = parseFloat(rect.getAttribute("x")) || 0;
+    if (!Number.isFinite(w) || w <= 0) return;
+    if (rect._paddedW != null && Math.abs(w - rect._paddedW) < 0.5) return;
+    const paddedW = w + LINE_CLIP_PAD * 2;
+    rect._paddedW = paddedW;
+    rect.setAttribute("x", String(x - LINE_CLIP_PAD));
+    rect.setAttribute("width", String(paddedW));
   });
 }
 
@@ -606,8 +602,10 @@ function attachBarHoverHighlight(chartEl) {
       sumCx[i] += b.rect.cx; cnt[i] += 1;
       if (!cursor) return;
       const d = distPointToRect(cursor.x, cursor.y, b.rect);
-      const s = 1 + (BAR_HOVER_SCALE - 1) * hoverKernel(d / refWidth);
-      if (s > scale[i]) scale[i] = s;
+      if (!REDUCED_MOTION.matches) {
+        const s = 1 + (BAR_HOVER_SCALE - 1) * hoverKernel(d / refWidth);
+        if (s > scale[i]) scale[i] = s;
+      }
       if (d < dist[i]) dist[i] = d;
       if (d === 0 && !insideBar) insideBar = b;
     });
@@ -1058,9 +1056,10 @@ function attachScatterHoverHighlight(chartEl) {
     // scale relaxes the self-reference across frames; it converges and is
     // bounded by SCATTER_PEAK_SCALE, giving a slightly "magnetic" grow.
     const W = new Float64Array(N), S = new Float64Array(N), R = new Float64Array(N);
+    const reduced = REDUCED_MOTION.matches;
     for (let i = 0; i < N; i++) {
       const m = list[i];
-      if (pointer.active) {
+      if (pointer.active && !reduced) {
         const dcRest = Math.hypot(pointer.x - m.cx, pointer.y - m.cy);
         W[i] = 1 / (1 + (dcRest / sprDenom) ** 2);
         const dcCur = Math.hypot(pointer.x - (m.cx + dispX[i]), pointer.y - (m.cy + dispY[i]));
@@ -1172,7 +1171,7 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
   traces.forEach((t, i) => { if (t.type === "bar") barIndices.push(i); });
   const horizontal = barIndices.some((i) => traces[i].orientation === "h");
   const vk = horizontal ? "x" : "y";   // the axis the bar values run along
-  const shouldAnimate = barIndices.length > 0 && (now - lastPlotTime) > BAR_ANIM_DEBOUNCE;
+  const shouldAnimate = !REDUCED_MOTION.matches && barIndices.length > 0 && (now - lastPlotTime) > BAR_ANIM_DEBOUNCE;
   lastPlotTime = now;
   const animId = ++currentAnim;   // invalidate any in-flight animation
 

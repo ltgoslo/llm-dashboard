@@ -156,6 +156,11 @@ function attachLegendHoverEmphasis(chartEl) {
   });
 }
 
+const NARROW_PROGRESS = "(max-width: 640px)";
+function isNarrowProgress() {
+  return window.matchMedia(NARROW_PROGRESS).matches;
+}
+
 /** Render a progress chart for the current task selection.
  *  config = { getTrajectories, xToTokens, xAxisLabel, hoverXFormat, titlePrefix,
  *             plotlyConfig, legendPosition: "bottom-right"|"top-left",
@@ -167,7 +172,14 @@ export function renderProgressChart(config) {
   if (chartEl) {
     chartEl._emphasizedTrace = null;
     chartEl._legendEmphasis = null;
+    chartEl._lastProgressConfig = config;
     attachLegendHoverEmphasis(chartEl);
+    if (!chartEl._narrowProgressBound) {
+      chartEl._narrowProgressBound = true;
+      window.matchMedia(NARROW_PROGRESS).addEventListener("change", () => {
+        if (chartEl._lastProgressConfig) renderProgressChart(chartEl._lastProgressConfig);
+      });
+    }
   }
   const sel = state.currentTaskSelection;
 
@@ -180,38 +192,149 @@ export function renderProgressChart(config) {
   }
 }
 
-function legendFor(config) {
+function legendFor(config, narrow) {
+  if (narrow) {
+    return {
+      orientation: "h", x: 0, y: -0.22, xanchor: "left", yanchor: "top",
+      bgcolor: "rgba(0,0,0,0)", borderwidth: 0,
+    };
+  }
   return config.legendPosition === "top-left"
     ? { ...TOP_LEFT_LEGEND, bordercolor: controlBorderColor() }
     : PROGRESS_LEGEND;
 }
 
-/** Layout fragment for the legend(s). With config.legendColumns
- *  ([{title, x, y?}, …]) the chart gets one titled Plotly legend per
- *  column ("legend", "legend2", …), anchored top-left side by side;
- *  trajectories opt into a column via their `legendColumn` index.
- *  Without it, the single positional legend is used. */
-function legendLayout(config) {
-  if (!config.legendColumns) return { legend: legendFor(config) };
-  const out = {};
-  config.legendColumns.forEach((col, i) => {
-    out[i === 0 ? "legend" : "legend" + (i + 1)] = {
-      x: col.x ?? 0.01, y: col.y ?? 0.99, xanchor: "left", yanchor: "top",
-      bgcolor: "rgba(0,0,0,0)", borderwidth: 0,
-      // Title-to-entries spacing is handled in style.css (the legend
-      // `.groups` translateY rule) -- Plotly has no padding option, and
-      // a <br> in the title adds a full line-height, which is too much.
-      title: { text: "<b>" + col.title + "</b>" },
-    };
-  });
-  return out;
+/** Layout fragment for Plotly's built-in legend. Dashboards using
+ *  config.legendColumns (NorOLMo) render a responsive HTML legend above the
+ *  chart instead (see renderProgressLegend), so Plotly's legend is hidden. */
+function legendLayout(config, narrow) {
+  if (config.legendColumns) return {};
+  return { legend: legendFor(config, narrow) };
 }
 
-/** Plotly legend reference ("legend", "legend2", …) for a trajectory's
- *  legendColumn, or undefined when multi-column legends aren't configured. */
-function legendRefFor(config, traj) {
-  if (!config.legendColumns || traj.legendColumn == null) return undefined;
-  return traj.legendColumn === 0 ? "legend" : "legend" + (traj.legendColumn + 1);
+/** Render the responsive multi-column HTML legend above `#chart` for
+ *  progress dashboards with `config.legendColumns` (NorOLMo). Clicking
+ *  toggles a trajectory; double-clicking isolates it; hovering emphasizes
+ *  its trace on the chart. */
+function renderProgressLegend(config, trajectories, bandCount, traces) {
+  const chartEl = document.getElementById("chart");
+  if (!chartEl) return;
+  let root = document.getElementById("progress-legend");
+  if (!config.legendColumns || trajectories.length <= 1) {
+    if (root) root.hidden = true;
+    return;
+  }
+  if (!root) {
+    root = document.createElement("div");
+    root.id = "progress-legend";
+    root.className = "progress-legend";
+    root.setAttribute("role", "region");
+    root.setAttribute("aria-label", "Chart legend");
+    chartEl.before(root);
+  }
+  root.hidden = false;
+  if (!chartEl._legendHidden) chartEl._legendHidden = new Set();
+  const hidden = chartEl._legendHidden;
+  const keys = trajectories.map((t) => t.key || t.name);
+  if (traces && hidden.size) {
+    for (const t of traces) {
+      if (hidden.has(t.legendgroup)) t.visible = "legendonly";
+    }
+  }
+
+  const applyVisibility = () => {
+    const data = chartEl.data || [];
+    const vis = data.map((t) => (hidden.has(t.legendgroup) ? "legendonly" : true));
+    if (data.length) Plotly.restyle(chartEl, { visible: vis });
+    root.querySelectorAll(".pl-item").forEach((btn) => {
+      const off = hidden.has(btn.dataset.key);
+      btn.classList.toggle("is-hidden", off);
+      btn.setAttribute("aria-pressed", String(!off));
+    });
+  };
+
+  const cols = config.legendColumns.map((col, idx) => ({ title: col.title, idx, items: [] }));
+  trajectories.forEach((traj, i) => {
+    const colIdx = traj.legendColumn ?? 0;
+    const col = cols[colIdx] || cols[0];
+    col.items.push({ traj, lineIdx: bandCount + i });
+  });
+
+  const NS = "http://www.w3.org/2000/svg";
+  root.replaceChildren(...cols.filter((c) => c.items.length).map((col) => {
+    const sec = document.createElement("div");
+    sec.className = "pl-col";
+    const h = document.createElement("div");
+    h.className = "pl-col-title";
+    h.textContent = col.title;
+    const list = document.createElement("div");
+    list.className = "pl-list";
+    for (const { traj, lineIdx } of col.items) {
+      const key = traj.key || traj.name;
+      const off = hidden.has(key);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "pl-item" + (traj.emphasized ? " pl-emphasized" : "") + (off ? " is-hidden" : "");
+      btn.dataset.key = key;
+      btn.setAttribute("aria-pressed", String(!off));
+      btn.title = `${traj.name} — click to toggle, double-click to isolate`;
+
+      const sw = document.createElement("span");
+      sw.className = "pl-swatch";
+      sw.setAttribute("aria-hidden", "true");
+      const svg = document.createElementNS(NS, "svg");
+      svg.setAttribute("viewBox", "0 0 20 12");
+      svg.setAttribute("width", "20");
+      svg.setAttribute("height", "12");
+      const line = document.createElementNS(NS, "line");
+      line.setAttribute("x1", "1"); line.setAttribute("y1", "6");
+      line.setAttribute("x2", "19"); line.setAttribute("y2", "6");
+      line.setAttribute("stroke", traj.color);
+      line.setAttribute("stroke-width", traj.emphasized ? "3" : "2");
+      line.setAttribute("stroke-linecap", "round");
+      svg.append(line);
+      if (traj.emphasized) {
+        const star = document.createElementNS(NS, "polygon");
+        star.setAttribute("points", "10,1.2 11.4,4.3 14.8,4.6 12.2,6.8 13,10.1 10,8.3 7,10.1 7.8,6.8 5.2,4.6 8.6,4.3");
+        star.setAttribute("fill", traj.color);
+        svg.append(star);
+      } else {
+        const dot = document.createElementNS(NS, "circle");
+        dot.setAttribute("cx", "10"); dot.setAttribute("cy", "6"); dot.setAttribute("r", "3");
+        dot.setAttribute("fill", traj.color);
+        svg.append(dot);
+      }
+      sw.append(svg);
+
+      const lbl = document.createElement("span");
+      lbl.className = "pl-label";
+      lbl.textContent = traj.name;
+      btn.append(sw, lbl);
+
+      const emphasize = () => { if (!hidden.has(key)) setTraceEmphasis(lineIdx); };
+      const clearEmphasis = () => setTraceEmphasis(null);
+      btn.addEventListener("mouseenter", emphasize);
+      btn.addEventListener("mouseleave", clearEmphasis);
+      btn.addEventListener("focus", emphasize);
+      btn.addEventListener("blur", clearEmphasis);
+      btn.addEventListener("click", () => {
+        if (hidden.has(key)) hidden.delete(key); else hidden.add(key);
+        setTraceEmphasis(null);
+        applyVisibility();
+      });
+      btn.addEventListener("dblclick", (e) => {
+        e.preventDefault();
+        const onlyThis = keys.every((k) => k === key ? !hidden.has(k) : hidden.has(k));
+        hidden.clear();
+        if (!onlyThis) keys.forEach((k) => { if (k !== key) hidden.add(k); });
+        setTraceEmphasis(null);
+        applyVisibility();
+      });
+      list.append(btn);
+    }
+    sec.append(h, list);
+    return sec;
+  }));
 }
 
 /** With config.xRangeTight, pin the x-axis to the first/last checkpoint
@@ -284,19 +407,19 @@ function runCheckpointXs(config, trajectories) {
  *  which paints below all lines) when `cis` is non-null, and its line trace
  *  (into `lineTraces`). */
 function pushRunTraces(traces, lineTraces, config, traj, { xs, ys, cis, name, color, lgroup, customdata }) {
-  const lref = legendRefFor(config, traj);
   const emph = emphasisFor(traj);
+  const hidden = document.getElementById("chart")?._legendHidden?.has(lgroup);
   if (cis) {
     const band = makeBandTrace(xs, ys, cis, color, lgroup);
     if (band) {
-      if (lref) band.legend = lref;
+      if (hidden) band.visible = "legendonly";
       traces.push(band);
     }
   }
   lineTraces.push({
     x: xs, y: ys, mode: traj.reference ? "lines" : "lines+markers", name,
     legendgroup: lgroup,
-    ...(lref && { legend: lref }),
+    ...(hidden && { visible: "legendonly" }),
     ...(traj.zorder != null && { zorder: traj.zorder }),
     line: { color, width: emph.baseW, ...(traj.reference && { dash: "dash" }) },
     marker: { size: emph.baseS, symbol: emph.symbol },
@@ -309,15 +432,20 @@ function pushRunTraces(traces, lineTraces, config, traj, { xs, ys, cis, name, co
 
 /** Shared layout for the progress charts. */
 function progressLayout(config, trajectories, yRange, showlegend) {
+  const narrow = isNarrowProgress();
+  const useHtmlLegend = !!config.legendColumns;
+  const showPlotlyLegend = !useHtmlLegend && showlegend;
   const xRange = tightXRange(config, trajectories);
   document.getElementById("chart")?.classList.toggle(
-    "legend-card", !config.legendColumns && config.legendPosition === "top-left");
+    "legend-card", !narrow && !useHtmlLegend && config.legendPosition === "top-left");
   return getPlotlyLayout({
-    margin: { l: 105, r: 4, t: 8, b: 50 },
+    margin: narrow
+      ? { l: 46, r: 8, t: 8, b: showPlotlyLegend ? 90 : 50 }
+      : { l: 105, r: 4, t: 8, b: 50 },
     xaxis: { automargin: false, title: config.xAxisLabel, ...(xRange && { range: xRange }) },
     yaxis: makeYAxis(yRange),
-    ...(showlegend !== undefined && { showlegend }),
-    ...legendLayout(config),
+    showlegend: !!showPlotlyLegend,
+    ...legendLayout(config, narrow),
   });
 }
 
@@ -509,9 +637,11 @@ function renderAggregateProgress(config) {
   const series = [];
   let baseline = null;
   const fitValues = [];
+  const plottedTrajs = [];
   for (const traj of trajectories) {
     const xValues = traj.checkpoints();
     if (!xValues.length) continue;
+    plottedTrajs.push(traj);
     const refXs = traj.reference ? runCheckpointXs(config, trajectories) : null;
     const aggResults = refXs
       ? Array(refXs.length).fill(aggregateAt(traj, xValues[0], state.currentShot, useCI))
@@ -535,12 +665,14 @@ function renderAggregateProgress(config) {
       series.push({ name: traj.name, key: traj.key || traj.name, xs, ys });
     }
   }
+  const bandCount = traces.length;
   traces.push(...lineTraces);
 
   const yRange = config.yRangeFit
     ? computeFitRange(fitValues)
     : computeYRange(allYValues, !!config.yRangeSkipFirst, config.yMaxHeadroom || 0);
   const layout = progressLayout(config, trajectories, yRange, trajectories.length > 1);
+  renderProgressLegend(config, plottedTrajs, bandCount, traces);
   plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), onProgressUnhover);
   if (config.onSeries) config.onSeries(series, baseline ?? 0);
 }
@@ -570,9 +702,11 @@ function renderSingleProgress(config, benchmark) {
   const series = [];
   let baseline = null;
   const fitValues = [];
+  const plottedTrajs = [];
   for (const traj of trajectories) {
     let xValues = traj.checkpoints();
     if (!xValues.length) continue;
+    plottedTrajs.push(traj);
     const refXs = traj.reference ? runCheckpointXs(config, trajectories) : null;
     if (refXs) xValues = refXs.map(() => xValues[0]);
     const allRaw = refFor(traj, state.currentShot);
@@ -603,6 +737,7 @@ function renderSingleProgress(config, benchmark) {
       series.push({ name: traj.name, key: traj.key || traj.name, xs, ys });
     }
   }
+  const bandCount = traces.length;
   traces.push(...lineTraces);
 
   const yRange = config.yRangeFit
@@ -611,6 +746,7 @@ function renderSingleProgress(config, benchmark) {
       ? computeYRange(allYVals, tight, config.yMaxHeadroom || 0, rawScale)
       : [0, computeYMax(allYVals)];
   const layout = progressLayout(config, trajectories, yRange, trajectories.length > 1);
+  renderProgressLegend(config, plottedTrajs, bandCount, traces);
   plotChart(traces, layout, config.plotlyConfig, makeHoverHandler(config), onProgressUnhover);
   if (config.onSeries) {
     config.onSeries(series, baseline ?? 0, {

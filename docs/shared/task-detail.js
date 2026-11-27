@@ -318,8 +318,10 @@ export function createTaskDetail({ onClose, onShot, onModel }) {
     const side = list.closest(".tv-side");
     const beside = side && getComputedStyle(side).position === "sticky";
     sheet.style.setProperty("--tv-head-h", parts.head.offsetHeight + "px");
+    // `.tv-side` is sticky relative to `sheet`, so `list.getBoundingClientRect().top`
+    // is already in viewport coordinates whether `sheet` is scrolled or not.
     const room = beside
-      ? sheet.getBoundingClientRect().bottom - list.getBoundingClientRect().top - sheet.scrollTop - 24
+      ? sheet.getBoundingClientRect().bottom - list.getBoundingClientRect().top - 24
       : window.innerHeight * 0.6;
     list.style.maxHeight = Math.max(240, Math.floor(room)) + "px";
     const me = list.querySelector(".tv-rank-me");

@@ -31,8 +31,8 @@
   --surface: #ffffff;          /* the white plot band */
   --bg-tint: #eef0f4;          /* page background + tinted modules band */
   --fg: #1e293b;
-  --fg-muted: #64748b;
-  --accent: #6366f1;
+  --fg-muted: #57657a;
+  --accent: #4f46e5;
   --accent-hover: #312e81;
   --accent-light: #eef2ff;
   --border: #d2d9e4;
@@ -42,8 +42,8 @@
   /* Controls — the chrome shared by the custom dropdowns, segmented
      buttons, small buttons and checkboxes (see the Controls block). */
   --control-h: 2.0625rem;                            /* 33px */
-  --control-border: rgba(100, 116, 139, 0.4);        /* --fg-muted at 40% */
-  --control-border-hover: rgba(99, 102, 241, 0.5);   /* --accent at 50% */
+  --control-border: rgba(87, 101, 122, 0.4);         /* --fg-muted at 40% */
+  --control-border-hover: rgba(79, 70, 229, 0.5);    /* --accent at 50% */
   --control-radius: 0.35rem;
   --control-shadow: 0 2px 10px rgba(30, 41, 59, 0.12);
   --control-popup-shadow: 0 6px 20px rgba(30, 41, 59, 0.15);
@@ -171,20 +171,27 @@ header.dashboard-header h1 {
 }
 .about-inline[open] > summary::after { transform: rotate(225deg); }
 .about-inline > summary:hover { color: var(--accent); }
-/* The comparison pages' header is one line: the page title in bold, then
-   "– click here for more information" and the arrow, all of it the About
-   toggle (the <h1> sits in the <summary>). It flows as text, so on a narrow
-   screen it wraps and the arrow follows the last word. */
-.comparison-page header.dashboard-header { padding: 0.85rem 0 0.8rem; }
-.comparison-page .about-inline > summary { display: inline; line-height: 1.45; }
-.comparison-page .about-inline > summary h1 { display: inline; font-size: inherit; line-height: inherit; }
-.comparison-page .about-inline > summary:hover h1 { color: var(--accent); }
+.about-inline > summary:focus-visible,
+.about-more > summary:focus-visible,
+.chart-title-details > summary:focus-visible {
+  outline: none;
+  border-radius: 4px;
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+/* Pages whose header is a single About-toggle line (the <h1> sits in the
+   <summary>, followed by "– click here for more information" and the arrow).
+   It flows as text so on narrow screens it wraps and the arrow follows the
+   last word. */
+header.dashboard-header:has(.about-inline > summary > h1) { padding: 0.85rem 0 0.8rem; }
+.about-inline > summary:has(h1) { display: inline; line-height: 1.45; }
+.about-inline > summary:has(h1) h1 { display: inline; font-size: inherit; line-height: inherit; }
+.about-inline > summary:has(h1):hover h1 { color: var(--accent); }
 /* A touch screen keeps :hover on the line tapped last: no hover colour there. */
 @media (hover: none) {
-  .comparison-page .about-inline > summary:hover { color: var(--fg); }
-  .comparison-page .about-inline > summary:hover h1 { color: #000; }
+  .about-inline > summary:has(h1):hover { color: var(--fg); }
+  .about-inline > summary:has(h1):hover h1 { color: #000; }
 }
-.comparison-page .about-inline > summary::after { margin-left: 0.4em; position: relative; top: -0.15em; }
+.about-inline > summary:has(h1)::after { margin-left: 0.4em; position: relative; top: -0.15em; }
 
 .about-content {
   max-width: 760px;
@@ -302,31 +309,22 @@ header.dashboard-header h1 {
 .chart-title-details > summary::after {
   content: "";
   display: inline-block;
-  width: 0.55em;
-  height: 0.55em;
+  width: 0.38em;
+  height: 0.38em;
   /* Borders use currentColor so the hover rule below tints the chevron
      in sync with the title text. Defaults to black to match .chart-title. */
   color: #000;
-  border-right: 0.25em solid currentColor;
-  border-bottom: 0.25em solid currentColor;
+  border-right: 0.15em solid currentColor;
+  border-bottom: 0.15em solid currentColor;
   transform: rotate(45deg);
   vertical-align: middle;
   /* Visual centre of the rotated-corner chevron sits below its box centre
      (the V is in the bottom half of the original square); nudge it up. */
   position: relative;
-  top: -0.3em;
+  top: -0.18em;
   transition: transform 0.15s, color 0.15s;
 }
 .chart-title-details[open] > summary::after { transform: rotate(225deg); }
-/* The comparison pages' arrow: smaller and lighter, nearer the text's
-   x-height. */
-.comparison-page .chart-title-details > summary::after {
-  width: 0.38em;
-  height: 0.38em;
-  border-right-width: 0.15em;
-  border-bottom-width: 0.15em;
-  top: -0.18em;
-}
 
 .chart-title {
   font-family: var(--font-serif);
@@ -335,7 +333,6 @@ header.dashboard-header h1 {
   letter-spacing: -0.01em;
   line-height: 1.25;
   color: #000;
-  margin: 0 0 10px 0;
   display: inline;
 }
 .chart-title-details > summary:hover .chart-title { color: var(--accent); }
@@ -351,15 +348,22 @@ header.dashboard-header h1 {
 .chart-description a { color: var(--accent); text-decoration: none; }
 .chart-description a:hover { color: var(--accent-hover); }
 
-/* Plain chart title (no expandable description) with the FineWeb2 signal
-   measures of the plotted curves on the line below it. */
+/* Chart title block with optional FineWeb2 signal measures below it. */
 .chart-title-block { margin: 0 0 1rem; }
+.chart-title-block .chart-title-details { margin-bottom: 0; }
 .chart-signals {
-  display: flex; flex-wrap: wrap; gap: 0.2rem 1.4rem;
-  margin-top: 0.2rem; font-size: 0.88rem; color: var(--fg-muted);
+  display: flex; flex-wrap: wrap; gap: 0.25rem 1.4rem;
+  margin-top: 0.3rem; font-size: 0.88rem; color: var(--fg-muted);
 }
-.chart-signal { cursor: help; }
-.chart-signal-label::after { content: " "; }
+.chart-signal { cursor: help; display: inline-flex; align-items: baseline; gap: 0.35rem; }
+.chart-signal-label {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(87, 101, 122, 0.45);
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+.chart-signal:hover .chart-signal-label { color: var(--fg); text-decoration-color: var(--accent); }
 .chart-signal-value { font-weight: 600; color: var(--fg); font-variant-numeric: tabular-nums; }
 
 /* ──── Controls bar — two flex rows of inline controls ────
@@ -671,8 +675,9 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
   transform: translate(-50%, -50%); cursor: grab; z-index: 2;
   transition: box-shadow 0.15s;
 }
-.range-thumb:hover, .range-thumb.active {
-  box-shadow: 0 0 0 4px var(--accent-light), 0 1px 3px rgba(0,0,0,0.2);
+.range-thumb:hover, .range-thumb.active, .range-thumb:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--accent-light), 0 0 0 6px rgba(79, 70, 229, 0.22), 0 1px 3px rgba(0,0,0,0.2);
 }
 .range-thumb.active { cursor: grabbing; }
 
@@ -699,19 +704,88 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
    so the modebar lines up with the title's right margin.
    ──────────────────────────────────────────────────────────── */
 
+/* ──── Responsive HTML legend for multi-column progress charts (NorOLMo) ────
+   Replaces Plotly's fixed-x SVG legend columns, which collide on medium/narrow
+   screens and eat vertical plot headroom. Clicking toggles a trajectory;
+   double-clicking isolates it; hovering emphasizes the trace. */
+.progress-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15.5rem, 1fr));
+  gap: 0.65rem 1.5rem;
+  margin: 0.15rem 0 0.65rem;
+  padding: 0.6rem 0.85rem;
+  background: #f8fafc;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+}
+.progress-legend[hidden] { display: none; }
+.pl-col { min-width: 0; }
+.pl-col-title {
+  font-family: var(--font-serif);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin-bottom: 0.3rem;
+}
+.pl-list { display: flex; flex-direction: column; gap: 0.12rem; }
+.pl-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.14rem 0.3rem;
+  margin: 0 -0.3rem;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  font: 500 0.78rem/1.35 var(--font-sans);
+  color: var(--fg);
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.12s, opacity 0.15s;
+}
+.pl-item.pl-emphasized { font-weight: 600; }
+.pl-item:hover { background: rgba(79, 70, 229, 0.07); }
+.pl-item:focus-visible { box-shadow: 0 0 0 2px var(--accent-light); background: rgba(79, 70, 229, 0.07); }
+.pl-item.is-hidden { opacity: 0.42; text-decoration: line-through; }
+.pl-swatch { flex: none; width: 20px; height: 12px; display: inline-flex; align-items: center; justify-content: center; }
+.pl-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 #chart {
+  position: relative;
   margin-left: -5.5rem;
   width: calc(100% + 5.5rem);
   height: 500px;
   transition: opacity 0.15s;
 }
 /* A comparison view waiting for model results it hasn't loaded yet
-   (comparison.js setChartLoading): dim the previous chart — after a short
-   delay, so a quick load doesn't flash. */
+   (comparison.js setChartLoading): dim the previous chart and glide an
+   indeterminate hairline bar along its top — after a short delay, so a
+   quick load doesn't flash. */
 #chart.chart-loading {
   opacity: 0.45;
   transition: opacity 0.2s 0.15s;
   pointer-events: none;
+}
+#chart.chart-loading::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 5.5rem;
+  right: 0;
+  height: 2.5px;
+  border-radius: 2px;
+  z-index: 60;
+  background: linear-gradient(90deg, transparent 0%, var(--accent) 45%, transparent 100%) no-repeat;
+  background-size: 38% 100%;
+  animation: chart-load-slide 1.1s ease-in-out infinite;
+}
+@keyframes chart-load-slide {
+  from { background-position: -55% 0; }
+  to { background-position: 155% 0; }
 }
 
 /* The legend card of the progress charts that keep it top-left (multisynt,
@@ -986,7 +1060,8 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
   transition: transform 0.15s;
 }
 .checkbox-category details.task-item[open] > summary::after { transform: rotate(225deg); }
-.checkbox-category details.task-item > summary:hover { background: rgba(99, 102, 241, 0.08); }
+.checkbox-category details.task-item > summary:hover { background: rgba(79, 70, 229, 0.08); }
+.checkbox-category details.task-item > summary:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--accent-light); background: rgba(79, 70, 229, 0.06); }
 .checkbox-category details.task-item > summary:hover::after { color: var(--accent); }
 .checkbox-category .task-name { flex: 1; min-width: 0; }
 /* Tasks masked out of the aggregate by the multisynt task-type selector:
@@ -1213,7 +1288,7 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 .info-card[hidden] { display: none; }
 .info-card-title { font-family: var(--font-serif); font-weight: 700; font-size: 0.9rem; margin-bottom: 0.15rem; }
-.info-card-meta { color: #64748b; font-size: 0.72rem; margin-bottom: 0.35rem; }
+.info-card-meta { color: var(--fg-muted); font-size: 0.72rem; margin-bottom: 0.35rem; }
 .info-card-body { color: #475569; }
 .info-card-note { margin-top: 0.4rem; font-size: 0.75rem; font-weight: 600; color: #1e293b; }
 .info-card-link {
@@ -1234,7 +1309,7 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
    ──────────────────────────────────────────────────────────── */
 
 .custom-tooltip {
-  display: none; position: fixed; z-index: 1000; max-width: 420px;
+  display: none; position: fixed; z-index: 1000; max-width: min(420px, calc(100vw - 24px));
   padding: 0.7rem 0.9rem;
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -1249,8 +1324,8 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
   font-size: 0.9rem; margin-bottom: 0.25rem; color: #1e293b;
 }
 .tooltip-meta {
-  color: #64748b; font-size: 0.72rem;
-  opacity: 0.9; margin-bottom: 0.35rem;
+  color: var(--fg-muted); font-size: 0.72rem;
+  opacity: 0.95; margin-bottom: 0.35rem;
 }
 .tooltip-body { color: #475569; margin-bottom: 0.35rem; }
 .tooltip-footer { color: var(--accent); font-size: 0.75rem; word-break: break-all; }
@@ -1260,10 +1335,9 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
 .tooltip-hint { margin-top: 0.3rem; color: var(--fg-muted); font-size: 0.75rem; }
 
 /* ────────────────────────────────────────────────────────────
-   Plotly modebar — the top-right cluster of icon buttons over
-   the chart (zoom, pan, PNG/SVG/JSON export). Overrides defeat
-   Plotly's default white background + border so the buttons
-   blend into the white band; icon fill follows the page accent.
+   Plotly modebar — the top-right JSON export button over the chart.
+   Overrides defeat Plotly's default white background + border so it
+   blends into the white band; icon fill follows the page accent.
    Pinned to the chart canvas right edge, which aligns with the
    column's right text margin.
    ──────────────────────────────────────────────────────────── */
@@ -1276,16 +1350,9 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
   border: none !important;
   padding: 2px !important;
 }
-.modebar-btn path { fill: #64748b !important; }
+.modebar-btn path { fill: var(--fg-muted) !important; }
 .modebar-btn:hover path { fill: var(--accent) !important; }
 .modebar-btn.active path { fill: var(--accent) !important; }
-
-/* ────────────────────────────────────────────────────────────
-   HPLT-E filter panel — multisynt dashboard only.
-   A collapsible panel above the task grid: a row of criteria
-   the user can enable + threshold (each with pass/fail thresholds),
-   plus a downstream table showing each model's pass/fail per criterion.
-   ──────────────────────────────────────────────────────────── */
 
 /* ────────────────────────────────────────────────────────────
    App loading overlay — covers the page until the dashboard's
@@ -1343,13 +1410,8 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
    ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-  header.dashboard-header { padding: 2rem 0 1.25rem; gap: 0.75rem; }
-  header.dashboard-header h1 { font-size: 1.7rem; }
-  .chart-title { font-size: 1.2rem; }
-  .controls-bar { gap: 0.75rem; padding: 0.5rem 0.6rem; }
-  /* The comparison pages' top row starts at the column's edge, under the
-     title, as the bottom row does. */
-  .comparison-page .chart-zone .controls-bar:not(:has(+ #chart)) { padding-left: 0; padding-right: 0; }
+  .chart-title { font-size: 1.25rem; }
+  .controls-bar { gap: 0.5rem 1rem; padding: 0.25rem 0; }
   .checkbox-grid { grid-template-columns: 1fr; }
   #chart { height: 380px; }
   .module-header h3 { font-size: 1rem; }
@@ -1414,22 +1476,23 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
      screen; the export buttons go (they'd cover the scale above the bars,
      and downloading chart files isn't a phone task). */
 @media (max-width: 640px), (max-height: 500px) and (pointer: coarse) {
-  .comparison-page #chart { margin-left: 0; width: 100%; height: 420px; }
+  #chart { margin-left: 0; width: 100%; }
+  #chart.chart-loading::before { left: 0; }
+  .comparison-page #chart { height: 420px; }
   /* The header: just the title and the arrow, a finger-sized toggle. */
-  .comparison-page header.dashboard-header { padding: 0.35rem 0 0.3rem; }
-  .comparison-page .about-hint { display: none; }
-  .comparison-page .about-inline > summary { display: inline-block; padding: 0.55rem 0; font-size: 1rem; }
-  .comparison-page .custom-tooltip { max-width: calc(100vw - 24px); }
+  header.dashboard-header:has(.about-inline > summary > h1) { padding: 0.35rem 0 0.3rem; }
+  .about-hint { display: none; }
+  .about-inline > summary:has(h1) { display: inline-block; padding: 0.55rem 0; font-size: 1rem; }
   .comparison-page .modebar-container { display: none; }
   /* The chart title's arrow follows its last word (a flex box would park
      it at the right edge, beside two lines of title). */
-  .comparison-page .chart-title-details > summary { display: block; }
-  .comparison-page .chart-title-details > summary::after { margin-left: 0.35em; }
-  .comparison-page .chart-title { font-size: 1.2rem; }
+  .chart-title-details > summary { display: block; }
+  .chart-title-details > summary::after { margin-left: 0.35em; }
+  .chart-title { font-size: 1.2rem; }
   /* About's formulas fit the screen (or scroll inside their box), never
      widening the page. */
-  .comparison-page .about-formula { overflow-x: auto; }
-  .comparison-page .about-formula .katex { font-size: 1em; }
+  .about-formula { overflow-x: auto; }
+  .about-formula .katex { font-size: 1em; }
 
   /* Controls: one column, each label above its control, both bars on the
      column's edge; wide (sideways) screens keep the controls to 30rem. */
@@ -1617,8 +1680,15 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   .model-detail .md-groups { columns: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .model-detail, .model-detail.closing { animation: none; }
-  .md-me { transition: none; }
+  .model-detail, .model-detail.closing, .chart-jump { animation: none; }
+  #chart.chart-loading::before { animation: none; background-size: 100% 100%; opacity: 0.55; }
+  .shot-toggle.segmented-ready::before,
+  .shot-toggle::after,
+  .md-me,
+  .scatter-focus-halo,
+  #chart .imagelayer image,
+  .about-inline > summary::after,
+  .chart-title-details > summary::after { transition: none; }
 }
 
 /* The button to the panel, floating while it is out of sight below (after
@@ -1641,6 +1711,7 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   padding: 0; border: 0; border-radius: 50%; background: none; color: var(--fg-muted); cursor: pointer;
 }
 .md-close:hover { background: #f1f5f9; color: var(--fg); }
+.md-close:focus-visible { outline: none; background: #f1f5f9; color: var(--fg); box-shadow: 0 0 0 2px var(--accent-light), inset 0 0 0 1px var(--accent); }
 
 .md-desc { margin: 1rem 0 0; color: #475569; max-width: 62rem; }
 
@@ -1926,8 +1997,9 @@ button.tv-rank-row:active { background: #e8ecf1; }
 .tv-rubric-row { display: grid; grid-template-columns: 0.8rem 7.5rem minmax(0, 1fr) 2.6rem; align-items: center; gap: 0.6rem; }
 .tv-rubric-grade { color: var(--fg-muted); font-variant-numeric: tabular-nums; }   /* (left: under "Grades") */
 .tv-rubric-name { white-space: nowrap; }
-.tv-rubric-track { position: relative; height: 10px; }
+.tv-rubric-track { position: relative; height: 10px; border-radius: 2px; background: #f1f5f9; }
 .tv-rubric-bar { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 2px; background: var(--g); }
+.tv-rubric-bar[data-points="0"] { box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.14); }
 .tv-rubric-share { text-align: right; color: var(--fg-muted); font-variant-numeric: tabular-nums; }
 
 /* The examples (task-examples.js). The picker stays at the view's top
@@ -1943,6 +2015,7 @@ button.tv-rank-row:active { background: #e8ecf1; }
 }
 /* A grade's tile, in its shade. */
 .tx-tile { display: block; flex: none; width: 16px; height: 16px; border-radius: 3px; background: var(--g, #e6ebf1); }
+.tx-tile[data-points="0"] { box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.14); }
 .tx-pick {
   flex: 1; min-width: 0; display: flex; align-items: center; gap: 0.6rem;
   height: var(--control-h); padding: 0 1.6rem 0 0.6rem;
@@ -2091,6 +2164,7 @@ button.tv-rank-row:active { background: #e8ecf1; }
 }
 details[open] > .tx-reasoning-sum::before { transform: translateY(-0.1rem) rotate(45deg); }
 .tx-reasoning-sum:hover { color: var(--accent-hover); }
+.tx-reasoning-sum:focus-visible { outline: none; border-radius: 4px; box-shadow: 0 0 0 3px var(--accent-light); }
 
 /* A response's Markdown (markdown.js), in the view's type: headings are
    bold text, code is tinted. */

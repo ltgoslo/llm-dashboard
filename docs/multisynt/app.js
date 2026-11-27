@@ -486,7 +486,12 @@ async function init() {
   } catch (err) {
     console.error("init failed:", err);
     const el = document.getElementById("chart");
-    if (el) el.innerHTML = "<pre style='color:red;padding:1rem;'>" + err.stack + "</pre>";
+    if (el) {
+      const pre = document.createElement("pre");
+      pre.style.cssText = "color:red;padding:1rem;white-space:pre-wrap;";
+      pre.textContent = err?.stack || String(err);
+      el.replaceChildren(pre);
+    }
     markAppReady();
   }
 }
