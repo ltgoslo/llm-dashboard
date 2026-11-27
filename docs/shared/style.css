@@ -20,6 +20,7 @@
                                          checkboxes — drawn by the stylesheet
                                          so they look alike on every system)
      • Hover tooltip                    (.custom-tooltip — fixed overlay)
+     • Custom scrollbars                (Oslo Mist floating fjord-slate pills)
      • Plotly modebar overrides         (.modebar-container, .modebar-btn)
      • Bar hover scale animation        (driven by chart.js, see #chart
                                          .barlayer path)
@@ -44,11 +45,13 @@
   /* Controls — the chrome shared by the custom dropdowns, segmented
      buttons, small buttons and checkboxes (see the Controls block). */
   --control-h: 2.0625rem;                            /* 33px */
-  --control-border: rgba(22, 28, 36, 0.21);
-  --control-border-hover: rgba(22, 28, 36, 0.56);
+  --control-border: rgba(var(--shadow-rgb), 0.30);
+  --control-border-hover: rgba(var(--shadow-rgb), 0.50);
   --control-radius: 6px;
   --control-shadow: 0 1px 2px rgba(var(--shadow-rgb), 0.08), 0 3px 11px -2px rgba(var(--shadow-rgb), 0.16);
+  --control-shadow-hover: 0 2px 4px rgba(var(--shadow-rgb), 0.1), 0 6px 16px -2px rgba(var(--shadow-rgb), 0.22);
   --control-popup-shadow: 0 4px 12px rgba(var(--shadow-rgb), 0.11), 0 14px 34px -4px rgba(var(--shadow-rgb), 0.2);
+  --control-ease: cubic-bezier(0.22, 0.9, 0.3, 1);
   /* Same size and line-height as the control labels (.control-group
      label), so a control's text line and its label's are the same box
      and centre on the same line of the controls bar. */
@@ -75,6 +78,154 @@ body {
   color: var(--fg);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Scrollbars — Oslo Mist: slim floating 6px fjord-slate pills on
+   a transparent track (no gray gutter, no corner box, no arrows).
+   Sheets, ranking lists, and the page root use a 12px hit area
+   (3px transparent border); compact popups and code/table boxes
+   use a 10px hit area (2px border). Firefox gets matching thin
+   scrollbars inside @supports not selector(::-webkit-scrollbar)
+   so Chromium 121+ keeps the full rounded pill styling.
+   ──────────────────────────────────────────────────────────── */
+
+html::-webkit-scrollbar,
+.tv-body::-webkit-scrollbar,
+.md-sheet::-webkit-scrollbar,
+.tv-rank-list::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+.ui-select-options::-webkit-scrollbar,
+.tx-list::-webkit-scrollbar,
+.about-prompt::-webkit-scrollbar,
+.about-citation::-webkit-scrollbar,
+.about-formula::-webkit-scrollbar,
+.markdown .markdown-table::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+html::-webkit-scrollbar-track,
+.tv-body::-webkit-scrollbar-track,
+.md-sheet::-webkit-scrollbar-track,
+.tv-rank-list::-webkit-scrollbar-track,
+.ui-select-options::-webkit-scrollbar-track,
+.tx-list::-webkit-scrollbar-track,
+.about-prompt::-webkit-scrollbar-track,
+.about-citation::-webkit-scrollbar-track,
+.about-formula::-webkit-scrollbar-track,
+.markdown .markdown-table::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html::-webkit-scrollbar-button,
+.tv-body::-webkit-scrollbar-button,
+.md-sheet::-webkit-scrollbar-button,
+.tv-rank-list::-webkit-scrollbar-button,
+.ui-select-options::-webkit-scrollbar-button,
+.tx-list::-webkit-scrollbar-button,
+.about-prompt::-webkit-scrollbar-button,
+.about-citation::-webkit-scrollbar-button,
+.about-formula::-webkit-scrollbar-button,
+.markdown .markdown-table::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+html::-webkit-scrollbar-corner,
+.tv-body::-webkit-scrollbar-corner,
+.md-sheet::-webkit-scrollbar-corner,
+.tv-rank-list::-webkit-scrollbar-corner,
+.ui-select-options::-webkit-scrollbar-corner,
+.tx-list::-webkit-scrollbar-corner,
+.about-prompt::-webkit-scrollbar-corner,
+.about-citation::-webkit-scrollbar-corner,
+.about-formula::-webkit-scrollbar-corner,
+.markdown .markdown-table::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+html::-webkit-scrollbar-thumb,
+.tv-body::-webkit-scrollbar-thumb,
+.md-sheet::-webkit-scrollbar-thumb,
+.tv-rank-list::-webkit-scrollbar-thumb {
+  background-color: rgba(33, 48, 68, 0.20);
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+  min-height: 36px;
+}
+.ui-select-options::-webkit-scrollbar-thumb,
+.tx-list::-webkit-scrollbar-thumb,
+.about-prompt::-webkit-scrollbar-thumb,
+.about-citation::-webkit-scrollbar-thumb,
+.about-formula::-webkit-scrollbar-thumb,
+.markdown .markdown-table::-webkit-scrollbar-thumb {
+  background-color: rgba(33, 48, 68, 0.20);
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+  min-width: 28px;
+  min-height: 28px;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+.tv-body::-webkit-scrollbar-thumb:hover,
+.md-sheet::-webkit-scrollbar-thumb:hover,
+.tv-rank-list::-webkit-scrollbar-thumb:hover,
+.ui-select-options::-webkit-scrollbar-thumb:hover,
+.tx-list::-webkit-scrollbar-thumb:hover,
+.about-prompt::-webkit-scrollbar-thumb:hover,
+.about-citation::-webkit-scrollbar-thumb:hover,
+.about-formula::-webkit-scrollbar-thumb:hover,
+.markdown .markdown-table::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(33, 48, 68, 0.44);
+}
+
+html::-webkit-scrollbar-thumb:active,
+.tv-body::-webkit-scrollbar-thumb:active,
+.md-sheet::-webkit-scrollbar-thumb:active,
+.tv-rank-list::-webkit-scrollbar-thumb:active,
+.ui-select-options::-webkit-scrollbar-thumb:active,
+.tx-list::-webkit-scrollbar-thumb:active,
+.about-prompt::-webkit-scrollbar-thumb:active,
+.about-citation::-webkit-scrollbar-thumb:active,
+.about-formula::-webkit-scrollbar-thumb:active,
+.markdown .markdown-table::-webkit-scrollbar-thumb:active {
+  background-color: rgba(33, 48, 68, 0.66);
+}
+
+/* Light pill inside dark model-colored chat bubbles (.tx-said). */
+.tx-said .markdown .markdown-table::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.34);
+}
+.tx-said .markdown .markdown-table::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.58);
+}
+.tx-said .markdown .markdown-table::-webkit-scrollbar-thumb:active {
+  background-color: rgba(255, 255, 255, 0.78);
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  html,
+  .tv-body,
+  .md-sheet,
+  .tv-rank-list,
+  .ui-select-options,
+  .tx-list,
+  .about-prompt,
+  .about-citation,
+  .about-formula,
+  .markdown .markdown-table {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(33, 48, 68, 0.24) transparent;
+  }
+  .tx-said .markdown .markdown-table {
+    scrollbar-color: rgba(255, 255, 255, 0.42) transparent;
+  }
 }
 
 /* ────────────────────────────────────────────────────────────
@@ -308,38 +459,35 @@ header.dashboard-header:has(.about-inline > summary > h1) { padding: 0.85rem 0 0
   list-style: none;
   cursor: pointer;
   display: inline-flex;
-  /* center (not baseline) so the rotated chevron in ::after vertically
-     lines up with the title text — same as the other summaries. */
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.34em;
+  font-size: 1.6rem;
+  line-height: 1.25;
 }
 .chart-title-details > summary::-webkit-details-marker { display: none; }
 .chart-title-details > summary::after {
   content: "";
   display: inline-block;
-  width: 0.38em;
-  height: 0.38em;
-  /* Borders use currentColor so the hover rule below tints the chevron
-     in sync with the title text. Defaults to --fg to match .chart-title. */
+  flex-shrink: 0;
+  width: 0.56em;
+  height: 0.36em;
   color: var(--fg);
-  border-right: 0.15em solid currentColor;
-  border-bottom: 0.15em solid currentColor;
-  transform: rotate(45deg);
+  background-color: currentColor;
+  -webkit-mask: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 9'%3E%3Cpath d='M2 2.25 7 7 12 2.25' fill='none' stroke='black' stroke-width='2.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  mask: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 9'%3E%3Cpath d='M2 2.25 7 7 12 2.25' fill='none' stroke='black' stroke-width='2.9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   vertical-align: middle;
-  /* Visual centre of the rotated-corner chevron sits below its box centre
-     (the V is in the bottom half of the original square); nudge it up. */
   position: relative;
-  top: -0.18em;
-  transition: transform 0.15s, color 0.15s;
+  top: 0.04em;
+  transition: transform 0.18s var(--control-ease), color 0.15s;
 }
-.chart-title-details[open] > summary::after { transform: rotate(225deg); }
+.chart-title-details[open] > summary::after { transform: rotate(180deg); }
 
 .chart-title {
   font-family: var(--font-serif);
   font-weight: 800;
-  font-size: 1.6rem;
+  font-size: inherit;
   letter-spacing: -0.025em;
-  line-height: 1.25;
+  line-height: inherit;
   color: var(--fg);
   display: inline;
 }
@@ -450,28 +598,53 @@ select.ui-select-native { display: none !important; }
   border: 1px solid var(--control-border);
   border-radius: var(--control-radius);
   background-color: #ffffff;
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M1 1l4 4 4-4" fill="none" stroke="%23535d6a" stroke-width="1.5" stroke-linecap="round"/></svg>');
-  background-repeat: no-repeat;
-  background-position: right 0.45rem center;
   box-shadow: var(--control-shadow);
   cursor: pointer;
   outline: none;
-  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+  transform: scale(1);
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s,
+              box-shadow 0.18s ease, transform 0.18s var(--control-ease);
 }
+.ui-select::after {
+  content: "";
+  position: absolute;
+  right: 0.48rem;
+  top: 50%;
+  width: 10px;
+  height: 6px;
+  margin-top: -3px;
+  background: center / contain no-repeat url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M1 1l4 4 4-4" fill="none" stroke="%23535d6a" stroke-width="1.5" stroke-linecap="round"/></svg>');
+  pointer-events: none;
+  transition: transform 0.2s var(--control-ease);
+}
+.ui-select[aria-expanded="true"]::after { transform: rotate(180deg); }
 .ui-select-label { overflow: hidden; text-overflow: ellipsis; }
-.ui-select:hover,
-.ui-select:focus-visible,
-.ui-select[aria-expanded="true"] {
-  color: var(--accent);
-  border-color: var(--control-border-hover);
-  background-color: var(--accent-light);
+@media (hover: hover) {
+  .ui-select:not(.disabled):not([aria-expanded="true"]):hover {
+    color: var(--fg);
+    border-color: var(--control-border-hover);
+    background-color: #ffffff;
+    box-shadow: var(--control-shadow-hover);
+    transform: scale(1.03);
+  }
 }
-.ui-select:focus-visible { box-shadow: var(--control-shadow), 0 0 0 2px var(--accent-light); }
+.ui-select[aria-expanded="true"] {
+  color: var(--fg);
+  border-color: var(--control-border-hover);
+  background-color: #ffffff;
+  box-shadow: var(--control-shadow), 0 0 0 3px rgba(var(--shadow-rgb), 0.10);
+}
+.ui-select:focus-visible {
+  color: var(--fg);
+  border-color: var(--control-border-hover);
+  background-color: #ffffff;
+  box-shadow: var(--control-shadow), 0 0 0 3px rgba(var(--shadow-rgb), 0.12);
+}
 .ui-select.disabled { opacity: 0.5; cursor: not-allowed; }
 
-/* The open list: appended to <body> and positioned by dropdown.js, so it
-   escapes the controls bar's clip-path. Regular weight, the current
-   choice bold, the highlighted row in the accent tint. */
+/* The open list (O1 Porcelain Sheet): appended to <body> and positioned by
+   dropdown.js, so it escapes the controls bar's clip-path. Inset rounded rows,
+   group hairlines, and a subtle checkmark on the selected choice. */
 .ui-select-options {
   position: fixed;
   z-index: 500;            /* above the chart overlays (100), below the tooltip (1000) */
@@ -479,117 +652,155 @@ select.ui-select-native { display: none !important; }
   max-height: 60vh;        /* long task lists scroll */
   overflow-y: auto;
   margin: 0;
-  padding: 0.25rem 0;
+  padding: 5px;
   list-style: none;
   font-family: var(--font-sans);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 400;
   line-height: 1.35;
   color: var(--fg);
-  border: 1px solid var(--control-border);
-  border-radius: var(--control-radius);
+  border: 1px solid rgba(var(--shadow-rgb), 0.22);
+  border-radius: 10px;
   background: var(--surface);
   box-shadow: var(--control-popup-shadow);
+  animation: ui-menu-in 0.14s var(--control-ease);
+}
+@keyframes ui-menu-in {
+  from { opacity: 0; transform: translateY(-4px) scale(0.985); }
 }
 .ui-select-options[hidden] { display: none; }
 .ui-select-options li[role="option"] {
-  padding: 0.25rem 1.4rem 0.25rem 0.6rem; /* the closed control's inset */
+  position: relative;
+  padding: 0.34rem 1.85rem 0.34rem 0.6rem;
+  border-radius: 6px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
+  transition: background-color 0.1s, color 0.1s;
 }
-.ui-select-options li.ui-select-grouped { padding-left: 1.2rem; }
-.ui-select-options li[aria-selected="true"] { font-weight: 600; }
-.ui-select-options li.active { color: var(--accent); background: var(--accent-light); }
+.ui-select-options li.ui-select-grouped { padding-left: 1.05rem; }
+.ui-select-options li[aria-selected="true"] { font-weight: 600; color: var(--fg); }
+.ui-select-options li[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  right: 0.55rem;
+  top: 50%;
+  width: 12px;
+  height: 10px;
+  transform: translateY(-50%);
+  background: center / contain no-repeat url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="10"><path d="M1.5 5.2 4.5 8.2 10.5 1.8" fill="none" stroke="%231b2430" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+  pointer-events: none;
+}
+.ui-select-options li.active { color: #0b111a; background: #eaf0f7; }
 .ui-select-options li[aria-disabled="true"] { color: var(--fg-muted); opacity: 0.6; cursor: default; }
 .ui-select-group {
-  padding: 0.5rem 0.6rem 0.15rem;
-  font-size: 0.7rem;
+  padding: 0.45rem 0.6rem 0.2rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--fg-muted);
   cursor: default;
 }
+.ui-select-group:not(:first-child) {
+  margin-top: 0.25rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e7edf3;
+}
 
-/* Segmented button groups (Shots, Error bands, NorPrelude's WSM window):
-   .shot-toggle is the track, a tinted pill in the controls' chrome; the
-   buttons are its options, set in the normal ink (muted grey would read
-   as disabled). The selected one sits on a white raised thumb, the
-   ::before below, positioned by shared/segmented.js through --thumb-left
-   / --thumb-width, and takes the accent. Hovering (or keyboard-focusing)
-   another option tints the track under it — the ::after, placed the same
-   way through --hover-left / --hover-width — and colours its text. The
-   tint is solid and the very colour of the thumb's 1px border, and the
-   thumb casts no shadow beyond that border, so where the two meet they
-   merge without a seam. Thumb and tint are concentric with the track:
-   their radius is the track's minus its padding and border. */
+/* Segmented button groups (Shots, Error bands, NorPrelude's WSM window,
+   and .md-shots in model/task details):
+   .shot-toggle is a slim recessed cool-mist rail; the selected option rides
+   on a proud white card (::before, positioned by shared/segmented.js via
+   --thumb-left / --thumb-width) styled 1:1 like .ui-select and overhanging
+   the rail by --rail-step on all four sides (margin: var(--rail-step)
+   reserves that overhang so alignment with neighbouring controls stays exact).
+   Hovering an inactive option darkens its label without drawing a second box,
+   while the proud card leans slightly toward it along the rail. */
 .shot-toggle {
-  --segment-pad: 2px;
-  --segment-radius: 0.45rem;   /* 7.2px: a touch rounder than the pills, so the thumb keeps a visible radius */
-  --segment-inner-radius: calc(var(--segment-radius) - var(--segment-pad) - 1px);
-  --segment-edge: rgba(var(--shadow-rgb), 0.09);   /* hover tint inside the track */
+  --rail-step: 3px;
+  --segment-h: var(--control-h);
+  --hover-on: 0;
   position: relative;
-  isolation: isolate;          /* the thumb's and tint's z-indices stay inside the group */
+  isolation: isolate;          /* the proud card stays layered inside the group */
   display: inline-flex;
-  height: var(--control-h);
-  padding: var(--segment-pad);
-  border: 1px solid var(--control-border);
-  border-radius: var(--segment-radius);
-  background: #e2e7ed;
+  align-items: center;
+  height: calc(var(--segment-h) - 2 * var(--rail-step));
+  margin: var(--rail-step);
+  padding: 0;
+  border: 1px solid rgba(var(--shadow-rgb), 0.14);
+  border-radius: 5.5px;
+  background: #e8edf4;
   box-shadow: inset 0 1px 2px rgba(var(--shadow-rgb), 0.08);
 }
-.shot-toggle::before, .shot-toggle::after {
+.shot-toggle.segmented-hover { --hover-on: 1; }
+.shot-toggle::before {                        /* proud active card (1:1 .ui-select chrome) */
   content: "";
   position: absolute;
-  top: var(--segment-pad);
-  bottom: var(--segment-pad);
-  border-radius: var(--segment-inner-radius);
-}
-.shot-toggle::after {                         /* hover tint: the thumb's footprint, border included */
-  top: calc(var(--segment-pad) - 1px);
-  bottom: calc(var(--segment-pad) - 1px);
-  left: calc(var(--hover-left, 0) - 1px);
-  width: calc(var(--hover-width, 0) + 2px);
-  border-radius: calc(var(--segment-inner-radius) + 1px);
-  background: var(--segment-edge);
-  opacity: 0;
-  transition: opacity 0.15s;
-  z-index: 0;
-}
-.shot-toggle.segmented-hover::after { opacity: 1; }
-.shot-toggle::before {                        /* thumb */
-  left: var(--thumb-left, var(--segment-pad));
-  width: var(--thumb-width, 0);
+  top: calc(-1 * var(--rail-step) - 1px);
+  bottom: calc(-1 * var(--rail-step) - 1px);
+  left: calc(
+    var(--thumb-left, 0px) - var(--rail-step) - 1px
+    + var(--hover-on) * clamp(-4.5px, (var(--hover-left, 0px) - var(--thumb-left, 0px)) * 0.03, 4.5px)
+  );
+  width: calc(var(--thumb-width, 0px) + 2 * var(--rail-step) + 2px);
+  border: 1px solid var(--control-border);
+  border-radius: var(--control-radius);
   background: #ffffff;
-  box-shadow: 0 1px 2px rgba(var(--shadow-rgb), 0.14), 0 0 0 1px rgba(22, 28, 36, 0.08);
+  box-shadow: var(--control-shadow);
+  box-sizing: border-box;
+  pointer-events: none;
+  transform: scale(1);
   z-index: 1;
 }
-.shot-toggle.segmented-ready::before { transition: left 0.2s ease, width 0.2s ease; }
+.shot-toggle.segmented-hover::before {
+  border-color: var(--control-border-hover);
+  transform: scale(1.04);
+  box-shadow: var(--control-shadow-hover);
+}
+@media (hover: hover) {
+  .shot-toggle:hover::before {
+    border-color: var(--control-border-hover);
+    transform: scale(1.04);
+    box-shadow: var(--control-shadow-hover);
+  }
+}
+.shot-toggle.segmented-ready::before {
+  transition: left 0.22s var(--control-ease),
+              width 0.22s var(--control-ease),
+              transform 0.18s var(--control-ease),
+              box-shadow 0.18s ease,
+              border-color 0.15s;
+}
 .shot-btn, .ci-btn, .wsm-btn {
-  position: relative;      /* above the thumb and the tint */
+  position: relative;      /* above the proud card */
   z-index: 2;
   display: inline-flex;    /* centre the text ourselves, like .ui-select, */
   align-items: center;     /* rather than by each browser's button rules */
   justify-content: center;
-  height: 100%;
-  padding: 0 0.7rem;
+  height: var(--segment-h);
+  margin: calc(-1 * var(--rail-step) - 1px) 0;
+  padding: 0 0.65rem;
   border: none;
-  border-radius: var(--segment-inner-radius);
+  border-radius: var(--control-radius);
   background: transparent;
   cursor: pointer;
   font: var(--control-font);
-  color: var(--fg);
+  color: #606c7b;
   outline: none;
-  transition: color 0.15s;
+  transition: color 0.14s;
 }
 .shot-btn:hover, .ci-btn:hover, .wsm-btn:hover,
-.shot-btn:focus-visible, .ci-btn:focus-visible, .wsm-btn:focus-visible { color: var(--accent); }
-.shot-btn.active, .ci-btn.active, .wsm-btn.active { color: var(--accent); cursor: default; }
+.shot-btn:focus-visible, .ci-btn:focus-visible, .wsm-btn:focus-visible { color: var(--fg); }
+.shot-btn:focus-visible, .ci-btn:focus-visible, .wsm-btn:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--control-border-hover);
+}
+.shot-btn.active, .ci-btn.active, .wsm-btn.active { color: var(--fg); cursor: default; }
 
-/* Checkboxes (task and model grids, the fully-open toggle): a drawn box
-   in the controls' chrome; checked and indeterminate fill with the accent. */
+/* Checkboxes (task and model grids, the fully-open toggle): C6 Fjord Charcoal
+   — white porcelain tile unchecked, deep fjord-charcoal fill checked, with the
+   controls' tactile hover scale and fjord lift shadow. */
 input[type="checkbox"] {
   -webkit-appearance: none;
   appearance: none;
@@ -599,31 +810,43 @@ input[type="checkbox"] {
   margin: 0;
   vertical-align: -0.15em;
   border: 1px solid var(--control-border);
-  border-radius: 0.2rem;
-  background: #ffffff center / 72% no-repeat;
-  box-shadow: 0 1px 3px rgba(var(--shadow-rgb), 0.1);
+  border-radius: 4.5px;
+  background: #ffffff center / 68% no-repeat;
+  box-shadow: var(--control-shadow);
   cursor: pointer;
-  transition: border-color 0.12s, background-color 0.12s;
-}
-input[type="checkbox"]:not(:checked):not(:indeterminate):not(:disabled):hover {
-  border-color: var(--control-border-hover);
-  background-color: var(--accent-light);
+  transform: scale(1);
+  transition: border-color 0.14s, background-color 0.14s,
+              box-shadow 0.16s ease, transform 0.16s var(--control-ease);
 }
 input[type="checkbox"]:checked,
 input[type="checkbox"]:indeterminate {
-  background-color: var(--accent);
-  border-color: var(--accent);
+  background-color: #213044;
+  border-color: #192636;
+  box-shadow: 0 1px 3px rgba(var(--shadow-rgb), 0.22);
 }
 input[type="checkbox"]:checked {
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8"><path d="M1.5 4l2.5 2.5 4.5-5" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8"><path d="M1.5 4l2.5 2.5 4.5-5" fill="none" stroke="white" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>');
 }
 input[type="checkbox"]:indeterminate {
-  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8"><path d="M2 4h6" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>');
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 8"><path d="M2 4h6" fill="none" stroke="white" stroke-width="1.75" stroke-linecap="round"/></svg>');
+}
+@media (hover: hover) {
+  input[type="checkbox"]:not(:disabled):hover,
+  :is(label, .checkbox-category-header):hover > input[type="checkbox"]:not(:disabled) {
+    border-color: var(--control-border-hover);
+    box-shadow: var(--control-shadow-hover);
+    transform: scale(1.1);
+  }
+  input[type="checkbox"]:is(:checked, :indeterminate):not(:disabled):hover,
+  :is(label, .checkbox-category-header):hover > input[type="checkbox"]:is(:checked, :indeterminate):not(:disabled) {
+    background-color: #172333;
+    border-color: #121c29;
+  }
 }
 input[type="checkbox"]:focus-visible {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-light);
+  border-color: var(--control-border-hover);
+  box-shadow: var(--control-shadow), 0 0 0 3px rgba(var(--shadow-rgb), 0.14);
 }
 input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -654,13 +877,28 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
    and the labels just hang into the row's margin-bottom area. */
 .size-label {
   position: absolute;
-  top: calc(100% - 2px);
+  top: calc(100% + 1px);
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background: transparent;
   font-size: 0.7rem;
+  line-height: 1.25;
   transform: translateX(-50%);
-  font-weight: 500; color: var(--fg);
+  font-weight: 600; color: var(--fg);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   pointer-events: none;
+  transition: transform 0.16s var(--control-ease), background-color 0.16s,
+              border-color 0.16s, box-shadow 0.16s;
+}
+#thumb-min:is(:hover, .active, :focus-visible) ~ #size-min-label,
+#thumb-max:is(:hover, .active, :focus-visible) ~ #size-max-label {
+  background: #ffffff;
+  border-color: var(--control-border);
+  box-shadow: 0 1px 4px rgba(var(--shadow-rgb), 0.16);
+  transform: translateX(-50%) translateY(1px) scale(1.06);
+  z-index: 3;
 }
 /* Slider is back to just the track+thumb area (22px). Labels overflow
    below via top: calc(100% + …) above. */
@@ -669,23 +907,27 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
   user-select: none; touch-action: none;
 }
 .range-track {
-  position: absolute; top: 50%; left: 0; right: 0; height: 3.5px;
-  transform: translateY(-50%); background: #e2e7ed; border-radius: 999px;
+  position: absolute; top: 50%; left: 0; right: 0; height: 6px;
+  transform: translateY(-50%); background: #e8edf4; border-radius: 999px;
+  border: 1px solid rgba(var(--shadow-rgb), 0.14);
+  box-shadow: inset 0 1px 1.5px rgba(var(--shadow-rgb), 0.08);
 }
 .range-fill {
-  position: absolute; top: 50%; height: 3.5px; transform: translateY(-50%);
+  position: absolute; top: 50%; height: 6px; transform: translateY(-50%);
   background: var(--accent); border-radius: 999px; pointer-events: none;
 }
 .range-thumb {
-  position: absolute; top: 50%; width: 14px; height: 14px; border-radius: 50%;
+  position: absolute; top: 50%; width: 15px; height: 15px; border-radius: 50%;
   background: var(--accent); border: 2px solid var(--surface);
-  box-shadow: 0 1px 4px rgba(var(--shadow-rgb), 0.32);
-  transform: translate(-50%, -50%); cursor: grab; z-index: 2;
-  transition: box-shadow 0.15s;
+  box-shadow: 0 1px 4px rgba(var(--shadow-rgb), 0.3);
+  transform: translate(-50%, -50%) scale(1); cursor: grab; z-index: 2;
+  transition: transform 0.18s var(--control-ease), box-shadow 0.18s ease, background-color 0.14s;
 }
 .range-thumb:hover, .range-thumb.active, .range-thumb:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px var(--accent-light), 0 0 0 5.5px rgba(27, 36, 48, 0.24), 0 1px 4px rgba(var(--shadow-rgb), 0.32);
+  background: var(--accent-hover);
+  transform: translate(-50%, -50%) scale(1.22);
+  box-shadow: 0 2px 10px rgba(var(--shadow-rgb), 0.4), 0 0 0 3px rgba(var(--shadow-rgb), 0.12);
 }
 .range-thumb.active { cursor: grabbing; }
 
@@ -833,6 +1075,12 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
 #chart:not(.line-mode):not(.bar-pan) [clip-path] {
   clip-path: none !important;
 }
+/* In panning bar mode, bar-pan.js clips the y-axis numbers layer horizontally
+   at the plot's left/right edges; lift Plotly's vertical plot-box clip on the
+   shapes inside so the "0" tick centred on y = 0 isn't sliced in half. */
+#chart.bar-pan .layer-between .shapelayer [clip-path] {
+  clip-path: none !important;
+}
 
 /* ──── Panning bar chart (bar-pan.js) ────
    A chart with more bars than fit keeps Plotly's plot-area clip (above:
@@ -857,8 +1105,8 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
   mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 calc(100% - var(--tail, 0px)), transparent);
 }
 /* Light at the edge, with an eased fall-off: a shadow rather than a stripe. */
-.bar-pan-shadow-left { background: linear-gradient(to right, rgba(var(--shadow-rgb), 0.11), rgba(var(--shadow-rgb), 0.05) 30%, rgba(var(--shadow-rgb), 0.015) 65%, rgba(var(--shadow-rgb), 0)); }
-.bar-pan-shadow-right { background: linear-gradient(to left, rgba(var(--shadow-rgb), 0.11), rgba(var(--shadow-rgb), 0.05) 30%, rgba(var(--shadow-rgb), 0.015) 65%, rgba(var(--shadow-rgb), 0)); }
+.bar-pan-shadow-left { background: linear-gradient(to right, rgba(var(--shadow-rgb), 0.18), rgba(var(--shadow-rgb), 0.085) 30%, rgba(var(--shadow-rgb), 0.025) 65%, rgba(var(--shadow-rgb), 0)); }
+.bar-pan-shadow-right { background: linear-gradient(to left, rgba(var(--shadow-rgb), 0.18), rgba(var(--shadow-rgb), 0.085) 30%, rgba(var(--shadow-rgb), 0.025) 65%, rgba(var(--shadow-rgb), 0)); }
 .bar-pan-shadow.shown { opacity: 1; }
 .bar-pan-btn {
   position: absolute; z-index: 45;
@@ -869,7 +1117,9 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
   color: var(--fg-muted); cursor: pointer; outline: none;
   opacity: 0; pointer-events: none;
   user-select: none; -webkit-user-select: none;
-  transition: opacity 0.2s, color 0.15s, border-color 0.15s, background-color 0.15s;
+  transform: scale(1);
+  transition: opacity 0.2s, color 0.15s, border-color 0.15s, background-color 0.15s,
+              box-shadow 0.18s ease, transform 0.18s var(--control-ease);
 }
 .bar-pan-btn::before {               /* chevron */
   content: ""; width: 0.5rem; height: 0.5rem;
@@ -880,7 +1130,11 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
 .bar-pan-btn.shown { opacity: 1; pointer-events: auto; }
 .bar-pan-btn:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light), var(--control-shadow); }
 @media (hover: hover) {
-  .bar-pan-btn:hover { color: var(--accent); border-color: var(--control-border-hover); background: var(--accent-light); }
+  .bar-pan-btn:hover {
+    color: var(--fg); border-color: var(--control-border-hover); background: #ffffff;
+    box-shadow: var(--control-shadow-hover); transform: scale(1.07);
+  }
+  .bar-pan-btn:active { transform: scale(0.98); }
 }
 .bar-pan-shadow[hidden], .bar-pan-btn[hidden] { display: none; }
 
@@ -1017,10 +1271,20 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
   background: #ffffff; color: var(--fg-muted); cursor: pointer;
   box-shadow: var(--control-shadow);
   outline: none;
-  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+  transform: scale(1);
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s,
+              box-shadow 0.18s ease, transform 0.18s var(--control-ease);
 }
-.small-btn:hover, .small-btn:focus-visible {
+@media (hover: hover) {
+  .small-btn:hover {
+    background: #ffffff; color: var(--fg); border-color: var(--control-border-hover);
+    box-shadow: var(--control-shadow-hover); transform: scale(1.04);
+  }
+  .small-btn:active { transform: scale(0.99); }
+}
+.small-btn:focus-visible {
   background: var(--accent-light); color: var(--accent); border-color: var(--control-border-hover);
+  box-shadow: var(--control-shadow), 0 0 0 2px var(--accent-light);
 }
 
 /* ──── Task checkbox grid — used in the "Tasks" module ────
@@ -1185,10 +1449,12 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
   cursor: pointer;
   outline: none;
   -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
-  transition: color 0.12s, border-color 0.12s, background-color 0.12s, opacity 0.12s;
+  transform: scale(1);
+  transition: color 0.14s, border-color 0.14s, background-color 0.14s, opacity 0.14s,
+              box-shadow 0.18s ease, transform 0.18s var(--control-ease);
 }
 .variant-pill[aria-pressed="true"], .model-chip[aria-pressed="true"] {
-  border-style: solid; border-color: var(--control-border-hover);
+  border-style: solid; border-color: var(--control-border);
   background: #ffffff;
   color: var(--fg);
   box-shadow: 0 1px 3px rgba(var(--shadow-rgb), 0.1);
@@ -1270,11 +1536,21 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23535d6a' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='m15.5 15.5 5 5'/%3E%3C/svg%3E");
   box-shadow: var(--control-shadow);
   outline: none;
-  transition: border-color 0.15s;
+  transform: scale(1);
+  transition: border-color 0.15s, box-shadow 0.18s ease, transform 0.18s var(--control-ease);
 }
 .model-search::placeholder { color: var(--fg-muted); }
-.model-search:hover, .model-search:focus { border-color: var(--control-border-hover); }
-.model-search:focus { box-shadow: 0 0 0 3px var(--accent-light), var(--control-shadow); }
+@media (hover: hover) {
+  .model-search:not(:focus):hover {
+    border-color: var(--control-border-hover);
+    box-shadow: var(--control-shadow-hover);
+    transform: scale(1.02);
+  }
+}
+.model-search:focus {
+  border-color: var(--control-border-hover);
+  box-shadow: var(--control-shadow), 0 0 0 3px rgba(var(--shadow-rgb), 0.12);
+}
 
 /* Hover styles only for a pointer that hovers: a touch screen keeps them
    on the element tapped last, so a chip just switched off would look on. */
@@ -1283,8 +1559,10 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
   .module-toggle:hover::after { border-color: var(--accent); }
   .task-row:hover { background: rgba(var(--shadow-rgb), 0.05); }
   .variant-pill:hover, .model-chip:hover {
-    border-color: var(--control-border-hover); background: var(--accent-light); color: var(--accent);
+    border-color: var(--control-border-hover); background: #ffffff; color: var(--fg);
+    box-shadow: var(--control-shadow-hover); transform: scale(1.04);
   }
+  .variant-pill:active, .model-chip:active { transform: scale(0.99); }
   .model-chip.filtered-out:hover { opacity: 0.85; }
   .picker-more:hover { color: var(--accent-hover); }
 }
@@ -1349,24 +1627,86 @@ input[type="checkbox"]:disabled { opacity: 0.5; cursor: not-allowed; }
 .tooltip-hint { margin-top: 0.3rem; color: var(--fg-muted); font-size: 0.75rem; }
 
 /* ────────────────────────────────────────────────────────────
-   Plotly modebar — the top-right JSON export button over the chart.
-   Overrides defeat Plotly's default white background + border so it
-   blends into the white band; icon fill follows the page accent.
-   Pinned to the chart canvas right edge, which aligns with the
-   column's right text margin.
+   Plotly modebar — the top-right "Export data as JSON" button over the
+   chart. Styled to match the Oslo Mist controls (white porcelain button,
+   30% -> 50% fjord border, fjord shadow, hover lift) and restyles Plotly's
+   built-in [data-title] hover tooltip to match .custom-tooltip.
+   Pinned to the chart canvas right edge, aligned with the column margin.
    ──────────────────────────────────────────────────────────── */
 .modebar-container {
-  top: 6px !important;
-  right: 0 !important;
+  top: 4px !important;
+  right: 6px !important;
+  z-index: 50 !important;  /* above .bar-pan-shadow (40) and .bar-pan-btn (45), below dropdowns (500) */
 }
 .modebar-group {
   background: transparent !important;
   border: none !important;
-  padding: 2px !important;
+  padding: 0 !important;
 }
-.modebar-btn path { fill: var(--fg-muted) !important; }
-.modebar-btn:hover path { fill: var(--accent) !important; }
-.modebar-btn.active path { fill: var(--accent) !important; }
+.js-plotly-plot .plotly .modebar-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 1.9rem !important;
+  height: 1.9rem !important;
+  padding: 0 !important;
+  font-size: 15px !important;
+  background: #ffffff !important;
+  border: 1px solid var(--control-border) !important;
+  border-radius: var(--control-radius) !important;
+  box-shadow: var(--control-shadow) !important;
+  color: var(--fg-muted) !important;
+  cursor: pointer !important;
+  outline: none !important;
+  transform: scale(1);
+  transition: color 0.15s, border-color 0.15s, box-shadow 0.18s ease,
+              transform 0.18s var(--control-ease) !important;
+}
+.js-plotly-plot .plotly .modebar-btn svg {
+  display: block;
+  position: static !important;
+  top: 0 !important;
+}
+.modebar-btn path { fill: var(--fg-muted) !important; transition: fill 0.15s; }
+@media (hover: hover) {
+  .js-plotly-plot .plotly .modebar-btn:hover {
+    border-color: var(--control-border-hover) !important;
+    box-shadow: var(--control-shadow-hover) !important;
+    transform: scale(1.06);
+  }
+  .js-plotly-plot .plotly .modebar-btn:active { transform: scale(0.98); }
+}
+.modebar-btn:hover path,
+.modebar-btn:focus-visible path,
+.modebar-btn.active path { fill: var(--fg) !important; }
+.js-plotly-plot .plotly .modebar-btn:focus-visible {
+  border-color: var(--control-border-hover) !important;
+  box-shadow: var(--control-shadow), 0 0 0 3px rgba(var(--shadow-rgb), 0.12) !important;
+}
+/* Restyle Plotly's built-in dark [data-title] hover label to match Oslo Mist. */
+.js-plotly-plot .plotly .modebar-btn[data-title]::before { display: none !important; }
+.js-plotly-plot .plotly .modebar-btn[data-title]::after {
+  top: calc(100% + 6px) !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translateX(-50%) !important;
+  margin: 0 !important;
+  height: auto !important;
+  padding: 0.35rem 0.65rem !important;
+  background: var(--surface) !important;
+  color: var(--fg) !important;
+  border: 1px solid var(--control-border) !important;
+  border-radius: var(--control-radius) !important;
+  box-shadow: var(--control-popup-shadow) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  text-align: center !important;
+  text-shadow: none !important;
+  white-space: nowrap !important;
+}
 
 /* ────────────────────────────────────────────────────────────
    App loading overlay — covers the page until the dashboard's
@@ -1424,7 +1764,7 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
    ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-  .chart-title { font-size: 1.25rem; }
+  .chart-title-details > summary { font-size: 1.25rem; }
   .controls-bar { gap: 0.5rem 1rem; padding: 0.25rem 0; }
   .checkbox-grid { grid-template-columns: 1fr; }
   #chart { height: 380px; }
@@ -1463,7 +1803,11 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   font: 600 0.92rem/1 var(--font-sans);
   box-shadow: 0 6px 18px rgba(var(--shadow-rgb), 0.3);
   cursor: pointer; outline: none;
+  transition: transform 0.18s var(--control-ease), box-shadow 0.18s ease;
   animation: chart-jump-in 0.2s ease-out;
+}
+@media (hover: hover) {
+  .chart-jump:hover { transform: translateX(-50%) scale(1.04); box-shadow: 0 8px 24px rgba(var(--shadow-rgb), 0.36); }
 }
 .chart-jump::before {                 /* up arrow */
   content: ""; width: 0.45rem; height: 0.45rem; margin-top: 0.25rem;
@@ -1500,9 +1844,8 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   .comparison-page .modebar-container { display: none; }
   /* The chart title's arrow follows its last word (a flex box would park
      it at the right edge, beside two lines of title). */
-  .chart-title-details > summary { display: block; }
-  .chart-title-details > summary::after { margin-left: 0.35em; }
-  .chart-title { font-size: 1.2rem; }
+  .chart-title-details > summary { display: block; font-size: 1.2rem; }
+  .chart-title-details > summary::after { margin-left: 0.3em; top: -0.02em; }
   /* About's formulas fit the screen (or scroll inside their box), never
      widening the page. */
   .about-formula { overflow-x: auto; }
@@ -1524,7 +1867,10 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   .comparison-page .chart-zone .ui-select-label { min-width: 0; }
   .comparison-page .chart-zone .control-group > label { font-size: 0.8rem; line-height: 1.2; }
   .comparison-page .chart-zone .ui-select { width: 100%; height: 2.5rem; }
-  .comparison-page .chart-zone .shot-toggle { width: 100%; height: 2.5rem; }
+  .comparison-page .chart-zone .shot-toggle {
+    --segment-h: 2.5rem;
+    width: calc(100% - 2 * var(--rail-step));
+  }
   .comparison-page .chart-zone .shot-btn { flex: 1 1 0; padding: 0 0.25rem; }
   .comparison-page .range-slider { flex: none; max-width: none; min-width: 0; margin: 0.45rem 10px 0.95rem; }
   .comparison-page .chart-zone .control-group > :is(.fully-open-label, .size-filter-label) {
@@ -1545,9 +1891,16 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
     display: flex; align-items: center; gap: 0.6rem;
     min-height: 2.5rem; padding: 0.4rem 0.8rem;
     border: 1px solid var(--control-border); border-radius: var(--control-radius);
-    background: var(--surface); box-shadow: var(--control-shadow);
+    background: #ffffff; box-shadow: var(--control-shadow);
     font: var(--control-font); color: var(--fg); text-align: left;
     cursor: pointer; outline: none;
+    transform: scale(1);
+    transition: border-color 0.15s, box-shadow 0.18s ease, transform 0.18s var(--control-ease);
+  }
+  @media (hover: hover) {
+    .comparison-page .settings-toggle:hover {
+      border-color: var(--control-border-hover); box-shadow: var(--control-shadow-hover); transform: scale(1.015);
+    }
   }
   .comparison-page .settings-toggle::before {          /* sliders icon */
     content: ""; flex-shrink: 0; width: 1rem; height: 1rem;
@@ -1577,9 +1930,9 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   .comparison-page .ui-select-options {
     left: 12px !important; right: 12px; min-width: 0 !important; max-width: none;
   }
-  .comparison-page .ui-select-options li[role="option"] { padding: 0.65rem 1rem; white-space: normal; }
-  .comparison-page .ui-select-options li.ui-select-grouped { padding-left: 1.75rem; }
-  .comparison-page .ui-select-group { padding: 0.8rem 1rem 0.3rem; }
+  .comparison-page .ui-select-options li[role="option"] { padding: 0.65rem 2.1rem 0.65rem 0.85rem; white-space: normal; }
+  .comparison-page .ui-select-options li.ui-select-grouped { padding-left: 1.55rem; }
+  .comparison-page .ui-select-group { padding: 0.7rem 0.85rem 0.25rem; }
 
   /* Pickers: the sections start folded, as full-width header rows between
      rules (pickers.js initModuleToggles); the toolbar fills its row; an
@@ -1698,15 +2051,31 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   .model-detail .md-groups { columns: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .model-detail, .model-detail.closing, .chart-jump { animation: none; }
+  .model-detail, .model-detail.closing, .chart-jump, .ui-select-options, .tx-list { animation: none; }
   #chart.chart-loading::before { animation: none; background-size: 100% 100%; opacity: 0.55; }
   .shot-toggle.segmented-ready::before,
-  .shot-toggle::after,
+  .ui-select, .ui-select::after, .small-btn, .bar-pan-btn, .variant-pill, .model-chip,
+  .model-search, .range-thumb, .size-label, input[type="checkbox"],
+  .js-plotly-plot .plotly .modebar-btn,
+  .tx-pick, .tx-pick::after, .tx-step, .md-close, .chart-jump, .comparison-page .settings-toggle,
   .md-me,
   .scatter-focus-halo,
   #chart .imagelayer image,
   .about-inline > summary::after,
   .chart-title-details > summary::after { transition: none; }
+  .shot-toggle.segmented-hover { --hover-on: 0; }
+  .shot-toggle.segmented-hover::before,
+  .shot-toggle:hover::before,
+  .ui-select:hover, .small-btn:hover, .bar-pan-btn:hover,
+  .variant-pill:hover, .model-chip:hover, .model-search:hover,
+  .js-plotly-plot .plotly .modebar-btn:hover,
+  input[type="checkbox"]:hover, :is(label, .checkbox-category-header):hover > input[type="checkbox"],
+  .tx-pick:hover, .tx-step:hover,
+  .md-close:hover, .comparison-page .settings-toggle:hover { transform: none; }
+  .range-thumb:hover, .range-thumb.active, .range-thumb:focus-visible { transform: translate(-50%, -50%); }
+  #thumb-min:is(:hover, .active, :focus-visible) ~ #size-min-label,
+  #thumb-max:is(:hover, .active, :focus-visible) ~ #size-max-label { transform: translateX(-50%); }
+  .chart-jump:hover { transform: translateX(-50%); }
 }
 
 /* The button to the panel, floating while it is out of sight below (after
@@ -1727,8 +2096,10 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
 .md-close {
   flex: none; display: grid; place-items: center; width: 2rem; height: 2rem; margin: -0.25rem -0.4rem 0 0;
   padding: 0; border: 0; border-radius: 50%; background: none; color: var(--fg-muted); cursor: pointer;
+  transform: scale(1);
+  transition: background-color 0.14s, color 0.14s, transform 0.18s var(--control-ease);
 }
-.md-close:hover { background: var(--accent-light); color: var(--fg); }
+.md-close:hover { background: var(--accent-light); color: var(--fg); transform: scale(1.06); }
 .md-close:focus-visible { outline: none; background: var(--accent-light); color: var(--fg); box-shadow: 0 0 0 2px var(--accent-light), inset 0 0 0 1px var(--accent); }
 
 .md-desc { margin: 1rem 0 0; color: var(--fg-muted); max-width: 62rem; }
@@ -1740,15 +2111,24 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
    its average in bold. */
 .md-headline { margin-top: 1rem; }
 .md-label { color: var(--fg-muted); font-size: var(--md-small); }
-.model-detail .md-shots { display: flex; width: 100%; max-width: 24rem; margin-top: 0.35rem; }
-.md-shot {
-  position: relative; z-index: 2;   /* above the thumb and the tint */
-  flex: 1 1 0; min-width: 0; height: 100%; padding: 0 0.5rem;
-  border: 0; border-radius: var(--segment-inner-radius); background: transparent; outline: none;
-  font: inherit; line-height: calc(var(--control-h) - 2 * var(--segment-pad) - 2px);
-  color: var(--fg); white-space: nowrap; cursor: pointer; transition: color 0.15s;
+.model-detail .md-shots {
+  display: flex;
+  width: calc(100% - 2 * var(--rail-step));
+  max-width: calc(24rem - 2 * var(--rail-step));
+  margin: calc(0.35rem + var(--rail-step)) var(--rail-step) var(--rail-step);
 }
-.md-shot:hover, .md-shot:focus-visible, .md-shot.active { color: var(--accent); }
+.md-shot {
+  position: relative; z-index: 2;   /* above the proud card */
+  flex: 1 1 0; min-width: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  height: var(--segment-h); margin: calc(-1 * var(--rail-step) - 1px) 0;
+  padding: 0 0.5rem;
+  border: 0; border-radius: var(--control-radius); background: transparent; outline: none;
+  font: inherit; line-height: 1;
+  color: #606c7b; white-space: nowrap; cursor: pointer; transition: color 0.14s;
+}
+.md-shot:hover, .md-shot:focus-visible, .md-shot.active { color: var(--fg); }
+.md-shot:focus-visible { box-shadow: inset 0 0 0 2px var(--control-border-hover); }
 .md-shot.active { cursor: default; }
 .md-shot-name { font-size: var(--md-small); }
 .md-shot-value { margin-left: 0.4em; font-weight: 600; }
@@ -1866,14 +2246,18 @@ button.md-row:active::before { background: var(--accent-light); }
 .tv-sheet {
   position: absolute; top: 1.5rem; bottom: 1.5rem;
   left: max(1.5rem, calc((100% - 1320px) / 2)); right: max(1.5rem, calc((100% - 1320px) / 2));
-  overflow-y: auto; overscroll-behavior: contain; outline: none;
+  overflow: hidden; outline: none;
   background: var(--surface); border-radius: 14px;
   box-shadow: 0 20px 56px -10px rgba(var(--shadow-rgb), 0.26);
 }
+.tv-content {
+  display: flex; flex-direction: column; height: 100%;
+}
 /* The head: the model's badge, "Model – Task [Variant]", the close button,
-   over a rule (as the drawer's). */
+   pinned cleanly above the scrolling .tv-body so its bottom rule spans the
+   full sheet width and the scrollbar starts below it. */
 .tv-head {
-  position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 0.75rem;
+  flex: none; position: relative; z-index: 3; display: flex; align-items: center; gap: 0.75rem;
   padding: 1.1rem 1.4rem 0.9rem 1.75rem; background: var(--surface); border-bottom: 1px solid var(--border-light);
 }
 .tv-head .org-badge { flex: none; width: 2rem; height: 2rem; }
@@ -1885,12 +2269,19 @@ button.md-row:active::before { background: var(--accent-light); }
 .tv-source { margin: 0.45rem 0 0; color: var(--fg-muted); font-size: var(--md-small); }
 
 .tv-body {
+  flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; outline: none;
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(18rem, 25rem); gap: 1.5rem 3.5rem;
+  align-items: start;
   padding: 1.25rem 1.75rem 1.5rem;
 }
 .tv-main > * + * { margin-top: 1rem; }
 .tv-desc { margin: 0; color: var(--fg-muted); max-width: 50rem; }
-.task-view .md-shots { display: flex; width: 100%; max-width: 24rem; margin-top: 0.35rem; }
+.task-view .md-shots {
+  display: flex;
+  width: calc(100% - 2 * var(--rail-step));
+  max-width: calc(24rem - 2 * var(--rail-step));
+  margin: calc(0.35rem + var(--rail-step)) var(--rail-step) var(--rail-step);
+}
 .tv-section { padding-top: 0.5rem; }
 .tv-h { margin: 0; font-size: inherit; font-weight: 600; }
 .tv-note { margin: 0.15rem 0 0; color: var(--fg-muted); font-size: var(--md-small); }
@@ -1945,7 +2336,7 @@ button.md-row:active::before { background: var(--accent-light); }
    colour on a tinted row, its 95% interval a band through the list. Beside
    the prompts the list stays in sight, as tall as the sheet leaves it
    (task-detail.js placeList). */
-.tv-side { position: sticky; top: calc(var(--tv-head-h, 6rem) + 1.25rem); align-self: start; }
+.tv-side { position: sticky; top: 1.25rem; align-self: start; }
 .tv-ranking { padding-top: 0; }
 .tv-rank-list { position: relative; margin: 0.5rem -0.4rem 0; overflow-y: auto; }
 /* Its ends fade where it scrolls on. */
@@ -1954,6 +2345,22 @@ button.md-row:active::before { background: var(--accent-light); }
 .tv-rank-list.fade-top.fade-bottom {
   -webkit-mask-image: linear-gradient(transparent, #000 1.5rem, #000 calc(100% - 1.5rem), transparent);
   mask-image: linear-gradient(transparent, #000 1.5rem, #000 calc(100% - 1.5rem), transparent);
+}
+/* Keep the 12px custom scrollbar strip opaque so the top/bottom list fade
+   never dims or clips the scrollbar thumb. */
+@supports selector(::-webkit-scrollbar) {
+  .tv-rank-list.fade-top {
+    -webkit-mask-image: linear-gradient(to left, #000 0 12px, transparent 12px), linear-gradient(transparent, #000 1.5rem);
+    mask-image: linear-gradient(to left, #000 0 12px, transparent 12px), linear-gradient(transparent, #000 1.5rem);
+  }
+  .tv-rank-list.fade-bottom {
+    -webkit-mask-image: linear-gradient(to left, #000 0 12px, transparent 12px), linear-gradient(#000 calc(100% - 1.5rem), transparent);
+    mask-image: linear-gradient(to left, #000 0 12px, transparent 12px), linear-gradient(#000 calc(100% - 1.5rem), transparent);
+  }
+  .tv-rank-list.fade-top.fade-bottom {
+    -webkit-mask-image: linear-gradient(to left, #000 0 12px, transparent 12px), linear-gradient(transparent, #000 1.5rem, #000 calc(100% - 1.5rem), transparent);
+    mask-image: linear-gradient(to left, #000 0 12px, transparent 12px), linear-gradient(transparent, #000 1.5rem, #000 calc(100% - 1.5rem), transparent);
+  }
 }
 .tv-rank-row {
   display: grid; grid-template-columns: minmax(0, 10rem) minmax(0, 1fr) 2.5rem;
@@ -2027,7 +2434,7 @@ button.tv-rank-row:active { background: var(--accent-light); }
    example's grade, number and prompt in a line) that opens a list of every
    example, and ‹ › beside it. */
 .tx-nav {
-  position: sticky; top: var(--tv-head-h, 4rem); z-index: 2;
+  position: sticky; top: 0; z-index: 2;
   display: flex; align-items: center; gap: 0.75rem;
   margin-top: 0.55rem; padding: 0.45rem 0 0.6rem; background: var(--surface);
   border-bottom: 1px solid var(--border-light);
@@ -2036,42 +2443,73 @@ button.tv-rank-row:active { background: var(--accent-light); }
 .tx-tile { display: block; flex: none; width: 16px; height: 16px; border-radius: 3px; background: var(--g, var(--accent-light)); }
 .tx-tile[data-points="0"] { box-shadow: inset 0 0 0 1px rgba(var(--shadow-rgb), 0.16); }
 .tx-pick {
+  position: relative;
   flex: 1; min-width: 0; display: flex; align-items: center; gap: 0.6rem;
   height: var(--control-h); padding: 0 1.6rem 0 0.6rem;
   border: 1px solid var(--control-border); border-radius: var(--control-radius);
-  background: #ffffff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M1 1l4 4 4-4" fill="none" stroke="%23535d6a" stroke-width="1.5" stroke-linecap="round"/></svg>') no-repeat right 0.6rem center;
+  background: #ffffff;
   box-shadow: var(--control-shadow); color: var(--fg); font: inherit; text-align: left; cursor: pointer; outline: none;
-  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+  transform: scale(1);
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s,
+              box-shadow 0.18s ease, transform 0.18s var(--control-ease);
 }
-.tx-pick:hover, .tx-pick:focus-visible, .tx-pick[aria-expanded="true"] {   /* as .ui-select's */
-  color: var(--accent); border-color: var(--control-border-hover); background-color: var(--accent-light);
+.tx-pick::after {
+  content: ""; position: absolute; right: 0.6rem; top: 50%;
+  width: 10px; height: 6px; margin-top: -3px;
+  background: center / contain no-repeat url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M1 1l4 4 4-4" fill="none" stroke="%23535d6a" stroke-width="1.5" stroke-linecap="round"/></svg>');
+  pointer-events: none; transition: transform 0.2s var(--control-ease);
 }
-.tx-pick:focus-visible { box-shadow: var(--control-shadow), 0 0 0 2px var(--accent-light); }
+.tx-pick[aria-expanded="true"]::after { transform: rotate(180deg); }
+@media (hover: hover) {
+  .tx-pick:not([aria-expanded="true"]):hover {
+    color: var(--fg); border-color: var(--control-border-hover); background-color: #ffffff;
+    box-shadow: var(--control-shadow-hover); transform: scale(1.012);
+  }
+}
+.tx-pick[aria-expanded="true"] {
+  color: var(--fg); border-color: var(--control-border-hover); background-color: #ffffff;
+  box-shadow: var(--control-shadow), 0 0 0 3px rgba(var(--shadow-rgb), 0.10);
+}
+.tx-pick:focus-visible {
+  color: var(--fg); border-color: var(--control-border-hover); background-color: #ffffff;
+  box-shadow: var(--control-shadow), 0 0 0 3px rgba(var(--shadow-rgb), 0.12);
+}
 .tx-pick-n { flex: none; color: var(--fg-muted); font-variant-numeric: tabular-nums; }
 .tx-pick-text { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-/* The list: the current example bold, the one the keys are on (or the
-   pointer) in the accent tint, as the dropdowns' lists. */
+/* The list: O1 Porcelain Sheet matching .ui-select-options. */
 .tx-list {
-  position: absolute; z-index: 3; top: calc(100% - 0.3rem); left: 0; right: 0;
-  max-height: min(26rem, 60vh); overflow-y: auto; padding: 0.25rem 0;
-  border: 1px solid var(--control-border); border-radius: var(--control-radius);
+  position: absolute; z-index: 3; top: calc(100% - 0.15rem); left: 0; right: 0;
+  max-height: min(26rem, 60vh); overflow-y: auto; padding: 5px;
+  border: 1px solid rgba(var(--shadow-rgb), 0.22); border-radius: 10px;
   background: var(--surface); box-shadow: var(--control-popup-shadow);
+  animation: ui-menu-in 0.14s var(--control-ease);
 }
 .tx-list[hidden] { display: none; }
 .tx-list-row {
+  position: relative;
   display: grid; grid-template-columns: 16px 1.5rem minmax(0, 1fr); align-items: center; gap: 0.6rem;
-  padding: 0.3rem 0.75rem; cursor: pointer;
+  padding: 0.34rem 1.85rem 0.34rem 0.6rem; border-radius: 6px; cursor: pointer;
+  transition: background-color 0.1s, color 0.1s;
 }
 .tx-list-n { color: var(--fg-muted); text-align: right; font-variant-numeric: tabular-nums; }
 .tx-list-text { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.tx-list-row[aria-selected="true"] { font-weight: 600; }
-.tx-list-row.active { color: var(--accent); background: var(--accent-light); }
+.tx-list-row[aria-selected="true"] { font-weight: 600; color: var(--fg); }
+.tx-list-row[aria-selected="true"]::after {
+  content: ""; position: absolute; right: 0.55rem; top: 50%; width: 12px; height: 10px;
+  transform: translateY(-50%);
+  background: center / contain no-repeat url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="10"><path d="M1.5 5.2 4.5 8.2 10.5 1.8" fill="none" stroke="%231b2430" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+  pointer-events: none;
+}
+.tx-list-row.active { color: #0b111a; background: #eaf0f7; }
 .tx-steps { flex: none; display: flex; gap: 0.35rem; }
 .tx-step {
   display: grid; place-items: center; width: 1.75rem; height: 1.75rem; padding: 0;
-  border: 1px solid var(--control-border); border-radius: 50%; background: var(--surface);
+  border: 1px solid var(--control-border); border-radius: 50%; background: #ffffff;
+  box-shadow: var(--control-shadow);
   color: var(--fg-muted); cursor: pointer; outline: none;
-  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+  transform: scale(1);
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s,
+              box-shadow 0.18s ease, transform 0.18s var(--control-ease);
 }
 .tx-step::before {   /* chevron, as the bar chart's pan buttons' */
   content: ""; width: 0.4rem; height: 0.4rem;
@@ -2079,10 +2517,14 @@ button.tv-rank-row:active { background: var(--accent-light); }
 }
 .tx-prev::before { transform: translateX(0.1rem) rotate(135deg); }
 .tx-next::before { transform: translateX(-0.1rem) rotate(-45deg); }
-.tx-step:disabled { opacity: 0.4; cursor: default; }
+.tx-step:disabled { opacity: 0.4; cursor: default; box-shadow: none; }
 .tx-step:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
 @media (hover: hover) {
-  .tx-step:not(:disabled):hover { color: var(--accent); border-color: var(--control-border-hover); background: var(--accent-light); }
+  .tx-step:not(:disabled):hover {
+    color: var(--fg); border-color: var(--control-border-hover); background: #ffffff;
+    box-shadow: var(--control-shadow-hover); transform: scale(1.07);
+  }
+  .tx-step:not(:disabled):active { transform: scale(0.98); }
 }
 
 /* An example as a conversation in a messaging app: the prompt, a message

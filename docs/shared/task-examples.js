@@ -502,11 +502,11 @@ export function createExamples() {
         if (x.others.length) parts.push(othersPart(x, i, open));
         // Read from part-way down, the next example shows from its start,
         // under the picker (which stays at the view's top: style.css).
-        const sheet = holder.closest(".tv-sheet");
+        const scroller = holder.closest(".tv-body") || holder.closest(".tv-sheet");
         const below = picker.el.getBoundingClientRect().bottom;
-        const into = !!sheet && holder.getBoundingClientRect().top < below - 1;
+        const into = !!scroller && holder.getBoundingClientRect().top < below - 1;
         holder.replaceChildren(...parts);
-        if (into) sheet.scrollTop += holder.getBoundingClientRect().top - below;
+        if (into) scroller.scrollTop += holder.getBoundingClientRect().top - below;
       }
       go(x.index());
       return sec;

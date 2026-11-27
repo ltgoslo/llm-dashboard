@@ -31,6 +31,7 @@ const BUTTON_GAP_PX = 12;    // between a button outside the plot and the plot
 const SCREEN_EDGE_PX = 6;    // a button outside the plot keeps off the window's edge
 const OVERLAY_INSET_PX = 8;  // a button on top of the plot, from its edge
 const SCORE_CLIP_ID = "bar-pan-score-clip";
+const AXIS_CLIP_ID = "bar-pan-axis-clip";
 
 const pan = {
   enabled: false,
@@ -58,6 +59,7 @@ export function setBarPan(chart, opts) {
     pan.enabled = false;
     chart.classList.remove("bar-pan");
     chart.querySelector(".infolayer")?.removeAttribute("clip-path");
+    chart.querySelector(".layer-between > .shapelayer")?.removeAttribute("clip-path");
     if (pan.ui) pan.ui.all.forEach((el) => { el.hidden = true; });
     return;
   }
@@ -250,20 +252,18 @@ function position() {
   clipScores(size);
 }
 
-/** The bars' scores are Plotly annotations, in its info layer, which Plotly
- *  doesn't clip (it only drops one whose bar's centre leaves the view): clip
- *  the layer to the plot's width, so they pan under the margins like their
- *  bars. (A redraw from scratch makes a new SVG: hence on every afterplot.) */
-function clipScores(size) {
-  const info = pan.chart.querySelector(".infolayer");
-  const svg = info?.ownerSVGElement;
+/** Clip a layer horizontally to the plot's width (leaving generous vertical
+ *  headroom) so scores above bars and y-axis labels centred on the 0 line pan
+ *  cleanly under the page margins without slicing the top/bottom ticks. */
+function clipLayerX(layer, clipId, size) {
+  const svg = layer?.ownerSVGElement;
   if (!svg) return;
-  let clip = svg.querySelector("#" + SCORE_CLIP_ID);
+  let clip = svg.querySelector("#" + clipId);
   if (!clip) {
     const NS = "http://www.w3.org/2000/svg";
     const defs = svg.querySelector("defs") || svg.insertBefore(document.createElementNS(NS, "defs"), svg.firstChild);
     clip = defs.appendChild(document.createElementNS(NS, "clipPath"));
-    clip.id = SCORE_CLIP_ID;
+    clip.id = clipId;
     clip.appendChild(document.createElementNS(NS, "rect"));
   }
   const rect = clip.firstChild;
@@ -271,7 +271,15 @@ function clipScores(size) {
   rect.setAttribute("width", size.w);
   rect.setAttribute("y", -size.t - 1000);
   rect.setAttribute("height", svg.getAttribute("height") * 1 + 2000);
-  info.setAttribute("clip-path", `url(#${SCORE_CLIP_ID})`);
+  layer.setAttribute("clip-path", `url(#${clipId})`);
+}
+
+/** The bars' scores (in .infolayer) and the y-axis numbers (in the
+ *  layer-between .shapelayer) pan under the margins like their bars.
+ *  (A redraw from scratch makes a new SVG: hence on every afterplot.) */
+function clipScores(size) {
+  clipLayerX(pan.chart.querySelector(".infolayer"), SCORE_CLIP_ID, size);
+  clipLayerX(pan.chart.querySelector(".layer-between > .shapelayer"), AXIS_CLIP_ID, size);
 }
 
 /** The shadows and buttons for the current view. */

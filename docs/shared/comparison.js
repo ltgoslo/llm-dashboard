@@ -2972,23 +2972,21 @@ function renderModelBars(modelNames, opts) {
   // 0.1 slot before the first bar (as Plotly's plot did, before the column):
   // labels of empty shapes over the band, both in the layer between the
   // gridlines and the bars — under the bars (one widened by the hover can
-  // reach them) and cut at the plot's edge with them. One on the plot's
-  // bottom or top edge sits just inside it. (Shape labels keep ~3px from
-  // their shape's edge.)
+  // reach them) and clipped horizontally at the plot's edges (bar-pan.js) so
+  // even the bottom/top tick ("0") stays centred on its gridline without
+  // shifting toward its neighbour. (Shape labels keep ~3px from their edge.)
   const numbersEnd = -0.6;
-  const plotHeight = (chartEl?.clientHeight || 500) - margin.t - margin.b;
-  const edgePx = (v) => (v - yRange[0]) / (yRange[1] - yRange[0]) * plotHeight;
+  const yPad = (yRange[1] - yRange[0]) * 0.015;
   const yNumbers = [
     { type: "rect", layer: "between", name: AXIS_LABELS, xref: "x", yref: "y",
-      x0: -0.5 - lead, x1: numbersEnd, y0: yRange[0], y1: yRange[1], fillcolor: "#fdfefe", line: { width: 0 } },
+      x0: -0.5 - lead, x1: numbersEnd, y0: yRange[0] - yPad, y1: yRange[1] + yPad, fillcolor: "#fdfefe", line: { width: 0 } },
     ...yTicks.map((tk) => ({
       type: "rect", layer: "between", name: AXIS_LABELS, xref: "x", yref: "y",
       x0: -0.5 - lead, x1: numbersEnd - (Y_LABEL_GAP_PX - 3) / view.slotPx, y0: tk.v, y1: tk.v,
       fillcolor: "rgba(0,0,0,0)", line: { width: 0 },
       label: {
         text: tk.text, font: { ...Y_TICK_FONT }, padding: 0,
-        textposition: edgePx(tk.v) < Y_TICK_FONT.size * 0.6 ? "bottom right"
-          : plotHeight - edgePx(tk.v) < Y_TICK_FONT.size * 0.6 ? "top right" : "middle right",
+        textposition: "middle right",
       },
     })),
   ];

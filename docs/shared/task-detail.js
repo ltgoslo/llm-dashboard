@@ -296,13 +296,13 @@ export function createTaskDetail({ onClose, onShot, onModel }) {
     const stops = [...sheet.querySelectorAll("a[href], button:not([disabled]), summary")].filter((x) => x.offsetParent && x.tabIndex >= 0);
     if (!stops.length) { e.preventDefault(); return; }
     const first = stops[0], last = stops[stops.length - 1], at = document.activeElement;
-    if (e.shiftKey && (at === first || at === sheet)) { e.preventDefault(); last.focus(); }
+    if (e.shiftKey && (at === first || at === sheet || at === parts?.body)) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && at === last) { e.preventDefault(); first.focus(); }
   });
 
   const shots = shotControl(onShot);   // (kept: its thumb slides to a picked shot)
   const examples = createExamples();   // (a judged task's: kept for the same task)
-  let parts = null;    // { head, list }
+  let parts = null;    // { head, body, list }
   let shown = null;    // the content shown
   let motion = [];     // the running Animations
   let opening = null;  // the opening's token, while its start is held
@@ -356,13 +356,14 @@ export function createTaskDetail({ onClose, onShot, onModel }) {
     ranking.list.addEventListener("scroll", fadeList, { passive: true });
     side.append(ranking.sec);
     const body = el("div", "tv-body");
+    body.tabIndex = -1;
     body.append(main, side);
-    const top = sheet.scrollTop, listTop = parts?.list.scrollTop || 0;
+    const top = parts?.body.scrollTop || 0, listTop = parts?.list.scrollTop || 0;
     content.style.setProperty("--tv-me", d.model.color);
     if (d.judged) setModelColors(content, d.model.color);
     content.replaceChildren(head, body);
-    sheet.scrollTop = shown?.task === d.task ? top : 0;
-    parts = { head, list: ranking.list };
+    body.scrollTop = shown?.task === d.task ? top : 0;
+    parts = { head, body, list: ranking.list };
     const recenter = !shown || shown.task !== d.task || shown.model.id !== d.model.id || shown.shot !== d.shot;
     shown = d;
     placeList(recenter);
@@ -406,7 +407,7 @@ export function createTaskDetail({ onClose, onShot, onModel }) {
       refocus = refocusTo || document.activeElement;
       root.hidden = false;
       fill(d);
-      sheet.focus({ preventScroll: true });
+      (parts?.body || sheet).focus({ preventScroll: true });
       if (!onScreen(from)) return;
       stop();
       // The motion's start held for two frames, while the content is laid

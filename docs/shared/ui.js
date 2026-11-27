@@ -136,10 +136,11 @@ export function setChartHeader(titleText, desc) {
 // Control-bar tooltips
 // ─────────────────────────────────────────────────────────────
 
-// Tooltip text shown when the user hovers each control-bar setting.
+// Tooltip text shown when the user hovers each control-bar setting's label.
 // `anchor` is a selector for any element inside the control's wrapper;
-// the tooltip is attached to the nearest enclosing .control-group so
-// hovering the label OR the input both trigger it.
+// the tooltip is attached to the control group's label (or its text <span>
+// when the label wraps a checkbox) so hovering the interactive control itself
+// doesn't trigger a tooltip.
 const CONTROL_TOOLTIPS = [
   {
     anchor: "#task-select",
@@ -223,9 +224,13 @@ export function attachControlTooltips(overrides = {}) {
     const cfg = overrides[base.anchor] ? { ...base, ...overrides[base.anchor] } : base;
     const el = document.querySelector(cfg.anchor);
     if (!el) continue;
-    const target = el.classList.contains("control-group")
+    const group = el.classList.contains("control-group")
       ? el
       : el.closest(".control-group") || el;
+    const label = group.querySelector(":scope > label");
+    const target = label
+      ? (label.querySelector(":scope > span") || label)
+      : group;
     attachTooltip(target, () => {
       // Never pop a control tooltip over an open custom dropdown list.
       if (document.querySelector('.ui-select[aria-expanded="true"]')) return null;
