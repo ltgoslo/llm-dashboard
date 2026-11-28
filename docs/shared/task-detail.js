@@ -31,7 +31,7 @@
 // (task-examples.js): the prompts and the model's responses as in a
 // messaging app, and their judgments. Its type is every task view's.
 
-import { el, position, shotControl, detailMotion } from "./model-detail.js";
+import { el, position, shotControl, detailMotion, makeDotCanvas, paintDotStrips } from "./model-detail.js";
 import { createExamples, setModelColors } from "./task-examples.js";
 
 /** Text with its slots ({{expression}}: fields of the task's examples)
@@ -77,12 +77,7 @@ function buildScoreRow(row, d) {
   const name = el("span", "tv-row-name", row.name);
   if (row.best) name.append(el("span", "tv-best", "best"));
   const strip = el("div", "tv-strip");
-  for (const v of row.all) {
-    if (v == null) continue;
-    const dot = el("span", "md-dot");
-    dot.style.left = position(v, d.domain);
-    strip.append(dot);
-  }
+  strip.append(makeDotCanvas(row.all, d.domain));
   if (row.ci) {
     const ci = el("span", "tv-ci");
     ci.style.left = position(row.ci[0], d.domain);
@@ -317,9 +312,8 @@ export function createTaskDetail({ onClose, onShot, onModel }) {
     if (!list) return;
     const side = list.closest(".tv-side");
     const beside = side && getComputedStyle(side).position === "sticky";
-    sheet.style.setProperty("--tv-head-h", parts.head.offsetHeight + "px");
-    // `.tv-side` is sticky relative to `sheet`, so `list.getBoundingClientRect().top`
-    // is already in viewport coordinates whether `sheet` is scrolled or not.
+    // `.tv-side` is sticky relative to `.tv-body`, so `list.getBoundingClientRect().top`
+    // is already in viewport coordinates whether `.tv-body` is scrolled or not.
     const room = beside
       ? sheet.getBoundingClientRect().bottom - list.getBoundingClientRect().top - 24
       : window.innerHeight * 0.6;
@@ -327,6 +321,7 @@ export function createTaskDetail({ onClose, onShot, onModel }) {
     const me = list.querySelector(".tv-rank-me");
     if (center && me) list.scrollTop = Math.max(0, me.offsetTop - (list.clientHeight - me.offsetHeight) / 2);
     fadeList();
+    paintDotStrips(content);
   }
   /** The list's ends fade where it scrolls on. */
   function fadeList() {
@@ -374,6 +369,8 @@ export function createTaskDetail({ onClose, onShot, onModel }) {
     opening = null;
     for (const a of motion) a.cancel();
     motion = [];
+    sheet.style.willChange = "";
+    backdrop.style.willChange = "";
   }
 
   function gone() {
@@ -388,18 +385,21 @@ export function createTaskDetail({ onClose, onShot, onModel }) {
     if (back?.isConnected) back.focus({ preventScroll: true });
   }
 
-  /** The sheet's clip as the box `r` (a DOMRect on the screen). */
-  function clipTo(r) {
+  /** GPU-composited directional transform emerging from / returning toward `r`
+   *  (avoids animating clip-path across a large shadowed sheet). */
+  function zoomTransform(r, scale) {
     const s = sheet.getBoundingClientRect();
-    const px = (v) => Math.round(v) + "px";
-    return `inset(${px(r.top - s.top)} ${px(s.right - r.right)} ${px(s.bottom - r.bottom)} ${px(r.left - s.left)} round 8px)`;
+    const dx = (r.left + r.width / 2) - (s.left + s.width / 2);
+    const dy = (r.top + r.height / 2) - (s.top + s.height / 2);
+    const tx = Math.round(Math.max(-160, Math.min(160, dx * 0.22)));
+    const ty = Math.round(Math.max(-120, Math.min(120, dy * 0.22)));
+    return `translate3d(${tx}px, ${ty}px, 0) scale(${scale})`;
   }
-  const clipNone = () => `inset(0px 0px 0px 0px round ${getComputedStyle(sheet).borderTopLeftRadius})`;
   const onScreen = (r) => r && r.bottom > 0 && r.top < window.innerHeight && r.right > 0 && r.left < window.innerWidth;
 
   return {
     isOpen: () => !root.hidden && !closing,
-    /** Show `d`: opened (grown out of the box `from`, a DOMRect, if any;
+    /** Show `d`: opened (zooming smoothly from `from`, a DOMRect, if any;
      *  focus returns to `refocusTo` when it closes) or updated in place. */
     show(d, { from = null, refocusTo = null } = {}) {
       if (closing) gone();
@@ -410,43 +410,54 @@ export function createTaskDetail({ onClose, onShot, onModel }) {
       (parts?.body || sheet).focus({ preventScroll: true });
       if (!onScreen(from)) return;
       stop();
-      // The motion's start held for two frames, while the content is laid
-      // out and painted (hidden); nothing moves before it is.
-      const start = clipTo(from), token = opening = {};
+      // Hold one frame at the starting GPU transform while layout & canvases
+      // finish painting, then run a pure transform + opacity animation.
+      const startTransform = zoomTransform(from, 0.93);
+      const token = opening = {};
+      sheet.style.willChange = "transform, opacity";
+      backdrop.style.willChange = "opacity";
       const hold = [
         backdrop.animate([{ opacity: 0 }], { fill: "forwards" }),
-        sheet.animate([{ clipPath: start }], { fill: "forwards" }),
-        content.animate([{ opacity: 0 }], { fill: "forwards" }),
+        sheet.animate([{ transform: startTransform, opacity: 0 }], { fill: "forwards" }),
       ];
       motion = hold;
-      requestAnimationFrame(() => requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
         if (opening !== token) return;
         opening = null;
         for (const a of hold) a.cancel();
+        const opts = detailMotion({ duration: detailMotion().duration ? 240 : 0, easing: "cubic-bezier(0.22, 1, 0.36, 1)" });
         motion = [
-          backdrop.animate([{ opacity: 0 }, { opacity: 1 }], detailMotion()),
-          sheet.animate([{ clipPath: start }, { clipPath: clipNone() }], detailMotion()),
-          // (Hidden while it doesn't show: the clip's frames paint no more than the sheet.)
-          content.animate([{ opacity: 0, visibility: "hidden" }, { opacity: 0, visibility: "hidden", offset: 0.29 },
-            { opacity: 0, visibility: "visible", offset: 0.3 }, { opacity: 1, visibility: "visible" }], detailMotion()),
+          backdrop.animate([{ opacity: 0 }, { opacity: 1 }], opts),
+          sheet.animate(
+            [{ transform: startTransform, opacity: 0 }, { transform: "translate3d(0, 0, 0) scale(1)", opacity: 1 }],
+            opts,
+          ),
         ];
-        Promise.all(motion.map((a) => a.finished)).then(() => { motion = []; }, () => {});
-      }));
+        Promise.all(motion.map((a) => a.finished)).then(() => {
+          motion = [];
+          sheet.style.willChange = "";
+          backdrop.style.willChange = "";
+        }, () => {});
+      });
     },
-    /** Hidden: shrunk into the box `to` (a DOMRect), if any on the screen,
-     *  else at once. Focus goes to `focus` if given (else back where it was
-     *  before the view opened). */
+    /** Hidden: zoomed back toward its row (`animate`), else at once.
+     *  Focus goes to `focus` if given (else back where it was before opening). */
     hide({ to = null, focus = null } = {}) {
       if (root.hidden || closing) return;
       if (focus) refocus = focus;
       if (!onScreen(to)) { gone(); return; }
       stop();
       const token = closing = {};
+      const endTransform = zoomTransform(to, 0.94);
+      sheet.style.willChange = "transform, opacity";
+      backdrop.style.willChange = "opacity";
+      const opts = detailMotion({ duration: detailMotion().duration ? 185 : 0, fill: "forwards" });
       motion = [
-        backdrop.animate([{ opacity: 1 }, { opacity: 0 }], detailMotion({ fill: "forwards" })),
-        sheet.animate([{ clipPath: clipNone() }, { clipPath: clipTo(to) }], detailMotion({ fill: "forwards" })),
-        content.animate([{ opacity: 1, visibility: "visible" }, { opacity: 0, visibility: "visible", offset: 0.4 },
-          { opacity: 0, visibility: "hidden", offset: 0.41 }, { opacity: 0, visibility: "hidden" }], detailMotion({ fill: "forwards" })),
+        backdrop.animate([{ opacity: 1 }, { opacity: 0 }], opts),
+        sheet.animate(
+          [{ transform: "translate3d(0, 0, 0) scale(1)", opacity: 1 }, { transform: endTransform, opacity: 0 }],
+          opts,
+        ),
       ];
       Promise.all(motion.map((a) => a.finished)).then(() => { if (closing === token) gone(); }, () => {});
     },

@@ -1378,7 +1378,7 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
     : null;
   chartEl._cbBarRecapture = barIndices.length && !horizontal
     ? () => {
-        if (chartEl._barAnimating) return;
+        if (chartEl._barAnimating || chartEl._skipBarRecapture) return;
         captureNaturalRects(chartEl);
         chartEl._barHoverRedrawn?.();
       }

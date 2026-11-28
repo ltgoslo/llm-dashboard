@@ -233,7 +233,7 @@ function ensureUI(chart) {
  *  plot's position in the chart comes from Plotly's layout. */
 function position() {
   const ui = pan.ui, size = pan.chart?._fullLayout?._size;
-  if (!ui || !size || !pan.enabled) return;
+  if (!ui || !size || !pan.enabled || pan.chart._skipBarRecapture) return;
   const x0 = pan.chart.offsetLeft + size.l, y0 = pan.chart.offsetTop + size.t;
   const cover = coverPx(), w = size.w - cover;   // the plot in sight
   const tail = Math.min(SHADOW_TAIL_PX, size.b);

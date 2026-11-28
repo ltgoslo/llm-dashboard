@@ -22,7 +22,7 @@ import { enhanceSegmentedControl } from "./segmented.js";
 /** Screens wide enough for the drawer (style.css has the same breakpoint). */
 export const DETAIL_DRAWER = "(min-width: 1180px)";
 const PANEL_IN_SIGHT_PX = 280;   // a click scrolls this much of the panel into sight
-const TASK_INTENT_MS = 120;      // the pointer resting this long on a task's row loads its details' data
+const TASK_INTENT_MS = 65;       // the pointer resting this long on a task's row preloads its data
 
 const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)");
 /** The details' motion — the drawer's slide, the page's shift, the band's
@@ -152,17 +152,71 @@ function buildLegend(d) {
 /** Where `v` lies on a strip with the scale `domain`: a CSS left (%). */
 export const position = (v, domain) => ((v - domain[0]) / (domain[1] - domain[0]) * 100).toFixed(2) + "%";
 
-/** A row's dot strip: every model's score on the profile's scale (the
- *  model's own under its dot), and the model's dot. (Where its dot sits
- *  among the others is its standing: no rank beside it.) */
+const DOT_COLOR = "rgba(83, 93, 106, 0.38)";
+const DOT_PAD = 3;      // matches .md-dots left: -3px / width: calc(100% + 6px)
+const DOT_RADIUS = 2.5; // matches .md-dot 5px diameter
+
+/** Single-element canvas holding all comparison dots of one strip (replaces
+ *  ~60 <span class="md-dot"> nodes per row with 1 node while keeping exact
+ *  translucent overlap compounding). Painted by paintDotStrips(). */
+export function makeDotCanvas(all, domain) {
+  const c = el("canvas", "md-dots");
+  c.setAttribute("aria-hidden", "true");
+  c._dots = { all, domain };
+  return c;
+}
+
+/** Batch-measure and paint every .md-dots canvas inside `container` at device
+ *  resolution (zero read/write interleaving; skips unchanged canvases). */
+export function paintDotStrips(container) {
+  if (!container) return;
+  const canvases = container.querySelectorAll("canvas.md-dots");
+  if (!canvases.length) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 3);
+  // Pass 1 (reads): measure parent strip widths/heights in one layout pass.
+  const jobs = [];
+  for (let i = 0; i < canvases.length; i++) {
+    const c = canvases[i];
+    const data = c._dots;
+    const p = c.parentElement;
+    if (!data || !p) continue;
+    const w = p.clientWidth;
+    const h = p.clientHeight;
+    if (!(w > 0 && h > 0)) continue;
+    if (c._pW === w && c._pH === h && c._pDpr === dpr && c._pRef === data) continue;
+    jobs.push({ c, data, w, h });
+  }
+  // Pass 2 (writes): size and draw each dirty canvas.
+  const twoPi = Math.PI * 2;
+  for (let i = 0; i < jobs.length; i++) {
+    const { c, data, w, h } = jobs[i];
+    const cw = w + DOT_PAD * 2;
+    c.width = Math.round(cw * dpr);
+    c.height = Math.round(h * dpr);
+    const ctx = c.getContext("2d");
+    if (!ctx) continue;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = DOT_COLOR;
+    const lo = data.domain[0], span = data.domain[1] - lo || 1, cy = h / 2;
+    const all = data.all;
+    for (let j = 0; j < all.length; j++) {
+      const v = all[j];
+      if (v == null) continue;
+      const x = DOT_PAD + ((v - lo) / span) * w;
+      ctx.beginPath();
+      ctx.arc(x, cy, DOT_RADIUS, 0, twoPi);
+      ctx.fill();
+    }
+    c._pW = w; c._pH = h; c._pDpr = dpr; c._pRef = data;
+  }
+}
+
+/** A row's dot strip: every model's score on the profile's scale (rendered on
+ *  one canvas), and the model's dot. (Where its dot sits among the others is
+ *  its standing: no rank beside it.) */
 function buildStrip(row, d) {
   const s = el("div", "md-strip");
-  for (const v of row.all) {
-    if (v == null) continue;
-    const dot = el("span", "md-dot");
-    dot.style.left = position(v, d.domain);
-    s.append(dot);
-  }
+  s.append(makeDotCanvas(row.all, d.domain));
   const me = el("span", "md-me");
   s.append(me);
   return { strip: s, me };
@@ -195,6 +249,7 @@ function buildRow(row, d, refs, hooks) {
     let rest = null;
     r.addEventListener("pointerenter", () => { clearTimeout(rest); rest = setTimeout(intent, TASK_INTENT_MS); });
     r.addEventListener("pointerleave", () => clearTimeout(rest));
+    r.addEventListener("pointerdown", () => { clearTimeout(rest); intent(); });
     r.addEventListener("focus", intent);
   }
   refs.set(row.key, { me, value });
@@ -254,17 +309,21 @@ export function createModelDetail(anchor, hooks) {
   let slide = null;   // the drawer's running slide (an Animation)
   let closing = null; // the panel's fade-out timer
   const shots = shotControl(onShot);
+  if ("ResizeObserver" in window) {
+    new ResizeObserver(() => { if (!root.hidden) paintDotStrips(sheet); }).observe(sheet);
+  }
 
   /** The sheet's content for `d`: the rows rebuilt for a new signature;
    *  otherwise only the model's parts (its dots glide to their new places).
    *  The shot control is updated in place. */
-  function fill(d) {
+  function fill(d, opening) {
     const head = buildHead(d, onClose);
     const desc = el("p", "md-desc", d.description);
     desc.hidden = !d.description;
     const legend = buildLegend(d);
     shots.update(d);
     const inPlace = shown?.signature === d.signature && parts;
+    const noGlide = opening || !inPlace;
     let groups = parts?.groups;
     if (!inPlace) {
       refs = new Map();
@@ -275,21 +334,21 @@ export function createModelDetail(anchor, hooks) {
         for (const row of g.rows) sec.append(buildRow(row, d, refs, hooks));
         groups.append(sec);
       }
-      // (A new build's dots take their places at once, not gliding.)
-      sheet.classList.add("md-fresh");
     }
+    if (noGlide) sheet.classList.add("md-fresh");
     if (parts) {
       parts.head.replaceWith(head);
       parts.desc.replaceWith(desc);
       parts.legend.replaceWith(legend);
       if (!inPlace) parts.groups.replaceWith(groups);   // (the sheet keeps its scroll)
+      if (opening) sheet.scrollTop = 0;
     } else {
       sheet.replaceChildren(head, desc, shots.el, legend, groups);
       sheet.scrollTop = 0;
     }
     parts = { head, desc, legend, groups };
     for (const g of d.groups) for (const row of g.rows) fillRow(refs.get(row.key), row, d);
-    if (!inPlace) {
+    if (noGlide && !opening) {
       sheet.getBoundingClientRect();   // (placed without transitions)
       sheet.classList.remove("md-fresh");
     }
@@ -305,8 +364,9 @@ export function createModelDetail(anchor, hooks) {
     root.classList.remove("closing");
     root.hidden = true;
     sheet.style.transform = "";
-    shown = null;
-    parts = null;
+    sheet.style.willChange = "";
+    // Keep `parts` and `shown` warm so reopening the drawer reuses the
+    // existing rows and dot canvases in place instead of rebuilding them.
   }
 
   return {
@@ -321,11 +381,18 @@ export function createModelDetail(anchor, hooks) {
     show(d, { reveal = null, offWindow = false } = {}) {
       if (closing) gone();
       const opening = root.hidden;
-      if (opening || shown?.data !== d) fill(d);
+      if (opening || shown?.data !== d) fill(d, opening);
       root.hidden = false;
+      paintDotStrips(sheet);
+      if (opening && sheet.classList.contains("md-fresh")) {
+        requestAnimationFrame(() => sheet.classList.remove("md-fresh"));
+      }
       if (drawer.matches) {
         jump.hidden = true;
-        if (opening && offWindow) sheet.style.transform = "translateX(100%)";
+        if (opening && offWindow) {
+          sheet.style.willChange = "transform";
+          sheet.style.transform = "translate3d(100%, 0, 0)";
+        }
         return;
       }
       this.reveal(reveal);
@@ -345,13 +412,16 @@ export function createModelDetail(anchor, hooks) {
      *  hidden once there. */
     slide(inward) {
       slide?.cancel();
-      const from = inward ? "translateX(100%)" : "none", to = inward ? "none" : "translateX(100%)";
+      sheet.style.willChange = "transform";
+      const from = inward ? "translate3d(100%, 0, 0)" : "translate3d(0, 0, 0)";
+      const to = inward ? "translate3d(0, 0, 0)" : "translate3d(100%, 0, 0)";
       const mine = slide = sheet.animate([{ transform: from }, { transform: to }], detailMotion({ fill: "forwards" }));
       sheet.style.transform = "";
       mine.finished.then(() => {
         if (slide !== mine) return;
+        sheet.style.willChange = "";
         if (inward) { mine.cancel(); slide = null; } else gone();
-      }, () => {});
+      }, () => { sheet.style.willChange = ""; });
       return mine;
     },
     /** Hidden: the panel fades out (`animate`, style.css .closing); else,

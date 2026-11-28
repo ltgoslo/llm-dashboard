@@ -2044,6 +2044,7 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   .model-detail.closing { animation: none; }
   .md-sheet {
     height: 100%; box-sizing: border-box; overflow-y: auto; overscroll-behavior: contain;
+    contain: layout style paint;
     padding: 0 1.1rem 1.5rem; pointer-events: auto;
     background: var(--surface); border-left: 1px solid var(--border);
     box-shadow: -12px 0 38px -4px rgba(var(--shadow-rgb), 0.17);
@@ -2158,8 +2159,12 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
 .md-row-variant { display: inline-block; color: var(--fg-muted); }
 .md-row-variant::before { content: "·"; display: inline-block; width: 0.8em; margin-left: -0.8em; text-align: center; }
 .md-row-value { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
-.md-strip { position: relative; height: 14px; }
+.md-strip { position: relative; height: 14px; contain: layout style; }
 .md-strip::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--border-light); }
+.md-dots {
+  position: absolute; left: -3px; top: 0; width: calc(100% + 6px); height: 100%;
+  pointer-events: none;
+}
 .md-dot {
   position: absolute; top: 50%; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px;
   border-radius: 50%; background: rgba(83, 93, 106, 0.38);
@@ -2249,6 +2254,7 @@ button.md-row:active::before { background: var(--accent-light); }
   position: absolute; top: 1.5rem; bottom: 1.5rem;
   left: max(1.5rem, calc((100% - 1320px) / 2)); right: max(1.5rem, calc((100% - 1320px) / 2));
   overflow: hidden; outline: none;
+  contain: layout style paint;
   background: var(--surface); border-radius: 14px;
   box-shadow: 0 20px 56px -10px rgba(var(--shadow-rgb), 0.26);
 }

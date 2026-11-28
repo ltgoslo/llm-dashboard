@@ -352,6 +352,11 @@ export async function initComparison(config) {
     renderChart();
     markAppReady();
     prefetchDefaultModels();
+    // Warm details/best.json on idle so the first drawer open has every model's
+    // scores immediately instead of rebuilding once the file arrives.
+    const warmDetails = () => loadBestScores();
+    if ("requestIdleCallback" in window) requestIdleCallback(warmDetails, { timeout: 1500 });
+    else setTimeout(warmDetails, 400);
     // Opening a share link in a tab that already shows this dashboard only
     // changes the hash (no reload) — apply it. Our own URL updates use
     // history.replaceState, which fires no hashchange.
@@ -1711,17 +1716,19 @@ async function openDrawer() {
   const move = drawerMove = {};
   const cl = document.body.classList;
   const shift = placeDrawer();
-  cl.add("detail-layout");
+  // Defer below-the-fold `.band-tint` reflow until after the slide when the
+  // controls bar doesn't need to wrap to clear the drawer.
+  const needsControlsWrap = bodyPx("--controls-inset") > 0;
+  if (needsControlsWrap) cl.add("detail-layout");
   detailView.show(modelDetailData(detailModel), { offWindow: true });
   loadDetailScores();
   const band = moveBand(detailModel, { wait: true });
-  await nextFrame();
-  await nextFrame();   // (laid out and painted, nothing moved yet)
+  await nextFrame();   // (laid out and canvases painted off-window before motion starts)
   if (move !== drawerMove) return;
   const motion = [detailView.slide(true), ...shiftPage(0, -shift), band?.()].filter(Boolean);
   await Promise.all(motion.map((a) => a.finished.catch(() => {})));
   if (move !== drawerMove) return;
-  cl.add("detail-open", "detail-cover");   // (the page's shift held by style.css now)
+  cl.add("detail-layout", "detail-open", "detail-cover");   // (the page's shift held by style.css now)
   for (const a of motion) a.cancel();
   drawerMove = null;
   const chart = document.getElementById("chart");
@@ -1773,8 +1780,15 @@ async function closeDrawer(was) {
  *  `to` px: the Animations, held at `to` when done. */
 function shiftPage(from, to) {
   if (Math.abs(from - to) < 0.5) return [];
-  const frames = [{ transform: `translateX(${from}px)` }, { transform: `translateX(${to}px)` }];
-  const motion = [...document.querySelectorAll(".band-inner")].map((e) => e.animate(frames, detailMotion({ fill: "forwards" })));
+  const frames = [{ transform: `translate3d(${from}px, 0, 0)` }, { transform: `translate3d(${to}px, 0, 0)` }];
+  const inners = [...document.querySelectorAll(".band-inner")];
+  const motion = inners.map((e) => {
+    e.style.willChange = "transform";
+    const anim = e.animate(frames, detailMotion({ fill: "forwards" }));
+    const clear = () => { e.style.willChange = ""; };
+    anim.finished.then(clear, clear);
+    return anim;
+  });
   const flag = document.querySelector(".flag-line");
   if (flag) motion.push(flag.animate(frames, detailMotion({ fill: "forwards", pseudoElement: "::before" })));
   return motion;
@@ -1992,9 +2006,12 @@ function setBand(gd, horizontal, order) {
   const shapes = (gd.layout.shapes || []).filter((sh) => sh.name !== SELECTED_MARK);
   const i = bandModel ? order.indexOf(bandModel) : -1;
   if (i >= 0) shapes.push(bandShape(i, bandColor(bandModel, BAND_ALPHA), horizontal));
-  Plotly.relayout(gd, {
+  // Bar geometry doesn't move when toggling the highlight band or bolding a
+  // tick label — skip redundant 40-bar rect capture and pan-shadow relayout.
+  gd._skipBarRecapture = true;
+  Promise.resolve(Plotly.relayout(gd, {
     shapes, [horizontal ? "yaxis.ticktext" : "xaxis.ticktext"]: boldLabels(gd._barLabels, detailModel ? order.indexOf(detailModel) : -1),
-  });
+  })).finally(() => { gd._skipBarRecapture = false; });
 }
 
 /** The band to model `to`'s bar on the bar chart as drawn (null: away),
@@ -2138,6 +2155,10 @@ function loadDetailScores() {
   loadBestScores().then(() => { if (detailModel) refreshModelDetail(); });
 }
 
+// Shared per-(shot, models, source) score matrix across all models so switching
+// between models in the drawer reuses the 35×N background dots & domain in O(T).
+let detailBaseCache = null;
+
 /** The details' content for model `m`, whatever the chart shows: with the
  *  best prompt and random-baseline rescaling, over all tasks — its card
  *  (facts: lines of items); its category average at each shot; and its
@@ -2158,41 +2179,54 @@ function modelDetailData(m) {
     DATA: { ...state.DATA, models: source },
   };
   const data = withState(fixed, () => {
-    const idx = models.indexOf(m);
     const fmt = scoreDecimals();
     const ok = (v) => v != null && !Number.isNaN(v);
     const text = (v) => (ok(v) ? v.toFixed(fmt) : "–");
-    const mine = (vals) => ({ value: ok(vals[idx]) ? vals[idx] : null, text: text(vals[idx]) });
+    let base = detailBaseCache?.signature === signature ? detailBaseCache : null;
+    if (!base) {
+      const headline = CFG.detailAverage ? { label: capitalize(getChartTitleText().replace(` (${shot}-shot)`, "")) } : null;
+      const byCat = new Map();
+      let lo = Infinity, hi = -Infinity;
+      for (const b of tasks) {
+        const all = models.map((mm) => {
+          const raw = getScore(state.DATA.models, mm, b, shot);
+          if (raw === undefined) return null;
+          const v = normScore(raw, b, null);
+          if (ok(v)) { if (v < lo) lo = v; if (v > hi) hi = v; }
+          return v;
+        });
+        const info = state.metricsSetup[b];
+        const name = info.pretty_name || b;
+        const cat = info.category || "other";
+        if (!byCat.has(cat)) byCat.set(cat, []);
+        byCat.get(cat).push({ key: b, name, variant: taskVariant(b, name), all });
+      }
+      const baseGroups = [...byCat].sort(([a], [b]) => compareCategories(a, b)).map(([cat, rows]) => {
+        rows.sort((a, b) => a.name.localeCompare(b.name) || a.variant.localeCompare(b.variant));
+        return { key: "__cat__" + cat, name: capitalize(cat), rows };
+      });
+      if (!Number.isFinite(lo)) { lo = 0; hi = 0; }
+      if (!(hi > lo)) { lo -= state.scoreTop / 100; hi += state.scoreTop / 100; }
+      const pad = (hi - lo) * 0.03;
+      const idxMap = new Map(models.map((id, i) => [id, i]));
+      base = detailBaseCache = { signature, headline, baseGroups, domain: [lo - pad, hi + pad], idxMap };
+    }
+    const idx = base.idxMap.get(m);
+    const mine = (vals) => {
+      const v = idx != null ? vals[idx] : null;
+      return { value: ok(v) ? v : null, text: text(v) };
+    };
     // The category average over all tasks at each shot count (the shot
     // shown in the details is one of them: the label says no shot).
-    const headline = CFG.detailAverage ? { label: capitalize(getChartTitleText().replace(` (${shot}-shot)`, "")) } : null;
     const shots = shotValues().map((s) => ({
       shot: s, current: s === shot, text: text(withState({ currentShot: s }, () => aggregateModelResult(m, models)?.score)),
     }));
-    const byCat = new Map();
-    for (const b of tasks) {
-      const all = models.map((mm) => {
-        const raw = getScore(state.DATA.models, mm, b, shot);
-        return raw === undefined ? null : normScore(raw, b, null);
-      });
-      const info = state.metricsSetup[b];
-      const name = info.pretty_name || b;
-      const cat = info.category || "other";
-      if (!byCat.has(cat)) byCat.set(cat, []);
-      byCat.get(cat).push({ key: b, name, variant: taskVariant(b, name), ...mine(all), all });
-    }
-    // The categories in CATEGORY_ORDER, each its tasks' heading.
-    const groups = [...byCat].sort(([a], [b]) => compareCategories(a, b)).map(([cat, rows]) => {
-      rows.sort((a, b) => a.name.localeCompare(b.name) || a.variant.localeCompare(b.variant));
-      return { key: "__cat__" + cat, name: capitalize(cat), rows };
-    });
-    // One scale for every row, from the lowest to the highest value shown.
-    const values = groups.flatMap((g) => g.rows.flatMap((r) => r.all)).filter(ok);
-    if (!values.length) values.push(0);
-    let lo = Math.min(...values), hi = Math.max(...values);
-    if (!(hi > lo)) { lo -= state.scoreTop / 100; hi += state.scoreTop / 100; }
-    const pad = (hi - lo) * 0.03;
-    return { headline, shots, groups, domain: [lo - pad, hi + pad] };
+    const groups = base.baseGroups.map((g) => ({
+      key: g.key,
+      name: g.name,
+      rows: g.rows.map((r) => ({ ...r, ...mine(r.all) })),
+    }));
+    return { headline: base.headline, shots, groups, domain: base.domain };
   });
   const info = state.DATA.model_info?.[m];
   const url = info?.huggingface_url;
