@@ -204,9 +204,11 @@ export function makeErrorY(ciValues) {
 }
 
 // Bar "grow-up" animation. Debounced so rapid renders (e.g. dragging the size
-// slider) don't constantly re-animate. We do the animation by hand with a
-// requestAnimationFrame loop rather than via Plotly.animate, because
-// Plotly.animate's bar-trace transitions are flaky in Firefox.
+// slider) don't constantly re-animate. Instead of calling Plotly.update() on
+// every frame (which rebuilds the SVG and forces layout reflows), we render
+// the final geometry once via Plotly.react/newPlot and drive the already-drawn
+// bar paths, error bars, and score annotations with pure CSS transforms and
+// opacity inside requestAnimationFrame.
 //
 // Two phases driven by one clock:
 //   Phase 1 (BAR_ANIM_DURATION): bars grow 0 → score.
@@ -224,6 +226,7 @@ const ERR_ANIM_DURATION = 250;
 const PHASE_OVERLAP = 250;   // ms by which phase 2 overlaps the tail of phase 1
 const BAR_ANIM_DEBOUNCE = 250;
 let lastPlotTime = 0;
+let plotRevision = 0;
 /** The next plotChart draws the bars at once (a re-layout of the same
  *  chart, not a new one). */
 export function holdBarAnimation() { lastPlotTime = Date.now(); }
@@ -297,45 +300,41 @@ function distPointToRect(x, y, rect) {
 // separately so they ride along as their own group rather than being
 // mistaken for extra bars.
 const BAR_RECT_SELECTOR = ".barlayer .trace.bars .points path";
-// Aux elements that ride along with the bars (per model column, by index).
-// Used to clear their inline transforms on settle; the hover loop addresses
-// them directly when painting.
-const AUX_SELECTORS = [
-  ".barlayer .trace.bars .errorbar",   // error-bar I-beams (the <g>)
-  ".imagelayer image",                 // org logos
-  ".xtick",                            // x-axis tick labels
-  ".annotation",                       // score labels
-];
 
-// Cache one element's natural (pre-CSS-transform) screen rect + centre-x.
-// We briefly clear any inline scale/translate (transitions blocked) inside a
-// synchronous read so getBoundingClientRect sees the resting geometry and the
-// browser never paints the cleared state.
-function capRect(el) {
-  const savedScale = el.style.scale;
-  const savedTranslate = el.style.translate;
-  const savedTransition = el.style.transition;
-  const dirty = savedScale || savedTranslate;
-  if (dirty) {
-    el.style.transition = "none";
-    el.style.scale = "";
-    el.style.translate = "";
-  }
-  // getBoundingClientRect flushes pending style+layout, so the read reflects
-  // the cleared transforms even though we set them a statement ago.
-  const r = el.getBoundingClientRect();
-  el._natRect = (r.width > 0 && r.height > 0)
-    ? { left: r.left, top: r.top, right: r.right, bottom: r.bottom,
-        width: r.width, height: r.height, cx: (r.left + r.right) / 2 }
-    : null;
-  if (dirty) {
-    el.style.scale = savedScale;
-    el.style.translate = savedTranslate;
-    // Flush the restored transforms while transitions are still off, so they
-    // snap back rather than animating from the natural state.
-    el.getBoundingClientRect();
-    el.style.transition = savedTransition;
-  }
+// Batch-measure every bar's natural (pre-CSS-transform) screen rect + centre-x
+// in a single layout flush (instead of 2×N flushes), and cache the resolved
+// column DOM elements so the 60/120fps hover loop runs zero querySelectorAll.
+function refreshBarDomCache(chartEl) {
+  const traces = chartEl.querySelectorAll(".barlayer .trace.bars");
+  if (!traces.length) { chartEl._barDomCache = null; return null; }
+  const bars = [];
+  const errorbars = [];
+  let N = 0;
+  traces.forEach((tr, traceIdx) => {
+    const paths = tr.querySelectorAll(".points path");
+    if (N === 0) N = paths.length;
+    paths.forEach((bar, modelIdx) => {
+      const rect = bar._natRect || null;
+      if (rect) bars.push({ el: bar, traceIdx, modelIdx, rect });
+    });
+    tr.querySelectorAll(".errorbar").forEach((el, i) => {
+      errorbars.push({ el, i });
+    });
+  });
+  if (!bars.length || N === 0) { chartEl._barDomCache = null; return null; }
+  const logos = [...chartEl.querySelectorAll(".imagelayer image")];
+  const xticks = [...chartEl.querySelectorAll(".xtick")].map((el, i) => ({ el, m: tickColumn(el, i) }));
+  const annPerModel = annotationsPerModel(chartEl, N);
+  const annotations = annPerModel > 0
+    ? [...chartEl.querySelectorAll(".annotation")].map((el, j) => ({
+        el,
+        m: annotationColumn(el, j, annPerModel),
+        rawIdx: +(el.getAttribute("data-index") ?? j),
+      }))
+    : [];
+  const cache = { bars, N, refWidth: bars[0].rect.width, logos, xticks, errorbars, annPerModel, annotations };
+  chartEl._barDomCache = cache;
+  return cache;
 }
 
 // We DO NOT measure inside the hover handler — that path is hostile (an
@@ -344,29 +343,41 @@ function capRect(el) {
 // partial-height rect if seeded mid-grow-up). Instead this runs at known
 // clean points (after a fresh layout / after the grow-up completes).
 function captureNaturalRects(chartEl) {
-  // Only bars need a cached rect — they're what the cursor is hit-tested
-  // against. Aux elements are positioned by model-column index, not measured.
-  chartEl.querySelectorAll(BAR_RECT_SELECTOR).forEach(capRect);
-}
-
-// Re-measure after every redraw that is not part of the grow-up animation:
-// a responsive resize relayouts the chart, and the hover would otherwise
-// hit-test against the old geometry (no bar magnifies or bolds under the
-// cursor); then put the hover pose back on what the redraw rebuilt
-// (attachBarHoverHighlight). Registered after each newPlot, which purges the
-// previous one.
-function recaptureOnRedraw(chartEl) {
-  chartEl.on("plotly_afterplot", () => {
-    if (chartEl._barAnimating) return;
-    captureNaturalRects(chartEl);
-    chartEl._barHoverRedrawn?.();
-  });
-}
-
-// Hover handlers ask this. Returns the captured natural rect or null. If
-// null, the bar is skipped this frame — better to do nothing than guess.
-function getBarNatRect(el) {
-  return el._natRect || null;
+  const barPaths = [...chartEl.querySelectorAll(BAR_RECT_SELECTOR)];
+  const dirty = [];
+  for (let i = 0; i < barPaths.length; i++) {
+    const el = barPaths[i];
+    const savedScale = el.style.scale;
+    const savedTranslate = el.style.translate;
+    if (savedScale || savedTranslate) {
+      dirty.push({ el, savedScale, savedTranslate, savedTransition: el.style.transition });
+      el.style.transition = "none";
+      el.style.scale = "";
+      el.style.translate = "";
+    }
+  }
+  // One synchronous layout flush reads every bar's resting rect.
+  for (let i = 0; i < barPaths.length; i++) {
+    const el = barPaths[i];
+    const r = el.getBoundingClientRect();
+    el._natRect = (r.width > 0 && r.height > 0)
+      ? { left: r.left, top: r.top, right: r.right, bottom: r.bottom,
+          width: r.width, height: r.height, cx: (r.left + r.right) / 2 }
+      : null;
+  }
+  if (dirty.length) {
+    for (let i = 0; i < dirty.length; i++) {
+      const d = dirty[i];
+      d.el.style.scale = d.savedScale;
+      d.el.style.translate = d.savedTranslate;
+    }
+    // Single flush while transitions are still off so transforms snap back.
+    dirty[0].el.getBoundingClientRect();
+    for (let i = 0; i < dirty.length; i++) {
+      dirty[i].el.style.transition = dirty[i].savedTransition;
+    }
+  }
+  refreshBarDomCache(chartEl);
 }
 
 /** A mouseleave into Plotly's drag cover — laid over the page while a
@@ -563,23 +574,12 @@ function attachBarHoverHighlight(chartEl) {
     }
   }
 
-  // Collect the bar paths with their cached natural rects. null until the
-  // first captureNaturalRects has run for this layout.
+  // Read the cached column DOM lists + natural rects (refreshed on captureNaturalRects).
+  // Returns null until captureNaturalRects has run for the current layout.
   function gatherBars() {
-    const traces = chartEl.querySelectorAll(".barlayer .trace.bars");
-    if (!traces.length) return null;
-    const bars = [];
-    let N = 0;
-    traces.forEach((tr, traceIdx) => {
-      const paths = tr.querySelectorAll(".points path");
-      if (N === 0) N = paths.length;
-      paths.forEach((bar, modelIdx) => {
-        const rect = getBarNatRect(bar);
-        if (rect) bars.push({ el: bar, traceIdx, modelIdx, rect });
-      });
-    });
-    if (!bars.length || N === 0) return null;
-    return { bars, N, refWidth: bars[0].rect.width };
+    const cache = chartEl._barDomCache;
+    if (cache && cache.bars.length && cache.bars[0].el.isConnected) return cache;
+    return refreshBarDomCache(chartEl);
   }
 
   // Per-model targets the current cursor implies: peak scale, dock shift,
@@ -640,34 +640,30 @@ function attachBarHoverHighlight(chartEl) {
 
   // Write the current (eased) per-column state onto every element of each
   // column. Bars scale in x only (height encodes the score); logos scale
-  // uniformly like a dock icon. Aux elements are matched by index.
-  function paint(bars, N) {
-    bars.forEach((b) => {
-      const i = b.modelIdx;
+  // uniformly like a dock icon. Uses the cached DOM lists (zero querySelectorAll).
+  function paint(got) {
+    const { bars, N, logos, xticks, errorbars, annotations } = got;
+    for (let k = 0; k < bars.length; k++) {
+      const b = bars[k], i = b.modelIdx;
       b.el.style.scale = `${curScale[i]} 1`;
       b.el.style.translate = `${curShift[i]}px 0`;
-    });
-    chartEl.querySelectorAll(".imagelayer image").forEach((el, i) => {
-      if (i < N) {
-        el.style.scale = `${curScale[i]} ${curScale[i]}`;
-        el.style.translate = `${curShift[i]}px 0`;
-      }
-    });
-    chartEl.querySelectorAll(".xtick").forEach((el, i) => {
-      const m = tickColumn(el, i);
+    }
+    for (let i = 0; i < logos.length && i < N; i++) {
+      const s = curScale[i];
+      logos[i].style.scale = `${s} ${s}`;
+      logos[i].style.translate = `${curShift[i]}px 0`;
+    }
+    for (let k = 0; k < xticks.length; k++) {
+      const { el, m } = xticks[k];
       if (m < N) el.style.translate = `${curShift[m]}px 0`;
-    });
-    chartEl.querySelectorAll(".barlayer .trace.bars").forEach((tr) => {
-      tr.querySelectorAll(".errorbar").forEach((el, i) => {
-        if (i < N) el.style.translate = `${curShift[i]}px 0`;
-      });
-    });
-    const annPerModel = annotationsPerModel(chartEl, N);
-    if (annPerModel > 0) {
-      chartEl.querySelectorAll(".annotation").forEach((el, j) => {
-        const m = annotationColumn(el, j, annPerModel);
-        if (m < N) el.style.translate = `${curShift[m]}px 0`;
-      });
+    }
+    for (let k = 0; k < errorbars.length; k++) {
+      const { el, i } = errorbars[k];
+      if (i < N) el.style.translate = `${curShift[i]}px 0`;
+    }
+    for (let k = 0; k < annotations.length; k++) {
+      const { el, m } = annotations[k];
+      if (m < N) el.style.translate = `${curShift[m]}px 0`;
     }
     // Elements the page draws in a model's column (comparison.js: the open
     // model's band) widen and move with its bar.
@@ -679,34 +675,31 @@ function attachBarHoverHighlight(chartEl) {
   }
 
   // Bold the xtick + score label of the column the cursor sits inside.
-  function updateBold(insideBar, N) {
+  function updateBold(insideBar, got) {
     if ((insideBar && insideBar.el) === currentBoldBar) return;
     chartEl.querySelectorAll(".bar-hover-bold").forEach((el) =>
       el.classList.remove("bar-hover-bold"));
     if (insideBar) {
-      const xt = [...chartEl.querySelectorAll(".xtick")].find((el, i) => tickColumn(el, i) === insideBar.modelIdx);
-      if (xt) xt.classList.add("bar-hover-bold");
-      const annPerModel = annotationsPerModel(chartEl, N);
-      if (annPerModel > 0) {
-        const annIdx = annPerModel === 1
+      const xt = got.xticks.find((x) => x.m === insideBar.modelIdx);
+      if (xt) xt.el.classList.add("bar-hover-bold");
+      if (got.annPerModel > 0) {
+        const annIdx = got.annPerModel === 1
           ? insideBar.modelIdx
-          : insideBar.modelIdx * annPerModel + Math.min(insideBar.traceIdx, annPerModel - 1);
-        const an = [...chartEl.querySelectorAll(".annotation")]
-          .find((el, j) => +(el.getAttribute("data-index") ?? j) === annIdx);
-        if (an) an.classList.add("bar-hover-bold");
+          : insideBar.modelIdx * got.annPerModel + Math.min(insideBar.traceIdx, got.annPerModel - 1);
+        const an = got.annotations.find((a) => a.rawIdx === annIdx);
+        if (an) an.el.classList.add("bar-hover-bold");
       }
     }
     currentBoldBar = insideBar ? insideBar.el : null;
   }
 
   // Drop all inline transforms so elements return to their natural geometry.
-  function clearInline(bars) {
-    bars.forEach((b) => { b.el.style.scale = ""; b.el.style.translate = ""; });
-    chartEl.querySelectorAll(".imagelayer image").forEach((el) => {
-      el.style.scale = ""; el.style.translate = "";
-    });
-    AUX_SELECTORS.forEach((sel) =>
-      chartEl.querySelectorAll(sel).forEach((el) => { el.style.translate = ""; }));
+  function clearInline(got) {
+    for (const b of got.bars) { b.el.style.scale = ""; b.el.style.translate = ""; }
+    for (const el of got.logos) { el.style.scale = ""; el.style.translate = ""; }
+    for (const x of got.xticks) x.el.style.translate = "";
+    for (const e of got.errorbars) e.el.style.translate = "";
+    for (const a of got.annotations) a.el.style.translate = "";
     for (const { el } of chartEl._barFollowers?.() || []) { el.style.scale = ""; el.style.translate = ""; }
   }
 
@@ -752,12 +745,12 @@ function attachBarHoverHighlight(chartEl) {
       curShift[i] += a * (targets.shift[i] - curShift[i]);
       maxRes = Math.max(maxRes, Math.abs(targets.shift[i] - curShift[i]));
     }
-    paint(bars, N);
+    paint(got);
     setDrawnBar(pointer.active ? drawnBarAt(bars, pointer.x, pointer.y) : null);
 
     if (pointer.active) {
       chartEl.classList.add("hover-active");
-      updateBold(drawnBar, N);
+      updateBold(drawnBar, got);
     }
 
     if (maxRes < EMA_SETTLE && !pop) {
@@ -766,12 +759,12 @@ function attachBarHoverHighlight(chartEl) {
       for (let i = 0; i < N; i++) { curScale[i] = targets.scale[i]; curShift[i] = targets.shift[i]; }
       lastT = null;
       if (pointer.active) {
-        paint(bars, N);   // rest at the hover pose; idle until the next move
+        paint(got);   // rest at the hover pose; idle until the next move
         setDrawnBar(drawnBarAt(bars, pointer.x, pointer.y));
-        updateBold(drawnBar, N);
+        updateBold(drawnBar, got);
       } else {
         setDrawnBar(null);
-        clearInline(bars);
+        clearInline(got);
         chartEl.querySelectorAll(".bar-hover-bold").forEach((el) =>
           el.classList.remove("bar-hover-bold"));
         chartEl.classList.remove("hover-active");
@@ -794,9 +787,23 @@ function attachBarHoverHighlight(chartEl) {
     if (!curScale || (!pointer.active && rafId === null)) return;   // at rest
     const got = gatherBars();
     if (!got || got.N !== stateN) return;
-    paint(got.bars, got.N);
+    paint(got);
     currentBoldBar = null;   // the rebuilt score label lost its bold
     ensureLoop();
+  };
+
+  chartEl._resetBarHover = () => {
+    if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+    lastT = null;
+    pop = null;
+    currentBoldBar = null;
+    drawnBar = null;
+    if (curScale) curScale.fill(1);
+    if (curShift) curShift.fill(0);
+    const cache = chartEl._barDomCache;
+    if (cache) clearInline(cache);
+    chartEl.querySelectorAll(".bar-hover-bold").forEach((el) => el.classList.remove("bar-hover-bold"));
+    chartEl.classList.remove("hover-active");
   };
 
   /** A click (or tap) on the bar of model column `col`: its pop. */
@@ -1160,11 +1167,145 @@ function attachScatterHoverHighlight(chartEl) {
   });
 }
 
-/** Plotly.newPlot + register hover handlers. Bar traces animate from y=0
- *  to their target values on each render (debounced). Horizontal bars
- *  (orientation "h", the comparison pages on narrow screens) grow along x
- *  instead and skip the column hover effects, which assume vertical bars
- *  (touch screens don't hover anyway). */
+// Bind Plotly's EventEmitter callbacks once per chart element and forward to
+// mutable slots, so Plotly.react never stacks duplicate listeners across renders.
+function ensurePlotEventDispatchers(chartEl) {
+  if (chartEl._plotEventsBound || typeof chartEl.on !== "function") return;
+  chartEl._plotEventsBound = true;
+  chartEl.on("plotly_hover", (d) => chartEl._cbHover?.(d));
+  chartEl.on("plotly_click", (d) => chartEl._cbClick?.(d));
+  chartEl.on("plotly_unhover", (d) => chartEl._cbUnhover?.(d));
+  chartEl.on("plotly_afterplot", () => {
+    chartEl._cbLineAfterplot?.();
+    chartEl._cbBarRecapture?.();
+  });
+}
+
+/** Collect the already-drawn bar paths, error bars, and score annotations so
+ *  the grow-up animation can drive them purely with CSS scale/translate/opacity
+ *  (zero Plotly.update calls per frame). Returns { apply(p1, e1, e2), clean() }
+ *  or null if the axis isn't ready yet. */
+function buildBarAnimDrivers(chartEl, traces, barIndices, horizontal, vk, errKey, annotationsTarget, annAnim) {
+  const fl = chartEl._fullLayout;
+  const axis = horizontal ? fl?.xaxis : fl?.yaxis;
+  if (!axis || typeof axis.c2p !== "function") return null;
+
+  const barItems = [];
+  const errItems = [];
+  const traceGroups = chartEl.querySelectorAll(".barlayer .trace.bars");
+  traceGroups.forEach((trEl, gIdx) => {
+    const traceIdx = barIndices[gIdx];
+    const trace = traceIdx != null ? traces[traceIdx] : null;
+    if (!trace) return;
+    const vals = trace[vk] || [];
+    const err = trace[errKey];
+    const hiArr = err?.array || null;
+    const loArr = err?.arrayminus || hiArr;
+
+    trEl.querySelectorAll(".points path").forEach((el, j) => {
+      const idx = el.__data__?.i ?? j;
+      const val = vals[idx];
+      if (val == null || !Number.isFinite(val)) return;
+      el.style.transformBox = "fill-box";
+      el.style.transformOrigin = horizontal
+        ? (val < 0 ? "100% 50%" : "0% 50%")
+        : (val < 0 ? "50% 0%" : "50% 100%");
+      barItems.push(el);
+    });
+
+    if (hiArr) {
+      trEl.querySelectorAll(".errorbar").forEach((g, j) => {
+        const idx = g.__data__?.i ?? j;
+        const val = vals[idx];
+        const hi = hiArr[idx] || 0;
+        const lo = (loArr ? loArr[idx] : hi) || 0;
+        if (val == null || !Number.isFinite(val) || hi + lo <= 0) return;
+        const tipPct = horizontal
+          ? (lo / (hi + lo)) * 100
+          : (hi / (hi + lo)) * 100;
+        g.style.transformBox = "fill-box";
+        g.style.transformOrigin = horizontal ? `${tipPct}% 50%` : `50% ${tipPct}%`;
+        errItems.push({ el: g, val, pFinal: axis.c2p(val) });
+      });
+    }
+  });
+
+  const annItems = [];
+  if (annotationsTarget.length) {
+    chartEl.querySelectorAll(".infolayer .annotation").forEach((el, j) => {
+      const rawIdx = el.getAttribute("data-index");
+      const idx = rawIdx == null ? j : +rawIdx;
+      const a = annotationsTarget[idx];
+      if (!a) return;
+      const meta = annAnim && annAnim[idx];
+      const finalPos = meta ? (meta.score + meta.se) : (typeof a[vk] === "number" ? a[vk] : null);
+      if (finalPos == null || !Number.isFinite(finalPos)) return;
+      annItems.push({
+        el,
+        score: meta ? meta.score : finalPos,
+        se: meta ? meta.se : 0,
+        pFinal: axis.c2p(finalPos),
+      });
+    });
+  }
+
+  function apply(p1, e1, e2) {
+    const barScale = horizontal ? `${e1} 1` : `1 ${e1}`;
+    for (let i = 0; i < barItems.length; i++) {
+      barItems[i].style.scale = barScale;
+    }
+    if (errItems.length) {
+      const showErr = e2 > 0;
+      const errScale = horizontal ? `${e2} 1` : `1 ${e2}`;
+      const errOp = showErr ? String(Math.min(1, e2 * 5)) : "0";
+      for (let i = 0; i < errItems.length; i++) {
+        const item = errItems[i];
+        item.el.style.opacity = errOp;
+        if (showErr) {
+          const delta = axis.c2p(item.val * e1) - item.pFinal;
+          item.el.style.translate = horizontal ? `${delta}px 0` : `0 ${delta}px`;
+          item.el.style.scale = errScale;
+        }
+      }
+    }
+    const opStr = String(p1);
+    for (let i = 0; i < annItems.length; i++) {
+      const item = annItems[i];
+      const delta = axis.c2p(item.score * e1 + item.se * e2) - item.pFinal;
+      item.el.style.translate = horizontal ? `${delta}px 0` : `0 ${delta}px`;
+      item.el.style.opacity = opStr;
+    }
+  }
+
+  function clean() {
+    for (let i = 0; i < barItems.length; i++) {
+      const s = barItems[i].style;
+      s.scale = ""; s.transformOrigin = ""; s.transformBox = "";
+    }
+    for (let i = 0; i < errItems.length; i++) {
+      const s = errItems[i].el.style;
+      s.scale = ""; s.translate = ""; s.opacity = ""; s.transformOrigin = ""; s.transformBox = "";
+    }
+    for (let i = 0; i < annItems.length; i++) {
+      const s = annItems[i].el.style;
+      s.translate = ""; s.opacity = "";
+    }
+  }
+
+  function isConnected() {
+    if (barItems.length && !barItems[0].isConnected) return false;
+    if (annItems.length && !annItems[0].el.isConnected) return false;
+    return true;
+  }
+
+  return { apply, clean, isConnected, hasErr: errItems.length > 0 };
+}
+
+/** Plotly.react (or newPlot on first draw) + register hover handlers. Bar traces
+ *  animate from y=0 to their target values via lightweight SVG transforms
+ *  (debounced). Horizontal bars (orientation "h", the comparison pages on narrow
+ *  screens) grow along x instead and skip the column hover effects, which assume
+ *  vertical bars (touch screens don't hover anyway). */
 export function plotChart(traces, layout, config, onHover, onUnhover) {
   const now = Date.now();
   const barIndices = [];
@@ -1178,10 +1319,24 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
   // Pull the annotation animation metadata off the layout before handing it
   // to Plotly (which would otherwise warn about an unknown key).
   const annAnim = layout._annAnim || null;
-  const plotLayout = Object.assign({}, layout);
+  const plotLayout = Object.assign({}, layout, { datarevision: ++plotRevision });
   delete plotLayout._annAnim;
 
   const chartEl = document.getElementById("chart");
+  // Clean up any leftover inline styles from an interrupted grow-up or hover
+  // before Plotly.react reuses existing SVG nodes.
+  chartEl._cleanBarAnim?.();
+  chartEl._cleanBarAnim = null;
+  chartEl._resetBarHover?.();
+  chartEl._barDomCache = null;
+  // Reset scatter image tags/transforms so Plotly.react updates re-snapshot
+  // fresh resting marker coordinates on the next hover frame.
+  chartEl.querySelectorAll(".imagelayer image").forEach((img) => {
+    img._scatterTagged = false;
+    img.style.scale = "";
+    img.style.translate = "";
+  });
+
   // Scatter-mode flag: lets style.css swap the logo transform-origin from
   // bottom-centre (bar-mode default, where logos sit at the chart floor)
   // to centre (scatter, where the logo is the data marker itself).
@@ -1204,190 +1359,121 @@ export function plotChart(traces, layout, config, onHover, onUnhover) {
   // Set while the bars grow (recaptureOnRedraw must not measure them then).
   chartEl._barAnimating = shouldAnimate;
 
+  // Wire mutable event slots BEFORE Plotly.react so synchronous plotly_afterplot
+  // callbacks see the new render's handlers (and never stack duplicate listeners).
+  const compositeScatter = isScatterMode && !!chartEl._scatterImageMap;
+  if (compositeScatter) {
+    chartEl._scatterOnHover = onHover || null;
+    chartEl._scatterOnUnhover = onUnhover || null;
+    chartEl._cbHover = null;
+    chartEl._cbClick = null;
+    chartEl._cbUnhover = null;
+  } else {
+    chartEl._cbHover = onHover || null;
+    chartEl._cbClick = onHover && barIndices.length ? onHover : null;
+    chartEl._cbUnhover = onUnhover || null;
+  }
+  chartEl._cbLineAfterplot = isLineMode
+    ? () => { widenLineModeClip(chartEl); applyLegendTitleGap(chartEl); }
+    : null;
+  chartEl._cbBarRecapture = barIndices.length && !horizontal
+    ? () => {
+        if (chartEl._barAnimating) return;
+        captureNaturalRects(chartEl);
+        chartEl._barHoverRedrawn?.();
+      }
+    : null;
+
+  // Reuse the existing Plotly instance when present (3-5x faster than newPlot,
+  // preserves modebar and image caches); fall back to newPlot on first draw.
+  const draw = chartEl._fullLayout
+    ? Plotly.react("chart", traces, plotLayout, config)
+    : Plotly.newPlot("chart", traces, plotLayout, config);
+  ensurePlotEventDispatchers(chartEl);
+
+  if (barIndices.length && !horizontal) attachBarHoverHighlight(chartEl);
+  if (isScatterMode) attachScatterHoverHighlight(chartEl);
+
   if (!shouldAnimate) {
-    Plotly.newPlot("chart", traces, plotLayout, config).then(() => {
+    liftBarsAndLogos(chartEl);
+    applyLegendTitleGap(chartEl);
+    if (isLineMode) widenLineModeClip(chartEl);
+    draw.then(() => {
+      if (animId !== currentAnim) return;
       liftBarsAndLogos(chartEl);
       if (isLineMode) widenLineModeClip(chartEl);
       applyLegendTitleGap(chartEl);
-      // Bars are at full height immediately (no grow-up). Capture their
-      // natural geometry now so the hover handler has a stable cache from
-      // the first mousemove.
       if (barIndices.length && !horizontal) captureNaturalRects(chartEl);
     });
-    liftBarsAndLogos(chartEl);
-    applyLegendTitleGap(chartEl);
-    if (isLineMode) {
-      widenLineModeClip(chartEl);
-      // Responsive resizes rebuild the clip rect (and legend transforms) at
-      // new dimensions — the afterplot event fires on every redraw, so
-      // re-apply there. newPlot purges previous listeners, so this doesn't
-      // stack across renders.
-      chartEl.on("plotly_afterplot", () => {
-        widenLineModeClip(chartEl);
-        applyLegendTitleGap(chartEl);
-      });
-    }
-    // Composite scatter (single trace + _scatterImageMap) drives its tooltip
-    // from chart.js's own paint-order hit-test, so the tooltip, magnify, and
-    // bring-to-front all agree and honour the live z-order. Every other mode
-    // (bars, grouped scatter) uses Plotly's hover as before.
-    const compositeScatter = isScatterMode && !!chartEl._scatterImageMap;
-    if (compositeScatter) {
-      chartEl._scatterOnHover = onHover || null;
-      chartEl._scatterOnUnhover = onUnhover || null;
-    } else {
-      if (onHover) {
-        chartEl.on("plotly_hover", onHover);
-        // A tap on a touch screen makes Plotly compute the hover point but
-        // emit only plotly_click (no hover): show the tooltip from that.
-        if (barIndices.length) chartEl.on("plotly_click", onHover);
-      }
-      if (onUnhover) chartEl.on("plotly_unhover", onUnhover);
-    }
-    if (barIndices.length && !horizontal) {
-      attachBarHoverHighlight(chartEl);
-      recaptureOnRedraw(chartEl);
-    }
-    if (isScatterMode) attachScatterHoverHighlight(chartEl);
     return;
   }
 
-  // Build starting traces with the values at 0 (and zeroed error bars) for
-  // bar traces.
   const errKey = "error_" + vk;
-  const startTraces = traces.map((t) => {
-    if (t.type !== "bar") return t;
-    const start = Object.assign({}, t, { [vk]: t[vk].map(() => 0) });
-    if (t[errKey] && t[errKey].array) {
-      const zeroErr = { array: t[errKey].array.map(() => 0) };
-      if (t[errKey].arrayminus) zeroErr.arrayminus = t[errKey].arrayminus.map(() => 0);
-      start[errKey] = Object.assign({}, t[errKey], zeroErr);
-    }
-    return start;
-  });
-
-  // Start annotations at y=0 (sitting on the floor) with opacity 0; they'll
-  // ride up and fade in alongside the bars during phase 1.
   const annotationsTarget = plotLayout.annotations || [];
-  const startLayout = Object.assign({}, plotLayout);
-  if (annotationsTarget.length) {
-    startLayout.annotations = annotationsTarget.map(
-      (a) => Object.assign({}, a, { [vk]: 0, opacity: 0 }));
-  }
-
-  Plotly.newPlot("chart", startTraces, startLayout, config).then(
-    () => liftBarsAndLogos(chartEl));
   liftBarsAndLogos(chartEl);
-  if (onHover) {
-    chartEl.on("plotly_hover", onHover);
-    chartEl.on("plotly_click", onHover);   // taps (see the static path)
-  }
-  if (onUnhover) chartEl.on("plotly_unhover", onUnhover);
-  if (!horizontal) {
-    attachBarHoverHighlight(chartEl);
-    recaptureOnRedraw(chartEl);
+  let lastP1 = 0, lastE1 = 0, lastE2 = 0;
+  let drivers = buildBarAnimDrivers(chartEl, traces, barIndices, horizontal, vk, errKey, annotationsTarget, annAnim);
+  if (drivers) {
+    drivers.apply(0, 0, 0);
+    chartEl._cleanBarAnim = drivers.clean;
   }
 
-  const barYTargets = barIndices.map((i) => traces[i][vk]);
-  // Indices (into barIndices) of bar traces that actually carry error bars,
-  // along with the target arrays — precomputed for the phase-2 loop.
-  const errBarIdx = [], errBarTargets = [], errBarMinusTargets = [];
-  let hasErrMinus = false;
-  barIndices.forEach((traceIdx) => {
-    if (traces[traceIdx][errKey] && traces[traceIdx][errKey].array) {
-      errBarIdx.push(traceIdx);
-      errBarTargets.push(traces[traceIdx][errKey].array);
-      const minus = traces[traceIdx][errKey].arrayminus;
-      if (minus) hasErrMinus = true;
-      errBarMinusTargets.push(minus || null);
+  draw.then(() => {
+    if (animId !== currentAnim) return;
+    liftBarsAndLogos(chartEl);
+    if (chartEl._barAnimating && (!drivers || !drivers.isConnected())) {
+      drivers = buildBarAnimDrivers(chartEl, traces, barIndices, horizontal, vk, errKey, annotationsTarget, annAnim);
+      if (drivers) {
+        drivers.apply(lastP1, lastE1, lastE2);
+        chartEl._cleanBarAnim = drivers.clean;
+      }
     }
   });
 
-  const hasErrBars = errBarIdx.length > 0;
+  const hasErrBars = barIndices.some((i) => traces[i][errKey] && traces[i][errKey].array);
   const phase2StartOffset = BAR_ANIM_DURATION - PHASE_OVERLAP;
   const totalDuration = hasErrBars
     ? phase2StartOffset + ERR_ANIM_DURATION
     : BAR_ANIM_DURATION;
 
   let animStart = null;
-  let barsAtTarget = false;   // a frame has drawn the bars at e1 = 1
   function tick(t) {
     if (animId !== currentAnim) return;   // a newer render took over
+    if (!drivers || !drivers.isConnected()) {
+      drivers = buildBarAnimDrivers(chartEl, traces, barIndices, horizontal, vk, errKey, annotationsTarget, annAnim);
+      if (drivers) chartEl._cleanBarAnim = drivers.clean;
+    }
     if (animStart === null) animStart = t;
     const elapsed = t - animStart;
 
-    const p1 = Math.min(1, elapsed / BAR_ANIM_DURATION);
-    const e1 = easeOutCubic(p1);
-    const p2 = hasErrBars
-      ? Math.max(0, Math.min(1, (elapsed - phase2StartOffset) / ERR_ANIM_DURATION))
-      : 0;
-    const e2 = easeOutCubic(p2);
-
-    // Build a single trace update covering whichever phases are active.
-    // During the overlap, both `y` and `error_y.array` ride in the same call.
-    // Assumes errBarIdx === barIndices when both are active — true here, since
-    // each chart's bar traces either all carry error bars or none do.
-    const traceUpdate = {};
-    let traceIdx = null;
-    // Bars are written every frame until one has drawn them at e1 = 1, their
-    // exact targets — not only while elapsed ≤ BAR_ANIM_DURATION: a frame
-    // arriving late (a long task, a hidden tab) would otherwise leave them
-    // at the fraction the last on-time frame drew.
-    if (!barsAtTarget) {
-      traceUpdate[vk] = barYTargets.map((arr) => arr.map((v) => v == null ? null : v * e1));
-      traceIdx = barIndices;
-      barsAtTarget = p1 >= 1;
-    }
-    if (hasErrBars && elapsed >= phase2StartOffset) {
-      traceUpdate[errKey + ".array"] = errBarTargets.map(
-        (arr) => arr.map((v) => v == null ? 0 : v * e2));
-      if (hasErrMinus) {
-        traceUpdate[errKey + ".arrayminus"] = errBarMinusTargets.map(
-          (arr, j) => (arr || errBarTargets[j]).map((v) => v == null ? 0 : v * e2));
-      }
-      if (traceIdx === null) traceIdx = errBarIdx;
-    }
-
-    // Annotations — y = score*e1 + se*e2 tracks the (bar + error-bar) top.
-    let layoutUpdate = null;
-    if (annotationsTarget.length) {
-      const newAnnotations = annotationsTarget.map((a, i) => {
-        const meta = annAnim && annAnim[i];
-        let pos;
-        if (meta) pos = meta.score * e1 + meta.se * e2;
-        else pos = typeof a[vk] === "number" ? a[vk] * e1 : a[vk];
-        return Object.assign({}, a, { [vk]: pos, opacity: p1 });
-      });
-      layoutUpdate = { annotations: newAnnotations };
-    }
-
-    // One Plotly call per frame so Firefox does a single render pass.
-    const hasTrace = traceIdx !== null;
-    if (hasTrace && layoutUpdate) {
-      Plotly.update("chart", traceUpdate, layoutUpdate, traceIdx);
-    } else if (hasTrace) {
-      Plotly.restyle("chart", traceUpdate, traceIdx);
-    } else if (layoutUpdate) {
-      Plotly.relayout("chart", layoutUpdate);
-    }
-
     if (elapsed < totalDuration) {
+      if (drivers) {
+        const p1 = Math.min(1, elapsed / BAR_ANIM_DURATION);
+        const e1 = easeOutCubic(p1);
+        const p2 = hasErrBars
+          ? Math.max(0, Math.min(1, (elapsed - phase2StartOffset) / ERR_ANIM_DURATION))
+          : 0;
+        const e2 = easeOutCubic(p2);
+        lastP1 = p1; lastE1 = e1; lastE2 = e2;
+        drivers.apply(p1, e1, e2);
+      }
       requestAnimationFrame(tick);
     } else {
-      // Grow-up done. Capture the natural rects right now, while the
-      // bars are at their final geometry and (if the user happened to
-      // mouse over during the animation) any inline CSS gets cleared
-      // briefly inside the capture function. After this point the hover
-      // handler has a locked, correct cache.
+      // Grow-up done. Clear animation transforms so elements sit at their
+      // exact resting Plotly geometry, then capture natural rects for hover.
+      if (drivers) drivers.clean();
+      chartEl._cleanBarAnim = null;
       chartEl._barAnimating = false;
-      if (!horizontal) captureNaturalRects(chartEl);
+      if (!horizontal) {
+        captureNaturalRects(chartEl);
+        chartEl._barHoverRedrawn?.();
+      }
     }
   }
 
-  // Defer one frame so the y=0 start state is painted before we begin
-  // interpolating — without this, Firefox can skip the first paint and
-  // appear to jump straight to the target.
-  requestAnimationFrame(() => requestAnimationFrame(tick));
+  // Start interpolating on the next frame (the initial scale=0 state is
+  // already applied synchronously above so frame 0 paints cleanly).
+  requestAnimationFrame(tick);
 }
 
 // ─────────────────────────────────────────────────────────────

@@ -88,6 +88,7 @@ export function shotControl(onShot) {
   h.append(label, group, single);
   enhanceSegmentedControl(group);
   const buttons = new Map();
+  let shotFrame = 0;
   return {
     el: h,
     update(d) {
@@ -110,7 +111,12 @@ export function shotControl(onShot) {
         group.replaceChildren(...d.shots.map((sh) => {
           const b = el("button", "md-shot");
           b.type = "button";
-          b.addEventListener("click", () => { if (!b.classList.contains("active")) onShot(sh.shot); });
+          b.addEventListener("click", () => {
+            if (b.classList.contains("active")) return;
+            for (const [s, elBtn] of buttons) elBtn.classList.toggle("active", s === sh.shot);
+            cancelAnimationFrame(shotFrame);
+            shotFrame = requestAnimationFrame(() => { shotFrame = 0; onShot(sh.shot); });
+          });
           b.append(el("span", "md-shot-name", sh.shot + "-shot"), el("span", "md-shot-value"));
           buttons.set(sh.shot, b);
           return b;

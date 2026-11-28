@@ -172,12 +172,17 @@ export function onTaskCheckboxChange(render) {
  *  selection "Select all" switches to, or a function returning it (called
  *  before the selection changes, so it can depend on the current view). */
 export function bindTaskControls(render, { selectAll = "__all__" } = {}) {
+  let shotFrame = 0;
   document.querySelectorAll(".shot-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
+      if (btn.classList.contains("active")) return;
       document.querySelector(".shot-btn.active")?.classList.remove("active");
       btn.classList.add("active");
       state.currentShot = btn.dataset.shot;
-      render();
+      // Let the segmented thumb paint and start gliding on the GPU before
+      // running the chart redraw, coalescing rapid clicks.
+      cancelAnimationFrame(shotFrame);
+      shotFrame = requestAnimationFrame(() => { shotFrame = 0; render(); });
     });
   });
 

@@ -740,10 +740,7 @@ select.ui-select-native { display: none !important; }
   position: absolute;
   top: calc(-1 * var(--rail-step) - 1px);
   bottom: calc(-1 * var(--rail-step) - 1px);
-  left: calc(
-    var(--thumb-left, 0px) - var(--rail-step) - 1px
-    + var(--hover-on) * clamp(-4.5px, (var(--hover-left, 0px) - var(--thumb-left, 0px)) * 0.03, 4.5px)
-  );
+  left: calc(-1 * var(--rail-step) - 1px);
   width: calc(var(--thumb-width, 0px) + 2 * var(--rail-step) + 2px);
   border: 1px solid var(--control-border);
   border-radius: var(--control-radius);
@@ -751,25 +748,30 @@ select.ui-select-native { display: none !important; }
   box-shadow: var(--control-shadow);
   box-sizing: border-box;
   pointer-events: none;
-  transform: scale(1);
+  translate: calc(
+    var(--thumb-left, 0px)
+    + var(--hover-on) * clamp(-4.5px, (var(--hover-left, 0px) - var(--thumb-left, 0px)) * 0.03, 4.5px)
+  ) 0;
+  scale: 1;
+  will-change: translate, scale;
   z-index: 1;
 }
 .shot-toggle.segmented-hover::before {
   border-color: var(--control-border-hover);
-  transform: scale(1.04);
+  scale: 1.04;
   box-shadow: var(--control-shadow-hover);
 }
 @media (hover: hover) {
   .shot-toggle:hover::before {
     border-color: var(--control-border-hover);
-    transform: scale(1.04);
+    scale: 1.04;
     box-shadow: var(--control-shadow-hover);
   }
 }
 .shot-toggle.segmented-ready::before {
-  transition: left 0.22s var(--control-ease),
+  transition: translate 0.22s var(--control-ease),
               width 0.22s var(--control-ease),
-              transform 0.18s var(--control-ease),
+              scale 0.18s var(--control-ease),
               box-shadow 0.18s ease,
               border-color 0.15s;
 }
@@ -2065,7 +2067,7 @@ footer.dashboard-footer a:hover { color: var(--accent-hover); }
   .chart-title-details > summary::after { transition: none; }
   .shot-toggle.segmented-hover { --hover-on: 0; }
   .shot-toggle.segmented-hover::before,
-  .shot-toggle:hover::before,
+  .shot-toggle:hover::before { scale: 1; }
   .ui-select:hover, .small-btn:hover, .bar-pan-btn:hover,
   .variant-pill:hover, .model-chip:hover, .model-search:hover,
   .js-plotly-plot .plotly .modebar-btn:hover,

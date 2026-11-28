@@ -10,7 +10,7 @@
 import { state } from "./state.js";
 import {
   MODEL_COLORS,
-  getScore, getCombinedCI, scaleCIDistances, applyNorm,
+  resolvePoint, getScore, getCombinedCI, scaleCIDistances, applyNorm,
   getBaseMetric, aggregateScores, isAggregateSelection, isMacroSelection,
   getEffectiveMetric, formatTitleWithShot, capitalize, taskTitleDescription,
   wantCI, normNeedsAllValues, scoreDecimals, taskBaseMetric, scoreScaleText, getMetricYLabel, isRawScaleMetric,
@@ -908,14 +908,21 @@ function getModelLabel(modelDir) {
   return state.DATA.model_display_names?.[modelDir] || modelDir;
 }
 
+let fallbackColorCache = { data: null, map: new Map() };
 function getModelColor(modelDir) {
   const explicit = state.DATA.model_colors?.[modelDir];
   if (explicit) return explicit;
-  const assigned = new Set(Object.values(state.DATA.model_colors || {}));
-  const available = MODEL_COLORS.filter((c) => !assigned.has(c));
-  const unassigned = allModelIds().filter((m) => !state.DATA.model_colors?.[m]);
-  const idx = unassigned.indexOf(modelDir);
-  return available[idx % available.length] || MODEL_COLORS[idx % MODEL_COLORS.length];
+  if (fallbackColorCache.data !== state.DATA) {
+    const map = new Map();
+    const assigned = new Set(Object.values(state.DATA.model_colors || {}));
+    const available = MODEL_COLORS.filter((c) => !assigned.has(c));
+    const unassigned = allModelIds().filter((m) => !state.DATA.model_colors?.[m]);
+    unassigned.forEach((m, idx) => {
+      map.set(m, available[idx % available.length] || MODEL_COLORS[idx % MODEL_COLORS.length]);
+    });
+    fallbackColorCache = { data: state.DATA, map };
+  }
+  return fallbackColorCache.map.get(modelDir) || MODEL_COLORS[0];
 }
 
 function getModelOpenLabel(modelDir) {
@@ -961,30 +968,48 @@ function normCI(ci, bench, metric, allRaw) {
 /** Normalized display score + scaled CI for one model on one benchmark, or
  *  null when the model has no score. CI is null when CIs are off. */
 function modelScoreCI(m, bench, metric, allRaw) {
-  const raw = getScore(state.DATA.models, m, bench, state.currentShot, metric);
-  if (raw == null) return null;
-  const score = normScore(raw, bench, allRaw, metric);
-  const ci = wantCI()
-    ? normCI(getCombinedCI(state.DATA.models, m, bench, state.currentShot, metric), bench, metric, allRaw)
+  const pt = resolvePoint(state.DATA.models[m]?.[bench]?.[state.currentShot], bench, metric);
+  if (!pt || pt.value == null) return null;
+  const score = normScore(pt.value, bench, allRaw, metric);
+  const ci = wantCI() && state.currentPromptAgg !== "stdev" && pt.loDist != null && pt.hiDist != null
+    ? normCI({ loDist: pt.loDist, hiDist: pt.hiDist }, bench, metric, allRaw)
     : null;
   return { score, ci };
 }
 
 /** Aggregate {score, count, ci} for one model across state.checkedTasks,
- *  under the current macro/micro mode and normalization. */
-function aggregateModelResult(m, modelNames) {
+ *  under the current macro/micro mode and normalization. Pass precomputed
+ *  `allRawByBench` (Map) to avoid O(M² × T) recomputation across models. */
+function aggregateModelResult(m, modelNames, allRawByBench = null) {
   const needAll = normNeedsAllValues();
-  const useCI = wantCI();
+  const useCI = wantCI() && state.currentPromptAgg !== "stdev";
+  const modelData = state.DATA.models[m];
+  const shot = state.currentShot;
   return aggregateScores(state.checkedTasks, (bench) => {
-    const raw = getScore(state.DATA.models, m, bench, state.currentShot);
-    if (raw === undefined) return undefined;
-    const allRaw = needAll ? allRawScores(modelNames, bench) : null;
-    const score = normScore(raw, bench, allRaw);
-    const ci = useCI
-      ? normCI(getCombinedCI(state.DATA.models, m, bench, state.currentShot), bench, undefined, allRaw)
+    const pt = resolvePoint(modelData?.[bench]?.[shot], bench);
+    if (!pt || pt.value === undefined) return undefined;
+    const allRaw = needAll
+      ? (allRawByBench ? allRawByBench.get(bench) : allRawScores(modelNames, bench))
+      : null;
+    const score = normScore(pt.value, bench, allRaw);
+    const ci = useCI && pt.loDist != null && pt.hiDist != null
+      ? normCI({ loDist: pt.loDist, hiDist: pt.hiDist }, bench, undefined, allRaw)
       : undefined;
     return { score, ci };
   }, isMacroSelection());
+}
+
+/** Compute aggregateModelResult for every model in `modelNames` in O(M × T)
+ *  by precomputing per-benchmark raw reference sets once. */
+function aggregateModelResults(modelNames) {
+  let allRawByBench = null;
+  if (normNeedsAllValues()) {
+    allRawByBench = new Map();
+    for (const bench of state.checkedTasks) {
+      allRawByBench.set(bench, allRawScores(modelNames, bench));
+    }
+  }
+  return modelNames.map((m) => aggregateModelResult(m, modelNames, allRawByBench));
 }
 
 function isModelInSizeRange(modelDir) {
@@ -1129,6 +1154,7 @@ function orgBadge(org, color) {
 function buildModelPicker() {
   const root = document.getElementById("model-picker");
   if (!root) return;
+  lastModelPickerSig = "";
   root.replaceChildren();
   const bySize = (a, b) => modelSize(a) - modelSize(b) || getModelLabel(a).localeCompare(getModelLabel(b));
 
@@ -1225,11 +1251,21 @@ function buildModelPicker() {
   });
 }
 
+let lastModelPickerSig = "";
+
 /** Show the selection, the filters and the search in the model picker and
  *  its section header. */
 function syncModelPicker() {
   const root = document.getElementById("model-picker");
   if (!root) return;
+  const sig = [
+    sizeFilterOn ? 1 : 0, currentSizeMin, currentSizeMax,
+    fullyOpenOnly ? 1 : 0, showAllModels ? 1 : 0,
+    modelSearchWords.join("\0"),
+    [...checkedModels].sort().join(","),
+  ].join("|");
+  if (sig === lastModelPickerSig) return;
+  lastModelPickerSig = sig;
   const searching = modelSearchWords.length > 0;
   let outside = 0;
   for (const chip of root.querySelectorAll(".model-chip")) {
@@ -1574,16 +1610,19 @@ function barOrder() {
  *  can be clicked. */
 function bindModelDetailClicks(chartEl) {
   if (!chartEl) return;
-  chartEl.on("plotly_click", (data) => {
-    if (touchEcho(data.event) || drawnBarHits(chartEl)) return;   // (a mouse on columns: below)
-    const pt = data.points?.[0];
-    // (Columns only: a row's length is its score.)
-    if (pt?.data?.type === "bar" && pt.data.orientation !== "h") chartEl._barPop?.(pt.pointNumber);
-    openFromChart(pt?.customdata?.modelDir);
-  });
   const drag = () => chartEl.querySelector(".nsewdrag");
-  chartEl.on("plotly_hover", () => { if (FINE_POINTER.matches && !drawnBarHits(chartEl)) drag()?.classList.add("bar-clickable"); });
-  chartEl.on("plotly_unhover", () => { if (!drawnBarHits(chartEl)) drag()?.classList.remove("bar-clickable"); });
+  if (!chartEl._detailPlotlyBound && typeof chartEl.on === "function") {
+    chartEl._detailPlotlyBound = true;
+    chartEl.on("plotly_click", (data) => {
+      if (touchEcho(data.event) || drawnBarHits(chartEl)) return;   // (a mouse on columns: below)
+      const pt = data.points?.[0];
+      // (Columns only: a row's length is its score.)
+      if (pt?.data?.type === "bar" && pt.data.orientation !== "h") chartEl._barPop?.(pt.pointNumber);
+      openFromChart(pt?.customdata?.modelDir);
+    });
+    chartEl.on("plotly_hover", () => { if (FINE_POINTER.matches && !drawnBarHits(chartEl)) drag()?.classList.add("bar-clickable"); });
+    chartEl.on("plotly_unhover", () => { if (!drawnBarHits(chartEl)) drag()?.classList.remove("bar-clickable"); });
+  }
   // A mouse on columns: the bar drawn under the pointer is hovered (the
   // tooltip, the pointer cursor) …
   chartEl._onBarUnder = (col, ev) => {
@@ -2786,13 +2825,17 @@ function wrapRowLabels(labels, maxPx) {
  *  height-only resizes of a mobile browser's address bar). On touch
  *  screens a tooltip has no mouse to leave from, so a tap closes it. */
 function bindNarrowScreenListeners() {
-  window.matchMedia(PHONE_SCREEN).addEventListener("change", () => renderChart());
+  window.matchMedia(PHONE_SCREEN).addEventListener("change", () => {
+    setChartExtraHeight(0);
+    renderChart();
+  });
   let width = window.innerWidth, timer = null;
   window.addEventListener("resize", () => {
     clearTimeout(timer);
     timer = setTimeout(() => {
       if (window.innerWidth === width) return;
       width = window.innerWidth;
+      setChartExtraHeight(0);
       if (useHorizontalBars() || barPanChanges() || barNamesChange() || drawerBeside()
           || (sizeFilterOn && (width < 1340 || lastBarMarginL > BAR_MARGIN.l))) renderChart();
     }, 200);
@@ -2829,8 +2872,13 @@ function barPanChanges() {
   return getModelList().length * BAR_SLOT_MIN_PX > chart.clientWidth - BAR_MARGIN.l - BAR_MARGIN.r - barYLabelPx;
 }
 
+let chartExtraHeight = 0;
+let chartHeightMode = "base";   // "base" (CSS height + extra) | "explicit" (setChartHeight)
+
 function setChartHeight(px) {
   const el = document.getElementById("chart");
+  chartExtraHeight = 0;
+  chartHeightMode = px == null ? "base" : "explicit";
   if (el) el.style.height = px == null ? "" : px + "px";
 }
 
@@ -2871,12 +2919,25 @@ function rotatedLabelShift(angleDeg, slotPx) {
 /** Make the chart box `extra` px taller than the stylesheet's height (room
  *  for long model names below the bars) or, negative, shorter (bars without
  *  names), so the plot area keeps its size; 0 restores the stylesheet's
- *  height. */
-function setChartExtraHeight(extra) {
+ *  height. Avoids forced synchronous reflows when `extra` is unchanged. */
+function setChartExtraHeight(extra, baseHeight = null) {
   const el = document.getElementById("chart");
   if (!el) return;
-  el.style.height = "";
-  if (extra) el.style.height = el.clientHeight + extra + "px";
+  if (!extra) {
+    if (chartExtraHeight !== 0 || chartHeightMode !== "base" || el.style.height) el.style.height = "";
+    chartExtraHeight = 0;
+    chartHeightMode = "base";
+    return;
+  }
+  if (chartHeightMode === "base" && extra === chartExtraHeight && el.style.height) return;
+  let base = baseHeight;
+  if (base == null || chartHeightMode !== "base") {
+    el.style.height = "";
+    base = el.clientHeight;
+  }
+  chartExtraHeight = extra;
+  chartHeightMode = "base";
+  el.style.height = base + extra + "px";
 }
 
 let lastBarMarginL = 105;
@@ -2952,8 +3013,9 @@ function renderModelBars(modelNames, opts) {
   // The y-axis's ticks, as Plotly would place them on the plot's height
   // (which stays the stylesheet's chart height less the default margins,
   // whatever the names need: setChartExtraHeight), and their column.
-  setChartExtraHeight(0);
-  const yTicks = barYTicks(yRange, (chartEl?.clientHeight || 500) - BAR_MARGIN.t - BAR_MARGIN.b);
+  if (chartHeightMode !== "base") setChartExtraHeight(0);
+  const baseHeight = (chartEl?.clientHeight || 500) - chartExtraHeight;
+  const yTicks = barYTicks(yRange, baseHeight - BAR_MARGIN.t - BAR_MARGIN.b);
   barYLabelPx = Math.ceil(Math.max(0, ...measureLabels(yTicks.map((tk) => tk.text), Y_TICK_FONT.size, Y_TICK_FONT.weight))) + Y_LABEL_GAP_PX;
   const asClosed = closed ? barView(labels, closed.width, barNamesShown, barYLabelPx, null, chartLeft) : null;
   if (closed) setChartCut(asClosed.panning ? 0 : chartCovered());
@@ -2962,7 +3024,7 @@ function renderModelBars(modelNames, opts) {
   const view = barView(labels, chartWidth, barNamesShown, barYLabelPx, cut ? asClosed.slotPx : null, chartLeft, cut ? asClosed.margin.l : null);
   const { tickAngle, labelShift, margin, lead } = view;
   lastBarMarginL = margin.l;
-  setChartExtraHeight(margin.b - BAR_MARGIN.b);
+  setChartExtraHeight(margin.b - BAR_MARGIN.b, baseHeight);
   // (At the start, barViewStart stays -Infinity: the start of this layout,
   // whose lead may differ from the last one's.)
   const viewStart = view.panning ? Math.min(Math.max(-lead, barViewStart), labels.length - view.visible) : -Infinity;
@@ -3285,7 +3347,7 @@ function renderEmptyState(message) {
 
 function renderAggregateBarChart() {
   const modelNames = getModelList();
-  const results = modelNames.map((m) => aggregateModelResult(m, modelNames));
+  const results = aggregateModelResults(modelNames);
   renderModelBars(modelNames, {
     // A model without a score on any selected task gets no bar (not a 0).
     values: results.map((r) => r ? r.score : null),
@@ -3293,7 +3355,7 @@ function renderAggregateBarChart() {
     customdata: results.map((r, i) => ({
       count: r ? r.count : 0, ci: r ? r.ci : null, modelDir: modelNames[i],
     })),
-    yRange: computeAggregateYRange(),
+    yRange: barYRange(results),
   });
 }
 
@@ -3309,7 +3371,7 @@ function renderSingleBenchmarkBarChart(benchmark) {
     values: points.map((p) => p ? p.score : null),
     ciValues: wantCI() ? points.map((p) => p ? p.ci : null) : null,
     customdata: modelNames.map((m, i) => ({ ci: points[i]?.ci ?? null, modelDir: m })),
-    yRange: computeSingleYRange(benchmark, metric),
+    yRange: barYRange(points),
   });
 }
 
@@ -3321,9 +3383,11 @@ function renderSingleBenchmarkBarChart(benchmark) {
 
 function renderAggregateScatter() {
   const modelNames = getModelList();
+  const results = aggregateModelResults(modelNames);
+  const byModel = new Map(modelNames.map((m, i) => [m, results[i]]));
   const { xs, ys, dirs, colors, cis, extras } = collectScatterPoints(
-    modelNames, (m) => aggregateModelResult(m, modelNames));
-  plotScatter(xs, ys, dirs, colors, cis, computeAggregateYRange(), extras);
+    modelNames, (m) => byModel.get(m));
+  plotScatter(xs, ys, dirs, colors, cis, barYRange(results), extras);
 }
 
 function renderSingleBenchmarkScatter(benchmark) {
@@ -3333,9 +3397,11 @@ function renderSingleBenchmarkScatter(benchmark) {
   const allRaw = (state.currentNormalization !== "none")
     ? allRawScores(modelNames, benchmark, metric)
     : null;
+  const points = modelNames.map((m) => modelScoreCI(m, benchmark, metric, allRaw));
+  const byModel = new Map(modelNames.map((m, i) => [m, points[i]]));
   const { xs, ys, dirs, colors, cis, extras } = collectScatterPoints(
-    modelNames, (m) => modelScoreCI(m, benchmark, metric, allRaw));
-  plotScatter(xs, ys, dirs, colors, cis, computeSingleYRange(benchmark, metric), extras);
+    modelNames, (m) => byModel.get(m));
+  plotScatter(xs, ys, dirs, colors, cis, barYRange(points), extras);
 }
 
 /** Build a single-trace scatter chart: one marker per model, org logos
@@ -3422,17 +3488,6 @@ function barYRange(points) {
   if (!negative) return [lo, hi];
   const mn = Math.min(...bottoms);
   return [mn - Math.max((hi - mn) * 0.05, state.scoreTop * 0.005), hi];
-}
-
-function computeAggregateYRange() {
-  const modelNames = getModelList();
-  return barYRange(modelNames.map((m) => aggregateModelResult(m, modelNames)));
-}
-
-function computeSingleYRange(benchmark, metric) {
-  const modelNames = getModelList();
-  const raws = allRawScores(modelNames, benchmark, metric);
-  return barYRange(modelNames.map((m) => modelScoreCI(m, benchmark, metric, raws)));
 }
 
 // ─────────────────────────────────────────────────────────────

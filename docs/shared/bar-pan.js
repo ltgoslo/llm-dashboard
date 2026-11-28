@@ -74,8 +74,11 @@ export function setBarPan(chart, opts) {
   position();
   indicate();
   // Plotly redraws on a resize and on every pan: keep the overlays on the
-  // plot. (newPlot purged the previous listener.)
-  chart.on?.("plotly_afterplot", position);
+  // plot. Guard against stacking when plotChart uses Plotly.react.
+  if (!chart._barPanAfterplotBound && chart.on) {
+    chart._barPanAfterplotBound = true;
+    chart.on("plotly_afterplot", position);
+  }
 }
 
 /** Pan by `bars` (animated). */

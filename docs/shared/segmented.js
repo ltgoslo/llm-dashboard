@@ -25,6 +25,7 @@ export function enhanceSegmentedControl(group) {
     }
   }
 
+  let lastLeft = null, lastWidth = null;
   const place = () => {
     const buttons = group.querySelectorAll("button");
     let active = null;
@@ -34,8 +35,10 @@ export function enhanceSegmentedControl(group) {
       const pressed = String(isAct);
       if (b.getAttribute("aria-pressed") !== pressed) b.setAttribute("aria-pressed", pressed);
     }
-    group.style.setProperty("--thumb-left", `${active ? active.offsetLeft : 0}px`);
-    group.style.setProperty("--thumb-width", `${active ? active.offsetWidth : 0}px`);
+    const left = active ? active.offsetLeft : 0;
+    const width = active ? active.offsetWidth : 0;
+    if (left !== lastLeft) { lastLeft = left; group.style.setProperty("--thumb-left", `${left}px`); }
+    if (width !== lastWidth) { lastWidth = width; group.style.setProperty("--thumb-width", `${width}px`); }
   };
 
   // Hover tint (the track's ::after, see style.css): under the hovered or
@@ -44,11 +47,15 @@ export function enhanceSegmentedControl(group) {
   // (The class is only touched when it changes: even a no-op classList
   // add/remove rewrites the attribute, which the MutationObserver below
   // would see and re-run this, without end.)
+  let lastHoverBtn = null;
   const showHover = (btn) => {
     const show = !!btn && !btn.classList.contains("active");
-    if (show) {
+    if (show && btn !== lastHoverBtn) {
+      lastHoverBtn = btn;
       group.style.setProperty("--hover-left", `${btn.offsetLeft}px`);
       group.style.setProperty("--hover-width", `${btn.offsetWidth}px`);
+    } else if (!show) {
+      lastHoverBtn = null;
     }
     if (show !== group.classList.contains("segmented-hover")) {
       group.classList.toggle("segmented-hover", show);

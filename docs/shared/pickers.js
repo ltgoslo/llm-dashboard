@@ -500,6 +500,7 @@ export function buildTaskPicker({ onChange }) {
     }
     changed();
   });
+  lastTaskPickerSig = "";
   syncTaskPicker();
 }
 
@@ -508,10 +509,16 @@ function changed() {
   taskPickerChange?.();
 }
 
+let lastTaskPickerSig = "";
+
 /** Show state.checkedTasks in the task picker and its section header. */
 export function syncTaskPicker() {
   const root = document.getElementById("task-picker");
   if (!root) return;
+  const allKeys = Object.keys(state.metricsSetup);
+  const sig = allKeys.length + "|" + [...state.checkedTasks].sort().join(",");
+  if (sig === lastTaskPickerSig) return;
+  lastTaskPickerSig = sig;
   const on = (benches) => benches.filter((b) => state.checkedTasks.has(b)).length;
   for (const holder of root.querySelectorAll(".task-row, .task-cat")) {
     const benches = holder.dataset.benches.split(" ");
@@ -523,8 +530,8 @@ export function syncTaskPicker() {
   }
   const summary = document.getElementById("task-summary");
   if (summary) {
-    const total = Object.keys(state.metricsSetup).length;
-    const n = on(Object.keys(state.metricsSetup));
+    const total = allKeys.length;
+    const n = on(allKeys);
     summary.textContent = `${n} of ${total} selected`;
   }
 }

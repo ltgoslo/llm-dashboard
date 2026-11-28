@@ -220,20 +220,27 @@ function bindEventListeners() {
     setLanguage(btn.dataset.lang);
   });
 
+  let toggleFrame = 0;
+  const scheduleRender = () => {
+    cancelAnimationFrame(toggleFrame);
+    toggleFrame = requestAnimationFrame(() => { toggleFrame = 0; render(); });
+  };
   document.querySelectorAll(".shot-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
+      if (btn.classList.contains("active")) return;
       document.querySelector(".shot-btn.active")?.classList.remove("active");
       btn.classList.add("active");
       state.currentShot = btn.dataset.shot;
-      render();
+      scheduleRender();
     });
   });
   document.querySelectorAll(".ci-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
+      if (btn.classList.contains("active")) return;
       document.querySelector(".ci-btn.active")?.classList.remove("active");
       btn.classList.add("active");
       state.showCIBands = btn.dataset.ci === "1";
-      render();
+      scheduleRender();
     });
   });
 
